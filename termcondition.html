@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Terms & Conditions | PREMium Mind</title>
+  <link rel="icon" type="image/png" href="small-logo.png">
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #f9f9f9;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;  /* 👈 yaha add karna hai */
+  background: #ffffff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+
+    /* Terms Section */
+    .terms-section {
+      max-width: 900px;
+      margin: 100px auto 50px auto;
+      padding: 30px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .terms-section h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 28px;
+      color: #111;
+    }
+
+    .terms-section h2 {
+      margin-top: 25px;
+      font-size: 20px;
+      color: #0073e6;
+    }
+
+    .terms-section p {
+      line-height: 1.6;
+      margin: 12px 0;
+      font-size: 15px;
+    }
+
+    .terms-section ul {
+      margin: 12px 0 12px 20px;
+      font-size: 15px;
+    }
+
+    .terms-section ul li {
+      margin: 6px 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .terms-section {
+        margin: 40px 15px 30px 15px;
+        padding: 20px;
+      }
+      .terms-section h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ✅ Navbar -->
+<nav class="navbar">
+  <div class="logo-container">
+    <img src="small-logo.png" alt="PM Logo" class="logo-image" />
+    <div class="logo-text">PREMium Mind</div>
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="index.html">PREMium Store</a></li>
+    <!-- <li><a href="resume.html">Resume</a></li> -->
+    <li><a href="#help-form">Help</a></li>
+  </ul>
+
+  <div class="menu-btn" id="menu-btn">☰</div>
+</nav>
+
+<!-- Sidebar Menu -->
+<!-- Sidebar Menu -->
+<div class="sidebar" id="sidebar">
+  <h2>PREMium Mind</h2>
+  <ul>
+    <li><a href="index.html">🏠 Home</a></li>
+    <!-- <li><a href="resume.html">🛒 Resume</a></li> -->
+    <li><a href="#help-form">📞 Contact</a></li>
+    <li><a href="#help-form">❓ Help</a></li>
+    <li><a href="termcondition.html">⚙️ Terms & Privacy</a></li>
+  </ul>
+</div>
+<!-- Overlay -->
+<div class="overlay" id="overlay"></div>
+
+<!-- ✅ Terms Content -->
+<section class="terms-section">
+  <h1>Terms & Conditions</h1>
+
+  <p>Welcome to <strong>PREMium Mind</strong>. By accessing or using our website, you agree to comply with and be bound by the following terms and conditions. Please read them carefully before proceeding.</p>
+
+  <h2>1. Acceptance of Terms</h2>
+  <p>By using our services, you confirm that you accept these terms and agree to abide by them. If you do not agree, please refrain from using our website.</p>
+
+  <h2>2. Services</h2>
+  <p>We provide educational content, resume templates, and resources for students and professionals. All purchases are for personal use only and must not be resold without permission.</p>
+
+  <h2>3. Payments</h2>
+  <p>All payments are processed securely. Once purchased, digital products are delivered instantly and are non-refundable unless specified under our Refund Policy.</p>
+
+  <h2>4. Refund Policy</h2>
+  <p>Refunds are applicable only in cases of duplicate payment or technical error. Please contact our support team for assistance.</p>
+
+  <h2>5. User Responsibilities</h2>
+  <ul>
+    <li>Do not misuse or distribute our content without authorization.</li>
+    <li>Ensure that your provided information is accurate and up-to-date.</li>
+    <li>Comply with all applicable laws when using our services.</li>
+  </ul>
+
+  <h2>6. Changes to Terms</h2>
+  <p>We reserve the right to modify or update these terms at any time. Users are advised to check this page periodically for updates.</p>
+
+  <h2>7. Contact Us</h2>
+  <p>If you have any questions regarding these Terms & Conditions, please reach out via the Help or Contact section on our website.</p>
+</section>
+
+<!-- ✅ Sidebar Toggle Script -->
+<script>
+  const menuBtn = document.getElementById("menu-btn");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+
+  menuBtn.addEventListener("click", () => {
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
+  });
+
+  overlay.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+  });
+
+  document.querySelectorAll(".sidebar ul li a").forEach(link => {
+    link.addEventListener("click", () => {
+      sidebar.classList.remove("active");
+      overlay.classList.remove("active");
+    });
+  });
+</script>
+
+</body>
+</html>

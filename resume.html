@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>PREMium Mind</title>
+  <link rel="icon" type="image/png" href="small-logo.png">
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <style>
+    /* Responsive styling for mobile devices */
+    @media screen and (max-width: 600px) {
+      .card-container {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+      }
+      .course-card {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+      }
+      .navbar {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+      }
+      .footer-container {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+      }
+    }
+
+
+    /* Smooth scroll */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="logo-container">
+    <img src="small-logo.png" alt="PM Logo" class="logo-image" />
+    <div class="logo-text">PREMium Mind</div>
+  </div>
+
+  <!-- Normal Nav Links (Desktop ke liye) -->
+  <ul class="nav-links">
+    <li><a href="#">PREMium Store</a></li>
+    <li><a href="#">CONTACT US</a></li>
+    <li><a href="#help-form">HELP</a></li>
+  </ul>
+
+  <!-- Menu Button (Mobile ke liye) -->
+  <div class="menu-btn" id="menu-btn">☰</div>
+</nav>
+
+<!-- Sidebar Menu -->
+<div class="sidebar" id="sidebar">
+  <h2>PREMium Mind</h2>
+  <ul>
+    <li><a href="index.html">🏠 Home</a></li>
+    <li><a href="resume.html">🛒 Resume</a></li>
+    <li><a href="#help-form">📞 Contact</a></li>
+    <li><a href="#help-form">❓ Help</a></li>
+    <li><a href="termcondition.html">⚙️ Terms & Privacy</a></li>
+  </ul>
+</div>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay"></div>
+
+
+<!-- Main Section -->
+<section class="course-section">
+  <h1>EXPLORE OUR PREMium Mind STORE</h1>
+  <div class="card-container">
+      
+     <!-- Card Example -->
+<div class="course-card">
+  <img src="resume1.jpg" alt="Resume Template 1" />
+  <h2>Modern Resume Template</h2>
+  <p>🔥 Clean & Professional design for freshers and experienced</p>
+  <p class="price">₹99 <span>₹299</span></p>
+  <button class="order-btn" disabled>Coming Soon</button>
+</div>
+
+<div class="course-card">
+  <img src="resume1.png" alt="Resume Template 2" />
+  <h2>Creative Resume Template</h2>
+  <p>🚀 Eye-catching design to make you stand out</p>
+  <p class="price">₹99 <span>₹349</span></p>
+  <button class="order-btn" disabled>Coming Soon</button>
+</div>
+
+<div class="course-card">
+  <img src="resume1.png" alt="Resume Template 3" />
+  <h2>Professional Resume Template</h2>
+  <p>📘 Perfect for corporate & IT jobs</p>
+  <p class="price">₹99 <span>₹399</span></p>
+  <button class="order-btn" disabled>Coming Soon</button>
+</div>
+
+
+    </div>
+  </section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-container">
+    
+    <!-- Left: Logo & Contact -->
+    <div class="footer-left">
+      <div class="logo-box">
+        <img src="small-logo.png" alt="Premium Learnings Logo" class="logo" />
+      </div>
+    </div>
+
+    <!-- Middle: About Why -->
+    <div class="footer-links">
+      <div class="footer-column">
+        <h3>About Us</h3>
+        <p>
+          At <strong>PREMium Mind</strong>, we are committed to empowering students and freshers with job-ready skills through practical learning and expert-led courses.
+        </p>
+      </div>
+
+      <div class="footer-column">
+        <h3>Why Choose Us?</h3>
+        <p>
+          With personalized mentorship, project-based learning, and lifetime support, we ensure your career doesn't just start — it accelerates.
+        </p>
+      </div>
+      <div class="contact-info">
+        <div class="brand-text">
+          <h2>Premium Learnings</h2>
+          <p>Wisdom on Demand</p>
+        </div>
+        <div class="support-text">
+          <p><strong>Have doubts? Our support team will be happy to assist you!</strong></p>
+        </div>
+        <p><strong>Contact course counsellor</strong></p>
+        <ul style="list-style: none;">
+          <li>📞 +91 8102525609</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Right: Form -->
+    <div class="footer-form" id="help-form">
+      <form id="whForm">
+        <label>Full Name:
+          <input type="text" id="name" required placeholder="Enter Full Name"/>
+        </label>
+        <label>Phone Number:
+          <input type="tel" id="phone" pattern="[0-9]{10}" required placeholder="Enter Phone Number" />
+        </label>
+        <label>Report Problem:
+          <textarea id="message" rows="4" placeholder="Your message..." required></textarea>
+        </label>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+    <div style="text-align:center; margin-top:10px; font-size:14px; color:#555;">
+    &copy; 2025 PREMium Mind | 
+    <a href="privacy.html" style="color:#0073e6; text-decoration:none;">Privacy Policy</a>
+    </div>
+
+<script>
+document.getElementById("whForm").addEventListener("submit", function(e){
+  e.preventDefault(); // normal submit roko
+
+  const name = encodeURIComponent(document.getElementById("name").value);
+  const phone = encodeURIComponent(document.getElementById("phone").value);
+  const msg   = encodeURIComponent(document.getElementById("message").value);
+
+  // apna WhatsApp number (country code + number, bina +)
+  const owner = "918102525609";
+
+  // prefilled text
+  const text = `Name: ${name}%0APhone: ${phone}%0AMessage: ${msg}`;
+
+  // wa.me link banao
+  const url = `https://wa.me/${owner}?text=${text}`;
+
+  // redirect/open
+  window.open(url, "_blank"); // nayi tab me, _self same tab ke liye
+});
+
+  const menuBtn = document.getElementById("menu-btn");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+
+  // Open menu
+  menuBtn.addEventListener("click", () => {
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
+  });
+
+  // Close menu when clicking overlay
+  overlay.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+  });
+
+  // Close menu when clicking on any link
+  document.querySelectorAll(".sidebar ul li a").forEach(link => {
+    link.addEventListener("click", () => {
+      sidebar.classList.remove("active");
+      overlay.classList.remove("active");
+    });
+  });
+
+
+</script>
+
+  </div>
+</footer>
+
+</body>
+</html>

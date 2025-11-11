@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics MCQ Test - Premium Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 900px;
+            animation: slideIn 0.5s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .category {
+            display: inline-block;
+            background: linear-gradient(135deg, #000000 0%, #434343 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .question-counter {
+            font-size: 15px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #000000 0%, #434343 100%);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        .question-container {
+            margin: 35px 0;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 16px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: #000;
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #000000 0%, #434343 100%);
+            border-color: #000;
+            color: white;
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .option-label {
+            font-weight: 700;
+            margin-right: 15px;
+            min-width: 30px;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 12px;
+            margin-top: 35px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-prev {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-prev:hover:not(:disabled) {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-prev:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-next, .btn-submit {
+            background: linear-gradient(135deg, #000000 0%, #434343 100%);
+            color: white;
+        }
+
+        .btn-next:hover, .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+            font-size: 14px;
+            color: #999;
+        }
+
+        .status.answered {
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        .results {
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .results-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            animation: rotate 15s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .results-banner-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .results-icon {
+            font-size: 45px;
+            margin-bottom: 10px;
+            animation: bounce 1s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .results h1 {
+            font-size: 26px;
+            color: white;
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .results-subtitle {
+            font-size: 14px;
+            opacity: 0.95;
+            margin-bottom: 0;
+        }
+
+        .result-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 20px 15px;
+            border-radius: 12px;
+            border: 2px solid #f0f0f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .result-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .result-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            border-color: #667eea;
+        }
+
+        .result-card h3 {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .result-card .value {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .final-score {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 30px 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .final-score::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+        }
+
+        .final-score-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .final-score h2 {
+            font-size: 14px;
+            margin-bottom: 15px;
+            opacity: 0.8;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .final-score .score {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 10px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .final-score .percentage {
+            font-size: 24px;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px 20px;
+            }
+
+            .question {
+                font-size: 17px;
+            }
+
+            .results h1 {
+                font-size: 22px;
+            }
+
+            .result-cards {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            .result-card {
+                padding: 16px 12px;
+            }
+
+            .result-card h3 {
+                font-size: 10px;
+            }
+
+            .result-card .value {
+                font-size: 30px;
+            }
+
+            .final-score {
+                padding: 25px 20px;
+            }
+
+            .final-score .score {
+                font-size: 40px;
+            }
+
+            .final-score .percentage {
+                font-size: 20px;
+            }
+
+            .option {
+                padding: 14px 16px;
+            }
+
+            .btn-action {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app"></div>
+
+    <script>
+        // Get chapter from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const chapter = urlParams.get('chapter') || '1';
+
+        // ALL QUESTIONS ORGANIZED BY CHAPTER
+        const allQuestions = {
+            // CHAPTER 1: Units and Measurements
+            '1': [
+                { id: 1, category: "Ch 1: Units & Measurements", question: "The SI unit of luminous intensity is:", options: ["Candela", "Lumen", "Lux", "Watt"], correctAnswer: 0 },
+                { id: 2, category: "Ch 1: Units & Measurements", question: "Which is NOT a fundamental quantity?", options: ["Force", "Length", "Mass", "Time"], correctAnswer: 0 },
+                { id: 3, category: "Ch 1: Units & Measurements", question: "Dimensional formula of G (gravitational constant) is:", options: ["[M⁻¹L³T⁻²]", "[ML³T⁻²]", "[M⁻¹L²T⁻²]", "[ML²T⁻²]"], correctAnswer: 0 }
+            ],
+            
+            // CHAPTER 2: Motion in a Straight Line
+            '2': [
+                { id: 4, category: "Ch 2: Motion", question: "A body moving with constant velocity has:", options: ["Zero acceleration", "Constant acceleration", "Variable acceleration", "Infinite acceleration"], correctAnswer: 0 },
+                { id: 5, category: "Ch 2: Motion", question: "For a freely falling body, the velocity after 2 seconds is: (g=10 m/s²)", options: ["20 m/s", "10 m/s", "40 m/s", "5 m/s"], correctAnswer: 0 }
+            ],
+            
+            // CHAPTER 3: Laws of Motion
+            '3': [
+                { id: 6, category: "Ch 3: Laws of Motion", question: "Newton's first law is also known as:", options: ["Law of inertia", "Law of acceleration", "Law of momentum", "Law of force"], correctAnswer: 0 },
+                { id: 7, category: "Ch 3: Laws of Motion", question: "Force required to move a 5 kg body with 2 m/s² acceleration is:", options: ["10 N", "7 N", "2.5 N", "3 N"], correctAnswer: 0 },
+                { id: 8, category: "Ch 3: Laws of Motion", question: "Friction is a force that:", options: ["Opposes motion", "Aids motion", "Has no effect", "Creates motion"], correctAnswer: 0 }
+            ],
+            
+            // CHAPTER 4: Work, Power and Energy
+            '4': [
+                { id: 9, category: "Ch 4: Work & Energy", question: "Work done in lifting a 2 kg object to 5 m height is: (g=10 m/s²)", options: ["100 J", "50 J", "10 J", "20 J"], correctAnswer: 0 },
+                { id: 10, category: "Ch 4: Work & Energy", question: "SI unit of power is:", options: ["Watt", "Joule", "Newton", "Pascal"], correctAnswer: 0 }
+            ],
+            
+            // CHAPTER 5: Rotational Motion
+            '5': [
+                { id: 11, category: "Ch 5: Rotational Motion", question: "Angular momentum is conserved when:", options: ["No external torque acts", "External torque acts", "Force is applied", "Velocity changes"], correctAnswer: 0 },
+                { id: 12, category: "Ch 5: Rotational Motion", question: "SI unit of angular velocity is:", options: ["rad/s", "m/s", "rpm", "deg/s"], correctAnswer: 0 }
+            ],
+            
+            // CHAPTER 6: Thermodynamics
+            '6': [
+                { id: 13, category: "Ch 6: Thermodynamics", question: "First law of thermodynamics is based on:", options: ["Conservation of energy", "Conservation of mass", "Conservation of momentum", "Conservation of charge"], correctAnswer: 0 },
+                { id: 14, category: "Ch 6: Thermodynamics", question: "In an adiabatic process:", options: ["No heat exchange", "Constant temperature", "Constant pressure", "Constant volume"], correctAnswer: 0 },
+                { id: 15, category: "Ch 6: Thermodynamics", question: "Enthalpy is a measure of:", options: ["Total heat content", "Temperature only", "Pressure only", "Volume only"], correctAnswer: 0 }
+            ],
+            
+            // CHAPTER 7: Electrostatics
+            '7': [
+                { id: 16, category: "Ch 7: Electrostatics", question: "Coulomb's law gives force between:", options: ["Two charges", "Two masses", "Two currents", "Two magnets"], correctAnswer: 0 },
+                { id: 17, category: "Ch 7: Electrostatics", question: "Electric field intensity has SI unit:", options: ["N/C", "N·C", "J/C", "C/N"], correctAnswer: 0 }
+            ],
+            
+            // CHAPTER 8: Current Electricity
+            '8': [
+                { id: 18, category: "Ch 8: Current Electricity", question: "Ohm's law states V=IR, where R is:", options: ["Resistance", "Reactance", "Reluctance", "Resonance"], correctAnswer: 0 },
+                { id: 19, category: "Ch 8: Current Electricity", question: "SI unit of resistance is:", options: ["Ohm", "Ampere", "Volt", "Watt"], correctAnswer: 0 }
+            ],
+            
+            // CHAPTER 9: Magnetism
+            '9': [
+                { id: 20, category: "Ch 9: Magnetism", question: "Magnetic field lines always form:", options: ["Closed loops", "Open lines", "Straight lines", "Parallel lines"], correctAnswer: 0 },
+                { id: 21, category: "Ch 9: Magnetism", question: "SI unit of magnetic field is:", options: ["Tesla", "Weber", "Henry", "Gauss"], correctAnswer: 0 }
+            ],
+            
+            // CHAPTER 10: Electromagnetic Induction
+            '10': [
+                { id: 22, category: "Ch 10: EM Induction", question: "Faraday's law relates to:", options: ["Induced EMF", "Magnetic force", "Electric force", "Gravitational force"], correctAnswer: 0 },
+                { id: 23, category: "Ch 10: EM Induction", question: "Lenz's law gives direction of:", options: ["Induced current", "Magnetic field", "Electric field", "Force"], correctAnswer: 0 }
+            ],
+            
+            // CHAPTER 11: Ray Optics
+            '11': [
+                { id: 24, category: "Ch 11: Ray Optics", question: "Refractive index of diamond is 2.42. Speed of light in diamond is:", options: ["1.24×10⁸ m/s", "2.42×10⁸ m/s", "3×10⁸ m/s", "7.26×10⁸ m/s"], correctAnswer: 0 },
+                { id: 25, category: "Ch 11: Ray Optics", question: "Focal length of plane mirror is:", options: ["Infinity", "Zero", "10 cm", "Depends on object"], correctAnswer: 0 },
+                { id: 26, category: "Ch 11: Ray Optics", question: "Concave lens always forms image which is:", options: ["Virtual, erect, diminished", "Real, inverted, magnified", "Virtual, erect, magnified", "Real, erect, diminished"], correctAnswer: 0 }
+            ],
+            
+            // CHAPTER 12: Dual Nature of Radiation
+            '12': [
+                { id: 27, category: "Ch 12: Dual Nature", question: "Photoelectric effect proves:", options: ["Particle nature of light", "Wave nature of light", "Both particle and wave", "None"], correctAnswer: 0 },
+                { id: 28, category: "Ch 12: Dual Nature", question: "de Broglie wavelength is associated with:", options: ["Matter waves", "Light waves only", "Sound waves", "Water waves"], correctAnswer: 0 }
+            ]
+        };
+
+        // Get questions for current chapter
+        const questions = allQuestions[chapter] || allQuestions['1'];
+
+        let currentQuestion = 0;
+        let answers = {};
+        let showResults = false;
+
+        function render() {
+            const app = document.getElementById('app');
+            
+            if (showResults) {
+                app.innerHTML = renderResults();
+            } else {
+                app.innerHTML = renderQuestion();
+            }
+            
+            attachEventListeners();
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            const isLastQuestion = currentQuestion === questions.length - 1;
+            
+            return `
+                <div class="header">
+                    <div class="header-top">
+                        <div class="category">${q.category}</div>
+                        <div class="question-counter">Question ${currentQuestion + 1} / ${questions.length}</div>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: ${progress}%"></div>
+                    </div>
+                </div>
+
+                <div class="question-container">
+                    <div class="question">${q.question}</div>
+                    
+                    <div class="options">
+                        ${q.options.map((opt, idx) => `
+                            <div class="option ${answers[currentQuestion] === idx ? 'selected' : ''}" data-index="${idx}">
+                                <span class="option-label">${String.fromCharCode(65 + idx)}.</span>
+                                <span>${opt}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn btn-prev" id="prevBtn" ${currentQuestion === 0 ? 'disabled' : ''}>
+                        ← Previous
+                    </button>
+                    ${isLastQuestion ? 
+                        '<button class="btn btn-submit" id="submitBtn">✓ Submit Test</button>' :
+                        '<button class="btn btn-next" id="nextBtn">Next →</button>'
+                    }
+                </div>
+
+                <div class="status ${answers[currentQuestion] !== undefined ? 'answered' : ''}">
+                    ${answers[currentQuestion] !== undefined ? '✓ Answered' : 'Not Answered'}
+                </div>
+            `;
+        }
+
+        function renderResults() {
+            const results = calculateResults();
+            const percentage = ((results.correct / questions.length) * 100).toFixed(1);
+            const passStatus = percentage >= 50;
+            
+            return `
+                <div class="results">
+                    <div class="results-banner">
+                        <div class="results-banner-content">
+                            <div class="results-icon">${passStatus ? '🎉' : '💪'}</div>
+                            <h1>${passStatus ? 'Congratulations!' : 'Keep Practicing!'}</h1>
+                            <p class="results-subtitle">${passStatus ? 'You have successfully completed the test' : 'Practice makes perfect - Try again!'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="result-cards">
+                        <div class="result-card">
+                            <h3>✓ Correct</h3>
+                            <div class="value">${results.correct}</div>
+                        </div>
+                        <div class="result-card">
+                            <h3>✗ Wrong</h3>
+                            <div class="value">${results.wrong}</div>
+                        </div>
+                        <div class="result-card">
+                            <h3>⊘ Skipped</h3>
+                            <div class="value">${results.skipped}</div>
+                        </div>
+                    </div>
+
+                    <div class="final-score">
+                        <div class="final-score-content">
+                            <h2>Your Score</h2>
+                            <div class="score">${results.correct}/${questions.length}</div>
+                            <div class="percentage">${percentage}%</div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-action btn-secondary" id="backBtn">← Back to Chapters</button>
+                        <button class="btn-action btn-primary" id="retryBtn">↻ Retry Test</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateResults() {
+            let correct = 0, wrong = 0, skipped = 0;
+            
+            questions.forEach((q, idx) => {
+                if (answers[idx] === undefined) {
+                    skipped++;
+                } else if (answers[idx] === q.correctAnswer) {
+                    correct++;
+                } else {
+                    wrong++;
+                }
+            });
+            
+            return { correct, wrong, skipped };
+        }
+
+        function attachEventListeners() {
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => {
+                opt.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    answers[currentQuestion] = index;
+                    render();
+                });
+            });
+
+            const prevBtn = document.getElementById('prevBtn');
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    if (currentQuestion > 0) {
+                        currentQuestion--;
+                        render();
+                    }
+                });
+            }
+
+            const nextBtn = document.getElementById('nextBtn');
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    if (currentQuestion < questions.length - 1) {
+                        currentQuestion++;
+                        render();
+                    }
+                });
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.addEventListener('click', () => {
+                    showResults = true;
+                    render();
+                });
+            }
+
+            const backBtn = document.getElementById('backBtn');
+            if (backBtn) {
+                backBtn.addEventListener('click', () => {
+                    window.location.href = 'courses.html';
+                });
+            }
+
+            const retryBtn = document.getElementById('retryBtn');
+            if (retryBtn) {
+                retryBtn.addEventListener('click', () => {
+                    currentQuestion = 0;
+                    answers = {};
+                    showResults = false;
+                    render();
+                });
+            }
+        }
+
+        render();
+    </script>
+</body>
+</html>

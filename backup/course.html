@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>D2D PREMium Batch | Chapter Wise MCQ</title>
+  <link rel="icon" type="image/png" href="small-logo.png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="coursestyl.css">
+  
+</head>
+<body>
+
+<!-- Premium Sidebar -->
+<div class="premium-sidebar" id="premiumSidebar">
+  <div class="sidebar-profile">
+    <div class="profile-avatar">
+      <span>👤</span>
+    </div>
+    <div class="profile-details">
+      <p class="profile-greeting">Hi,</p>
+      <h3 class="profile-username">NAME</h3>
+      <a href="#" class="profile-link">View profile</a>
+    </div>
+  </div>
+
+  <div class="sidebar-menu">
+    <div class="menu-item-toggle">
+      <div class="toggle-left">
+        <span class="menu-icon">🌙</span>
+        <span class="menu-label">Dark Mode</span>
+      </div>
+      <div class="theme-switch" id="themeSwitch">
+        <div class="switch-thumb"></div>
+      </div>
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <a href="index.html" class="menu-item">
+      <span class="menu-icon">🏠</span>
+      <span class="menu-label">Home</span>
+    </a>
+
+    <a href="#" class="menu-item">
+      <span class="menu-icon">🛒</span>
+      <span class="menu-label">PM Store</span>
+    </a>
+
+    <a href="courses.html" class="menu-item">
+      <span class="menu-icon">📚</span>
+      <span class="menu-label">PREMium Courses</span>
+    </a>
+
+    <a href="#" class="menu-item">
+      <span class="menu-icon">🤝</span>
+      <span class="menu-label">Become Our Partner</span>
+    </a>
+
+    <div class="menu-divider"></div>
+
+    <a href="#" class="menu-item">
+      <span class="menu-icon">ℹ️</span>
+      <span class="menu-label">About Us</span>
+    </a>
+
+    <a href="#" class="menu-item">
+      <span class="menu-icon">📞</span>
+      <span class="menu-label">Contact Us</span>
+    </a>
+
+    <a href="termcondition.html" class="menu-item">
+      <span class="menu-icon">⚙️</span>
+      <span class="menu-label">Terms & Privacy</span>
+    </a>
+
+    <div class="menu-divider"></div>
+
+    <a href="#" class="menu-item logout">
+      <span class="menu-icon">🚪</span>
+      <span class="menu-label">Logout</span>
+    </a>
+  </div>
+</div>
+
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="logo-container">
+    <img src="small-logo.png" alt="PM Logo" class="logo-image" />
+    <div class="logo-text">PREMium Mind</div>
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="index.html">PREMium Store</a></li>
+    <li><a href="courses.html">PREMium Courses</a></li>
+    <li><a href="#help-form">CONTACT US</a></li>
+    <li><a href="#help-form">HELP</a></li>
+  </ul>
+  <div class="menu-btn" id="menu-btn">☰</div>
+</nav>
+
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Premium Header Section -->
+  <div class="premium-header">
+    <div class="badge-container">
+      <span class="premium-badge">🎓 PREMIUM</span>
+    </div>
+    <h1 class="main-title">D2D PREMium Batch</h1>
+    <p class="subtitle">Chapter Wise MCQ Practice - Master Every Concept</p>
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-number">30+</span>
+        <span class="stat-label">Chapters</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">5000+</span>
+        <span class="stat-label">Questions</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">3</span>
+        <span class="stat-label">Subjects</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subject Selection -->
+  <div class="section-title">
+    <span class="title-icon">📚</span>
+    Select Your Subject
+  </div>
+  
+  <div class="subject-selection">
+    <div class="subject-card physics active" onclick="showSubject('physics')">
+      <div class="subject-gradient"></div>
+      <div class="subject-content">
+        <div class="subject-icon">⚛️</div>
+        <div class="subject-text">
+          <div class="subject-name">PHYSICS</div>
+          <div class="subject-count">12 Chapters</div>
+        </div>
+      </div>
+      <div class="subject-arrow">→</div>
+    </div>
+
+    <div class="subject-card chemistry" onclick="showSubject('chemistry')">
+      <div class="subject-gradient"></div>
+      <div class="subject-content">
+        <div class="subject-icon">🔬</div>
+        <div class="subject-text">
+          <div class="subject-name">CHEMISTRY</div>
+          <div class="subject-count">12 Chapters</div>
+        </div>
+      </div>
+      <div class="subject-arrow">→</div>
+    </div>
+
+    <div class="subject-card math" onclick="showSubject('math')">
+      <div class="subject-gradient"></div>
+      <div class="subject-content">
+        <div class="subject-icon">📐</div>
+        <div class="subject-text">
+          <div class="subject-name">MATH</div>
+          <div class="subject-count">12 Chapters</div>
+        </div>
+      </div>
+      <div class="subject-arrow">→</div>
+    </div>
+  </div>
+
+  <!-- Physics Chapters -->
+  <div class="chapters-container active" id="physics-chapters">
+    <div class="chapters-header">
+      <h2>⚛️ Physics Chapters</h2>
+      <p>Complete coverage of Class 11 & 12 Physics</p>
+    </div>
+
+    <div class="chapters-grid">
+      <div class="premium-chapter-card physics" onclick="goToMCQ('physics', 1)">
+        <div class="chapter-header">
+          <span class="chapter-badge">Ch 1</span>
+          <span class="difficulty easy">Easy</span>
+        </div>
+        <h3 class="chapter-name">Units and Measurements</h3>
+        <p class="chapter-desc">Physical quantities, SI units, and dimensions</p>
+        <div class="chapter-stats">
+          <div class="stat"><span class="icon">📝</span><span>50 MCQs</span></div>
+          <div class="stat"><span class="icon">⏱️</span><span>45 min</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+      </div>
+
+      <div class="premium-chapter-card physics" onclick="goToMCQ('physics', 2)">
+        <div class="chapter-header">
+          <span class="chapter-badge">Ch 2</span>
+          <span class="difficulty easy">Easy</span>
+        </div>
+        <h3 class="chapter-name">Motion in a Straight Line</h3>
+        <p class="chapter-desc">Position, velocity, and acceleration</p>
+        <div class="chapter-stats">
+          <div class="stat"><span class="icon">📝</span><span>40 MCQs</span></div>
+          <div class="stat"><span class="icon">⏱️</span><span>40 min</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+      </div>
+
+      <div class="premium-chapter-card physics" onclick="goToMCQ('physics', 3)">
+        <div class="chapter-header">
+          <span class="chapter-badge">Ch 3</span>
+          <span class="difficulty medium">Medium</span>
+        </div>
+        <h3 class="chapter-name">Laws of Motion</h3>
+        <p class="chapter-desc">Newton's laws and friction concepts</p>
+        <div class="chapter-stats">
+          <div class="stat"><span class="icon">📝</span><span>55 MCQs</span></div>
+          <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+      </div>
+
+      <div class="premium-chapter-card physics" onclick="goToMCQ('physics', 4)">
+        <div class="chapter-header">
+          <span class="chapter-badge">Ch 4</span>
+          <span class="difficulty medium">Medium</span>
+        </div>
+        <h3 class="chapter-name">Work, Power and Energy</h3>
+        <p class="chapter-desc">Concepts of work, energy, and power</p>
+        <div class="chapter-stats">
+          <div class="stat"><span class="icon">📝</span><span>45 MCQs</span></div>
+          <div class="stat"><span class="icon">⏱️</span><span>40 min</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+      </div>
+
+      <div class="premium-chapter-card physics" onclick="goToMCQ('physics', 5)">
+        <div class="chapter-header">
+          <span class="chapter-badge">Ch 5</span>
+          <span class="difficulty medium">Medium</span>
+        </div>
+        <h3 class="chapter-name">Rotational Motion</h3>
+        <p class="chapter-desc">Torque, moment of inertia, and angular momentum</p>
+        <div class="chapter-stats">
+          <div class="stat"><span class="icon">📝</span><span>60 MCQs</span></div>
+          <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+      </div>
+
+      <div class="premium-chapter-card physics" onclick="goToMCQ('physics', 6)">
+        <div class="chapter-header">
+          <span class="chapter-badge">Ch 6</span>
+          <span class="difficulty hard">Hard</span>
+        </div>
+        <h3 class="chapter-name">Thermodynamics</h3>
+        <p class="chapter-desc">Laws of thermodynamics and heat transfer</p>
+        <div class="chapter-stats">
+          <div class="stat"><span class="icon">📝</span><span>50 MCQs</span></div>
+          <div class="stat"><span class="icon">⏱️</span><span>45 min</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+      </div>
+
+      <div class="premium-chapter-card physics" onclick="goToMCQ('physics', 7)">
+        <div class="chapter-header">
+          <span class="chapter-badge">Ch 7</span>
+          <span class="difficulty easy">Easy</span>
+        </div>
+        <h3 class="chapter-name">Electrostatics</h3>
+        <p class="chapter-desc">Electric charges and Coulomb's law</p>
+        <div class="chapter-stats">
+          <div class="stat"><span class="icon">📝</span><span>40 MCQs</span></div>
+          <div class="stat"><span class="icon">⏱️</span><span>35 min</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+      </div>
+
+      <div class="premium-chapter-card physics" onclick="goToMCQ('physics', 8)">
+        <div class="chapter-header">
+          <span class="chapter-badge">Ch 8</span>
+          <span class="difficulty medium">Medium</span>
+        </div>
+        <h3 class="chapter-name">Current Electricity</h3>
+        <p class="chapter-desc">Ohm's law, resistance, and circuits</p>
+        <div class="chapter-stats">
+          <div class="stat"><span class="icon">📝</span><span>45 MCQs</span></div>
+          <div class="stat"><span class="icon">⏱️</span><span>40 min</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+      </div>
+
+      <div class="premium-chapter-card physics" onclick="goToMCQ('physics', 9)">
+        <div class="chapter-header">
+          <span class="chapter-badge">Ch 9</span>
+          <span class="difficulty medium">Medium</span>
+        </div>
+        <h3 class="chapter-name">Magnetism and Matter</h3>
+        <p class="chapter-desc">Bar magnet and earth's magnetism</p>
+        <div class="chapter-stats">
+          <div class="stat"><span class="icon">📝</span><span>50 MCQs</span></div>
+          <div class="stat"><span class="icon">⏱️</span><span>45 min</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+      </div>
+
+      <div class="premium-chapter-card physics" onclick="goToMCQ('physics', 10)">
+        <div class="chapter-header">
+          <span class="chapter-badge">Ch 10</span>
+          <span class="difficulty medium">Medium</span>
+        </div>
+        <h3 class="chapter-name">Electromagnetic Induction</h3>
+        <p class="chapter-desc">Faraday's laws and Lenz's law</p>
+        <div class="chapter-stats">
+          <div class="stat"><span class="icon">📝</span><span>45 MCQs</span></div>
+          <div class="stat"><span class="icon">⏱️</span><span>40 min</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+      </div>
+
+      <div class="premium-chapter-card physics" onclick="goToMCQ('physics', 11)">
+        <div class="chapter-header">
+          <span class="chapter-badge">Ch 11</span>
+          <span class="difficulty hard">Hard</span>
+        </div>
+        <h3 class="chapter-name">Ray Optics</h3>
+        <p class="chapter-desc">Reflection and refraction of light</p>
+        <div class="chapter-stats">
+          <div class="stat"><span class="icon">📝</span><span>60 MCQs</span></div>
+          <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+      </div>
+
+      <div class="premium-chapter-card physics" onclick="goToMCQ('physics', 12)">
+        <div class="chapter-header">
+          <span class="chapter-badge">Ch 12</span>
+          <span class="difficulty hard">Hard</span>
+        </div>
+        <h3 class="chapter-name">Dual Nature of Radiation</h3>
+        <p class="chapter-desc">Photoelectric effect and de Broglie waves</p>
+        <div class="chapter-stats">
+          <div class="stat"><span class="icon">📝</span><span>55 MCQs</span></div>
+          <div class="stat"><span class="icon">⏱️</span><span>45 min</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+      </div>
+
+      <div class="premium-chapter-card physics" onclick="window.location.href='new page/mcq.html'">
+        <div class="chapter-header">
+          <span class="chapter-badge">Set 1</span>
+          <span class="difficulty medium">Medium</span>
+        </div>
+        <h3 class="chapter-name">Physics Practice</h3>
+        <p class="chapter-desc">50 Questions, 40 min</p>
+        <div class="chapter-stats">
+          <div class="stat"><span class="icon">📝</span><span>50 MCQs</span></div>
+          <div class="stat"><span class="icon">⏱️</span><span>40 min</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chemistry Chapters -->
+  <div class="chapters-container" id="chemistry-chapters">
+    <div class="chapters-header">
+      <h2>🔬 Chemistry Chapters</h2>
+      <p>Complete coverage of Class 11 & 12 Chemistry</p>
+    </div>
+
+    <div class="chapters-grid">
+
+
+  <!-- Ch 1 -->
+  <div class="premium-chapter-card chemistry" onclick="goToMCQ('chemistry', 1)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 1</span>
+      <span class="difficulty easy">Easy</span>
+    </div>
+    <h3 class="chapter-name">Basic Concepts</h3>
+    <p class="chapter-desc">Mole concept, stoichiometry</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>55 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>45 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 2 -->
+  <div class="premium-chapter-card chemistry" onclick="goToMCQ('chemistry', 2)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 2</span>
+      <span class="difficulty hard">Hard</span>
+    </div>
+    <h3 class="chapter-name">Structure of Atom</h3>
+    <p class="chapter-desc">Quantum numbers, orbitals</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>70 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>60 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 3 -->
+  <div class="premium-chapter-card chemistry" onclick="goToMCQ('chemistry', 3)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 3</span>
+      <span class="difficulty medium">Medium</span>
+    </div>
+    <h3 class="chapter-name">Chemical Bonding</h3>
+    <p class="chapter-desc">Ionic, covalent, VSEPR</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>65 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>55 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 4 -->
+  <div class="premium-chapter-card chemistry" onclick="goToMCQ('chemistry', 4)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 4</span>
+      <span class="difficulty medium">Medium</span>
+    </div>
+    <h3 class="chapter-name">States of Matter</h3>
+    <p class="chapter-desc">Gases, liquids, solids, phase changes</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>60 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 5 -->
+  <div class="premium-chapter-card chemistry" onclick="goToMCQ('chemistry', 5)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 5</span>
+      <span class="difficulty medium">Medium</span>
+    </div>
+    <h3 class="chapter-name">Thermodynamics</h3>
+    <p class="chapter-desc">Laws, enthalpy, entropy</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>60 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 6 -->
+  <div class="premium-chapter-card chemistry" onclick="goToMCQ('chemistry', 6)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 6</span>
+      <span class="difficulty hard">Hard</span>
+    </div>
+    <h3 class="chapter-name">Equilibrium</h3>
+    <p class="chapter-desc">Chemical equilibrium, Le Chatelier</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>70 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>60 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 7 -->
+  <div class="premium-chapter-card chemistry" onclick="goToMCQ('chemistry', 7)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 7</span>
+      <span class="difficulty medium">Medium</span>
+    </div>
+    <h3 class="chapter-name">Redox Reactions</h3>
+    <p class="chapter-desc">Oxidation, reduction, balancing</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>60 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 8 -->
+  <div class="premium-chapter-card chemistry" onclick="goToMCQ('chemistry', 8)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 8</span>
+      <span class="difficulty medium">Medium</span>
+    </div>
+    <h3 class="chapter-name">Electrochemistry</h3>
+    <p class="chapter-desc">Galvanic cells, Nernst equation</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>60 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 9 -->
+  <div class="premium-chapter-card chemistry" onclick="goToMCQ('chemistry', 9)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 9</span>
+      <span class="difficulty hard">Hard</span>
+    </div>
+    <h3 class="chapter-name">Chemical Kinetics</h3>
+    <p class="chapter-desc">Rate laws, reaction order</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>70 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>60 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 10 -->
+  <div class="premium-chapter-card chemistry" onclick="goToMCQ('chemistry', 10)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 10</span>
+      <span class="difficulty medium">Medium</span>
+    </div>
+    <h3 class="chapter-name">Surface Chemistry</h3>
+    <p class="chapter-desc">Adsorption, catalysis, colloids</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>60 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 11 -->
+  <div class="premium-chapter-card chemistry" onclick="goToMCQ('chemistry', 11)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 11</span>
+      <span class="difficulty medium">Medium</span>
+    </div>
+    <h3 class="chapter-name">Organic Chemistry Basics</h3>
+    <p class="chapter-desc">Hydrocarbons, functional groups</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>60 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 12 -->
+  <div class="premium-chapter-card chemistry" onclick="goToMCQ('chemistry', 12)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 12</span>
+      <span class="difficulty hard">Hard</span>
+    </div>
+    <h3 class="chapter-name">Organic Reactions</h3>
+    <p class="chapter-desc">Addition, substitution, elimination</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>70 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>60 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+    </div>
+  </div>
+
+  <!-- Math Chapters -->
+  <div class="chapters-container" id="math-chapters">
+    <div class="chapters-header">
+      <h2>📐 Mathematics Chapters</h2>
+      <p>Complete coverage of Class 11 & 12 Mathematics</p>
+    </div>
+
+    <div class="chapters-grid">
+
+
+  <!-- Ch 1 -->
+  <div class="premium-chapter-card math" onclick="goToMCQ('math', 1)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 1</span>
+      <span class="difficulty easy">Easy</span>
+    </div>
+    <h3 class="chapter-name">Sets & Functions</h3>
+    <p class="chapter-desc">Set theory, relations, functions</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>55 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>45 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 2 -->
+  <div class="premium-chapter-card math" onclick="goToMCQ('math', 2)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 2</span>
+      <span class="difficulty hard">Hard</span>
+    </div>
+    <h3 class="chapter-name">Trigonometry</h3>
+    <p class="chapter-desc">Identities, equations, inverse</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>70 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>60 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 3 -->
+  <div class="premium-chapter-card math" onclick="goToMCQ('math', 3)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 3</span>
+      <span class="difficulty medium">Medium</span>
+    </div>
+    <h3 class="chapter-name">Complex Numbers</h3>
+    <p class="chapter-desc">Imaginary numbers, Argand plane</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>60 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 4 -->
+  <div class="premium-chapter-card math" onclick="goToMCQ('math', 4)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 4</span>
+      <span class="difficulty medium">Medium</span>
+    </div>
+    <h3 class="chapter-name">Quadratic Equations</h3>
+    <p class="chapter-desc">Roots, factorization, discriminant</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>55 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>45 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 5 -->
+  <div class="premium-chapter-card math" onclick="goToMCQ('math', 5)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 5</span>
+      <span class="difficulty medium">Medium</span>
+    </div>
+    <h3 class="chapter-name">Sequences & Series</h3>
+    <p class="chapter-desc">Arithmetic, geometric progressions</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>60 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 6 -->
+  <div class="premium-chapter-card math" onclick="goToMCQ('math', 6)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 6</span>
+      <span class="difficulty hard">Hard</span>
+    </div>
+    <h3 class="chapter-name">Limits & Continuity</h3>
+    <p class="chapter-desc">Limit laws, continuity conditions</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>65 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>55 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 7 -->
+  <div class="premium-chapter-card math" onclick="goToMCQ('math', 7)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 7</span>
+      <span class="difficulty medium">Medium</span>
+    </div>
+    <h3 class="chapter-name">Differentiation</h3>
+    <p class="chapter-desc">Derivative rules, applications</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>60 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 8 -->
+  <div class="premium-chapter-card math" onclick="goToMCQ('math', 8)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 8</span>
+      <span class="difficulty medium">Medium</span>
+    </div>
+    <h3 class="chapter-name">Integration</h3>
+    <p class="chapter-desc">Definite & indefinite integrals</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>60 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 9 -->
+  <div class="premium-chapter-card math" onclick="goToMCQ('math', 9)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 9</span>
+      <span class="difficulty hard">Hard</span>
+    </div>
+    <h3 class="chapter-name">Differential Equations</h3>
+    <p class="chapter-desc">First & second order DEs</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>70 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>60 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 10 -->
+  <div class="premium-chapter-card math" onclick="goToMCQ('math', 10)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 10</span>
+      <span class="difficulty medium">Medium</span>
+    </div>
+    <h3 class="chapter-name">Probability</h3>
+    <p class="chapter-desc">Basic probability, distributions</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>60 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 11 -->
+  <div class="premium-chapter-card math" onclick="goToMCQ('math', 11)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 11</span>
+      <span class="difficulty medium">Medium</span>
+    </div>
+    <h3 class="chapter-name">Vectors & 3D Geometry</h3>
+    <p class="chapter-desc">Vector algebra, 3D lines & planes</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>60 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>50 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+  <!-- Ch 12 -->
+  <div class="premium-chapter-card math" onclick="goToMCQ('math', 12)">
+    <div class="chapter-header">
+      <span class="chapter-badge">Ch 12</span>
+      <span class="difficulty hard">Hard</span>
+    </div>
+    <h3 class="chapter-name">Linear Algebra</h3>
+    <p class="chapter-desc">Matrices, determinants, linear systems</p>
+    <div class="chapter-stats">
+      <div class="stat"><span class="icon">📝</span><span>70 MCQs</span></div>
+      <div class="stat"><span class="icon">⏱️</span><span>60 min</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
+  </div>
+
+
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const menuBtn = document.getElementById("menu-btn");
+  const sidebar = document.getElementById("premiumSidebar");
+  const overlay = document.getElementById("menuOverlay");
+  const themeSwitch = document.getElementById("themeSwitch");
+
+  menuBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("active");
+    overlay.classList.toggle("active");
+  });
+
+  overlay.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+  });
+
+  themeSwitch.addEventListener("click", function() {
+    this.classList.toggle("active");
+  });
+
+  function showSubject(subject) {
+    document.querySelectorAll('.subject-card').forEach(card => {
+      card.classList.remove('active');
+    });
+    document.querySelectorAll('.chapters-container').forEach(container => {
+      container.classList.remove('active');
+    });
+
+    event.target.closest('.subject-card').classList.add('active');
+    document.getElementById(subject + '-chapters').classList.add('active');
+  }
+
+  function goToMCQ(subject, chapter) {
+    alert(`Opening ${subject.toUpperCase()} - Chapter ${chapter} MCQ Practice`);
+  }
+</script>
+
+</body>
+</html>
