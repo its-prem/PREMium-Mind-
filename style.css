@@ -136,7 +136,7 @@ body {
   border-radius: 8px;
   transition: all 0.3s ease;
   width: 110px;
-  height: 30px;
+  height: 25px;
 }
 
 .course-card button.preview-btn:hover {
