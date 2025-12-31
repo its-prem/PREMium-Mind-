@@ -4,335 +4,353 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MCQ Test - Chapter Wise</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            background: #000;
+            color: #fff;
             min-height: 100vh;
-            padding: 20px;
+            padding: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-            pointer-events: none;
-            animation: shimmer 3s ease-in-out infinite;
-        }
-
-        @keyframes shimmer {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 35px;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            max-width: 480px;
             width: 100%;
-            max-width: 800px;
-            animation: slideIn 0.5s ease;
-            position: relative;
-            z-index: 1;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
+        /* Header */
         .header {
-            margin-bottom: 25px;
-            padding-bottom: 18px;
-            border-bottom: 2px solid #f0f0f0;
+            background: #1a1a1a;
+            padding: 10px 12px;
+            border-bottom: 1px solid #333;
         }
 
         .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
+            font-size: 11px;
         }
 
         .category {
-            display: inline-block;
-            background: linear-gradient(135deg, #000000 0%, #434343 100%);
-            color: white;
-            padding: 6px 16px;
-            border-radius: 6px;
-            font-size: 12px;
+            background: #2a2a2a;
+            padding: 4px 8px;
+            border-radius: 4px;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .question-counter {
-            font-size: 13px;
-            color: #666;
-            font-weight: 500;
+            background: #000;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #333;
+            font-weight: 600;
         }
 
         .progress-container {
-            width: 100%;
-            height: 5px;
-            background: #f0f0f0;
-            border-radius: 10px;
+            height: 4px;
+            background: #2a2a2a;
+            border-radius: 2px;
             overflow: hidden;
         }
 
         .progress-bar {
             height: 100%;
-            background: linear-gradient(135deg, #000000 0%, #434343 100%);
-            border-radius: 10px;
-            transition: width 0.4s ease;
+            background: #fff;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
         }
 
+        /* Question Container */
         .question-container {
-            margin: 28px 0;
-            animation: fadeIn 0.4s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            padding: 12px;
+            min-height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
         }
 
         .question {
-            font-size: 17px;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 12px;
             font-weight: 600;
-            color: #333;
-            line-height: 1.6;
-            margin-bottom: 24px;
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 3px solid #fff;
         }
 
+        /* Options */
         .options {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
+            flex: 1;
         }
 
         .option {
-            background: white;
-            border: 2px solid #e0e0e0;
-            padding: 13px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            color: #333;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 10px 12px;
             display: flex;
             align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option:active {
+            transform: scale(0.98);
         }
 
         .option:hover {
-            border-color: #000;
-            transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: #2a2a2a;
+            border-color: #555;
         }
 
         .option.selected {
-            background: linear-gradient(135deg, #000000 0%, #434343 100%);
-            border-color: #000;
-            color: white;
-            transform: scale(1.02);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: #fff;
+            color: #000;
+            border-color: #fff;
         }
 
         .option-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: #2a2a2a;
+            border-radius: 50%;
+            margin-right: 10px;
             font-weight: 700;
-            margin-right: 12px;
-            min-width: 25px;
+            font-size: 12px;
+            flex-shrink: 0;
         }
 
+        .option.selected .option-label {
+            background: #000;
+            color: #fff;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 13px;
+            line-height: 1.3;
+        }
+
+        /* Navigation */
         .navigation {
-            display: flex;
-            gap: 10px;
-            margin-top: 28px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+            padding: 10px 12px;
+            border-top: 1px solid #333;
+            background: #0a0a0a;
         }
 
         .btn {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 10px 8px;
+            border-radius: 6px;
+            font-size: 12px;
             font-weight: 600;
+            border: 1px solid #333;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+            background: #1a1a1a;
+            color: #fff;
         }
 
-        .btn-prev {
-            background: #f0f0f0;
-            color: #333;
+        .btn:active {
+            transform: scale(0.95);
         }
 
-        .btn-prev:hover:not(:disabled) {
-            background: #e0e0e0;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-prev:disabled {
-            opacity: 0.4;
+        .btn:disabled {
+            opacity: 0.3;
             cursor: not-allowed;
         }
 
-        .btn-next, .btn-submit, .btn-back {
-            background: linear-gradient(135deg, #000000 0%, #434343 100%);
-            color: white;
+        .btn-prev:hover:not(:disabled),
+        .btn-mark:hover,
+        .btn-next:hover:not(:disabled) {
+            background: #2a2a2a;
         }
 
-        .btn-next:hover, .btn-submit:hover, .btn-back:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        .btn-submit {
+            background: #fff;
+            color: #000;
+            grid-column: span 3;
         }
 
+        .btn-submit:hover:not(:disabled) {
+            background: #e0e0e0;
+        }
+
+        .btn-mark.marked {
+            background: #fff;
+            color: #000;
+        }
+
+        /* Status */
         .status {
-            text-align: center;
-            margin-top: 18px;
-            padding-top: 18px;
-            border-top: 2px solid #f0f0f0;
-            font-size: 13px;
-            color: #999;
-        }
-
-        .status.answered {
-            color: #22c55e;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
             font-weight: 600;
+            border-top: 1px solid #333;
+            background: #0a0a0a;
         }
 
+        .status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #666;
+            margin-right: 6px;
+        }
+
+        .status.answered::before {
+            background: #fff;
+        }
+
+        /* Results Page */
         .results {
+            padding: 20px 12px;
             text-align: center;
-            animation: fadeIn 0.5s ease;
         }
 
         .results h1 {
-            font-size: 32px;
-            color: #333;
-            margin-bottom: 30px;
-            font-weight: 700;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #fff;
         }
 
         .result-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 12px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
         }
 
         .result-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            border: 2px solid #f0f0f0;
-            transition: all 0.3s ease;
-        }
-
-        .result-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            border-color: #e0e0e0;
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 12px 8px;
+            border: 1px solid #333;
         }
 
         .result-card h3 {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 10px;
+            margin-bottom: 8px;
+            color: #999;
             font-weight: 600;
         }
 
         .result-card .value {
-            font-size: 36px;
-            font-weight: 700;
-            color: #333;
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
         }
 
         .final-score {
-            background: linear-gradient(135deg, #000000 0%, #434343 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
             margin: 20px 0;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid #333;
         }
 
         .final-score h2 {
+            font-size: 13px;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .score {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .percentage {
             font-size: 18px;
-            margin-bottom: 10px;
-            opacity: 0.9;
-            font-weight: 600;
-        }
-
-        .final-score .score {
-            font-size: 48px;
             font-weight: 700;
-            margin: 8px 0;
-        }
-
-        .final-score .percentage {
-            font-size: 24px;
-            opacity: 0.9;
+            color: #999;
         }
 
         .result-actions {
-            display: flex;
-            gap: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
             margin-top: 20px;
         }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px 16px;
-            }
+        .btn-restart,
+        .btn-review {
+            padding: 12px;
+            font-size: 13px;
+        }
 
+        .btn-restart {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-restart:hover {
+            background: #e0e0e0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 380px) {
             .question {
-                font-size: 15px;
+                font-size: 13px;
             }
+            
+            .option-text {
+                font-size: 12px;
+            }
+            
+            .btn {
+                font-size: 11px;
+                padding: 8px 6px;
+            }
+        }
 
-            .results h1 {
-                font-size: 24px;
-            }
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
 
-            .result-cards {
-                grid-template-columns: 1fr;
-            }
-
-            .option {
-                padding: 12px 14px;
-            }
+        .question-container {
+            animation: fadeIn 0.3s ease;
         }
     </style>
 </head>
@@ -340,337 +358,193 @@
     <div class="container" id="app"></div>
 
     <script>
-// =============== PHYSICS QUESTIONS (30) ===============
-const physicsQuestions = [
-    { id: 1, category: "UNITS & MEASUREMENTS", question: "Dimensional formula of [(G²M⁵)/(L²S)]^(1/3) where L=angular momentum, S=stress, G=gravitational constant, M=mass is:", options: ["[L]", "[T]", "[M]", "[LT⁻¹]"], correctAnswer: 2 },
-    { id: 2, category: "UNITS & MEASUREMENTS", question: "SI unit of plane angle is:", options: ["Radian", "Degree", "Steradian", "Dimensionless"], correctAnswer: 0 },
-    
-    { id: 3, category: "MECHANICS", question: "A bomb at rest explodes into two fragments of masses 1 kg and 3 kg. If 1 kg mass moves with velocity 12 m/s, velocity of 3 kg mass is:", options: ["4 m/s in opposite direction", "12 m/s in same direction", "36 m/s in opposite direction", "6 m/s in same direction"], correctAnswer: 0 },
-    { id: 4, category: "MECHANICS", question: "A body of mass 5 kg moving with velocity 10 m/s collides with another body at rest of mass 5 kg. After collision they move together. Final velocity is:", options: ["5 m/s", "10 m/s", "2.5 m/s", "7.5 m/s"], correctAnswer: 0 },
-    
-    { id: 5, category: "ANGULAR PULLEY", question: "Dimensional formula of angular momentum is:", options: ["[ML²T⁻¹]", "[MLT⁻¹]", "[ML²T⁻²]", "[MLT⁻²]"], correctAnswer: 0 },
-    { id: 6, category: "ANGULAR PULLEY", question: "Among Force and Weight, which pair has same dimensional formula?", options: ["Both have same dimensional formula", "Both have different dimensional formula", "Force has higher dimension", "Weight has higher dimension"], correctAnswer: 0 },
-    
-    { id: 7, category: "WORK & ENERGY", question: "A man of mass 60 kg is running with kinetic energy 1800 J. His speed is:", options: ["10 m/s", "5 m/s", "15 m/s", "20 m/s"], correctAnswer: 2 },
-    { id: 8, category: "WORK & ENERGY", question: "A cyclist moving with velocity 5 m/s comes to rest in 10 meters due to friction of 50 N. Work done by friction on road is:", options: ["0 J", "-500 J", "500 J", "250 J"], correctAnswer: 1 },
-    
-    { id: 9, category: "PROPERTIES OF MATTER", question: "The dimensional formula of G (gravitational constant) is:", options: ["[M⁻¹L³T⁻²]", "[ML³T⁻²]", "[M⁻¹L²T⁻²]", "[ML²T⁻²]"], correctAnswer: 0 },
-    { id: 10, category: "PROPERTIES OF MATTER", question: "Planck's constant and Angular momentum have:", options: ["Different dimensional formula", "Same dimensional formula", "No relation", "Planck constant is dimensionless"], correctAnswer: 1 },
-    
-    { id: 11, category: "SURFACE TENSION", question: "Which is NOT a fundamental quantity in SI system?", options: ["Force", "Length", "Mass", "Time"], correctAnswer: 0 },
-    { id: 12, category: "SURFACE TENSION", question: "Solid angle has SI unit but is:", options: ["Dimensionless", "Has dimensions [L²]", "Has dimensions [L⁻²]", "Has dimensions [L]"], correctAnswer: 0 },
-    
-    { id: 13, category: "VISCOSITY", question: "A 500 g ball moving at 20 m/s strikes a wall and bounces back at 15 m/s. Change in momentum is:", options: ["17.5 kg·m/s", "2.5 kg·m/s", "10 kg·m/s", "7.5 kg·m/s"], correctAnswer: 0 },
-    { id: 14, category: "VISCOSITY", question: "The value of acceleration due to gravity at height h above earth surface is g/4. The value of h is: (R = radius of earth)", options: ["R", "2R", "3R", "4R"], correctAnswer: 1 },
-    
-    { id: 15, category: "HEAT", question: "Which of the following is an intensive property?", options: ["Temperature", "Volume", "Mass", "Internal energy"], correctAnswer: 0 },
-    { id: 16, category: "HEAT", question: "Which of the following is an extensive property?", options: ["Enthalpy", "Pressure", "Density", "Refractive index"], correctAnswer: 0 },
-    
-    { id: 17, category: "SOUND & ACOUSTICS", question: "Among sphere, cube and thin plate of same mass and material heated to same temperature, which cools fastest?", options: ["Thin plate", "Sphere", "Cube", "All cool at same rate"], correctAnswer: 0 },
-    { id: 18, category: "SOUND & ACOUSTICS", question: "Rate of cooling depends on:", options: ["Surface area", "Volume only", "Mass only", "Temperature only"], correctAnswer: 3 },
-    
-    { id: 19, category: "PROPERTIES OF LIGHT", question: "Two plane mirrors are placed at an angle of 72° to each other. An object is placed between them. The number of images formed is:", options: ["4", "5", "6", "3"], correctAnswer: 1 },
-    { id: 20, category: "PROPERTIES OF LIGHT", question: "The refractive index of diamond is 2.42. The velocity of light in diamond will be: (c = 3×10⁸ m/s)", options: ["1.24×10⁸ m/s", "2.42×10⁸ m/s", "3×10⁸ m/s", "7.26×10⁸ m/s"], correctAnswer: 0 },
-    
-    { id: 21, category: "ELECTRIC FIELD & POTENTIAL", question: "When a charge moves in electric field, work done is converted into:", options: ["Kinetic energy", "Only potential energy", "Heat energy", "Light energy"], correctAnswer: 0 },
-    { id: 22, category: "ELECTRIC FIELD & POTENTIAL", question: "A polythene piece rubbed with wool acquires negative charge because:", options: ["Electrons transfer from wool to polythene", "Protons transfer from polythene to wool", "Electrons transfer from polythene to wool", "Neutrons transfer"], correctAnswer: 0 },
-    
-    { id: 23, category: "MODERN PHYSICS", question: "A photon has zero rest mass. Therefore:", options: ["It cannot be slowed down", "It can be stopped", "It has no momentum", "It has no energy"], correctAnswer: 0 },
-    { id: 24, category: "MODERN PHYSICS", question: "Speed of photon in vacuum is:", options: ["3×10⁸ m/s", "Variable", "Depends on frequency", "Depends on wavelength"], correctAnswer: 0 },
-    
-    { id: 25, category: "LASER & X-RAYS", question: "Gold nanoparticles in cancer treatment work by:", options: ["Targeting cancer cells specifically", "Increasing body temperature", "Producing radiation", "Destroying all cells"], correctAnswer: 0 },
-    { id: 26, category: "LASER & X-RAYS", question: "Silver nanoparticles scatter which color of visible light most effectively?", options: ["Green", "Red", "Blue", "Yellow"], correctAnswer: 2 },
-    
-    { id: 27, category: "NANOTECHNOLOGY", question: "Nanoparticles are particles of size range:", options: ["1-100 nm", "1-10 μm", "100-1000 nm", "1-10 mm"], correctAnswer: 0 },
-    { id: 28, category: "NANOTECHNOLOGY", question: "Gold nanoparticles are used in medical applications primarily for:", options: ["Cancer treatment", "Bone fracture healing", "Blood pressure control", "Diabetes treatment"], correctAnswer: 0 },
-    
-    { id: 29, category: "ENERGY SOURCES", question: "Primary constituent of natural gas is:", options: ["Methane", "Ethane", "Propane", "Butane"], correctAnswer: 0 },
-    { id: 30, category: "ENERGY SOURCES", question: "Biogas contains primarily:", options: ["Methane and CO₂", "Only methane", "Only CO₂", "Hydrogen and oxygen"], correctAnswer: 0 }
-];
+        // Questions data
+        const physicsQuestions = [
+            { id: 1, category: "UNITS", question: "Dimensional formula of [(G²M⁵)/(L²S)]^(1/3) where L=angular momentum, S=stress, G=gravitational constant, M=mass is:", options: ["[L]", "[T]", "[M]", "[LT⁻¹]"], correctAnswer: 2 },
+            { id: 2, category: "UNITS", question: "SI unit of plane angle is:", options: ["Radian", "Degree", "Steradian", "Dimensionless"], correctAnswer: 0 },
+            { id: 3, category: "MECHANICS", question: "A bomb at rest explodes into two fragments of masses 1 kg and 3 kg. If 1 kg mass moves with velocity 12 m/s, velocity of 3 kg mass is:", options: ["4 m/s opposite", "12 m/s same", "36 m/s opposite", "6 m/s same"], correctAnswer: 0 },
+            { id: 4, category: "MECHANICS", question: "A body of mass 5 kg moving with velocity 10 m/s collides with another body at rest of mass 5 kg. After collision they move together. Final velocity is:", options: ["5 m/s", "10 m/s", "2.5 m/s", "7.5 m/s"], correctAnswer: 0 },
+            { id: 5, category: "ANGULAR", question: "Dimensional formula of angular momentum is:", options: ["[ML²T⁻¹]", "[MLT⁻¹]", "[ML²T⁻²]", "[MLT⁻²]"], correctAnswer: 0 },
+        ];
 
-// =============== CHEMISTRY QUESTIONS (22) ===============
-const chemistryQuestions = [
-    { id: 31, category: "ATOMIC STRUCTURE", question: "Atomic number of an element represents:", options: ["Number of protons", "Number of neutrons", "Number of electrons only in neutral atom", "Mass number"], correctAnswer: 0 },
-    { id: 32, category: "ATOMIC STRUCTURE", question: "Ground state electronic configuration of Na (Z=11) is:", options: ["1s² 2s² 2p⁶ 3s¹", "1s² 2s² 2p⁶ 3p¹", "1s² 2s² 2p⁵ 3s¹", "1s² 2s² 2p⁶ 3s²"], correctAnswer: 0 },
+        const chemistryQuestions = [
+            { id: 31, category: "ATOMIC", question: "Atomic number of an element represents:", options: ["Number of protons", "Number of neutrons", "Electrons only", "Mass number"], correctAnswer: 0 },
+            { id: 32, category: "ATOMIC", question: "Ground state electronic configuration of Na (Z=11) is:", options: ["1s² 2s² 2p⁶ 3s¹", "1s² 2s² 2p⁶ 3p¹", "1s² 2s² 2p⁵ 3s¹", "1s² 2s² 2p⁶ 3s²"], correctAnswer: 0 },
+            { id: 33, category: "ELECTRO", question: "In an electrochemical cell cathode is where:", options: ["Reduction occurs", "Oxidation occurs", "Electrons produced", "Anode located"], correctAnswer: 0 },
+            { id: 34, category: "ELECTRO", question: "Standard hydrogen electrode potential is defined as:", options: ["0 V", "1 V", "-1 V", "0.5 V"], correctAnswer: 0 },
+            { id: 35, category: "WATER", question: "Hardness of water is mainly due to presence of:", options: ["Ca²⁺ and Mg²⁺", "Na⁺ and K⁺", "Cl⁻ and SO₄²⁻", "H⁺ and OH⁻"], correctAnswer: 0 },
+        ];
 
-    { id: 33, category: "ELECTRO CHEMISTRY", question: "In an electrochemical cell cathode is where:", options: ["Reduction occurs", "Oxidation occurs", "Electrons are produced", "Anode is located"], correctAnswer: 0 },
-    { id: 34, category: "ELECTRO CHEMISTRY", question: "Standard hydrogen electrode potential is defined as:", options: ["0 V", "1 V", "-1 V", "0.5 V"], correctAnswer: 0 },
+        const mathQuestions = [
+            { id: 53, category: "ALGEBRA", question: "If x + 1/x = 4, then x² + 1/x² = ?", options: ["14", "16", "6", "8"], correctAnswer: 0 },
+            { id: 54, category: "ALGEBRA", question: "Sum of roots of x² - 5x + 6 = 0 is:", options: ["5", "6", "-5", "-6"], correctAnswer: 0 },
+            { id: 55, category: "LOG", question: "log_a(a³) equals:", options: ["3", "1", "a", "0"], correctAnswer: 0 },
+            { id: 56, category: "LOG", question: "If log₁₀(x) = 2, then x = ?", options: ["100", "2", "10", "20"], correctAnswer: 0 },
+            { id: 57, category: "FRACTION", question: "Partial fraction: 1/[x(x+1)] equals:", options: ["1/x - 1/(x+1)", "1/x + 1/(x+1)", "1/(x+1) - 1/x", "x/(x+1)"], correctAnswer: 0 },
+        ];
 
-    { id: 35, category: "WATER", question: "Hardness of water is mainly due to presence of:", options: ["Ca²⁺ and Mg²⁺ ions", "Na⁺ and K⁺ ions", "Cl⁻ and SO₄²⁻ ions", "H⁺ and OH⁻ ions"], correctAnswer: 0 },
-    { id: 36, category: "WATER", question: "pH of pure water at 25°C is approximately:", options: ["7", "1", "14", "0"], correctAnswer: 0 },
+        const allQuestions = [...physicsQuestions, ...chemistryQuestions, ...mathQuestions];
 
-    { id: 37, category: "MATERIAL", question: "Which of the following is a thermosetting polymer?", options: ["Bakelite", "Polyethylene", "PVC", "Nylon"], correctAnswer: 0 },
-    { id: 38, category: "MATERIAL", question: "Crystal structure of NaCl (rocksalt) is:", options: ["Face centered cubic", "Body centered cubic", "Simple cubic", "Hexagonal close packed"], correctAnswer: 0 },
+        let currentQuestion = 0;
+        let answers = {};
+        let showResults = false;
+        let markedQuestions = new Set();
 
-    { id: 39, category: "ALLOYS", question: "Brass is an alloy of:", options: ["Copper and Zinc", "Copper and Tin", "Iron and Carbon", "Iron and Nickel"], correctAnswer: 0 },
-    { id: 40, category: "ALLOYS", question: "Stainless steel resists corrosion due to addition of:", options: ["Chromium", "Lead", "Zinc", "Copper"], correctAnswer: 0 },
-
-    { id: 41, category: "CORROSION", question: "Corrosion of metals is primarily an example of:", options: ["Oxidation reaction", "Reduction reaction", "Acid-base reaction", "Precipitation reaction"], correctAnswer: 0 },
-    { id: 42, category: "ATMOSPHERIC CORROSION", question: "Rate of atmospheric corrosion typically increases with:", options: ["Higher humidity", "Lower humidity", "Lower temperature only", "Decreased oxygen"], correctAnswer: 0 },
-
-    { id: 43, category: "ELECTRO-CHEMICAL CORROSION", question: "In galvanic corrosion the anodic metal:", options: ["Corrodes (is more active)", "Becomes protected", "Is the noble metal", "Becomes cathode"], correctAnswer: 0 },
-    { id: 44, category: "ELECTRO-CHEMICAL CORROSION", question: "Sacrificial protection of iron commonly uses which metal?", options: ["Zinc", "Copper", "Gold", "Silver"], correctAnswer: 0 },
-
-    { id: 45, category: "PAINT & VARNISHES", question: "Primary role of a primer coat in painting is:", options: ["Adhesion and corrosion protection", "Colour only", "Increase flammability", "Add scent"], correctAnswer: 0 },
-    { id: 46, category: "PAINT & VARNISHES", question: "Pigments in paints are used to provide:", options: ["Colour and opacity", "Viscosity control", "Hardness only", "Electrical conductivity"], correctAnswer: 0 },
-
-    { id: 47, category: "LUBRICANTS", question: "Main purpose of a lubricant is to reduce:", options: ["Friction between surfaces", "Temperature of the room", "Mass of machine", "Volume of oil"], correctAnswer: 0 },
-    { id: 48, category: "LUBRICANTS", question: "High viscosity in a lubricant helps to:", options: ["Maintain a load-carrying film between surfaces", "Increase wear", "Evaporate quickly", "Conduct electricity"], correctAnswer: 0 },
-
-    { id: 49, category: "NON-METALLIC MATERIALS", question: "Common glass is primarily made of:", options: ["Silicon dioxide (SiO₂)", "Calcium carbonate", "Aluminium oxide", "Iron oxide"], correctAnswer: 0 },
-    { id: 50, category: "NON-METALLIC MATERIALS", question: "Ceramics are typically:", options: ["Brittle and hard", "Ductile and soft", "Highly elastic", "Good electrical conductors"], correctAnswer: 0 },
-
-    { id: 51, category: "POLLUTION & ITS CONTROL", question: "A major primary pollutant from incomplete vehicle combustion is:", options: ["Carbon monoxide (CO)", "Ozone (O₃)", "Sulfuric acid", "CFCs"], correctAnswer: 0 },
-    { id: 52, category: "POLLUTION & ITS CONTROL", question: "Which process is mainly used to remove suspended solids by gravity in water treatment?", options: ["Sedimentation", "Chlorination", "Aeration", "Fluoridation"], correctAnswer: 0 }
-];
-
-// =============== MATH QUESTIONS (26) ===============
-const mathQuestions = [
-    { id: 53, category: "ALGEBRA", question: "If x + 1/x = 4, then x² + 1/x² = ?", options: ["14", "16", "6", "8"], correctAnswer: 0 },
-    { id: 54, category: "ALGEBRA", question: "Sum of roots of x² - 5x + 6 = 0 is:", options: ["5", "6", "-5", "-6"], correctAnswer: 0 },
-
-    { id: 55, category: "LOGARITHMS", question: "log_a(a³) equals:", options: ["3", "1", "a", "0"], correctAnswer: 0 },
-    { id: 56, category: "LOGARITHMS", question: "If log₁₀(x) = 2, then x = ?", options: ["100", "2", "10", "20"], correctAnswer: 0 },
-
-    { id: 57, category: "PARTIAL FRACTION", question: "Partial fraction decomposition: 1/[x(x+1)] equals:", options: ["1/x - 1/(x+1)", "1/x + 1/(x+1)", "1/(x+1) - 1/x", "x/(x+1)"], correctAnswer: 0 },
-    { id: 58, category: "PARTIAL FRACTION", question: "∫ 1/(x² - 1) dx using partial fractions gives:", options: ["(1/2) ln|(x-1)/(x+1)| + C", "ln|x²-1| + C", "arctanh x + C", "(1/2) ln|(x+1)/(x-1)| + C"], correctAnswer: 0 },
-
-    { id: 59, category: "DETERMINANT AND MATRICES", question: "Determinant of matrix [[1,2],[3,4]] is:", options: ["-2", "-5", "2", "5"], correctAnswer: 0 },
-    { id: 60, category: "DETERMINANT AND MATRICES", question: "Multiplying any 2×2 matrix A by identity I₂ gives:", options: ["A", "I₂", "Zero matrix", "Transpose of A"], correctAnswer: 0 },
-
-    { id: 61, category: "BINOMIAL THEOREM", question: "Coefficient of x² in (1 + x)⁵ is:", options: ["10", "5", "1", "15"], correctAnswer: 0 },
-    { id: 62, category: "BINOMIAL THEOREM", question: "Sum of coefficients in expansion of (1+x)ⁿ equals:", options: ["2ⁿ", "n", "n+1", "1"], correctAnswer: 0 },
-
-    { id: 63, category: "TRIGONOMETRY", question: "sin²θ + cos²θ equals:", options: ["1", "0", "sin2θ", "tanθ"], correctAnswer: 0 },
-    { id: 64, category: "INVERSE TRIGONOMETRY", question: "arcsin(1/2) equals (principal value):", options: ["π/6", "π/4", "π/3", "π/2"], correctAnswer: 0 },
-
-    { id: 65, category: "POINT AND DISTANCE", question: "Distance between (0,0) and (3,4) is:", options: ["5", "7", "1", "√13"], correctAnswer: 0 },
-    { id: 66, category: "POINT AND DISTANCE", question: "Midpoint of (2,3) and (4,7) is:", options: ["(3,5)", "(6,10)", "(1,2)", "(2,7)"], correctAnswer: 0 },
-
-    { id: 67, category: "STRAIGHT LINE", question: "Slope of line through (1,2) and (3,6) is:", options: ["2", "1", "0.5", "-2"], correctAnswer: 0 },
-    { id: 68, category: "STRAIGHT LINE", question: "In y = mx + c, 'm' denotes:", options: ["Slope", "Y-intercept", "X-intercept", "Constant"], correctAnswer: 0 },
-
-    { id: 69, category: "CIRCLE", question: "Equation of circle with centre (h,k) and radius r is:", options: ["(x-h)² + (y-k)² = r²", "x² + y² = r²", "x² + y² + 2gx + 2fy + c = 0", "x² + y² = 0"], correctAnswer: 0 },
-    { id: 70, category: "CIRCLE", question: "Radius of circle x² + y² = 25 is:", options: ["5", "25", "√5", "10"], correctAnswer: 0 },
-
-    { id: 71, category: "VECTOR", question: "Dot product of two perpendicular vectors equals:", options: ["0", "1", "-1", "Depends"], correctAnswer: 0 },
-    { id: 72, category: "VECTOR", question: "Magnitude of vector (3,4) is:", options: ["5", "7", "1", "25"], correctAnswer: 0 },
-
-    { id: 73, category: "FUNCTION", question: "A function is one-to-one when it is:", options: ["Injective", "Surjective", "Both", "Neither"], correctAnswer: 0 },
-    { id: 74, category: "FUNCTION", question: "f(x) = x² over all real numbers: is it injective?", options: ["No", "Yes", "Only for x ≥ 0", "Only for x ≤ 0"], correctAnswer: 0 },
-
-    { id: 75, category: "LIMIT", question: "lim(x→0) (sin x)/x =", options: ["1", "0", "∞", "-1"], correctAnswer: 0 },
-    { id: 76, category: "LIMIT", question: "lim(n→∞) (1 + 1/n)ⁿ =", options: ["e", "1", "0", "∞"], correctAnswer: 0 },
-
-    { id: 77, category: "DIFFERENTIATION", question: "Derivative of xⁿ (n constant) is:", options: ["n xⁿ⁻¹", "xⁿ", "n!", "0"], correctAnswer: 0 },
-    { id: 78, category: "DIFFERENTIATION", question: "Derivative of sin x is:", options: ["cos x", "sin x", "-sin x", "-cos x"], correctAnswer: 0 }
-];
-
-// =============== CHAPTER MAPPING ===============
-const chapterMap = {
-    // Physics Chapters (1-15)
-    '1': [0, 1],     '2': [2, 3],     '3': [4, 5],     '4': [6, 7],     '5': [8, 9],
-    '6': [10, 11],   '7': [12, 13],   '8': [14, 15],   '9': [16, 17],   '10': [18, 19],
-    '11': [20, 21],  '12': [22, 23],  '13': [24, 25],  '14': [26, 27],  '15': [28, 29]
-};
-
-// =============== COMBINE ALL QUESTIONS ===============
-const allQuestions = [...physicsQuestions, ...chemistryQuestions, ...mathQuestions];
-
-// =============== GET CHAPTER FROM URL ===============
-function getChapterFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('chapter');
-}
-
-// =============== FILTER QUESTIONS BY CHAPTER ===============
-const chapterNumber = getChapterFromURL();
-let questions = allQuestions;
-
-if (chapterNumber && chapterMap[chapterNumber]) {
-    const [startIdx, endIdx] = chapterMap[chapterNumber];
-    questions = allQuestions.slice(startIdx, endIdx + 1);
-}
-
-let currentQuestion = 0;
-let answers = {};
-let showResults = false;
-
-function render() {
-    const app = document.getElementById('app');
-    
-    if (showResults) {
-        app.innerHTML = renderResults();
-    } else {
-        app.innerHTML = renderQuestion();
-    }
-    
-    attachEventListeners();
-}
-
-function renderQuestion() {
-    const q = questions[currentQuestion];
-    const progress = ((currentQuestion + 1) / questions.length) * 100;
-    const isLastQuestion = currentQuestion === questions.length - 1;
-    
-    return `
-        <div class="header">
-            <div class="header-top">
-                <div class="category">${q.category}</div>
-                <div class="question-counter">Question ${currentQuestion + 1} / ${questions.length}</div>
-            </div>
-            <div class="progress-container">
-                <div class="progress-bar" style="width: ${progress}%"></div>
-            </div>
-        </div>
-
-        <div class="question-container">
-            <div class="question">${q.question}</div>
-            
-            <div class="options">
-                ${q.options.map((opt, idx) => `
-                    <div class="option ${answers[currentQuestion] === idx ? 'selected' : ''}" data-index="${idx}">
-                        <span class="option-label">${String.fromCharCode(65 + idx)}.</span>
-                        <span>${opt}</span>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-
-        <div class="navigation">
-            <button class="btn btn-prev" id="prevBtn" ${currentQuestion === 0 ? 'disabled' : ''}>
-                ← Previous
-            </button>
-            ${isLastQuestion ? 
-                '<button class="btn btn-submit" id="submitBtn">✓ Submit Test</button>' :
-                '<button class="btn btn-next" id="nextBtn">Next →</button>'
-            }
-        </div>
-
-        <div class="status ${answers[currentQuestion] !== undefined ? 'answered' : ''}">
-            ${answers[currentQuestion] !== undefined ? '✓ Answered' : 'Not Answered'}
-        </div>
-    `;
-}
-
-function renderResults() {
-    const results = calculateResults();
-    const percentage = ((results.correct / questions.length) * 100).toFixed(1);
-    
-    // Save progress to sessionStorage
-    if (chapterNumber) {
-        const progress = JSON.parse(sessionStorage.getItem('chapterProgress') || '{}');
-        progress[chapterNumber] = percentage;
-        sessionStorage.setItem('chapterProgress', JSON.stringify(progress));
-    }
-    
-    return `
-        <div class="results">
-            <h1>Test Results</h1>
-            
-            <div class="result-cards">
-                <div class="result-card">
-                    <h3>✓ Correct</h3>
-                    <div class="value">${results.correct}</div>
-                </div>
-                <div class="result-card">
-                    <h3>✗ Wrong</h3>
-                    <div class="value">${results.wrong}</div>
-                </div>
-                <div class="result-card">
-                    <h3>⊘ Skipped</h3>
-                    <div class="value">${results.skipped}</div>
-                </div>
-            </div>
-
-            <div class="final-score">
-                <h2>Final Score</h2>
-                <div class="score">${results.correct}/${questions.length}</div>
-                <div class="percentage">${percentage}%</div>
-            </div>
-
-            <div class="result-actions">
-                <button class="btn btn-submit" id="restartBtn">↻ Restart Test</button>
-                ${chapterNumber ? '<button class="btn btn-back" id="backBtn">← Back to Chapters</button>' : ''}
-            </div>
-        </div>
-    `;
-}
-
-function calculateResults() {
-    let correct = 0, wrong = 0, skipped = 0;
-    
-    questions.forEach((q, idx) => {
-        if (answers[idx] === undefined) {
-            skipped++;
-        } else if (answers[idx] === q.correctAnswer) {
-            correct++;
-        } else {
-            wrong++;
+        function render() {
+            const app = document.getElementById('app');
+            app.innerHTML = showResults ? renderResults() : renderQuestion();
+            attachEventListeners();
         }
-    });
-    
-    return { correct, wrong, skipped };
-}
 
-function attachEventListeners() {
-    const options = document.querySelectorAll('.option');
-    options.forEach(opt => {
-        opt.addEventListener('click', function() {
-            const index = parseInt(this.dataset.index);
-            answers[currentQuestion] = index;
-            render();
-        });
-    });
+        function renderQuestion() {
+            const q = allQuestions[currentQuestion];
+            const progress = ((currentQuestion + 1) / allQuestions.length) * 100;
+            const isLastQuestion = currentQuestion === allQuestions.length - 1;
+            const isMarked = markedQuestions.has(currentQuestion);
+            
+            return `
+                <div class="header">
+                    <div class="header-top">
+                        <div class="category">
+                            <i class="fas fa-bookmark"></i> ${q.category}
+                        </div>
+                        <div class="question-counter">
+                            ${currentQuestion + 1}/${allQuestions.length}
+                        </div>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: ${progress}%"></div>
+                    </div>
+                </div>
 
-    const prevBtn = document.getElementById('prevBtn');
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-            if (currentQuestion > 0) {
-                currentQuestion--;
+                <div class="question-container">
+                    <div class="question">${q.question}</div>
+                    
+                    <div class="options">
+                        ${q.options.map((opt, idx) => `
+                            <div class="option ${answers[currentQuestion] === idx ? 'selected' : ''}" data-index="${idx}">
+                                <span class="option-label">${String.fromCharCode(65 + idx)}</span>
+                                <span class="option-text">${opt}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn btn-prev" id="prevBtn" ${currentQuestion === 0 ? 'disabled' : ''}>
+                        <i class="fas fa-arrow-left"></i> Prev
+                    </button>
+                    
+                    <button class="btn btn-mark ${isMarked ? 'marked' : ''}" id="markBtn">
+                        <i class="fas fa-flag"></i> ${isMarked ? 'Mark' : 'Mark'}
+                    </button>
+                    
+                    ${isLastQuestion ? 
+                        `<button class="btn btn-submit" id="submitBtn">
+                            <i class="fas fa-check"></i> Submit
+                        </button>` :
+                        `<button class="btn btn-next" id="nextBtn">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>`
+                    }
+                </div>
+
+                <div class="status ${answers[currentQuestion] !== undefined ? 'answered' : ''}">
+                    ${answers[currentQuestion] !== undefined ? 'Answered' : 'Not Answered'}
+                    ${isMarked ? ' • Marked' : ''}
+                </div>
+            `;
+        }
+
+        function renderResults() {
+            const results = calculateResults();
+            const percentage = ((results.correct / allQuestions.length) * 100).toFixed(1);
+            
+            return `
+                <div class="results">
+                    <h1><i class="fas fa-chart-bar"></i> Test Results</h1>
+                    
+                    <div class="result-cards">
+                        <div class="result-card">
+                            <h3>CORRECT</h3>
+                            <div class="value">${results.correct}</div>
+                        </div>
+                        <div class="result-card">
+                            <h3>WRONG</h3>
+                            <div class="value">${results.wrong}</div>
+                        </div>
+                        <div class="result-card">
+                            <h3>SKIPPED</h3>
+                            <div class="value">${results.skipped}</div>
+                        </div>
+                    </div>
+
+                    <div class="final-score">
+                        <h2>${percentage >= 80 ? 'Excellent!' : percentage >= 60 ? 'Good Job!' : 'Keep Practicing'}</h2>
+                        <div class="score">${results.correct}/${allQuestions.length}</div>
+                        <div class="percentage">${percentage}%</div>
+                    </div>
+
+                    <div class="result-actions">
+                        <button class="btn btn-restart" id="restartBtn">
+                            <i class="fas fa-redo"></i> Restart
+                        </button>
+                        <button class="btn btn-review" id="reviewBtn">
+                            <i class="fas fa-eye"></i> Review
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateResults() {
+            let correct = 0, wrong = 0, skipped = 0;
+            allQuestions.forEach((q, idx) => {
+                if (answers[idx] === undefined) skipped++;
+                else if (answers[idx] === q.correctAnswer) correct++;
+                else wrong++;
+            });
+            return { correct, wrong, skipped };
+        }
+
+        function attachEventListeners() {
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => {
+                opt.addEventListener('click', function() {
+                    answers[currentQuestion] = parseInt(this.dataset.index);
+                    render();
+                });
+            });
+
+            document.getElementById('prevBtn')?.addEventListener('click', () => {
+                if (currentQuestion > 0) { currentQuestion--; render(); }
+            });
+
+            document.getElementById('nextBtn')?.addEventListener('click', () => {
+                if (currentQuestion < allQuestions.length - 1) { currentQuestion++; render(); }
+            });
+
+            document.getElementById('submitBtn')?.addEventListener('click', () => {
+                if (confirm('Submit test?')) { showResults = true; render(); }
+            });
+
+            document.getElementById('markBtn')?.addEventListener('click', () => {
+                markedQuestions.has(currentQuestion) ? markedQuestions.delete(currentQuestion) : markedQuestions.add(currentQuestion);
                 render();
-            }
-        });
-    }
+            });
 
-    const nextBtn = document.getElementById('nextBtn');
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
-            if (currentQuestion < questions.length - 1) {
-                currentQuestion++;
-                render();
-            }
-        });
-    }
+            document.getElementById('restartBtn')?.addEventListener('click', () => {
+                if (confirm('Restart test?')) {
+                    currentQuestion = 0; answers = {}; markedQuestions.clear(); showResults = false; render();
+                }
+            });
 
-    const submitBtn = document.getElementById('submitBtn');
-    if (submitBtn) {
-        submitBtn.addEventListener('click', () => {
-            showResults = true;
-            render();
-        });
-    }
+            document.getElementById('reviewBtn')?.addEventListener('click', () => {
+                alert('Review feature: See all questions with answers');
+            });
+        }
 
-    const restartBtn = document.getElementById('restartBtn');
-    if (restartBtn) {
-        restartBtn.addEventListener('click', () => {
-            currentQuestion = 0;
-            answers = {};
-            showResults = false;
-            render();
-        });
-    }
-
-    const backBtn = document.getElementById('backBtn');
-    if (backBtn) {
-        backBtn.addEventListener('click', () => {
-            window.location.href = 'courses.html';
-        });
-    }
-}
-
-// Initialize app
-render();
+        render();
     </script>
 </body>
 </html>

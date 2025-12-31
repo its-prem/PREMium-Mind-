@@ -42,7 +42,7 @@ html {
 .logo-image {
   width: 50px;
   height: auto;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .logo-text {
@@ -85,7 +85,7 @@ html {
   background: #000000;
   border: none;
   border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   z-index: 999;
   align-items: center;
@@ -95,7 +95,7 @@ html {
 
 .menu-toggle-btn:hover {
   background: #1a1a1a;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
   transform: translateY(-50%) scale(1.05);
 }
 
@@ -130,7 +130,7 @@ html {
   z-index: 1500;
   transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
-  box-shadow: -5px 0 25px rgba(0,0,0,0.5);
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.5);
 }
 
 .premium-sidebar.active {
@@ -138,8 +138,8 @@ html {
 }
 
 .sidebar-profile {
-  padding:18px 15px 5px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding: 18px 15px 5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
   display: flex;
   gap: 8px;
@@ -207,7 +207,7 @@ html {
 }
 
 .menu-item:hover {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
   border-left-color: #667eea;
   padding-left: 30px;
 }
@@ -229,13 +229,13 @@ html {
 }
 
 .menu-item.logout:hover {
-  background: rgba(255,107,107,0.15);
+  background: rgba(255, 107, 107, 0.15);
   border-left-color: #ff6b6b;
 }
 
 .menu-divider {
   height: 1px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   margin: 15px 25px;
 }
 
@@ -276,7 +276,7 @@ html {
   top: 2px;
   left: 2px;
   transition: left 0.3s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .theme-switch.active .switch-thumb {
@@ -289,7 +289,7 @@ html {
   left: 0;
   width: 100%;
   height: 100vh;
-  background: rgba(0,0,0,0.75);
+  background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(5px);
   z-index: 1000;
   display: none;
@@ -308,12 +308,12 @@ html {
 }
 
 .premium-sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 3px;
 }
 
 .premium-sidebar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* ========== MAIN CONTENT ========== */
@@ -342,13 +342,18 @@ html {
   right: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
   animation: rotate 20s linear infinite;
 }
 
 @keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .badge-container {
@@ -359,21 +364,21 @@ html {
 
 .premium-badge {
   display: inline-block;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
   padding: 8px 20px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 1px;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .main-title {
   font-size: 42px;
   font-weight: 700;
   margin-bottom: 10px;
-  text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
   position: relative;
   z-index: 1;
 }
@@ -438,7 +443,7 @@ html {
   background: #fff;
   padding: 0;
   border-radius: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -479,7 +484,7 @@ html {
 
 .subject-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
 }
 
 .subject-card:hover .subject-gradient {
@@ -577,6 +582,7 @@ html {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -609,7 +615,7 @@ html {
   background: #fff;
   padding: 20px;
   border-radius: 15px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid transparent;
@@ -629,7 +635,7 @@ html {
 
 .premium-chapter-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 }
 
 .premium-chapter-card:hover::before {

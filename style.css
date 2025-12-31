@@ -207,41 +207,79 @@ body {
 }
 
 /* ===== Footer Section ===== */
+/* ===== Footer Section ===== */
 .footer {
   background-color: #000;
   color: white;
-  padding: 50px 30px;
+  padding: 50px 30px 20px 30px; /* Thoda bottom padding kam kiya */
 }
 
+/* Container for 3 Columns */
 .footer-container {
   display: flex;
+  justify-content: space-between; /* Teeno parts me barabar gap */
+  align-items: flex-start; /* Top se align */
   flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 40px;
+  gap: 30px;
   max-width: 1300px;
   margin: 0 auto;
+  border-bottom: 1px solid #333; /* Line separator copyright ke upar */
+  padding-bottom: 40px;
 }
 
-.footer-left,
-.footer-links,
-.footer-form {
-  flex: 1 1 300px;
-}
+/* ===== Column widths ===== */
 
-.footer-links {
+/* Part 1: Logo (Left) */
+.logo-part {
+  flex: 1;
   display: flex;
-  flex-direction: column;
-  gap: 30px;
-  line-height: 22px;
+  justify-content: center; /* Logo center me */
+  align-items: flex-start;
+  min-width: 200px;
+}
+
+.logo-part .logo {
+  
+  height: auto;
+}
+
+/* Part 2: Text (Middle) */
+.text-part {
+  flex: 2; /* Beech wala hissa thoda chauda */
+  min-width: 300px;
+  padding: 0 20px;
+}
+
+.text-part h3 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  margin-top: 20px;
+  color: #fff;
+}
+/* Pehle heading ka margin top hataya */
+.text-part .footer-column:first-child h3 {
+  margin-top: 0;
+}
+
+.text-part p, .text-part li {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #ccc;
+  margin-bottom: 15px;
+}
+
+/* Part 3: Form (Right) - Original Styling Preserved */
+.form-part {
+  flex: 1.5; /* Form thoda chauda taaki fit ho */
+  min-width: 300px;
 }
 
 .footer-form form {
   margin: 0;
   padding: 25px;
-  background-color: #111;
+  background-color: #111; /* Original dark grey background */
   border-radius: 14px;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.08); /* Original shadow */
 }
 
 .footer-form form label {
@@ -257,10 +295,11 @@ body {
   padding: 10px 15px;
   margin-top: 6px;
   margin-bottom: 15px;
-  border: 1px solid #444;
+  border: 1px solid #444; /* Original border color */
   border-radius: 8px;
-  background-color: #1a1a1a;
+  background-color: #1a1a1a; /* Original input background */
   color: white;
+  font-family: inherit;
 }
 
 .footer-form textarea {
@@ -285,6 +324,40 @@ body {
 .footer-form button:hover {
   background-color: #f1f1f1;
   box-shadow: 0 0 14px rgba(255, 255, 255, 0.3);
+}
+
+/* ===== Copyright Section (Bottom) ===== */
+.footer-bottom {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #fff;
+  width: 100%;
+}
+
+.footer-bottom a {
+  color: #0073e6;
+  text-decoration: none;
+  margin-left: 5px;
+}
+
+/* ===== Responsive (Mobile) ===== */
+@media (max-width: 900px) {
+  .footer-container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .logo-part, .text-part, .form-part {
+    width: 100%;
+    padding: 0;
+    margin-bottom: 30px;
+  }
+  
+  .logo-part {
+    margin-bottom: 10px;
+  }
 }
 
 /* ===== Mobile Menu Button ===== */

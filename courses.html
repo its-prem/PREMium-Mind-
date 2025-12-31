@@ -1,932 +1,1102 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>D2D PREMium Batch | Chapter Wise MCQ</title>
   <link rel="icon" type="image/png" href="small-logo.png">
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;600;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="coursestyl.css">
 </head>
+
 <body>
 
-<!-- Premium Sidebar -->
-<div class="premium-sidebar" id="premiumSidebar">
-  <div class="sidebar-profile">
-    <div class="profile-avatar">
-      <span>👤</span>
-    </div>
-    <div class="profile-details">
-      <p class="profile-greeting">Hi,</p>
-      <h3 class="profile-username">NAME</h3>
-      <a href="#" class="profile-link">View profile</a>
-    </div>
-  </div>
-
-  <div class="sidebar-menu">
-    <div class="menu-item-toggle">
-      <div class="toggle-left">
-        <span class="menu-icon">🌙</span>
-        <span class="menu-label">Dark Mode</span>
-      </div>
-      <div class="theme-switch" id="themeSwitch">
-        <div class="switch-thumb"></div>
-      </div>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo-container">
+      <img src="small-logo.png" alt="PM Logo" class="logo-image" />
+      <div class="logo-text">PREMium Minds</div>
     </div>
 
-    <div class="menu-divider"></div>
+    <!-- Normal Nav Links (Desktop ke liye) -->
+    <ul class="nav-links">
+      <li><a href="index.html">PREMium Store</a></li>
+      <li><a href="courses.html" class="protected-route" id="coursesLinkNav">PREMium Courses</a></li>
+      <li><a href="#help-form">CONTACT US</a></li>
+      <li><a href="#help-form">HELP</a></li>
+    </ul>
+    <div class="menu-btn" id="menu-btn">☰</div>
+  </nav>
 
-    <a href="index.html" class="menu-item">
-      <span class="menu-icon">🏠</span>
-      <span class="menu-label">Home</span>
-    </a>
-
-    <a href="#" class="menu-item">
-      <span class="menu-icon">🛒</span>
-      <span class="menu-label">PM Store</span>
-    </a>
-
-    <a href="courses.html" class="menu-item">
-      <span class="menu-icon">📚</span>
-      <span class="menu-label">PREMium Courses</span>
-    </a>
-
-    <a href="#" class="menu-item">
-      <span class="menu-icon">🤝</span>
-      <span class="menu-label">Become Our Partner</span>
-    </a>
-
-    <div class="menu-divider"></div>
-
-    <a href="#" class="menu-item">
-      <span class="menu-icon">ℹ️</span>
-      <span class="menu-label">About Us</span>
-    </a>
-
-    <a href="#" class="menu-item">
-      <span class="menu-icon">📞</span>
-      <span class="menu-label">Contact Us</span>
-    </a>
-
-    <a href="termcondition.html" class="menu-item">
-      <span class="menu-icon">⚙️</span>
-      <span class="menu-label">Terms & Privacy</span>
-    </a>
-
-    <div class="menu-divider"></div>
-
-    <a href="#" class="menu-item logout">
-      <span class="menu-icon">🚪</span>
-      <span class="menu-label">Logout</span>
-    </a>
-  </div>
-</div>
-
-<div class="menu-overlay" id="menuOverlay"></div>
-
-<!-- Navbar -->
-<nav class="navbar">
-  <div class="logo-container">
-    <img src="small-logo.png" alt="PM Logo" class="logo-image" />
-    <div class="logo-text">PREMium Mind</div>
-  </div>
-
-  <ul class="nav-links">
-    <li><a href="index.html">PREMium Store</a></li>
-    <li><a href="courses.html">PREMium Courses</a></li>
-    <li><a href="#help-form">CONTACT US</a></li>
-    <li><a href="#help-form">HELP</a></li>
-  </ul>
-  <div class="menu-btn" id="menu-btn">☰</div>
-</nav>
-
-<!-- Main Content -->
-<div class="main-content">
-  <!-- Premium Header Section -->
-  <div class="premium-header">
-    <div class="badge-container">
-      <span class="premium-badge">🎓 PREMIUM</span>
+  <!-- Sidebar Menu -->
+  <div class="sidebar" id="sidebar">
+    <!-- User Profile Section (Shows when logged in) -->
+    <div class="user-profile" id="userProfile" style="display: none;">
+      <div class="profile-photo-container">
+        <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile"
+          class="profile-photo" id="profilePhoto" onclick="document.getElementById('photo-input').click()">
+        <button class="change-photo-btn" onclick="document.getElementById('photo-input').click()">📷</button>
+      </div>
+      <input type="file" id="photo-input" accept="image/*">
+      <div class="user-name" id="userName">User Name</div>
+      <div class="user-email" id="userEmail">user@example.com</div>
+      <button class="logout-btn-sidebar" onclick="handleLogout()">Logout</button>
     </div>
-    <h1 class="main-title">D2D PREMium Batch</h1>
-    <p class="subtitle">Chapter Wise MCQ Practice - Master Every Concept</p>
-    <div class="stats-row">
-      <div class="stat-item">
-        <span class="stat-number">30+</span>
-        <span class="stat-label">Chapters</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">6000+</span>
-        <span class="stat-label">Questions</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">3</span>
-        <span class="stat-label">Subjects</span>
-      </div>
+
+    <!-- Login Prompt (Shows when not logged in) -->
+    <div class="login-prompt" id="loginPrompt">
+      <h3>Welcome to PREMium Mind</h3>
+      <button class="login-btn" onclick="window.location.href='login.html'">Login / Sign Up</button>
     </div>
+
+    <ul>
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="courses.html" class="protected-route" id="coursesLink">📚 PREMium Courses</a></li>
+      <li><a href="#help-form">📞 Contact</a></li>
+      <li><a href="#help-form">❓ Help</a></li>
+      <li><a href="termcondition.html">⚙️ Terms & Privacy</a></li>
+    </ul>
   </div>
 
-  <!-- Subject Selection -->
-  <div class="section-title">
-    <span class="title-icon">📚</span>
-    Select Your Subject
-  </div>
-  
-  <div class="subject-selection">
-    <div class="subject-card physics active" onclick="showSubject('physics')">
-      <div class="subject-gradient"></div>
-      <div class="subject-content">
-        <div class="subject-icon">⚛️</div>
-        <div class="subject-text">
-          <div class="subject-name">PHYSICS</div>
-          <div class="subject-count">12 Chapters</div>
+  <!-- Overlay -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Premium Header Section -->
+    <div class="premium-header">
+      <div class="badge-container">
+        <span class="premium-badge">🎓 PREMIUM</span>
+      </div>
+      <h1 class="main-title">D2D PREMium Batch</h1>
+      <p class="subtitle">Chapter Wise MCQ Practice - Master Every Concept</p>
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-number">30+</span>
+          <span class="stat-label">Chapters</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">6000+</span>
+          <span class="stat-label">Questions</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">3</span>
+          <span class="stat-label">Subjects</span>
         </div>
       </div>
-      <div class="subject-arrow">→</div>
     </div>
 
-    <div class="subject-card chemistry" onclick="showSubject('chemistry')">
-      <div class="subject-gradient"></div>
-      <div class="subject-content">
-        <div class="subject-icon">🔬</div>
-        <div class="subject-text">
-          <div class="subject-name">CHEMISTRY</div>
-          <div class="subject-count">12 Chapters</div>
+    <!-- Subject Selection -->
+    <div class="section-title">
+      <span class="title-icon">📚</span>
+      Select Your Subject
+    </div>
+
+    <div class="subject-selection">
+      <div class="subject-card physics active" onclick="showSubject('physics')">
+        <div class="subject-gradient"></div>
+        <div class="subject-content">
+          <div class="subject-icon">⚛️</div>
+          <div class="subject-text">
+            <div class="subject-name">PHYSICS</div>
+            <div class="subject-count">12 Chapters</div>
+          </div>
+        </div>
+        <div class="subject-arrow">→</div>
+      </div>
+
+      <div class="subject-card chemistry" onclick="showSubject('chemistry')">
+        <div class="subject-gradient"></div>
+        <div class="subject-content">
+          <div class="subject-icon">🔬</div>
+          <div class="subject-text">
+            <div class="subject-name">CHEMISTRY</div>
+            <div class="subject-count">12 Chapters</div>
+          </div>
+        </div>
+        <div class="subject-arrow">→</div>
+      </div>
+
+      <div class="subject-card math" onclick="showSubject('math')">
+        <div class="subject-gradient"></div>
+        <div class="subject-content">
+          <div class="subject-icon">📐</div>
+          <div class="subject-text">
+            <div class="subject-name">MATH</div>
+            <div class="subject-count">14 Chapters</div>
+          </div>
+        </div>
+        <div class="subject-arrow">→</div>
+      </div>
+
+      <div class="subject-card pyq" onclick="showSubject('pyq')">
+        <div class="subject-gradient"></div>
+        <div class="subject-content">
+          <div class="subject-icon">📋</div>
+          <div class="subject-text">
+            <div class="subject-name">PYQ</div>
+            <div class="subject-count">6 Years</div>
+          </div>
+        </div>
+        <div class="subject-arrow">→</div>
+      </div>
+    </div>
+
+    <!-- Physics Chapters -->
+    <div class="chapters-container active" id="physics-chapters">
+      <div class="chapters-header">
+        <h2>⚛️ Physics Chapters</h2>
+        <p>Complete coverage of Class 11 & 12 Physics</p>
+      </div>
+
+      <div class="chapters-grid">
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=1'" data-chapter="1">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 1</span>
+            <span class="difficulty easy">Easy</span>
+          </div>
+          <h3 class="chapter-name">Units and Measurements</h3>
+          <p class="chapter-desc">Physical quantities, SI units, and dimensions</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>5 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=2'" data-chapter="2">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 2</span>
+            <span class="difficulty easy">Easy</span>
+          </div>
+          <h3 class="chapter-name">Mechanics</h3>
+          <p class="chapter-desc">Motion, force, energy and laws of mechanics</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>5 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=3'" data-chapter="3">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 3</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Angular Pulley & Motion of Lift</h3>
+          <p class="chapter-desc">Rotational dynamics, pulley systems and lift motion</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>4 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=4'" data-chapter="4">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 4</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Work, Power and Energy</h3>
+          <p class="chapter-desc">Concepts of work, energy and power</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>5 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=5'" data-chapter="5">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 5</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">General Properties of Matter</h3>
+          <p class="chapter-desc">Elasticity, pressure, and behavior of fluids</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>2 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>3 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=6'" data-chapter="6">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 6</span>
+            <span class="difficulty easy">Easy</span>
+          </div>
+          <h3 class="chapter-name">Surface Tension</h3>
+          <p class="chapter-desc">Molecular forces and liquid surface behavior</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>2 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>3 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=7'" data-chapter="7">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 7</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Viscosity</h3>
+          <p class="chapter-desc">Fluid resistance and streamline flow</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>2 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>3 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=8'" data-chapter="8">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 8</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Heat</h3>
+          <p class="chapter-desc">Thermal expansion, conduction and transfer</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>5 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=9'" data-chapter="9">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 9</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Sound & Acoustics of Building</h3>
+          <p class="chapter-desc">Reflection, resonance and noise control</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>4 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=10'"
+          data-chapter="10">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 10</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Properties of Light</h3>
+          <p class="chapter-desc">Reflection, refraction and interference</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>5 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=11'"
+          data-chapter="11">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 11</span>
+            <span class="difficulty hard">Hard</span>
+          </div>
+          <h3 class="chapter-name">Electric Field & Potential</h3>
+          <p class="chapter-desc">Electric charges, field lines and potential difference</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>4 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=12'"
+          data-chapter="12">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 12</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Modern Physics & Photo Electricity</h3>
+          <p class="chapter-desc">Quantum theory and photoelectric effect</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>5 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=13'"
+          data-chapter="13">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 13</span>
+            <span class="difficulty easy">Easy</span>
+          </div>
+          <h3 class="chapter-name">Laser & X-Rays</h3>
+          <p class="chapter-desc">Principle, production and applications</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>2 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>3 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=14'"
+          data-chapter="14">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 14</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Introduction to Nanotechnology</h3>
+          <p class="chapter-desc">Basics and modern applications of nanomaterials</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>2 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>3 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=15'"
+          data-chapter="15">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 15</span>
+            <span class="difficulty easy">Easy</span>
+          </div>
+          <h3 class="chapter-name">Non-Conventional Source of Energy</h3>
+          <p class="chapter-desc">Solar, wind, and renewable energy sources</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>2 MCQs</span></div>
+            <div class="stat"><span class="icon">⏱️</span><span>3 min</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Chemistry & Math Chapters -->
+    <div class="chapters-container" id="chemistry-chapters">
+      <div class="chapters-header">
+        <h2>🔬 Chemistry Chapters</h2>
+        <p>Complete coverage of Class 11 & 12 Chemistry</p>
+      </div>
+      <div class="chapters-grid">
+
+        <div class="premium-chapter-card chemistry" onclick="alert('Atomic Structure MCQs coming soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 1</span>
+            <span class="difficulty easy">Easy</span>
+          </div>
+          <h3 class="chapter-name">Atomic Structure</h3>
+          <p class="chapter-desc">Bohr model, orbitals, quantum numbers</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card chemistry" onclick="alert('Electro Chemistry MCQs coming soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 2</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Electro Chemistry</h3>
+          <p class="chapter-desc">Redox reactions, electrolysis, cells</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card chemistry" onclick="alert('Water MCQs coming soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 3</span>
+            <span class="difficulty easy">Easy</span>
+          </div>
+          <h3 class="chapter-name">Water</h3>
+          <p class="chapter-desc">Hardness, softening, purification</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card chemistry" onclick="alert('Material MCQs coming soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 4</span>
+            <span class="difficulty easy">Easy</span>
+          </div>
+          <h3 class="chapter-name">Material</h3>
+          <p class="chapter-desc">Classification and properties of materials</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card chemistry" onclick="alert('Alloys MCQs coming soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 5</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Alloys</h3>
+          <p class="chapter-desc">Composition and types of industrial alloys</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card chemistry" onclick="alert('Corrosion MCQs coming soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 6</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Corrosion</h3>
+          <p class="chapter-desc">Types, causes and prevention methods</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card chemistry" onclick="alert('Atmospheric Corrosion MCQs coming soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 7</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Atmospheric Corrosion</h3>
+          <p class="chapter-desc">Environmental effects on corrosion</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card chemistry" onclick="alert('Electro-Chemical Corrosion MCQs coming soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 8</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Electro-Chemical Corrosion</h3>
+          <p class="chapter-desc">Mechanism and protection techniques</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card chemistry" onclick="alert('Paint & Varnishes MCQs coming soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 9</span>
+            <span class="difficulty easy">Easy</span>
+          </div>
+          <h3 class="chapter-name">Paint & Varnishes</h3>
+          <p class="chapter-desc">Composition, uses and types of coatings</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card chemistry" onclick="alert('Lubricants MCQs coming soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 10</span>
+            <span class="difficulty easy">Easy</span>
+          </div>
+          <h3 class="chapter-name">Lubricants</h3>
+          <p class="chapter-desc">Functions, types, and properties of lubricants</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card chemistry" onclick="alert('Non-Metallic Materials MCQs coming soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 11</span>
+            <span class="difficulty easy">Easy</span>
+          </div>
+          <h3 class="chapter-name">Non-Metallic Materials</h3>
+          <p class="chapter-desc">Ceramics, polymers, composites</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card chemistry" onclick="alert('Pollution & Its Control MCQs coming soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 12</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Pollution & Its Control</h3>
+          <p class="chapter-desc">Air, water, and soil pollution control methods</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="chapters-container" id="math-chapters">
+      <div class="chapters-header">
+        <h2>📐 Mathematics Chapters</h2>
+        <p>Complete coverage of Class 11 & 12 Mathematics</p>
+      </div>
+      <div class="chapters-grid">
+
+        <div class="premium-chapter-card math" onclick="alert('Math MCQs Coming Soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 1</span>
+            <span class="difficulty easy">Easy</span>
+          </div>
+          <h3 class="chapter-name">Sets & Functions</h3>
+          <p class="chapter-desc">Set theory, relations, and types of functions</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card math" onclick="alert('Algebra MCQs Coming Soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 2</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Algebra</h3>
+          <p class="chapter-desc">Equations, identities, progressions</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card math" onclick="alert('Logarithms MCQs Coming Soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 3</span>
+            <span class="difficulty easy">Easy</span>
+          </div>
+          <h3 class="chapter-name">Logarithms</h3>
+          <p class="chapter-desc">Laws of logarithms and properties</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card math" onclick="alert('Partial Fractions MCQs Coming Soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 4</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Partial Fractions</h3>
+          <p class="chapter-desc">Decomposition and simplification of fractions</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card math" onclick="alert('Determinant & Matrices MCQs Coming Soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 5</span>
+            <span class="difficulty hard">Hard</span>
+          </div>
+          <h3 class="chapter-name">Determinant & Matrices</h3>
+          <p class="chapter-desc">Matrix operations, inverse, and determinant properties</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card math" onclick="alert('Binomial Theorem MCQs Coming Soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 6</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Binomial Theorem</h3>
+          <p class="chapter-desc">Expansion and general terms of binomial expressions</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card math" onclick="alert('Trigonometry MCQs Coming Soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 7</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Trigonometry & Inverse Trigonometry</h3>
+          <p class="chapter-desc">Identities, angles, and inverse relations</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card math" onclick="alert('Point & Distance MCQs Coming Soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 8</span>
+            <span class="difficulty easy">Easy</span>
+          </div>
+          <h3 class="chapter-name">Point & Distance</h3>
+          <p class="chapter-desc">Coordinate geometry and distance formula</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card math" onclick="alert('Straight Line MCQs Coming Soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 9</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Straight Line</h3>
+          <p class="chapter-desc">Slope, intercept, and angle between lines</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card math" onclick="alert('Circle MCQs Coming Soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 10</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Circle</h3>
+          <p class="chapter-desc">Equation of circle, tangent, and chord properties</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card math" onclick="alert('Vector MCQs Coming Soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 11</span>
+            <span class="difficulty hard">Hard</span>
+          </div>
+          <h3 class="chapter-name">Vector</h3>
+          <p class="chapter-desc">Vector addition, dot and cross products</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card math" onclick="alert('Function MCQs Coming Soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 12</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Function</h3>
+          <p class="chapter-desc">Domain, range, and types of functions</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card math" onclick="alert('Limit MCQs Coming Soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 13</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">Limit</h3>
+          <p class="chapter-desc">Basic limit concepts and L'Hospital’s rule</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="premium-chapter-card math" onclick="alert('Differentiation MCQs Coming Soon!')">
+          <div class="chapter-header">
+            <span class="chapter-badge">Ch 14</span>
+            <span class="difficulty hard">Hard</span>
+          </div>
+          <h3 class="chapter-name">Differentiation & Its Applications</h3>
+          <p class="chapter-desc">Derivatives, maxima-minima, and rate of change</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width:0%"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Previous Year Questions Section -->
+      <div class="chapters-container" id="pyq-chapters">
+        <div class="chapters-header">
+          <h2>📋 Previous Year Questions (PYQ)</h2>
+          <p>Practice with actual exam questions from previous years</p>
+        </div>
+
+        <div class="chapters-grid">
+
+          <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2025 Coming Soon!')">
+            <div class="chapter-header">
+              <span class="chapter-badge">PYQ 2025</span>
+              <span class="difficulty hard">Latest</span>
+            </div>
+            <h3 class="chapter-name">D2D 2025 Questions</h3>
+            <p class="chapter-desc">Most recent exam questions from 2025</p>
+            <div class="chapter-stats">
+              <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2024 Coming Soon!')">
+            <div class="chapter-header">
+              <span class="chapter-badge">PYQ 2024</span>
+              <span class="difficulty hard">Hard</span>
+            </div>
+            <h3 class="chapter-name">D2D 2024 Questions</h3>
+            <p class="chapter-desc">Complete question set from 2024 examination</p>
+            <div class="chapter-stats">
+              <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2023 Coming Soon!')">
+            <div class="chapter-header">
+              <span class="chapter-badge">PYQ 2023</span>
+              <span class="difficulty hard">Hard</span>
+            </div>
+            <h3 class="chapter-name">D2D 2023 Questions</h3>
+            <p class="chapter-desc">Complete question set from 2023 examination</p>
+            <div class="chapter-stats">
+              <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2022 Coming Soon!')">
+            <div class="chapter-header">
+              <span class="chapter-badge">PYQ 2022</span>
+              <span class="difficulty medium">Medium</span>
+            </div>
+            <h3 class="chapter-name">D2D 2022 Questions</h3>
+            <p class="chapter-desc">Complete question set from 2022 examination</p>
+            <div class="chapter-stats">
+              <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2021 Coming Soon!')">
+            <div class="chapter-header">
+              <span class="chapter-badge">PYQ 2021</span>
+              <span class="difficulty medium">Medium</span>
+            </div>
+            <h3 class="chapter-name">D2D 2021 Questions</h3>
+            <p class="chapter-desc">Complete question set from 2021 examination</p>
+            <div class="chapter-stats">
+              <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2020 Coming Soon!')">
+            <div class="chapter-header">
+              <span class="chapter-badge">PYQ 2020</span>
+              <span class="difficulty medium">Medium</span>
+            </div>
+            <h3 class="chapter-name">D2D 2020 Questions</h3>
+            <p class="chapter-desc">Complete question set from 2020 examination</p>
+            <div class="chapter-stats">
+              <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width:0%"></div>
+            </div>
+          </div>
+
         </div>
       </div>
-      <div class="subject-arrow">→</div>
-    </div>
-
-    <div class="subject-card math" onclick="showSubject('math')">
-      <div class="subject-gradient"></div>
-      <div class="subject-content">
-        <div class="subject-icon">📐</div>
-        <div class="subject-text">
-          <div class="subject-name">MATH</div>
-          <div class="subject-count">14 Chapters</div>
-        </div>
-      </div>
-      <div class="subject-arrow">→</div>
-    </div>
-
-    <div class="subject-card pyq" onclick="showSubject('pyq')">
-      <div class="subject-gradient"></div>
-      <div class="subject-content">
-        <div class="subject-icon">📋</div>
-        <div class="subject-text">
-          <div class="subject-name">PYQ</div>
-          <div class="subject-count">6 Years</div>
-        </div>
-      </div>
-      <div class="subject-arrow">→</div>
-    </div>
-  </div>
-
-  <!-- Physics Chapters -->
-  <div class="chapters-container active" id="physics-chapters">
-    <div class="chapters-header">
-      <h2>⚛️ Physics Chapters</h2>
-      <p>Complete coverage of Class 11 & 12 Physics</p>
-    </div>
-
-    <div class="chapters-grid">
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=1'" data-chapter="1">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 1</span>
-      <span class="difficulty easy">Easy</span>
-    </div>
-    <h3 class="chapter-name">Units and Measurements</h3>
-    <p class="chapter-desc">Physical quantities, SI units, and dimensions</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>5 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=2'" data-chapter="2">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 2</span>
-      <span class="difficulty easy">Easy</span>
-    </div>
-    <h3 class="chapter-name">Mechanics</h3>
-    <p class="chapter-desc">Motion, force, energy and laws of mechanics</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>5 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=3'" data-chapter="3">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 3</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">Angular Pulley & Motion of Lift</h3>
-    <p class="chapter-desc">Rotational dynamics, pulley systems and lift motion</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>4 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=4'" data-chapter="4">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 4</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">Work, Power and Energy</h3>
-    <p class="chapter-desc">Concepts of work, energy and power</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>5 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=5'" data-chapter="5">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 5</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">General Properties of Matter</h3>
-    <p class="chapter-desc">Elasticity, pressure, and behavior of fluids</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>2 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>3 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=6'" data-chapter="6">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 6</span>
-      <span class="difficulty easy">Easy</span>
-    </div>
-    <h3 class="chapter-name">Surface Tension</h3>
-    <p class="chapter-desc">Molecular forces and liquid surface behavior</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>2 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>3 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=7'" data-chapter="7">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 7</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">Viscosity</h3>
-    <p class="chapter-desc">Fluid resistance and streamline flow</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>2 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>3 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=8'" data-chapter="8">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 8</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">Heat</h3>
-    <p class="chapter-desc">Thermal expansion, conduction and transfer</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>5 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=9'" data-chapter="9">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 9</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">Sound & Acoustics of Building</h3>
-    <p class="chapter-desc">Reflection, resonance and noise control</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>4 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=10'" data-chapter="10">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 10</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">Properties of Light</h3>
-    <p class="chapter-desc">Reflection, refraction and interference</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>5 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=11'" data-chapter="11">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 11</span>
-      <span class="difficulty hard">Hard</span>
-    </div>
-    <h3 class="chapter-name">Electric Field & Potential</h3>
-    <p class="chapter-desc">Electric charges, field lines and potential difference</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>4 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=12'" data-chapter="12">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 12</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">Modern Physics & Photo Electricity</h3>
-    <p class="chapter-desc">Quantum theory and photoelectric effect</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>3 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>5 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=13'" data-chapter="13">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 13</span>
-      <span class="difficulty easy">Easy</span>
-    </div>
-    <h3 class="chapter-name">Laser & X-Rays</h3>
-    <p class="chapter-desc">Principle, production and applications</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>2 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>3 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=14'" data-chapter="14">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 14</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">Introduction to Nanotechnology</h3>
-    <p class="chapter-desc">Basics and modern applications of nanomaterials</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>2 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>3 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=15'" data-chapter="15">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 15</span>
-      <span class="difficulty easy">Easy</span>
-    </div>
-    <h3 class="chapter-name">Non-Conventional Source of Energy</h3>
-    <p class="chapter-desc">Solar, wind, and renewable energy sources</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>2 MCQs</span></div>
-      <div class="stat"><span class="icon">⏱️</span><span>3 min</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-</div>
-
-  </div>
-
-  <!-- Chemistry & Math Chapters -->
-  <div class="chapters-container" id="chemistry-chapters"> 
-    <div class="chapters-header">
-      <h2>🔬 Chemistry Chapters</h2>
-      <p>Complete coverage of Class 11 & 12 Chemistry</p>
-    </div>
-<div class="chapters-grid">
-
-  <div class="premium-chapter-card chemistry" onclick="alert('Atomic Structure MCQs coming soon!')">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 1</span>
-      <span class="difficulty easy">Easy</span>
-    </div>
-    <h3 class="chapter-name">Atomic Structure</h3>
-    <p class="chapter-desc">Bohr model, orbitals, quantum numbers</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card chemistry" onclick="alert('Electro Chemistry MCQs coming soon!')">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 2</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">Electro Chemistry</h3>
-    <p class="chapter-desc">Redox reactions, electrolysis, cells</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card chemistry" onclick="alert('Water MCQs coming soon!')">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 3</span>
-      <span class="difficulty easy">Easy</span>
-    </div>
-    <h3 class="chapter-name">Water</h3>
-    <p class="chapter-desc">Hardness, softening, purification</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card chemistry" onclick="alert('Material MCQs coming soon!')">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 4</span>
-      <span class="difficulty easy">Easy</span>
-    </div>
-    <h3 class="chapter-name">Material</h3>
-    <p class="chapter-desc">Classification and properties of materials</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card chemistry" onclick="alert('Alloys MCQs coming soon!')">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 5</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">Alloys</h3>
-    <p class="chapter-desc">Composition and types of industrial alloys</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card chemistry" onclick="alert('Corrosion MCQs coming soon!')">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 6</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">Corrosion</h3>
-    <p class="chapter-desc">Types, causes and prevention methods</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card chemistry" onclick="alert('Atmospheric Corrosion MCQs coming soon!')">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 7</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">Atmospheric Corrosion</h3>
-    <p class="chapter-desc">Environmental effects on corrosion</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card chemistry" onclick="alert('Electro-Chemical Corrosion MCQs coming soon!')">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 8</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">Electro-Chemical Corrosion</h3>
-    <p class="chapter-desc">Mechanism and protection techniques</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card chemistry" onclick="alert('Paint & Varnishes MCQs coming soon!')">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 9</span>
-      <span class="difficulty easy">Easy</span>
-    </div>
-    <h3 class="chapter-name">Paint & Varnishes</h3>
-    <p class="chapter-desc">Composition, uses and types of coatings</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card chemistry" onclick="alert('Lubricants MCQs coming soon!')">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 10</span>
-      <span class="difficulty easy">Easy</span>
-    </div>
-    <h3 class="chapter-name">Lubricants</h3>
-    <p class="chapter-desc">Functions, types, and properties of lubricants</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card chemistry" onclick="alert('Non-Metallic Materials MCQs coming soon!')">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 11</span>
-      <span class="difficulty easy">Easy</span>
-    </div>
-    <h3 class="chapter-name">Non-Metallic Materials</h3>
-    <p class="chapter-desc">Ceramics, polymers, composites</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-  <div class="premium-chapter-card chemistry" onclick="alert('Pollution & Its Control MCQs coming soon!')">
-    <div class="chapter-header">
-      <span class="chapter-badge">Ch 12</span>
-      <span class="difficulty medium">Medium</span>
-    </div>
-    <h3 class="chapter-name">Pollution & Its Control</h3>
-    <p class="chapter-desc">Air, water, and soil pollution control methods</p>
-    <div class="chapter-stats">
-      <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-    </div>
-    <div class="progress-bar"><div class="progress" style="width: 0%"></div></div>
-  </div>
-
-</div>
-
-  </div>
-
-  <div class="chapters-container" id="math-chapters">
-    <div class="chapters-header">
-      <h2>📐 Mathematics Chapters</h2>
-      <p>Complete coverage of Class 11 & 12 Mathematics</p>
-    </div>
-  <div class="chapters-grid">
-
-    <div class="premium-chapter-card math" onclick="alert('Math MCQs Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">Ch 1</span>
-        <span class="difficulty easy">Easy</span>
-      </div>
-      <h3 class="chapter-name">Sets & Functions</h3>
-      <p class="chapter-desc">Set theory, relations, and types of functions</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card math" onclick="alert('Algebra MCQs Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">Ch 2</span>
-        <span class="difficulty medium">Medium</span>
-      </div>
-      <h3 class="chapter-name">Algebra</h3>
-      <p class="chapter-desc">Equations, identities, progressions</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card math" onclick="alert('Logarithms MCQs Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">Ch 3</span>
-        <span class="difficulty easy">Easy</span>
-      </div>
-      <h3 class="chapter-name">Logarithms</h3>
-      <p class="chapter-desc">Laws of logarithms and properties</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card math" onclick="alert('Partial Fractions MCQs Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">Ch 4</span>
-        <span class="difficulty medium">Medium</span>
-      </div>
-      <h3 class="chapter-name">Partial Fractions</h3>
-      <p class="chapter-desc">Decomposition and simplification of fractions</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card math" onclick="alert('Determinant & Matrices MCQs Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">Ch 5</span>
-        <span class="difficulty hard">Hard</span>
-      </div>
-      <h3 class="chapter-name">Determinant & Matrices</h3>
-      <p class="chapter-desc">Matrix operations, inverse, and determinant properties</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card math" onclick="alert('Binomial Theorem MCQs Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">Ch 6</span>
-        <span class="difficulty medium">Medium</span>
-      </div>
-      <h3 class="chapter-name">Binomial Theorem</h3>
-      <p class="chapter-desc">Expansion and general terms of binomial expressions</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card math" onclick="alert('Trigonometry MCQs Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">Ch 7</span>
-        <span class="difficulty medium">Medium</span>
-      </div>
-      <h3 class="chapter-name">Trigonometry & Inverse Trigonometry</h3>
-      <p class="chapter-desc">Identities, angles, and inverse relations</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card math" onclick="alert('Point & Distance MCQs Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">Ch 8</span>
-        <span class="difficulty easy">Easy</span>
-      </div>
-      <h3 class="chapter-name">Point & Distance</h3>
-      <p class="chapter-desc">Coordinate geometry and distance formula</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card math" onclick="alert('Straight Line MCQs Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">Ch 9</span>
-        <span class="difficulty medium">Medium</span>
-      </div>
-      <h3 class="chapter-name">Straight Line</h3>
-      <p class="chapter-desc">Slope, intercept, and angle between lines</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card math" onclick="alert('Circle MCQs Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">Ch 10</span>
-        <span class="difficulty medium">Medium</span>
-      </div>
-      <h3 class="chapter-name">Circle</h3>
-      <p class="chapter-desc">Equation of circle, tangent, and chord properties</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card math" onclick="alert('Vector MCQs Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">Ch 11</span>
-        <span class="difficulty hard">Hard</span>
-      </div>
-      <h3 class="chapter-name">Vector</h3>
-      <p class="chapter-desc">Vector addition, dot and cross products</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card math" onclick="alert('Function MCQs Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">Ch 12</span>
-        <span class="difficulty medium">Medium</span>
-      </div>
-      <h3 class="chapter-name">Function</h3>
-      <p class="chapter-desc">Domain, range, and types of functions</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card math" onclick="alert('Limit MCQs Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">Ch 13</span>
-        <span class="difficulty medium">Medium</span>
-      </div>
-      <h3 class="chapter-name">Limit</h3>
-      <p class="chapter-desc">Basic limit concepts and L'Hospital’s rule</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card math" onclick="alert('Differentiation MCQs Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">Ch 14</span>
-        <span class="difficulty hard">Hard</span>
-      </div>
-      <h3 class="chapter-name">Differentiation & Its Applications</h3>
-      <p class="chapter-desc">Derivatives, maxima-minima, and rate of change</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-  </div>
-
-  <!-- Previous Year Questions Section -->
-<div class="chapters-container" id="pyq-chapters">
-  <div class="chapters-header">
-    <h2>📋 Previous Year Questions (PYQ)</h2>
-    <p>Practice with actual exam questions from previous years</p>
-  </div>
-
-  <div class="chapters-grid">
 
-    <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2025 Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">PYQ 2025</span>
-        <span class="difficulty hard">Latest</span>
-      </div>
-      <h3 class="chapter-name">D2D 2025 Questions</h3>
-      <p class="chapter-desc">Most recent exam questions from 2025</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
     </div>
-
-    <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2024 Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">PYQ 2024</span>
-        <span class="difficulty hard">Hard</span>
-      </div>
-      <h3 class="chapter-name">D2D 2024 Questions</h3>
-      <p class="chapter-desc">Complete question set from 2024 examination</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2023 Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">PYQ 2023</span>
-        <span class="difficulty hard">Hard</span>
-      </div>
-      <h3 class="chapter-name">D2D 2023 Questions</h3>
-      <p class="chapter-desc">Complete question set from 2023 examination</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2022 Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">PYQ 2022</span>
-        <span class="difficulty medium">Medium</span>
-      </div>
-      <h3 class="chapter-name">D2D 2022 Questions</h3>
-      <p class="chapter-desc">Complete question set from 2022 examination</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2021 Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">PYQ 2021</span>
-        <span class="difficulty medium">Medium</span>
-      </div>
-      <h3 class="chapter-name">D2D 2021 Questions</h3>
-      <p class="chapter-desc">Complete question set from 2021 examination</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-    <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2020 Coming Soon!')">
-      <div class="chapter-header">
-        <span class="chapter-badge">PYQ 2020</span>
-        <span class="difficulty medium">Medium</span>
-      </div>
-      <h3 class="chapter-name">D2D 2020 Questions</h3>
-      <p class="chapter-desc">Complete question set from 2020 examination</p>
-      <div class="chapter-stats">
-        <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-      </div>
-      <div class="progress-bar"><div class="progress" style="width:0%"></div></div>
-    </div>
-
-  </div>
-</div>
-
-</div>
-
-<script>
-  const menuBtn = document.getElementById("menu-btn");
-  const sidebar = document.getElementById("premiumSidebar");
-  const overlay = document.getElementById("menuOverlay");
-  const themeSwitch = document.getElementById("themeSwitch");
-
-  // Sidebar Toggle
-  menuBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("active");
-    overlay.classList.toggle("active");
-  });
-
-  overlay.addEventListener("click", () => {
-    sidebar.classList.remove("active");
-    overlay.classList.remove("active");
-  });
-
-  themeSwitch.addEventListener("click", function() {
-    this.classList.toggle("active");
-  });
-
-  // Subject Switch
-  function showSubject(subject) {
-    document.querySelectorAll('.subject-card').forEach(card => {
-      card.classList.remove('active');
-    });
-    document.querySelectorAll('.chapters-container').forEach(container => {
-      container.classList.remove('active');
-    });
-
-    event.target.closest('.subject-card').classList.add('active');
-    document.getElementById(subject + '-chapters').classList.add('active');
-  }
-
-  // LOGOUT FUNCTIONALITY
-  document.querySelector('.menu-item.logout').addEventListener('click', (e) => {
-    e.preventDefault();
-    if(confirm('Are you sure you want to logout?')) {
-      sessionStorage.clear();
-      alert('Logged out successfully!');
-      window.location.href = 'index.html';
-    }
-  });
 
-  // LOAD PROGRESS ON PAGE LOAD
-  function loadProgress() {
-    const progress = JSON.parse(sessionStorage.getItem('chapterProgress') || '{}');
-    
-    document.querySelectorAll('.premium-chapter-card[data-chapter]').forEach(card => {
-      const chapter = card.getAttribute('data-chapter');
-      if (progress[chapter]) {
-        const progressBar = card.querySelector('.progress');
-        progressBar.style.width = progress[chapter] + '%';
-        
-        // Add completion badge if 100%
-        if (progress[chapter] >= 100) {
-          card.style.borderColor = '#22c55e';
-          const badge = card.querySelector('.chapter-badge');
-          badge.innerHTML = 'Ch ' + chapter + ' ✓';
-          badge.style.background = '#22c55e';
+    <!-- Firebase & Custom Scripts -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+      import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+      import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
+        authDomain: "premium-mind-fcb16.firebaseapp.com",
+        projectId: "premium-mind-fcb16",
+        storageBucket: "premium-mind-fcb16.firebasestorage.app",
+        messagingSenderId: "864874199521",
+        appId: "1:864874199521:web:5deb96a956dc404a077aa0"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const storage = getStorage(app);
+
+      // Check authentication state
+      onAuthStateChanged(auth, (user) => {
+        const userProfile = document.getElementById('userProfile');
+        const loginPrompt = document.getElementById('loginPrompt');
+        const coursesLink = document.getElementById('coursesLink');
+        const coursesLinkNav = document.getElementById('coursesLinkNav');
+
+        if (user) {
+          // User is logged in
+          userProfile.style.display = 'block';
+          loginPrompt.style.display = 'none';
+
+          // Update user info
+          document.getElementById('userName').textContent = user.displayName || 'User';
+          document.getElementById('userEmail').textContent = user.email;
+
+          // Load profile photo
+          const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
+          if (photoURL) {
+            document.getElementById('profilePhoto').src = photoURL;
+          } else {
+            document.getElementById('profilePhoto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=000&color=fff&size=80`;
+          }
+
+          // Enable protected routes
+          if (coursesLink) {
+            coursesLink.classList.remove('locked');
+            coursesLink.onclick = null;
+          }
+          if (coursesLinkNav) {
+            coursesLinkNav.classList.remove('locked');
+            coursesLinkNav.onclick = null;
+          }
+        } else {
+          // User is not logged in
+          userProfile.style.display = 'none';
+          loginPrompt.style.display = 'block';
+
+          // Lock protected routes
+          if (coursesLink) {
+            coursesLink.classList.add('locked');
+            coursesLink.onclick = (e) => {
+              e.preventDefault();
+              alert('Please login to access PREMium Courses!');
+              window.location.href = 'login.html';
+            };
+          }
+          if (coursesLinkNav) {
+            coursesLinkNav.classList.add('locked');
+            coursesLinkNav.onclick = (e) => {
+              e.preventDefault();
+              alert('Please login to access PREMium Courses!');
+              window.location.href = 'login.html';
+            };
+          }
         }
-      }
-    });
-  }
+      });
 
-  // Load progress when page loads
-  window.addEventListener('DOMContentLoaded', loadProgress);
-</script>
+      // Photo upload handler
+      document.getElementById('photo-input').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const user = auth.currentUser;
+        if (!user) return;
+
+        try {
+          // Upload to Firebase Storage
+          const storageRef = ref(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
+          await uploadBytes(storageRef, file);
+          const photoURL = await getDownloadURL(storageRef);
+
+          // Save to localStorage and update UI
+          localStorage.setItem('profilePhoto_' + user.uid, photoURL);
+          document.getElementById('profilePhoto').src = photoURL;
+
+          alert('Profile photo updated successfully!');
+        } catch (error) {
+          console.error('Error uploading photo:', error);
+          alert('Error uploading photo. Please try again.');
+        }
+      });
+
+      // Logout function
+      window.handleLogout = async () => {
+        try {
+          await signOut(auth);
+          alert('Logged out successfully!');
+          window.location.reload();
+        } catch (error) {
+          alert('Error logging out!');
+        }
+      };
+    </script>
+
+    <script>
+      // Menu handlers
+      const menuBtn = document.getElementById("menu-btn");
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+
+      menuBtn.addEventListener("click", () => {
+        sidebar.classList.add("active");
+        overlay.classList.add("active");
+      });
+
+      overlay.addEventListener("click", () => {
+        sidebar.classList.remove("active");
+        overlay.classList.remove("active");
+      });
+
+      document.querySelectorAll(".sidebar ul li a").forEach(link => {
+        link.addEventListener("click", () => {
+          sidebar.classList.remove("active");
+          overlay.classList.remove("active");
+        });
+      });
+
+      // Subject Switch
+      function showSubject(subject) {
+        document.querySelectorAll('.subject-card').forEach(card => {
+          card.classList.remove('active');
+        });
+        document.querySelectorAll('.chapters-container').forEach(container => {
+          container.classList.remove('active');
+        });
+
+        event.target.closest('.subject-card').classList.add('active');
+        document.getElementById(subject + '-chapters').classList.add('active');
+      }
+
+      // LOAD PROGRESS ON PAGE LOAD
+      function loadProgress() {
+        const progress = JSON.parse(sessionStorage.getItem('chapterProgress') || '{}');
+
+        document.querySelectorAll('.premium-chapter-card[data-chapter]').forEach(card => {
+          const chapter = card.getAttribute('data-chapter');
+          if (progress[chapter]) {
+            const progressBar = card.querySelector('.progress');
+            progressBar.style.width = progress[chapter] + '%';
+
+            // Add completion badge if 100%
+            if (progress[chapter] >= 100) {
+              card.style.borderColor = '#22c55e';
+              const badge = card.querySelector('.chapter-badge');
+              badge.innerHTML = 'Ch ' + chapter + ' ✓';
+              badge.style.background = '#22c55e';
+            }
+          }
+        });
+      }
+      // Load progress when page loads
+      window.addEventListener('DOMContentLoaded', loadProgress);
+    </script>
 
 </body>
+
 </html>

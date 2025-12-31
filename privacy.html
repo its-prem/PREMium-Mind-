@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Privacy Policy | PREMium Mind</title>
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 
   <style>
     * {
@@ -28,7 +30,7 @@
       align-items: center;
       padding: 12px 20px;
       background: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       position: sticky;
       top: 0;
       z-index: 1003;
@@ -89,7 +91,7 @@
       background: #fff;
       color: #111;
       padding: 60px 20px;
-      box-shadow: -4px 0 12px rgba(0,0,0,0.15);
+      box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
       transition: right 0.4s ease;
       z-index: 1002;
     }
@@ -145,7 +147,7 @@
       left: 0;
       height: 100%;
       width: 100%;
-      background: rgba(0,0,0,0.4);
+      background: rgba(0, 0, 0, 0.4);
       display: none;
       z-index: 1001;
     }
@@ -156,8 +158,13 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
 
     /* ===== Responsive ===== */
@@ -165,6 +172,7 @@
       .nav-links {
         display: none;
       }
+
       .menu-btn {
         display: block;
       }
@@ -175,19 +183,25 @@
         padding-left: 10px !important;
         padding-right: 10px !important;
       }
+
       .course-card {
         margin-left: 0 !important;
         margin-right: 0 !important;
       }
+
       .navbar {
         padding-left: 10px !important;
         padding-right: 10px !important;
       }
+
       .footer-container {
         padding-left: 10px !important;
         padding-right: 10px !important;
       }
     }
+
+
+
     /* ===== Content ===== */
     .container {
       max-width: 900px;
@@ -195,38 +209,47 @@
       background: #fff;
       padding: 40px;
       border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
       transition: transform 0.3s ease;
     }
+
     .container:hover {
       transform: translateY(-5px);
     }
+
     h1 {
       color: #111;
       font-size: 2.2rem;
       margin-bottom: 10px;
       text-align: center;
     }
-    p, li {
+
+    p,
+    li {
       font-size: 1rem;
       color: #555;
     }
+
     h2 {
       margin-top: 25px;
       color: #0073e6;
       font-size: 1.3rem;
     }
+
     ul {
       padding-left: 20px;
     }
+
     a {
       color: #0073e6;
       text-decoration: none;
       font-weight: 600;
     }
+
     a:hover {
       text-decoration: underline;
     }
+
     .highlight {
       background: #0073e6;
       color: #fff;
@@ -235,6 +258,7 @@
       border-radius: 6px;
       font-size: 0.9rem;
     }
+
     footer {
       text-align: center;
       margin-top: 40px;
@@ -244,33 +268,53 @@
     }
   </style>
 </head>
+
 <body>
 
   <!-- Navbar -->
   <nav class="navbar">
     <div class="logo-container">
       <img src="small-logo.png" alt="PM Logo" class="logo-image" />
-      <div class="logo-text">PREMium Mind</div>
+      <div class="logo-text">PREMium Minds</div>
     </div>
 
+    <!-- Normal Nav Links (Desktop ke liye) -->
     <ul class="nav-links">
-      <li><a href="#">PREMium Store</a></li>
-      <li><a href="#">CONTACT US</a></li>
+      <li><a href="index.html">PREMium Store</a></li>
+      <li><a href="courses.html" class="protected-route" id="coursesLinkNav">PREMium Courses</a></li>
+      <li><a href="#help-form">CONTACT US</a></li>
       <li><a href="#help-form">HELP</a></li>
     </ul>
-
     <div class="menu-btn" id="menu-btn">☰</div>
   </nav>
 
   <!-- Sidebar Menu -->
   <div class="sidebar" id="sidebar">
-    <h2>PREMium Mind</h2>
+    <!-- User Profile Section (Shows when logged in) -->
+    <div class="user-profile" id="userProfile" style="display: none;">
+      <div class="profile-photo-container">
+        <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile"
+          class="profile-photo" id="profilePhoto" onclick="document.getElementById('photo-input').click()">
+        <button class="change-photo-btn" onclick="document.getElementById('photo-input').click()">📷</button>
+      </div>
+      <input type="file" id="photo-input" accept="image/*">
+      <div class="user-name" id="userName">User Name</div>
+      <div class="user-email" id="userEmail">user@example.com</div>
+      <button class="logout-btn-sidebar" onclick="handleLogout()">Logout</button>
+    </div>
+
+    <!-- Login Prompt (Shows when not logged in) -->
+    <div class="login-prompt" id="loginPrompt">
+      <h3>Welcome to PREMium Mind</h3>
+      <button class="login-btn" onclick="window.location.href='login.html'">Login / Sign Up</button>
+    </div>
+
     <ul>
       <li><a href="index.html">🏠 Home</a></li>
-      <li><a href="#">🛒 Store</a></li>
-      <li><a href="#">📞 Contact</a></li>
+      <li><a href="courses.html" class="protected-route" id="coursesLink">📚 PREMium Courses</a></li>
+      <li><a href="#help-form">📞 Contact</a></li>
       <li><a href="#help-form">❓ Help</a></li>
-      <li><a href="privacy.html">⚙️ Terms & Privacy</a></li>
+      <li><a href="termcondition.html">⚙️ Terms & Privacy</a></li>
     </ul>
   </div>
 
@@ -281,7 +325,9 @@
   <div class="container">
     <h1>Privacy Policy</h1>
     <p><span class="highlight">Last Updated:</span> September 2025</p>
-    <p>Welcome to <strong>PREMium Mind</strong>. Your privacy is very important to us. This Privacy Policy explains how we collect, use, and protect your personal information when you use our website and purchase our digital products (such as PDFs).</p>
+    <p>Welcome to <strong>PREMium Mind</strong>. Your privacy is very important to us. This Privacy Policy explains how
+      we collect, use, and protect your personal information when you use our website and purchase our digital products
+      (such as PDFs).</p>
 
     <h2>Information We Collect</h2>
     <p>When you purchase a PDF or interact with our website, we may collect the following personal details:</p>
@@ -300,19 +346,24 @@
     </ul>
 
     <h2>Information Sharing</h2>
-    <p>We respect your privacy. We do <strong>not</strong> sell, trade, or rent your personal information to any third parties. Your data is used only by PREMium Mind for support and delivery purposes.</p>
+    <p>We respect your privacy. We do <strong>not</strong> sell, trade, or rent your personal information to any third
+      parties. Your data is used only by PREMium Mind for support and delivery purposes.</p>
 
     <h2>Data Security</h2>
-    <p>We implement reasonable measures to protect your personal data from unauthorized access, disclosure, or misuse. However, please note that no method of data transmission over the internet is 100% secure.</p>
+    <p>We implement reasonable measures to protect your personal data from unauthorized access, disclosure, or misuse.
+      However, please note that no method of data transmission over the internet is 100% secure.</p>
 
     <h2>Cookies</h2>
-    <p>Our website may use cookies to enhance your browsing experience. Cookies are small files stored on your device that help us improve website performance. You can choose to disable cookies in your browser settings.</p>
+    <p>Our website may use cookies to enhance your browsing experience. Cookies are small files stored on your device
+      that help us improve website performance. You can choose to disable cookies in your browser settings.</p>
 
     <h2>Your Rights</h2>
-    <p>You have the right to request correction or deletion of your personal data stored with us. If you wish to update or remove your data, you can contact us at any time.</p>
+    <p>You have the right to request correction or deletion of your personal data stored with us. If you wish to update
+      or remove your data, you can contact us at any time.</p>
 
     <h2>Contact Us</h2>
-    <p>If you have any questions about this Privacy Policy or how your information is handled, please reach out to us:</p>
+    <p>If you have any questions about this Privacy Policy or how your information is handled, please reach out to us:
+    </p>
     <p>Email: <a href="mailto:premkumar0443@gmail.com">premkumar0443@gmail.com</a></p>
     <p>Phone: +91-9153950552</p>
   </div>
@@ -322,6 +373,120 @@
   </footer>
 
   <!-- JS for Sidebar -->
+  <!-- Firebase & Custom Scripts -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
+      authDomain: "premium-mind-fcb16.firebaseapp.com",
+      projectId: "premium-mind-fcb16",
+      storageBucket: "premium-mind-fcb16.firebasestorage.app",
+      messagingSenderId: "864874199521",
+      appId: "1:864874199521:web:5deb96a956dc404a077aa0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const storage = getStorage(app);
+
+    // Check authentication state
+    onAuthStateChanged(auth, (user) => {
+      const userProfile = document.getElementById('userProfile');
+      const loginPrompt = document.getElementById('loginPrompt');
+      const coursesLink = document.getElementById('coursesLink');
+      const coursesLinkNav = document.getElementById('coursesLinkNav');
+
+      if (user) {
+        // User is logged in
+        userProfile.style.display = 'block';
+        loginPrompt.style.display = 'none';
+
+        // Update user info
+        document.getElementById('userName').textContent = user.displayName || 'User';
+        document.getElementById('userEmail').textContent = user.email;
+
+        // Load profile photo
+        const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
+        if (photoURL) {
+          document.getElementById('profilePhoto').src = photoURL;
+        } else {
+          document.getElementById('profilePhoto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=000&color=fff&size=80`;
+        }
+
+        // Enable protected routes
+        if (coursesLink) {
+          coursesLink.classList.remove('locked');
+          coursesLink.onclick = null;
+        }
+        if (coursesLinkNav) {
+          coursesLinkNav.classList.remove('locked');
+          coursesLinkNav.onclick = null;
+        }
+      } else {
+        // User is not logged in
+        userProfile.style.display = 'none';
+        loginPrompt.style.display = 'block';
+
+        // Lock protected routes
+        if (coursesLink) {
+          coursesLink.classList.add('locked');
+          coursesLink.onclick = (e) => {
+            e.preventDefault();
+            alert('Please login to access PREMium Courses!');
+            window.location.href = 'login.html';
+          };
+        }
+        if (coursesLinkNav) {
+          coursesLinkNav.classList.add('locked');
+          coursesLinkNav.onclick = (e) => {
+            e.preventDefault();
+            alert('Please login to access PREMium Courses!');
+            window.location.href = 'login.html';
+          };
+        }
+      }
+    });
+
+    // Photo upload handler
+    document.getElementById('photo-input').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const user = auth.currentUser;
+      if (!user) return;
+
+      try {
+        // Upload to Firebase Storage
+        const storageRef = ref(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
+        await uploadBytes(storageRef, file);
+        const photoURL = await getDownloadURL(storageRef);
+
+        // Save to localStorage and update UI
+        localStorage.setItem('profilePhoto_' + user.uid, photoURL);
+        document.getElementById('profilePhoto').src = photoURL;
+
+        alert('Profile photo updated successfully!');
+      } catch (error) {
+        console.error('Error uploading photo:', error);
+        alert('Error uploading photo. Please try again.');
+      }
+    });
+
+    // Logout function
+    window.handleLogout = async () => {
+      try {
+        await signOut(auth);
+        alert('Logged out successfully!');
+        window.location.reload();
+      } catch (error) {
+        alert('Error logging out!');
+      }
+    };
+  </script>
+
   <script>
     const menuBtn = document.getElementById("menu-btn");
     const sidebar = document.getElementById("sidebar");
@@ -348,4 +513,5 @@
     });
   </script>
 </body>
+
 </html>

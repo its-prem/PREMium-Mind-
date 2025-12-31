@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
+
   <title>PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
 
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+
 
   <style>
     /* Responsive styling for mobile devices */
@@ -19,14 +23,17 @@
         padding-left: 10px !important;
         padding-right: 10px !important;
       }
+
       .course-card {
         margin-left: 0 !important;
         margin-right: 0 !important;
       }
+
       .navbar {
         padding-left: 10px !important;
         padding-right: 10px !important;
       }
+
       .footer-container {
         padding-left: 10px !important;
         padding-right: 10px !important;
@@ -40,188 +47,323 @@
     }
   </style>
 </head>
+
 <body>
 
-<!-- Navbar -->
-<!-- Navbar -->
-<nav class="navbar">
-  <div class="logo-container">
-    <img src="small-logo.png" alt="PM Logo" class="logo-image" />
-    <div class="logo-text">PREMium Mind</div>
+  <!-- Navbar -->
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo-container">
+      <img src="small-logo.png" alt="PM Logo" class="logo-image" />
+      <div class="logo-text">PREMium Minds</div>
+    </div>
+
+    <!-- Normal Nav Links (Desktop ke liye) -->
+    <ul class="nav-links">
+      <li><a href="index.html">PREMium Store</a></li>
+      <li><a href="courses.html" class="protected-route" id="coursesLinkNav">PREMium Courses</a></li>
+      <li><a href="#help-form">CONTACT US</a></li>
+      <li><a href="#help-form">HELP</a></li>
+    </ul>
+    <div class="menu-btn" id="menu-btn">☰</div>
+  </nav>
+
+  <!-- Sidebar Menu -->
+  <div class="sidebar" id="sidebar">
+    <!-- User Profile Section (Shows when logged in) -->
+    <div class="user-profile" id="userProfile" style="display: none;">
+      <div class="profile-photo-container">
+        <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile"
+          class="profile-photo" id="profilePhoto" onclick="document.getElementById('photo-input').click()">
+        <button class="change-photo-btn" onclick="document.getElementById('photo-input').click()">📷</button>
+      </div>
+      <input type="file" id="photo-input" accept="image/*">
+      <div class="user-name" id="userName">User Name</div>
+      <div class="user-email" id="userEmail">user@example.com</div>
+      <button class="logout-btn-sidebar" onclick="handleLogout()">Logout</button>
+    </div>
+
+    <!-- Login Prompt (Shows when not logged in) -->
+    <div class="login-prompt" id="loginPrompt">
+      <h3>Welcome to PREMium Mind</h3>
+      <button class="login-btn" onclick="window.location.href='login.html'">Login / Sign Up</button>
+    </div>
+
+    <ul>
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="courses.html" class="protected-route" id="coursesLink">📚 PREMium Courses</a></li>
+      <li><a href="#help-form">📞 Contact</a></li>
+      <li><a href="#help-form">❓ Help</a></li>
+      <li><a href="termcondition.html">⚙️ Terms & Privacy</a></li>
+    </ul>
   </div>
 
-  <!-- Normal Nav Links (Desktop ke liye) -->
-  <ul class="nav-links">
-    <li><a href="#">PREMium Store</a></li>
-    <li><a href="#">CONTACT US</a></li>
-    <li><a href="#help-form">HELP</a></li>
-  </ul>
-
-  <!-- Menu Button (Mobile ke liye) -->
-  <div class="menu-btn" id="menu-btn">☰</div>
-</nav>
-
-<!-- Sidebar Menu -->
-<div class="sidebar" id="sidebar">
-  <h2>PREMium Mind</h2>
-  <ul>
-    <li><a href="index.html">🏠 Home</a></li>
-    <li><a href="resume.html">🛒 Resume</a></li>
-    <li><a href="#help-form">📞 Contact</a></li>
-    <li><a href="#help-form">❓ Help</a></li>
-    <li><a href="termcondition.html">⚙️ Terms & Privacy</a></li>
-  </ul>
-</div>
-
-<!-- Overlay -->
-<div class="overlay" id="overlay"></div>
+  <!-- Overlay -->
+  <div class="overlay" id="overlay"></div>
 
 
-<!-- Main Section -->
-<section class="course-section">
-  <h1>EXPLORE OUR PREMium Mind STORE</h1>
-  <div class="card-container">
-      
-     <!-- Card Example -->
-<div class="course-card">
-  <img src="resume1.jpg" alt="Resume Template 1" />
-  <h2>Modern Resume Template</h2>
-  <p>🔥 Clean & Professional design for freshers and experienced</p>
-  <p class="price">₹99 <span>₹299</span></p>
-  <button class="order-btn" disabled>Coming Soon</button>
-</div>
+  <!-- Main Section -->
+  <section class="course-section">
+    <h1>EXPLORE OUR PREMium Mind STORE</h1>
+    <div class="card-container">
 
-<div class="course-card">
-  <img src="resume1.png" alt="Resume Template 2" />
-  <h2>Creative Resume Template</h2>
-  <p>🚀 Eye-catching design to make you stand out</p>
-  <p class="price">₹99 <span>₹349</span></p>
-  <button class="order-btn" disabled>Coming Soon</button>
-</div>
+      <!-- Card Example -->
+      <div class="course-card">
+        <img src="resume1.jpg" alt="Resume Template 1" />
+        <h2>Modern Resume Template</h2>
+        <p>🔥 Clean & Professional design for freshers and experienced</p>
+        <p class="price">₹99 <span>₹299</span></p>
+        <button class="order-btn" disabled>Coming Soon</button>
+      </div>
 
-<div class="course-card">
-  <img src="resume1.png" alt="Resume Template 3" />
-  <h2>Professional Resume Template</h2>
-  <p>📘 Perfect for corporate & IT jobs</p>
-  <p class="price">₹99 <span>₹399</span></p>
-  <button class="order-btn" disabled>Coming Soon</button>
-</div>
+      <div class="course-card">
+        <img src="resume1.png" alt="Resume Template 2" />
+        <h2>Creative Resume Template</h2>
+        <p>🚀 Eye-catching design to make you stand out</p>
+        <p class="price">₹99 <span>₹349</span></p>
+        <button class="order-btn" disabled>Coming Soon</button>
+      </div>
+
+      <div class="course-card">
+        <img src="resume1.png" alt="Resume Template 3" />
+        <h2>Professional Resume Template</h2>
+        <p>📘 Perfect for corporate & IT jobs</p>
+        <p class="price">₹99 <span>₹399</span></p>
+        <button class="order-btn" disabled>Coming Soon</button>
+      </div>
 
 
     </div>
   </section>
 
-<!-- Footer -->
-<footer class="footer">
-  <div class="footer-container">
-    
-    <!-- Left: Logo & Contact -->
-    <div class="footer-left">
-      <div class="logo-box">
-        <img src="small-logo.png" alt="Premium Learnings Logo" class="logo" />
-      </div>
-    </div>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
 
-    <!-- Middle: About Why -->
-    <div class="footer-links">
-      <div class="footer-column">
-        <h3>About Us</h3>
-        <p>
-          At <strong>PREMium Mind</strong>, we are committed to empowering students and freshers with job-ready skills through practical learning and expert-led courses.
-        </p>
-      </div>
-
-      <div class="footer-column">
-        <h3>Why Choose Us?</h3>
-        <p>
-          With personalized mentorship, project-based learning, and lifetime support, we ensure your career doesn't just start — it accelerates.
-        </p>
-      </div>
-      <div class="contact-info">
-        <div class="brand-text">
-          <h2>Premium Learnings</h2>
-          <p>Wisdom on Demand</p>
+      <!-- Left: Logo & Contact -->
+      <div class="footer-left">
+        <div class="logo-box">
+          <img src="small-logo.png" alt="Premium Learnings Logo" class="logo" />
         </div>
-        <div class="support-text">
-          <p><strong>Have doubts? Our support team will be happy to assist you!</strong></p>
-        </div>
-        <p><strong>Contact course counsellor</strong></p>
-        <ul style="list-style: none;">
-          <li>📞 +91 8102525609</li>
-        </ul>
       </div>
+
+      <!-- Middle: About Why -->
+      <div class="footer-links">
+        <div class="footer-column">
+          <h3>About Us</h3>
+          <p>
+            At <strong>PREMium Mind</strong>, we are committed to empowering students and freshers with job-ready skills
+            through practical learning and expert-led courses.
+          </p>
+        </div>
+
+        <div class="footer-column">
+          <h3>Why Choose Us?</h3>
+          <p>
+            With personalized mentorship, project-based learning, and lifetime support, we ensure your career doesn't
+            just start — it accelerates.
+          </p>
+        </div>
+        <div class="contact-info">
+          <div class="brand-text">
+            <h2>Premium Learnings</h2>
+            <p>Wisdom on Demand</p>
+          </div>
+          <div class="support-text">
+            <p><strong>Have doubts? Our support team will be happy to assist you!</strong></p>
+          </div>
+          <p><strong>Contact course counsellor</strong></p>
+          <ul style="list-style: none;">
+            <li>📞 +91 8102525609</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right: Form -->
+      <div class="footer-form" id="help-form">
+        <form id="whForm">
+          <label>Full Name:
+            <input type="text" id="name" required placeholder="Enter Full Name" />
+          </label>
+          <label>Phone Number:
+            <input type="tel" id="phone" pattern="[0-9]{10}" required placeholder="Enter Phone Number" />
+          </label>
+          <label>Report Problem:
+            <textarea id="message" rows="4" placeholder="Your message..." required></textarea>
+          </label>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+      <div style="text-align:center; margin-top:10px; font-size:14px; color:#555;">
+        &copy; 2025 PREMium Mind |
+        <a href="privacy.html" style="color:#0073e6; text-decoration:none;">Privacy Policy</a>
+      </div>
+
+      <script>
+        document.getElementById("whForm").addEventListener("submit", function (e) {
+          e.preventDefault(); // normal submit roko
+
+          const name = encodeURIComponent(document.getElementById("name").value);
+          const phone = encodeURIComponent(document.getElementById("phone").value);
+          const msg = encodeURIComponent(document.getElementById("message").value);
+
+          // apna WhatsApp number (country code + number, bina +)
+          const owner = "918102525609";
+
+          // prefilled text
+          const text = `Name: ${name}%0APhone: ${phone}%0AMessage: ${msg}`;
+
+          // wa.me link banao
+          const url = `https://wa.me/${owner}?text=${text}`;
+
+          // redirect/open
+          window.open(url, "_blank"); // nayi tab me, _self same tab ke liye
+        });
+      </script>
+
+      <!-- Firebase & Custom Scripts -->
+      <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
+          authDomain: "premium-mind-fcb16.firebaseapp.com",
+          projectId: "premium-mind-fcb16",
+          storageBucket: "premium-mind-fcb16.firebasestorage.app",
+          messagingSenderId: "864874199521",
+          appId: "1:864874199521:web:5deb96a956dc404a077aa0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+
+        // Check authentication state
+        onAuthStateChanged(auth, (user) => {
+          const userProfile = document.getElementById('userProfile');
+          const loginPrompt = document.getElementById('loginPrompt');
+          const coursesLink = document.getElementById('coursesLink');
+          const coursesLinkNav = document.getElementById('coursesLinkNav');
+
+          if (user) {
+            // User is logged in
+            userProfile.style.display = 'block';
+            loginPrompt.style.display = 'none';
+
+            // Update user info
+            document.getElementById('userName').textContent = user.displayName || 'User';
+            document.getElementById('userEmail').textContent = user.email;
+
+            // Load profile photo
+            const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
+            if (photoURL) {
+              document.getElementById('profilePhoto').src = photoURL;
+            } else {
+              document.getElementById('profilePhoto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=000&color=fff&size=80`;
+            }
+
+            // Enable protected routes
+            if (coursesLink) {
+              coursesLink.classList.remove('locked');
+              coursesLink.onclick = null;
+            }
+            if (coursesLinkNav) {
+              coursesLinkNav.classList.remove('locked');
+              coursesLinkNav.onclick = null;
+            }
+          } else {
+            // User is not logged in
+            userProfile.style.display = 'none';
+            loginPrompt.style.display = 'block';
+
+            // Lock protected routes
+            if (coursesLink) {
+              coursesLink.classList.add('locked');
+              coursesLink.onclick = (e) => {
+                e.preventDefault();
+                alert('Please login to access PREMium Courses!');
+                window.location.href = 'login.html';
+              };
+            }
+            if (coursesLinkNav) {
+              coursesLinkNav.classList.add('locked');
+              coursesLinkNav.onclick = (e) => {
+                e.preventDefault();
+                alert('Please login to access PREMium Courses!');
+                window.location.href = 'login.html';
+              };
+            }
+          }
+        });
+
+        // Photo upload handler
+        document.getElementById('photo-input').addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          const user = auth.currentUser;
+          if (!user) return;
+
+          try {
+            // Upload to Firebase Storage
+            const storageRef = ref(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
+            await uploadBytes(storageRef, file);
+            const photoURL = await getDownloadURL(storageRef);
+
+            // Save to localStorage and update UI
+            localStorage.setItem('profilePhoto_' + user.uid, photoURL);
+            document.getElementById('profilePhoto').src = photoURL;
+
+            alert('Profile photo updated successfully!');
+          } catch (error) {
+            console.error('Error uploading photo:', error);
+            alert('Error uploading photo. Please try again.');
+          }
+        });
+
+        // Logout function
+        window.handleLogout = async () => {
+          try {
+            await signOut(auth);
+            alert('Logged out successfully!');
+            window.location.reload();
+          } catch (error) {
+            alert('Error logging out!');
+          }
+        };
+      </script>
+
+      <script>
+        const menuBtn = document.getElementById("menu-btn");
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("overlay");
+
+        // Open menu
+        menuBtn.addEventListener("click", () => {
+          sidebar.classList.add("active");
+          overlay.classList.add("active");
+        });
+
+        // Close menu when clicking overlay
+        overlay.addEventListener("click", () => {
+          sidebar.classList.remove("active");
+          overlay.classList.remove("active");
+        });
+
+        // Close menu when clicking on any link
+        document.querySelectorAll(".sidebar ul li a").forEach(link => {
+          link.addEventListener("click", () => {
+            sidebar.classList.remove("active");
+            overlay.classList.remove("active");
+          });
+        });
+      </script>
+
     </div>
-
-    <!-- Right: Form -->
-    <div class="footer-form" id="help-form">
-      <form id="whForm">
-        <label>Full Name:
-          <input type="text" id="name" required placeholder="Enter Full Name"/>
-        </label>
-        <label>Phone Number:
-          <input type="tel" id="phone" pattern="[0-9]{10}" required placeholder="Enter Phone Number" />
-        </label>
-        <label>Report Problem:
-          <textarea id="message" rows="4" placeholder="Your message..." required></textarea>
-        </label>
-        <button type="submit">Submit</button>
-      </form>
-    </div>
-    <div style="text-align:center; margin-top:10px; font-size:14px; color:#555;">
-    &copy; 2025 PREMium Mind | 
-    <a href="privacy.html" style="color:#0073e6; text-decoration:none;">Privacy Policy</a>
-    </div>
-
-<script>
-document.getElementById("whForm").addEventListener("submit", function(e){
-  e.preventDefault(); // normal submit roko
-
-  const name = encodeURIComponent(document.getElementById("name").value);
-  const phone = encodeURIComponent(document.getElementById("phone").value);
-  const msg   = encodeURIComponent(document.getElementById("message").value);
-
-  // apna WhatsApp number (country code + number, bina +)
-  const owner = "918102525609";
-
-  // prefilled text
-  const text = `Name: ${name}%0APhone: ${phone}%0AMessage: ${msg}`;
-
-  // wa.me link banao
-  const url = `https://wa.me/${owner}?text=${text}`;
-
-  // redirect/open
-  window.open(url, "_blank"); // nayi tab me, _self same tab ke liye
-});
-
-  const menuBtn = document.getElementById("menu-btn");
-  const sidebar = document.getElementById("sidebar");
-  const overlay = document.getElementById("overlay");
-
-  // Open menu
-  menuBtn.addEventListener("click", () => {
-    sidebar.classList.add("active");
-    overlay.classList.add("active");
-  });
-
-  // Close menu when clicking overlay
-  overlay.addEventListener("click", () => {
-    sidebar.classList.remove("active");
-    overlay.classList.remove("active");
-  });
-
-  // Close menu when clicking on any link
-  document.querySelectorAll(".sidebar ul li a").forEach(link => {
-    link.addEventListener("click", () => {
-      sidebar.classList.remove("active");
-      overlay.classList.remove("active");
-    });
-  });
-
-
-</script>
-
-  </div>
-</footer>
+  </footer>
 
 </body>
+
 </html>
