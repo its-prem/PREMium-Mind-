@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Courses | PREMium Mind</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="small-logo.png">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.9);
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+}
+
+.logo-section img {
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+}
+
+.logo-section h1 {
+  font-size: 1.5rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.user-info {
+  color: white;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 15px;
+  border-radius: 8px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+  color: white;
+}
+
+.page-header h2 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.loading {
+  text-align: center;
+  padding: 80px 20px;
+  color: white;
+}
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.empty-state h3 {
+  font-size: 2rem;
+  color: #1f2937;
+  margin-bottom: 15px;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+.course-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s;
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.course-image {
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  color: white;
+}
+
+.course-content {
+  padding: 20px;
+}
+
+.course-badge {
+  display: inline-block;
+  background: #d1fae5;
+  color: #065f46;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.course-title {
+  font-size: 1.4rem;
+  color: #1f2937;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.course-meta {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  color: #6b7280;
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.course-description {
+  color: #4b5563;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.course-progress {
+  margin-bottom: 15px;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  border-radius: 10px;
+  transition: width 0.3s;
+}
+
+.progress-text {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 5px;
+}
+
+.course-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+}
+
+.btn-continue {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.btn-continue:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .page-header h2 {
+    font-size: 1.8rem;
+  }
+
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .user-info {
+    font-size: 0.8rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-section">
+    <img src="small-logo.png" alt="PM Logo">
+    <h1>🎓 My Courses</h1>
+  </div>
+  <div class="header-actions">
+    <div class="user-info">
+      <span>👤</span>
+      <span id="userEmail">Loading...</span>
+    </div>
+    <button class="btn btn-primary" onclick="window.location.href='index.html'">🏠 Home</button>
+    <button class="btn btn-danger" onclick="handleLogout()">Logout</button>
+  </div>
+</header>
+
+<div class="container">
+  
+  <div class="page-header">
+    <h2>My Learning Journey</h2>
+    <p>Continue where you left off and explore your courses</p>
+  </div>
+
+  <div class="loading" id="loadingState">
+    <div class="spinner"></div>
+    <h3>Loading your courses...</h3>
+  </div>
+
+  <div class="empty-state" id="emptyState" style="display: none;">
+    <h3>📚 No Courses Yet</h3>
+    <p>You haven't purchased any courses yet.<br>Explore our course library and start your learning journey!</p>
+    <button class="btn btn-primary" onclick="window.location.href='index.html'" style="padding: 15px 40px; font-size: 1.1rem;">
+      Browse Courses
+    </button>
+  </div>
+
+  <div class="courses-grid" id="coursesGrid" style="display: none;">
+    <!-- Courses will be loaded here dynamically -->
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
+  authDomain: "premium-mind-fcb16.firebaseapp.com",
+  databaseURL: "https://premium-mind-fcb16-default-rtdb.firebaseio.com",
+  projectId: "premium-mind-fcb16",
+  storageBucket: "premium-mind-fcb16.firebasestorage.app",
+  messagingSenderId: "864874199521",
+  appId: "1:864874199521:web:5deb96a956dc404a077aa0"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const database = getDatabase(app);
+
+// Courses Master Data
+const coursesDatabase = {
+  'web-development': {
+    id: 'web-development',
+    title: 'Web Development Full Course',
+    description: 'Master HTML, CSS, JavaScript & Firebase. Build real-world projects and launch your web development career.',
+    icon: '🚀',
+    totalLessons: 15,
+    duration: '30+ hours',
+    level: 'Beginner to Advanced',
+    url: 'lecture.html?course=web-development'
+  },
+  'react-course': {
+    id: 'react-course',
+    title: 'React JS Mastery',
+    description: 'Learn React from scratch. Build modern web applications with hooks, routing, and state management.',
+    icon: '⚛️',
+    totalLessons: 20,
+    duration: '40+ hours',
+    level: 'Intermediate',
+    url: 'lecture.html?course=react-course'
+  },
+  'python-course': {
+    id: 'python-course',
+    title: 'Python Programming',
+    description: 'Complete Python course from basics to advanced. Data structures, OOP, and real projects.',
+    icon: '🐍',
+    totalLessons: 25,
+    duration: '50+ hours',
+    level: 'Beginner',
+    url: 'lecture.html?course=python-course'
+  },
+  'data-science': {
+    id: 'data-science',
+    title: 'Data Science Bootcamp',
+    description: 'Master data analysis, visualization, machine learning & AI with Python.',
+    icon: '📊',
+    totalLessons: 30,
+    duration: '60+ hours',
+    level: 'Advanced',
+    url: 'lecture.html?course=data-science'
+  }
+};
+
+onAuthStateChanged(auth, async (user) => {
+  const loadingState = document.getElementById('loadingState');
+  const emptyState = document.getElementById('emptyState');
+  const coursesGrid = document.getElementById('coursesGrid');
+  const userEmailEl = document.getElementById('userEmail');
+
+  if (!user) {
+    alert('⚠️ Please login first to view your courses!');
+    window.location.href = 'login.html';
+    return;
+  }
+
+  userEmailEl.textContent = user.email;
+
+  try {
+    const userRef = ref(database, 'users/' + user.uid);
+    const snapshot = await get(userRef);
+
+    loadingState.style.display = 'none';
+
+    if (snapshot.exists()) {
+      const userData = snapshot.val();
+      const purchasedCourses = userData.purchasedCourses || {};
+      
+      // Convert purchased courses to array
+      const coursesArray = [];
+      Object.keys(purchasedCourses).forEach(courseId => {
+        if (coursesDatabase[courseId]) {
+          coursesArray.push({
+            ...coursesDatabase[courseId],
+            ...purchasedCourses[courseId],
+            courseId: courseId
+          });
+        }
+      });
+
+      if (coursesArray.length > 0) {
+        displayCourses(coursesArray);
+        coursesGrid.style.display = 'grid';
+      } else {
+        emptyState.style.display = 'block';
+      }
+
+    } else {
+      emptyState.style.display = 'block';
+    }
+
+  } catch (error) {
+    console.error('Error loading courses:', error);
+    loadingState.style.display = 'none';
+    emptyState.style.display = 'block';
+  }
+});
+
+function displayCourses(courses) {
+  const coursesGrid = document.getElementById('coursesGrid');
+  coursesGrid.innerHTML = '';
+
+  courses.forEach(course => {
+    const progress = course.progress || 0;
+    const purchaseDate = new Date(course.purchaseDate || Date.now());
+    const formattedDate = purchaseDate.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+
+    const courseCard = document.createElement('div');
+    courseCard.className = 'course-card';
+    courseCard.innerHTML = `
+      <div class="course-image">
+        ${course.icon || '📚'}
+      </div>
+      <div class="course-content">
+        <span class="course-badge">✅ Enrolled</span>
+        <h3 class="course-title">${course.title}</h3>
+        
+        <div class="course-meta">
+          <div class="meta-item">
+            <span>📚</span>
+            <span>${course.totalLessons} Lessons</span>
+          </div>
+          <div class="meta-item">
+            <span>⏱️</span>
+            <span>${course.duration}</span>
+          </div>
+          <div class="meta-item">
+            <span>📊</span>
+            <span>${course.level}</span>
+          </div>
+        </div>
+
+        <p class="course-description">${course.description}</p>
+
+        <div class="course-progress">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width: ${progress}%"></div>
+          </div>
+          <p class="progress-text">${progress}% Complete • Enrolled on ${formattedDate}</p>
+        </div>
+
+        <div class="course-actions">
+          <button class="action-btn btn-continue" onclick="window.location.href='${course.url}'">
+            ${progress > 0 ? '▶️ Continue Learning' : '🎬 Start Course'}
+          </button>
+        </div>
+      </div>
+    `;
+
+    coursesGrid.appendChild(courseCard);
+  });
+}
+
+window.handleLogout = async () => {
+  try {
+    await signOut(auth);
+    alert('✅ Logged out successfully!');
+    window.location.href = 'index.html';
+  } catch (error) {
+    alert('❌ Error logging out');
+  }
+};
+</script>
+
+</body>
+</html>

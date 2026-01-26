@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Success - PREMium Mind</title>
+  <link rel="icon" type="image/png" href="small-logo.png">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .success-container {
+      background: white;
+      border-radius: 20px;
+      padding: 50px 40px;
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .success-icon {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 30px;
+      animation: scaleIn 0.5s ease-out 0.2s both;
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+
+    .success-icon svg {
+      width: 50px;
+      height: 50px;
+      stroke: white;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #1f2937;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .success-message {
+      font-size: 1.1rem;
+      color: #6b7280;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    .course-info {
+      background: #f3f4f6;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+
+    .course-info h3 {
+      font-size: 1.2rem;
+      color: #1f2937;
+      margin-bottom: 10px;
+    }
+
+    .course-info p {
+      color: #6b7280;
+      font-size: 0.95rem;
+    }
+
+    .loading-text {
+      font-size: 1rem;
+      color: #6b7280;
+      margin: 20px 0;
+    }
+
+    .spinner {
+      border: 3px solid #f3f4f6;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 14px 30px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #1f2937;
+    }
+
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+
+    .error-container {
+      display: none;
+    }
+
+    .error-icon {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 30px;
+    }
+
+    .error-icon svg {
+      width: 50px;
+      height: 50px;
+      stroke: white;
+      stroke-width: 3;
+    }
+
+    @media (max-width: 600px) {
+      .success-container {
+        padding: 40px 25px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="success-container" id="successContainer">
+  <div class="success-icon">
+    <svg viewBox="0 0 24 24">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+  
+  <h1>Payment Successful! 🎉</h1>
+  <p class="success-message">
+    Congratulations! Your payment has been processed successfully.
+  </p>
+
+  <div class="course-info" id="courseInfo" style="display: none;">
+    <h3 id="courseName">Loading course...</h3>
+    <p>Your course is being activated...</p>
+  </div>
+
+  <div class="spinner" id="loadingSpinner"></div>
+  <p class="loading-text" id="loadingText">Activating your course access...</p>
+
+  <div class="action-buttons" id="actionButtons" style="display: none;">
+    <a href="my-courses.html" class="btn btn-primary">Go to My Courses</a>
+    <a href="index.html" class="btn btn-secondary">Browse More Courses</a>
+  </div>
+</div>
+
+<div class="success-container error-container" id="errorContainer">
+  <div class="error-icon">
+    <svg viewBox="0 0 24 24" fill="none">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  </div>
+  
+  <h1>Something Went Wrong</h1>
+  <p class="success-message" id="errorMessage">
+    We couldn't process your course activation. Please contact support.
+  </p>
+
+  <div class="action-buttons">
+    <a href="index.html" class="btn btn-primary">Back to Home</a>
+    <a href="#" class="btn btn-secondary" onclick="location.reload()">Try Again</a>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getDatabase, ref, set, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
+    authDomain: "premium-mind-fcb16.firebaseapp.com",
+    databaseURL: "https://premium-mind-fcb16-default-rtdb.firebaseio.com",
+    projectId: "premium-mind-fcb16",
+    storageBucket: "premium-mind-fcb16.firebasestorage.app",
+    messagingSenderId: "864874199521",
+    appId: "1:864874199521:web:5deb96a956dc404a077aa0"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const database = getDatabase(app);
+
+  // Course mapping with details
+  const courseMap = {
+    'web-development': {
+      name: '🚀 Web Development Full Course',
+      price: '₹499',
+      description: 'Complete HTML, CSS, JavaScript & Firebase'
+    },
+    'react-course': {
+      name: '⚛️ React JS Mastery',
+      price: '₹699',
+      description: 'Build modern web apps with React'
+    },
+    'python-course': {
+      name: '🐍 Python Programming',
+      price: '₹799',
+      description: 'Complete Python from basics to advanced'
+    },
+    'data-science': {
+      name: '📊 Data Science Bootcamp',
+      price: '₹999',
+      description: 'Master data analysis, ML & AI'
+    }
+  };
+
+  // Get URL parameters
+  function getUrlParameter(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+  }
+
+  // Activate course for user
+  async function activateCourse(userId, courseId) {
+    try {
+      const courseData = courseMap[courseId];
+      if (!courseData) {
+        throw new Error('Invalid course ID');
+      }
+
+      // Update user's purchased courses
+      const userCoursesRef = ref(database, `users/${userId}/purchasedCourses/${courseId}`);
+      await set(userCoursesRef, {
+        purchasedAt: new Date().toISOString(),
+        courseName: courseData.name,
+        price: courseData.price,
+        status: 'active'
+      });
+
+      // Also update a transactions log (optional but recommended)
+      const transactionRef = ref(database, `transactions/${userId}/${Date.now()}`);
+      await set(transactionRef, {
+        courseId: courseId,
+        courseName: courseData.name,
+        price: courseData.price,
+        purchasedAt: new Date().toISOString(),
+        paymentStatus: 'success'
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error activating course:', error);
+      throw error;
+    }
+  }
+
+  // Show error state
+  function showError(message) {
+    document.getElementById('successContainer').style.display = 'none';
+    document.getElementById('errorContainer').style.display = 'block';
+    document.getElementById('errorMessage').textContent = message;
+  }
+
+  // Show success state
+  function showSuccess(courseId) {
+    const courseData = courseMap[courseId];
+    document.getElementById('courseName').textContent = courseData.name;
+    document.getElementById('courseInfo').style.display = 'block';
+    document.getElementById('loadingSpinner').style.display = 'none';
+    document.getElementById('loadingText').textContent = '✅ Course activated successfully!';
+    document.getElementById('actionButtons').style.display = 'flex';
+  }
+
+  // Main execution
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      showError('You must be logged in to complete the purchase. Please login and try again.');
+      return;
+    }
+
+    // Get course ID from URL
+    const courseId = getUrlParameter('course');
+    
+    if (!courseId || !courseMap[courseId]) {
+      showError('Invalid course selection. Please try again from the courses page.');
+      return;
+    }
+
+    try {
+      // Check if already purchased (to prevent duplicate purchases)
+      const userCoursesRef = ref(database, `users/${user.uid}/purchasedCourses/${courseId}`);
+      const snapshot = await get(userCoursesRef);
+
+      if (snapshot.exists()) {
+        // Already purchased, just show success
+        showSuccess(courseId);
+      } else {
+        // Activate the course
+        await activateCourse(user.uid, courseId);
+        
+        // Show success after a short delay for better UX
+        setTimeout(() => {
+          showSuccess(courseId);
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showError('Failed to activate your course. Please contact support with your payment details.');
+    }
+  });
+</script>
+
+</body>
+</html>
+ <!-- testing -->

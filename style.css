@@ -395,6 +395,7 @@ body {
   overflow-y: auto;
 }
 
+
 .sidebar.active {
   right: 0;
 }
@@ -491,4 +492,9 @@ body {
   .footer-form button {
     font-size: 14px;
   }
+}
+.disabled-btn {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
 }

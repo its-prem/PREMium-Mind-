@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel - Grant Course Access</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #1f2937;
+  margin-bottom: 10px;
+  font-size: 2rem;
+}
+
+.subtitle {
+  color: #6b7280;
+  margin-bottom: 30px;
+  font-size: 0.95rem;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  color: #374151;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+select {
+  cursor: pointer;
+  background: white;
+}
+
+button {
+  width: 100%;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4);
+}
+
+button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.result {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 8px;
+  display: none;
+}
+
+.result.success {
+  background: #d1fae5;
+  color: #065f46;
+  border: 2px solid #10b981;
+}
+
+.result.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 2px solid #ef4444;
+}
+
+.stats {
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 2px solid #e5e7eb;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  color: #4b5563;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.user-list {
+  margin-top: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.user-item {
+  background: #f9fafb;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.user-email {
+  font-size: 0.95rem;
+  color: #374151;
+  font-weight: 600;
+}
+
+.user-courses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.course-badge {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.course-badge.pending {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.quick-grant-section {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.quick-grant-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-right: 5px;
+  margin-top: 5px;
+}
+
+.course-select-small {
+  display: inline-block;
+  width: auto;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  margin-right: 5px;
+  margin-top: 5px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🔐 Admin Panel - Course Access</h1>
+  <p class="subtitle">Grant course access to users manually</p>
+
+  <div class="form-group">
+    <label>User Email Address</label>
+    <input type="email" id="userEmail" placeholder="user@example.com" />
+  </div>
+
+  <div class="form-group">
+    <label>Select Course</label>
+    <select id="courseSelect">
+      <option value="">-- Select Course --</option>
+      <option value="web-development">🚀 Web Development Full Course</option>
+      <option value="react-course">⚛️ React JS Mastery</option>
+      <option value="python-course">🐍 Python Programming</option>
+      <option value="data-science">📊 Data Science Bootcamp</option>
+    </select>
+  </div>
+
+  <button onclick="grantAccess()" id="grantBtn">
+    ✅ Grant Course Access
+  </button>
+
+  <div class="result" id="result"></div>
+
+  <div class="stats">
+    <h3 style="margin-bottom: 15px; color: #1f2937;">📊 Statistics</h3>
+    <div class="stat-item">
+      <span>Total Users:</span>
+      <span class="stat-value" id="totalUsers">0</span>
+    </div>
+    <div class="stat-item">
+      <span>Total Enrollments:</span>
+      <span class="stat-value" id="totalEnrollments">0</span>
+    </div>
+  </div>
+
+  <div class="stats">
+    <h3 style="margin-bottom: 15px; color: #1f2937;">👥 All Users & Their Courses</h3>
+    <div class="user-list" id="userList">
+      <p style="text-align: center; color: #9ca3af;">Loading users...</p>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getDatabase, ref, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
+  authDomain: "premium-mind-fcb16.firebaseapp.com",
+  databaseURL: "https://premium-mind-fcb16-default-rtdb.firebaseio.com",
+  projectId: "premium-mind-fcb16",
+  storageBucket: "premium-mind-fcb16.firebasestorage.app",
+  messagingSenderId: "864874199521",
+  appId: "1:864874199521:web:5deb96a956dc404a077aa0"
+};
+
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+// Course Database
+const coursesData = {
+  'web-development': {
+    title: 'Web Development Full Course',
+    price: 499,
+    icon: '🚀'
+  },
+  'react-course': {
+    title: 'React JS Mastery',
+    price: 699,
+    icon: '⚛️'
+  },
+  'python-course': {
+    title: 'Python Programming',
+    price: 799,
+    icon: '🐍'
+  },
+  'data-science': {
+    title: 'Data Science Bootcamp',
+    price: 999,
+    icon: '📊'
+  }
+};
+
+// Grant Access Function
+window.grantAccess = async () => {
+  const email = document.getElementById('userEmail').value.trim();
+  const courseId = document.getElementById('courseSelect').value;
+  const resultDiv = document.getElementById('result');
+  const grantBtn = document.getElementById('grantBtn');
+  
+  if (!email) {
+    showResult('Please enter a valid email address', 'error');
+    return;
+  }
+
+  if (!courseId) {
+    showResult('Please select a course', 'error');
+    return;
+  }
+  
+  grantBtn.disabled = true;
+  grantBtn.textContent = '⏳ Processing...';
+  
+  try {
+    const usersRef = ref(database, 'users');
+    const snapshot = await get(usersRef);
+    
+    let userFound = false;
+    
+    if (snapshot.exists()) {
+      snapshot.forEach((childSnapshot) => {
+        const userData = childSnapshot.val();
+        if (userData.email === email) {
+          const userId = childSnapshot.key;
+          const courseData = coursesData[courseId];
+          
+          // Grant access to specific course
+          const updates = {};
+          updates[`users/${userId}/purchasedCourses/${courseId}`] = {
+            courseName: courseData.title,
+            purchaseDate: new Date().toISOString(),
+            price: courseData.price,
+            progress: 0,
+            status: 'active',
+            grantedBy: 'admin'
+          };
+          
+          update(ref(database), updates);
+          
+          userFound = true;
+          showResult(`✅ ${courseData.title} access granted to ${email}`, 'success');
+          document.getElementById('userEmail').value = '';
+          document.getElementById('courseSelect').value = '';
+          
+          // Refresh user list
+          setTimeout(loadUsers, 1000);
+        }
+      });
+    }
+    
+    if (!userFound) {
+      showResult(`❌ User not found with email: ${email}`, 'error');
+    }
+    
+  } catch (error) {
+    showResult(`❌ Error: ${error.message}`, 'error');
+  }
+  
+  grantBtn.disabled = false;
+  grantBtn.textContent = '✅ Grant Course Access';
+};
+
+// Show Result Message
+function showResult(message, type) {
+  const resultDiv = document.getElementById('result');
+  resultDiv.textContent = message;
+  resultDiv.className = `result ${type}`;
+  resultDiv.style.display = 'block';
+  
+  setTimeout(() => {
+    resultDiv.style.display = 'none';
+  }, 5000);
+}
+
+// Load All Users
+async function loadUsers() {
+  try {
+    const usersRef = ref(database, 'users');
+    const snapshot = await get(usersRef);
+    
+    const userListDiv = document.getElementById('userList');
+    userListDiv.innerHTML = '';
+    
+    let totalUsers = 0;
+    let totalEnrollments = 0;
+    
+    if (snapshot.exists()) {
+      snapshot.forEach((childSnapshot) => {
+        const userData = childSnapshot.val();
+        const userId = childSnapshot.key;
+        totalUsers++;
+        
+        const purchasedCourses = userData.purchasedCourses || {};
+        const courseCount = Object.keys(purchasedCourses).length;
+        totalEnrollments += courseCount;
+        
+        const userItem = document.createElement('div');
+        userItem.className = 'user-item';
+        
+        let coursesHTML = '';
+        Object.keys(coursesData).forEach(courseId => {
+          if (purchasedCourses[courseId]) {
+            coursesHTML += `<span class="course-badge">${coursesData[courseId].icon} ${coursesData[courseId].title}</span>`;
+          }
+        });
+
+        if (!coursesHTML) {
+          coursesHTML = '<span class="course-badge pending">No courses enrolled</span>';
+        }
+        
+        userItem.innerHTML = `
+          <div class="user-header">
+            <div>
+              <div class="user-email">${userData.email || 'No email'}</div>
+              <small style="color: #9ca3af;">${userData.displayName || 'Anonymous'} • ${courseCount} course(s)</small>
+            </div>
+          </div>
+          <div class="user-courses">
+            ${coursesHTML}
+          </div>
+          <div class="quick-grant-section">
+            <small style="color: #6b7280;">Quick Grant:</small><br>
+            ${Object.keys(coursesData).map(courseId => {
+              if (!purchasedCourses[courseId]) {
+                return `<button class="quick-grant-btn" onclick="quickGrantCourse('${userData.email}', '${courseId}')">
+                  ${coursesData[courseId].icon} ${coursesData[courseId].title}
+                </button>`;
+              }
+              return '';
+            }).join('')}
+          </div>
+        `;
+        userListDiv.appendChild(userItem);
+      });
+    } else {
+      userListDiv.innerHTML = '<p style="text-align: center; color: #9ca3af;">No users found</p>';
+    }
+    
+    // Update stats
+    document.getElementById('totalUsers').textContent = totalUsers;
+    document.getElementById('totalEnrollments').textContent = totalEnrollments;
+    
+  } catch (error) {
+    console.error('Error loading users:', error);
+  }
+}
+
+// Quick Grant Function
+window.quickGrantCourse = (email, courseId) => {
+  document.getElementById('userEmail').value = email;
+  document.getElementById('courseSelect').value = courseId;
+  grantAccess();
+};
+
+// Load users on page load
+loadUsers();
+</script>
+
+</body>
+</html>
