@@ -191,63 +191,107 @@
       box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
     }
 
-    /* RED TAG */
+    /* ✅ FIXED: Card Container - Equal margins on both sides */
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Course Card */
     .course-card {
-  position: relative;
-  width: 280px;
-  border-radius: 12px;
-  padding: 15px;
-  background: #fff;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-  overflow: hidden;
-}
+      position: relative;
+      width: 280px;
+      border-radius: 12px;
+      padding: 15px;
+      background: #fff;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
 
-.course-card img {
-  width: 100%;
-  border-radius: 8px;
-}
+    .course-card img {
+      width: 100%;
+      border-radius: 8px;
+    }
 
-.course-card h2 {
-  font-size: 18px;
-  margin: 10px 0;
-}
+    .course-card h2 {
+      font-size: 18px;
+      margin: 10px 0;
+    }
 
-.price {
-  font-size: 18px;
-  font-weight: bold;
-}
+    .price {
+      font-size: 18px;
+      font-weight: bold;
+    }
 
-.price span {
-  color: #888;
-  text-decoration: line-through;
-  font-size: 14px;
-  margin-left: 6px;
-}
+    .price span {
+      color: #888;
+      text-decoration: line-through;
+      font-size: 14px;
+      margin-left: 6px;
+    }
 
-.disabled-btn {
-  width: 100%;
-  padding: 10px;
-  background: #ff9800;
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-}
+    .disabled-btn {
+      width: 100%;
+      padding: 10px;
+      background: #ff9800;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-/* 🔴 NEW Badge */
-.new-badge {
-  position: absolute;
-  top: 12px;
-  right: -35px;
-  background: red;
-  color: #fff;
-  font-size: 13px;
-  font-weight: bold;
-  padding: 6px 40px;
-  transform: rotate(45deg);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-}
+    /* 🔴 NEW Badge */
+    .new-badge {
+      position: absolute;
+      top: 12px;
+      right: -35px;
+      background: red;
+      color: #fff;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 6px 40px;
+      transform: rotate(45deg);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    }
+
+    /* ✅ IMPROVED: Better heading design */
+    .course-section h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #000000 0%, #434343 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 40px 0 30px 0;
+      padding: 0 20px;
+      letter-spacing: 1px;
+      position: relative;
+    }
+
+    .course-section h1::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, #000000, #666666);
+      border-radius: 2px;
+    }
+
+    @media screen and (max-width: 768px) {
+      .course-section h1 {
+        font-size: 1.8rem;
+      }
+    }
 
   </style>
 </head>
