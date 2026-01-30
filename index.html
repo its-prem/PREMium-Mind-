@@ -190,6 +190,65 @@
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
     }
+
+    /* RED TAG */
+    .course-card {
+  position: relative;
+  width: 280px;
+  border-radius: 12px;
+  padding: 15px;
+  background: #fff;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+.course-card img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.course-card h2 {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.price span {
+  color: #888;
+  text-decoration: line-through;
+  font-size: 14px;
+  margin-left: 6px;
+}
+
+.disabled-btn {
+  width: 100%;
+  padding: 10px;
+  background: #ff9800;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* 🔴 NEW Badge */
+.new-badge {
+  position: absolute;
+  top: 12px;
+  right: -35px;
+  background: red;
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 6px 40px;
+  transform: rotate(45deg);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+}
+
   </style>
 </head>
 <body>
@@ -271,104 +330,87 @@
   </button>
 </div>
 <div class="course-card">
-  <img src="/IMAGES/SMART GRID.png" alt="Transportation Engineering Microsheet" />
-  <h2>SMART GRID TECHNOLOGY MICROSHEET</h2>
+  <img src="AI AND ML.png" alt="Transportation Engineering Microsheet" />
+  <h2>AI AND ML MICROSHEET</h2>
+   <span class="new-badge">NEW</span>
   <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
-  <p>📄 Total Pages: 2 | Short & Easy Notes</p>
+  <p>📄 Total Pages: 3 | Short & Easy Notes</p>
   <p class="price">₹30 <span>₹49</span></p>
-  <button  onclick="window.location.href='https://payments.cashfree.com/forms?code=metalpage'">
+  <button class="disabled-btn" onclick="window.location.href='https://payments.cashfree.com/forms/csepage'">
     Buy Now
   </button>
 </div>
 <div class="course-card">
-  <img src="/IMAGES/POWER ELECTRONIC .png" alt="Transportation Engineering Microsheet" />
-  <h2>POWER ELECTRONICS & DRIVES Microsheet</h2>
+   
+  <img src="/IMAGES/HRM.png" alt="Transportation Engineering Microsheet" />
+  <h2>HRM USING AI AND DATA SCIENCE MICROSHEET</h2>
+  <span class="new-badge">NEW</span>
+  <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
+  <p>📄 Total Pages: 2 | Short & Easy Notes</p>
+  <p class="price">₹30 <span>₹49</span></p>
+  <button class="disabled-btn" onclick="window.location.href='https://payments.cashfree.com/forms?code=metalpage'">
+    Buy Now
+  </button>
+</div>
+<div class="course-card">
+  
+
+  <img src="/IMAGES/DATA ANALYTICS.png" alt="Transportation Engineering Microsheet" />
+  <h2>DATA ANALYTICS MICROSHEET</h2>
+  <span class="new-badge">NEW</span>
   <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
   <p>📄 Total Pages: 3 | Short & Easy Notes</p>
   <p class="price">₹30 <span>₹49</span></p>
-  <button  onclick="window.location.href='https://payments.cashfree.com/forms?code=metalpage'">
+
+  <button class="disabled-btn" onclick="window.location.href='https://payments.cashfree.com/forms?code=metalpage'">
     Buy Now
   </button>
 </div>
 
 <div class="course-card">
-  <img src="/IMAGES/block chain.png" alt="Transportation Engineering Microsheet" />
-  <h2>BLOCK CHAIN TECHNOLOGY MICROSHEET</h2>
+   <span class="new-badge">NEW</span>
+  <img src="/IMAGES/DRONE TECHNO.png" alt="Transportation Engineering Microsheet" />
+  <h2>DRONE TECHNOLOGY 
+ROBOTICS MICROSHEET </h2>
+<span class="new-badge">NEW</span>
   <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
   <p>📄 Total Pages: 2 | Short & Easy Notes</p>
-  <p class="price">₹30 <span>₹49</span></p>
-  <button  onclick="window.location.href='https://payments.cashfree.com/forms?code=metalpage'">
-    Buy Now
-  </button>
-</div>
-
-<div class="course-card">
-  <img src="GEO .png" alt="Transportation Engineering Microsheet" />
-  <h2>Geotechnical Engineering
-Microsheet</h2>
-  <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
-  <p>📄 Total Pages: 3 | Short & Easy Notes</p>
   <p class="price">₹30<span>₹49</span></p>
-  <button  onclick="window.location.href='https://payments.cashfree.com/forms/civilpage'">
+  <button class="disabled-btn" onclick="window.location.href='https://payments.cashfree.com/forms?code=metalpage'">
     Buy Now
   </button>
 </div>
-<div class="course-card">
+
+
+
+<!-- <div class="course-card">
   <img src="/IMAGES/RENEWABLE.png" alt="Transportation Engineering Microsheet" />
   <h2>Renewable Energy 
 Microsheet</h2>
   <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
   <p>📄 Total Pages: 2 | Short & Easy Notes</p>
   <p class="price">₹30 <span>₹49</span></p>
-    <button  onclick="window.location.href='https://payments.cashfree.com/forms?code=metalpage'">
+    <button class="disabled-btn" onclick="window.location.href='https://payments.cashfree.com/forms?code=metalpage'">
     Buy Now
   </button>
-  <!-- <button  onclick="window.location.href='scanner.html'">
+  <button  onclick="window.location.href='scanner.html'">
     Buy Now
   </button> -->
-</div>
-<div class="course-card">
-  <img src="/IMAGES/HVAC.png" alt="Transportation Engineering Microsheet" />
-  <h2>HVAC MICROSHEET</h2>
-  <p>🚧 Important Questions covered | Exam Oriented | Diploma / Degree</p>
-  <p>📄 Total Pages: 3 | Short & Easy Notes</p>
-  <p class="price">₹30 <span>₹49</span></p>
+<!-- </div> --> 
 
-  <button  onclick="window.location.href='https://payments.cashfree.com/forms?code=metalpage'">
-    Buy Now
-  </button>
-</div>
 
-<div class="course-card">
-  <img src="/IMAGES/POWER PLANT.png" alt="Transportation Engineering Microsheet" />
-  <h2>Power Plant Engineering Microsheet</h2>
-  <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
-  <p>📄 Total Pages: 3 | Short & Easy Notes</p>
-  <p class="price">₹30 <span>₹49</span></p>
-  <button  onclick="window.location.href='https://payments.cashfree.com/forms?code=metalpage'">
-    Buy Now
-  </button>
-</div>
+
 <div class="course-card">
   <img src="/IMAGES/A MANU PROCESS.png" alt="Transportation Engineering Microsheet" />
   <h2>ADVANCE MANUFECTURING PROCESS MICROSHEET</h2>
   <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
   <p>📄 Total Pages: 3 | Short & Easy Notes</p>
   <p class="price">₹30 <span>₹49</span></p>
-  <button  onclick="window.location.href='https://payments.cashfree.com/forms?code=metalpage'">
+  <button class="disabled-btn" onclick="window.location.href='https://payments.cashfree.com/forms?code=metalpage'">
     Buy Now
   </button>
 </div>
-<div class="course-card">
-  <img src="/IMAGES/CYBER.png" alt="Transportation Engineering Microsheet" />
-  <h2>CYBER SECURITY MICROSHEET</h2>
-  <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
-  <p>📄 Total Pages: 3 | Short & Easy Notes</p>
-  <p class="price">₹30 <span>₹49</span></p>
-  <button  onclick="window.location.href='https://payments.cashfree.com/forms/csepage'">
-    Buy Now
-  </button>
-</div>
+
 <div class="course-card">
   <img src="cs-black2.jpg" alt="Transportation Engineering Microsheet" />
   <h2>Poduction Processing of steel  – Microsheet</h2>
