@@ -796,49 +796,45 @@ IMPORTANT QUESTIONS</h2>
     });
   });
 
-  function startCountdown() {
-    const countdownEl = document.getElementById("countdown");
-    const btn = document.getElementById("preorderBtn");
+ function startCountdown() {
+  const countdownEl = document.getElementById("countdown");
+  const btn = document.getElementById("preorderBtn");
 
+  // 👉 Yahan date + time set karein
+  // Format: new Date("YYYY-MM-DDTHH:MM:SS")
+  const endTime = new Date("2026-02-03T01:04:00"); // 10 Feb 2026, 10:00 AM
+
+  function updateTimer() {
     const now = new Date();
-    let endTime = new Date();
+    const diff = endTime - now;
 
-    // Set 10:00 AM
-    endTime.setHours(24, 0, 0, 0);
-
-    // Agar 10 AM already cross ho chuka ho, to next day 10 AM
-    if (now >= endTime) {
-      endTime.setDate(endTime.getDate() + 1);
+    if (diff <= 0) {
+      countdownEl.innerHTML = "PRE-ORDER CLOSED";
+      btn.disabled = true;
+      btn.innerText = "Closed";
+      btn.style.background = "#9e9e9e";
+      btn.style.cursor = "not-allowed";
+      return;
     }
 
-    function updateTimer() {
-      const current = new Date();
-      const diff = endTime - current;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hrs = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const mins = Math.floor((diff / (1000 * 60)) % 60);
+    const secs = Math.floor((diff / 1000) % 60);
 
-      if (diff <= 0) {
-        countdownEl.innerHTML = "PRE-ORDER CLOSED";
-        btn.disabled = true;
-        btn.innerText = "Closed";
-        btn.style.background = "#9e9e9e";
-        btn.style.cursor = "not-allowed";
-        return;
-      }
-
-      const hrs = Math.floor(diff / (1000 * 60 * 60));
-      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const secs = Math.floor((diff % (1000 * 60)) / 1000);
-
-      countdownEl.innerHTML =
-        String(hrs).padStart(2, '0') + ":" +
-        String(mins).padStart(2, '0') + ":" +
-        String(secs).padStart(2, '0');
-    }
-
-    updateTimer();
-    setInterval(updateTimer, 1000);
+    countdownEl.innerHTML =
+      days + "d " +
+      String(hrs).padStart(2, '0') + ":" +
+      String(mins).padStart(2, '0') + ":" +
+      String(secs).padStart(2, '0');
   }
 
-  startCountdown();
+  updateTimer();
+  setInterval(updateTimer, 1000);
+}
+
+startCountdown();
+
 </script>
 
 </body>
