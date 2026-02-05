@@ -1,0 +1,33 @@
+<div class="sidebar" id="sidebar">
+  
+  <button class="close-sidebar-btn" onclick="document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active');">×</button>
+
+  <div class="user-profile" id="userProfile" style="display: none;">
+    <div class="profile-photo-container">
+      <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" 
+           alt="Profile" class="profile-photo" id="profilePhoto" onclick="document.getElementById('photo-input').click()">
+      <button class="change-photo-btn" onclick="document.getElementById('photo-input').click()">📷</button>
+    </div>
+    <input type="file" id="photo-input" accept="image/*">
+    <div class="user-name" id="userName">User Name</div>
+    <div class="user-email" id="userEmail">user@example.com</div>
+    <button class="logout-btn-sidebar" onclick="handleLogout()">Logout</button>
+  </div>
+
+  <div class="login-prompt" id="loginPrompt">
+    <h3>Welcome to PREMium Mind</h3>
+    <p style="color: #ccc;">Access your courses and profile.</p>
+    <button class="login-btn" onclick="window.location.href='login.html'">Login / Sign Up</button>
+  </div>
+
+  <ul>
+    <li><a href="index.html"><span class="icon">🏠</span> Home</a></li>
+    <li><a href="courses.html" class="protected-route" id="coursesLink"><span class="icon">📚</span> PREMium Courses</a></li>
+    <li><a href="lecture.html" class="protected-route" id="courseAccessLink"><span class="icon">🎓</span> My Course</a></li>
+    <li><a href="#help-form"><span class="icon">📞</span> Contact</a></li>
+    <li><a href="#help-form"><span class="icon">❓</span> Help</a></li>
+    <li><a href="termcondition.html"><span class="icon">⚙️</span> Terms & Privacy</a></li>
+  </ul>
+</div>
+
+<div class="overlay" id="overlay"></div>

@@ -5,326 +5,213 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Privacy Policy | PREMium Mind</title>
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="small-logo.png">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="style.css" />
+  
+  <script src="common.js" defer></script>
 
   <style>
-    * {
+    /* ===== Page Background (Light & Premium) ===== */
+    body {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
       font-family: 'Poppins', sans-serif;
-    }
-
-    body {
-      line-height: 1.8;
-      background: linear-gradient(135deg, #e0f7fa, #fce4ec);
+      /* Very subtle, professional animated gradient */
+      background: linear-gradient(-45deg, #f3f4f6, #e0eafc, #cfdef3, #ffffff);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
       color: #333;
+      min-height: 100vh;
     }
 
-    /* ===== Navbar ===== */
-    .navbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 20px;
-      background: #fff;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      position: sticky;
-      top: 0;
-      z-index: 1003;
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    .logo-container {
-      display: flex;
-      align-items: center;
+    /* ===== Background Decorative Blobs (Soft Glow) ===== */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      z-index: -1;
+      opacity: 0.6;
     }
 
-    .logo-image {
-      height: 78px;
-      margin-right: 10px;
-    }
-
-    .logo-text {
-      font-size: 1.7rem;
-      font-weight: 600;
-      color: #111;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 20px;
-      list-style: none;
-    }
-
-    .nav-links li a {
-      text-decoration: none;
-      color: #111;
-      font-weight: 500;
-      transition: color 0.3s;
-    }
-
-    .nav-links li a:hover {
-      color: #0073e6;
-    }
-
-    /* ===== Menu Button (Mobile) ===== */
-    .menu-btn {
-      display: none;
-      font-size: 1.6rem;
-      cursor: pointer;
-      padding: 6px 12px;
-      border-radius: 6px;
-      background: #000;
-      color: #fff;
-      z-index: 1004;
-    }
-
-    /* ===== Sidebar (Right Side) ===== */
-    .sidebar {
-      position: fixed;
-      top: 0;
-      right: -300px;
+    .blob-1 {
+      top: 10%;
+      left: 10%;
       width: 300px;
-      height: 100%;
-      background: #fff;
-      color: #111;
-      padding: 60px 20px;
-      box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
-      transition: right 0.4s ease;
-      z-index: 1002;
+      height: 300px;
+      background: #e0c3fc; /* Light Purple soft glow */
+      animation: float 8s ease-in-out infinite;
     }
 
-    .sidebar.active {
-      right: 0;
+    .blob-2 {
+      bottom: 10%;
+      right: 10%;
+      width: 350px;
+      height: 350px;
+      background: #8ec5fc; /* Light Blue soft glow */
+      animation: float 8s ease-in-out infinite reverse;
     }
 
-    .sidebar h2 {
-      font-size: 1.4rem;
-      margin-bottom: 20px;
-      text-align: center;
-      color: #000;
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(20px); }
+      100% { transform: translateY(0px); }
     }
 
-    .sidebar ul {
-      list-style: none;
-    }
-
-    .sidebar ul li {
-      margin: 18px 0;
-    }
-
-    .sidebar ul li a {
-      text-decoration: none;
-      color: #111;
-      font-size: 1.1rem;
-      font-weight: 500;
+    /* ===== Glass Card Container ===== */
+    .privacy-container {
+      max-width: 900px;
+      margin: 120px auto 60px auto; /* Margin for Navbar */
+      padding: 50px;
+      
+      /* The Real Glass Effect (Light Mode) */
+      background: rgba(255, 255, 255, 0.65); /* Translucent White */
+      backdrop-filter: blur(20px); /* Blurs the blobs behind */
+      -webkit-backdrop-filter: blur(20px);
+      
+      border: 1px solid rgba(255, 255, 255, 0.8); /* Crisp white border */
+      border-radius: 24px;
+      
+      /* Soft Premium Shadow */
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+      
       position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .privacy-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
+    }
+
+    /* ===== Typography (Matching Main Site) ===== */
+    .privacy-container h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #000;
+      text-align: center;
+      margin-bottom: 10px;
+      letter-spacing: -1px;
+    }
+
+    .privacy-container p {
+      color: #444;
+      line-height: 1.8;
+      font-size: 1.05rem;
+      margin-bottom: 20px;
+    }
+
+    .privacy-container h2 {
+      font-family: 'Montserrat', sans-serif;
+      margin-top: 35px;
+      color: #000;
+      font-size: 1.4rem;
+      font-weight: 700;
+      position: relative;
+      display: inline-block;
+    }
+
+    /* Underline animation for headings */
+    .privacy-container h2::after {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 3px;
+      background: linear-gradient(90deg, #000, #555);
+      margin-top: 5px;
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+
+    .privacy-container:hover h2::after {
+      width: 100%;
+    }
+
+    /* Lists */
+    .privacy-container ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .privacy-container ul li {
+      background: rgba(255, 255, 255, 0.5);
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 3px solid #000;
+      font-weight: 500;
+      color: #333;
       transition: all 0.3s ease;
     }
 
-    /* Gradient underline animation */
-    .sidebar ul li a::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: -5px;
-      width: 0%;
-      height: 2px;
-      background: linear-gradient(90deg, #111, #555);
-      transition: width 0.4s ease;
-    }
-
-    .sidebar ul li a:hover::after {
-      width: 100%;
-    }
-
-    /* ===== Overlay ===== */
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      display: none;
-      z-index: 1001;
-    }
-
-    .overlay.active {
-      display: block;
-      animation: fadeIn 0.4s;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
-    }
-
-    /* ===== Responsive ===== */
-    @media (max-width: 768px) {
-      .nav-links {
-        display: none;
-      }
-
-      .menu-btn {
-        display: block;
-      }
-    }
-
-    @media screen and (max-width: 600px) {
-      .card-container {
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-      }
-
-      .course-card {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-      }
-
-      .navbar {
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-      }
-
-      .footer-container {
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-      }
-    }
-
-
-
-    /* ===== Content ===== */
-    .container {
-      max-width: 900px;
-      margin: 40px auto;
+    .privacy-container ul li:hover {
       background: #fff;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-      transition: transform 0.3s ease;
+      transform: translateX(5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
 
-    .container:hover {
-      transform: translateY(-5px);
-    }
-
-    h1 {
-      color: #111;
-      font-size: 2.2rem;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-
-    p,
-    li {
-      font-size: 1rem;
-      color: #555;
-    }
-
-    h2 {
-      margin-top: 25px;
-      color: #0073e6;
-      font-size: 1.3rem;
-    }
-
-    ul {
-      padding-left: 20px;
-    }
-
-    a {
-      color: #0073e6;
-      text-decoration: none;
+    /* Links & Highlights */
+    .highlight {
+      background: #000;
+      color: #fff;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 0.9rem;
       font-weight: 600;
     }
 
-    a:hover {
-      text-decoration: underline;
+    .privacy-container a {
+      color: #000;
+      text-decoration: none;
+      font-weight: 700;
+      border-bottom: 1px solid transparent;
+      transition: 0.3s;
     }
 
-    .highlight {
-      background: #0073e6;
-      color: #fff;
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.9rem;
+    .privacy-container a:hover {
+      border-bottom: 1px solid #000;
     }
 
-    footer {
+    /* Footer specific to this page */
+    .privacy-footer {
       text-align: center;
-      margin-top: 40px;
-      padding: 15px;
+      padding: 30px;
+      color: #666;
       font-size: 0.9rem;
-      color: #444;
+    }
+
+    /* Mobile Responsive */
+    @media screen and (max-width: 600px) {
+      .privacy-container {
+        margin: 100px 15px 30px 15px;
+        padding: 30px 20px;
+      }
+      .privacy-container h1 {
+        font-size: 1.8rem;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="logo-container">
-      <img src="small-logo.png" alt="PM Logo" class="logo-image" />
-      <div class="logo-text">PREMium Minds</div>
-    </div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
 
-    <!-- Normal Nav Links (Desktop ke liye) -->
-    <ul class="nav-links">
-      <li><a href="index.html">PREMium Store</a></li>
-      <li><a href="courses.html" class="protected-route" id="coursesLinkNav">PREMium Courses</a></li>
-      <li><a href="#help-form">CONTACT US</a></li>
-      <li><a href="#help-form">HELP</a></li>
-    </ul>
-    <div class="menu-btn" id="menu-btn">☰</div>
-  </nav>
-
-  <!-- Sidebar Menu -->
-  <div class="sidebar" id="sidebar">
-    <!-- User Profile Section (Shows when logged in) -->
-    <div class="user-profile" id="userProfile" style="display: none;">
-      <div class="profile-photo-container">
-        <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile"
-          class="profile-photo" id="profilePhoto" onclick="document.getElementById('photo-input').click()">
-        <button class="change-photo-btn" onclick="document.getElementById('photo-input').click()">📷</button>
-      </div>
-      <input type="file" id="photo-input" accept="image/*">
-      <div class="user-name" id="userName">User Name</div>
-      <div class="user-email" id="userEmail">user@example.com</div>
-      <button class="logout-btn-sidebar" onclick="handleLogout()">Logout</button>
-    </div>
-
-    <!-- Login Prompt (Shows when not logged in) -->
-    <div class="login-prompt" id="loginPrompt">
-      <h3>Welcome to PREMium Mind</h3>
-      <button class="login-btn" onclick="window.location.href='login.html'">Login / Sign Up</button>
-    </div>
-
-    <ul>
-      <li><a href="index.html">🏠 Home</a></li>
-      <li><a href="courses.html" class="protected-route" id="coursesLink">📚 PREMium Courses</a></li>
-      <li><a href="#help-form">📞 Contact</a></li>
-      <li><a href="#help-form">❓ Help</a></li>
-      <li><a href="termcondition.html">⚙️ Terms & Privacy</a></li>
-    </ul>
-  </div>
-
-  <!-- Overlay -->
-  <div class="overlay" id="overlay"></div>
-
-  <!-- Content -->
-  <div class="container">
+  <div class="privacy-container">
     <h1>Privacy Policy</h1>
-    <p><span class="highlight">Last Updated:</span> September 2025</p>
+    <p style="text-align: center; margin-top: -10px;"><span class="highlight">Last Updated: September 2025</span></p>
+    
     <p>Welcome to <strong>PREMium Mind</strong>. Your privacy is very important to us. This Privacy Policy explains how
       we collect, use, and protect your personal information when you use our website and purchase our digital products
       (such as PDFs).</p>
@@ -341,8 +228,8 @@
     <p>The information you provide is used only for the following purposes:</p>
     <ul>
       <li>To verify your purchase and deliver the PDF you ordered.</li>
-      <li>To provide customer support if you face any issues with your purchase.</li>
       <li>To contact you for problem resolution related to your order.</li>
+      <li>To provide customer support if you face any issues with your purchase.</li>
     </ul>
 
     <h2>Information Sharing</h2>
@@ -350,38 +237,27 @@
       parties. Your data is used only by PREMium Mind for support and delivery purposes.</p>
 
     <h2>Data Security</h2>
-    <p>We implement reasonable measures to protect your personal data from unauthorized access, disclosure, or misuse.
-      However, please note that no method of data transmission over the internet is 100% secure.</p>
-
-    <h2>Cookies</h2>
-    <p>Our website may use cookies to enhance your browsing experience. Cookies are small files stored on your device
-      that help us improve website performance. You can choose to disable cookies in your browser settings.</p>
-
-    <h2>Your Rights</h2>
-    <p>You have the right to request correction or deletion of your personal data stored with us. If you wish to update
-      or remove your data, you can contact us at any time.</p>
+    <p>We implement reasonable measures to protect your personal data from unauthorized access, disclosure, or misuse.</p>
 
     <h2>Contact Us</h2>
-    <p>If you have any questions about this Privacy Policy or how your information is handled, please reach out to us:
-    </p>
-    <p>Email: <a href="mailto:premkumar0443@gmail.com">premkumar0443@gmail.com</a></p>
-    <p>Phone: +91-9153950552</p>
+    <p>If you have any questions about this Privacy Policy, please reach out:</p>
+    <p><strong>Email:</strong> <a href="mailto:premkumar0443@gmail.com">premkumar0443@gmail.com</a></p>
+    <p><strong>Phone:</strong> +91-9153950552</p>
   </div>
 
-  <footer>
+  <footer class="privacy-footer">
     &copy; 2025 PREMium Mind | All Rights Reserved
   </footer>
 
-  <!-- JS for Sidebar -->
-  <!-- Firebase & Custom Scripts -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
       authDomain: "premium-mind-fcb16.firebaseapp.com",
+      databaseURL: "https://premium-mind-fcb16-default-rtdb.firebaseio.com",
       projectId: "premium-mind-fcb16",
       storageBucket: "premium-mind-fcb16.firebasestorage.app",
       messagingSenderId: "864874199521",
@@ -392,7 +268,6 @@
     const auth = getAuth(app);
     const storage = getStorage(app);
 
-    // Check authentication state
     onAuthStateChanged(auth, (user) => {
       const userProfile = document.getElementById('userProfile');
       const loginPrompt = document.getElementById('loginPrompt');
@@ -400,82 +275,35 @@
       const coursesLinkNav = document.getElementById('coursesLinkNav');
 
       if (user) {
-        // User is logged in
-        userProfile.style.display = 'block';
-        loginPrompt.style.display = 'none';
+        if (userProfile) userProfile.style.display = 'block';
+        if (loginPrompt) loginPrompt.style.display = 'none';
 
-        // Update user info
-        document.getElementById('userName').textContent = user.displayName || 'User';
-        document.getElementById('userEmail').textContent = user.email;
+        const userName = document.getElementById('userName');
+        const userEmail = document.getElementById('userEmail');
+        if (userName) userName.textContent = user.displayName || 'User';
+        if (userEmail) userEmail.textContent = user.email;
 
-        // Load profile photo
         const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
-        if (photoURL) {
-          document.getElementById('profilePhoto').src = photoURL;
-        } else {
-          document.getElementById('profilePhoto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=000&color=fff&size=80`;
+        const profilePhoto = document.getElementById('profilePhoto');
+        if (profilePhoto) {
+            profilePhoto.src = photoURL ? photoURL : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=000&color=fff&size=80`;
         }
-
-        // Enable protected routes
-        if (coursesLink) {
-          coursesLink.classList.remove('locked');
-          coursesLink.onclick = null;
-        }
-        if (coursesLinkNav) {
-          coursesLinkNav.classList.remove('locked');
-          coursesLinkNav.onclick = null;
-        }
+        if (coursesLink) { coursesLink.classList.remove('locked'); coursesLink.onclick = null; }
+        if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
       } else {
-        // User is not logged in
-        userProfile.style.display = 'none';
-        loginPrompt.style.display = 'block';
-
-        // Lock protected routes
+        if (userProfile) userProfile.style.display = 'none';
+        if (loginPrompt) loginPrompt.style.display = 'block';
         if (coursesLink) {
           coursesLink.classList.add('locked');
-          coursesLink.onclick = (e) => {
-            e.preventDefault();
-            alert('Please login to access PREMium Courses!');
-            window.location.href = 'login.html';
-          };
+          coursesLink.onclick = (e) => { e.preventDefault(); alert('Please login to access PREMium Courses!'); window.location.href = 'login.html'; };
         }
         if (coursesLinkNav) {
           coursesLinkNav.classList.add('locked');
-          coursesLinkNav.onclick = (e) => {
-            e.preventDefault();
-            alert('Please login to access PREMium Courses!');
-            window.location.href = 'login.html';
-          };
+          coursesLinkNav.onclick = (e) => { e.preventDefault(); alert('Please login to access PREMium Courses!'); window.location.href = 'login.html'; };
         }
       }
     });
 
-    // Photo upload handler
-    document.getElementById('photo-input').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const user = auth.currentUser;
-      if (!user) return;
-
-      try {
-        // Upload to Firebase Storage
-        const storageRef = ref(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
-        await uploadBytes(storageRef, file);
-        const photoURL = await getDownloadURL(storageRef);
-
-        // Save to localStorage and update UI
-        localStorage.setItem('profilePhoto_' + user.uid, photoURL);
-        document.getElementById('profilePhoto').src = photoURL;
-
-        alert('Profile photo updated successfully!');
-      } catch (error) {
-        console.error('Error uploading photo:', error);
-        alert('Error uploading photo. Please try again.');
-      }
-    });
-
-    // Logout function
     window.handleLogout = async () => {
       try {
         await signOut(auth);
@@ -487,31 +315,5 @@
     };
   </script>
 
-  <script>
-    const menuBtn = document.getElementById("menu-btn");
-    const sidebar = document.getElementById("sidebar");
-    const overlay = document.getElementById("overlay");
-
-    // Open menu
-    menuBtn.addEventListener("click", () => {
-      sidebar.classList.add("active");
-      overlay.classList.add("active");
-    });
-
-    // Close menu when clicking overlay
-    overlay.addEventListener("click", () => {
-      sidebar.classList.remove("active");
-      overlay.classList.remove("active");
-    });
-
-    // Close menu when clicking on any link
-    document.querySelectorAll(".sidebar ul li a").forEach(link => {
-      link.addEventListener("click", () => {
-        sidebar.classList.remove("active");
-        overlay.classList.remove("active");
-      });
-    });
-  </script>
 </body>
-
 </html>

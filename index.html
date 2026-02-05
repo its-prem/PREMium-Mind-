@@ -142,7 +142,161 @@
       content: '🔒';
       margin-left: 5px;
     }
+/* Enhanced User Profile Section */
+.user-profile {
+  text-align: center;
+  padding: 20px 15px;
+  border-bottom: 2px solid rgba(0,0,0,0.08);
+  margin: 0 15px 20px 15px;
+  background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
 
+.profile-photo-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 15px;
+}
+
+.profile-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #000;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.profile-photo:hover {
+  transform: scale(1.08);
+  border-color: #333;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+.change-photo-btn {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: linear-gradient(135deg, #000 0%, #333 100%);
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.change-photo-btn:hover {
+  background: linear-gradient(135deg, #333 0%, #000 100%);
+  transform: scale(1.15) rotate(15deg);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.user-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+
+.user-email {
+  font-size: 0.85rem;
+  color: #666;
+  word-break: break-all;
+  background: rgba(0,0,0,0.03);
+  padding: 5px 10px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.logout-btn-sidebar {
+  width: 90%;
+  margin: 15px auto 10px;
+  padding: 11px;
+  background: linear-gradient(135deg, #000 0%, #333 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  letter-spacing: 0.5px;
+}
+
+.logout-btn-sidebar:hover {
+  background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255,68,68,0.4);
+}
+
+.logout-btn-sidebar:active {
+  transform: translateY(0);
+}
+
+/* Login Prompt Section */
+.login-prompt {
+  text-align: center;
+  padding: 25px 20px;
+  background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+  margin: 0 15px 20px 15px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.login-prompt h3 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #000 0%, #333 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+.login-prompt p {
+  margin: 10px 0;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.login-btn {
+  background: linear-gradient(135deg, #000 0%, #333 100%);
+  color: #fff;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 15px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  letter-spacing: 0.5px;
+}
+
+.login-btn:hover {
+  background: linear-gradient(135deg, #333 0%, #000 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+}
     /* Course Enrollment Badge */
     .enrolled-badge {
       display: inline-block;
@@ -563,7 +717,7 @@ IMPORTANT QUESTIONS</h2>
         <h3>Contact Us</h3>
         <p><strong>Contact course counsellor</strong></p>
         <ul style="list-style: none;">
-          <li>📞 +91 8102525609</li>
+          <li>📞 +91 9153950552</li>
         </ul>
       </div>
     </div>
@@ -834,6 +988,17 @@ IMPORTANT QUESTIONS</h2>
 
 startCountdown();
 
+
+// Sidebar active link highlight
+document.addEventListener('DOMContentLoaded', function() {
+  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.sidebar ul li a').forEach(link => {
+    const linkHref = link.getAttribute('href');
+    if (linkHref === currentPage) {
+      link.classList.add('active-sidebar');
+    }
+  });
+});
 </script>
 
 </body>
