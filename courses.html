@@ -6,26 +6,464 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>D2D PREMium Batch | Chapter Wise MCQ</title>
   <link rel="icon" type="image/png" href="small-logo.png">
-
+<link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="coursestyl.css">
+
+  <style>
+    /* Additional Unique Enhancements */
+    
+    /* Animated Background Particles */
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(102, 126, 234, 0.1);
+      animation: float 20s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0);
+        opacity: 0.5;
+      }
+      50% {
+        transform: translateY(-100px) translateX(50px);
+        opacity: 0.8;
+      }
+    }
+
+    /* Progress Ring Animation */
+    .progress-ring {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 40px;
+      height: 40px;
+    }
+
+    .progress-ring-circle {
+      transition: stroke-dashoffset 0.35s;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+
+    /* Chapter Card Hover Effect Enhancement */
+    .premium-chapter-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .premium-chapter-card::after {
+      content: '→';
+      position: absolute;
+      right: -50px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 3rem;
+      color: rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+
+    .premium-chapter-card:hover::after {
+      right: 20px;
+      color: rgba(0, 0, 0, 0.2);
+    }
+
+    /* Completion Celebration */
+    .completed-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      }
+      50% {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+      }
+    }
+
+    /* Enhanced Premium Header with Animation */
+    .premium-header {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .premium-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, 
+        #667eea 0%, 
+        #764ba2 25%, 
+        #f093fb 50%, 
+        #764ba2 75%, 
+        #667eea 100%);
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 200% center;
+      }
+      100% {
+        background-position: -200% center;
+      }
+    }
+
+    /* Subject Card Click Feedback */
+    .subject-card:active {
+      transform: scale(0.95);
+    }
+
+    /* Loading Skeleton for Better UX */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s ease-in-out infinite;
+      border-radius: 8px;
+    }
+
+    @keyframes loading {
+      0% {
+        background-position: 200% center;
+      }
+      100% {
+        background-position: -200% center;
+      }
+    }
+
+    /* Study Time Tracker */
+    .study-timer {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 50px;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      z-index: 100;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .study-timer:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .timer-icon {
+      font-size: 24px;
+      animation: tick 1s infinite;
+    }
+
+    @keyframes tick {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-5deg); }
+      75% { transform: rotate(5deg); }
+    }
+
+    /* Quick Stats Dashboard */
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .quick-stat-item {
+      text-align: center;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .quick-stat-item:hover {
+      transform: translateY(-3px);
+    }
+
+    .quick-stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .quick-stat-label {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 5px;
+      font-weight: 500;
+    }
+
+    /* Motivational Quote Banner */
+    .motivation-banner {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      border-left: 5px solid #667eea;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .motivation-banner::before {
+      content: '"';
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      font-size: 100px;
+      color: rgba(102, 126, 234, 0.1);
+      font-family: Georgia, serif;
+    }
+
+    .motivation-text {
+      font-size: 1.1rem;
+      font-style: italic;
+      color: #333;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .motivation-author {
+      text-align: right;
+      color: #667eea;
+      font-weight: 600;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+
+    /* Achievement Badges */
+    .achievement-section {
+      margin: 30px 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+      border-radius: 15px;
+    }
+
+    .achievement-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .achievement-badge {
+      text-align: center;
+      padding: 15px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .achievement-badge:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+    }
+
+    .achievement-badge.locked {
+      opacity: 0.4;
+      filter: grayscale(100%);
+    }
+
+    .achievement-icon {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+    }
+
+    .achievement-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    /* Search and Filter Bar */
+    .filter-bar {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      padding: 20px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+      padding: 12px 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .filter-btn {
+      padding: 12px 25px;
+      border: 2px solid #e0e0e0;
+      background: white;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    /* Mobile Optimizations */
+    @media (max-width: 768px) {
+      .study-timer {
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        font-size: 0.9rem;
+      }
+
+      .quick-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        padding: 15px;
+      }
+
+      .achievement-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .filter-bar {
+        padding: 15px;
+      }
+
+      .search-box {
+        min-width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .quick-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .achievement-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .premium-header .stats-row {
+        flex-direction: column;
+        gap: 15px;
+      }
+    }
+
+    /* Smooth Scroll */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Chapter Progress Indicator */
+    .chapter-progress-text {
+      font-size: 0.75rem;
+      color: #667eea;
+      font-weight: 600;
+      margin-top: 5px;
+      text-align: center;
+    }
+
+    /* Navbar Enhancement for Courses Page */
+    .navbar {
+      background: linear-gradient(to right, #ffffff 0%, #f9f9f9 100%);
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .logo-container:hover .logo-image {
+      animation: bounce 0.5s ease;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- Navbar -->
+  <!-- Animated Background -->
+  <div class="animated-bg">
+    <div class="particle" style="width: 100px; height: 100px; top: 10%; left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="width: 150px; height: 150px; top: 50%; left: 80%; animation-delay: 2s;"></div>
+    <div class="particle" style="width: 80px; height: 80px; top: 70%; left: 20%; animation-delay: 4s;"></div>
+    <div class="particle" style="width: 120px; height: 120px; top: 30%; left: 60%; animation-delay: 6s;"></div>
+  </div>
+
+  <!-- Navbar (Same as Index) -->
   <nav class="navbar">
     <div class="logo-container">
       <img src="small-logo.png" alt="PM Logo" class="logo-image" />
-      <div class="logo-text">PREMium Minds</div>
+      <div class="logo-text">PREMium Mind</div>
     </div>
 
-    <!-- Normal Nav Links (Desktop ke liye) -->
     <ul class="nav-links">
       <li><a href="index.html">PREMium Store</a></li>
       <li><a href="courses.html" class="protected-route" id="coursesLinkNav">PREMium Courses</a></li>
@@ -35,9 +473,10 @@
     <div class="menu-btn" id="menu-btn">☰</div>
   </nav>
 
-  <!-- Sidebar Menu -->
+  <!-- Sidebar Menu (Same as Index) -->
   <div class="sidebar" id="sidebar">
-    <!-- User Profile Section (Shows when logged in) -->
+    <button class="close-sidebar-btn" onclick="document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active');">×</button>
+
     <div class="user-profile" id="userProfile" style="display: none;">
       <div class="profile-photo-container">
         <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile"
@@ -50,53 +489,131 @@
       <button class="logout-btn-sidebar" onclick="handleLogout()">Logout</button>
     </div>
 
-    <!-- Login Prompt (Shows when not logged in) -->
     <div class="login-prompt" id="loginPrompt">
       <h3>Welcome to PREMium Mind</h3>
+      <p>Access your courses and profile.</p>
       <button class="login-btn" onclick="window.location.href='login.html'">Login / Sign Up</button>
     </div>
 
     <ul>
-      <li><a href="index.html">🏠 Home</a></li>
-      <li><a href="courses.html" class="protected-route" id="coursesLink">📚 PREMium Courses</a></li>
-      <li><a href="#help-form">📞 Contact</a></li>
-      <li><a href="#help-form">❓ Help</a></li>
-      <li><a href="termcondition.html">⚙️ Terms & Privacy</a></li>
+      <li><a href="index.html"><span class="icon">🏠</span> Home</a></li>
+      <li><a href="courses.html" class="protected-route" id="coursesLink"><span class="icon">📚</span> PREMium Courses</a></li>
+      <li><a href="lecture.html" class="protected-route" id="courseAccessLink"><span class="icon">🎓</span> My Course</a></li>
+      <li><a href="#help-form"><span class="icon">📞</span> Contact</a></li>
+      <li><a href="#help-form"><span class="icon">❓</span> Help</a></li>
+      <li><a href="termcondition.html"><span class="icon">⚙️</span> Terms & Privacy</a></li>
     </ul>
   </div>
 
-  <!-- Overlay -->
   <div class="overlay" id="overlay"></div>
+
+  <!-- Study Timer (Floating) -->
+  <div class="study-timer" id="studyTimer">
+    <span class="timer-icon">⏱️</span>
+    <span id="timerDisplay">00:00:00</span>
+  </div>
 
   <!-- Main Content -->
   <div class="main-content">
+    
     <!-- Premium Header Section -->
     <div class="premium-header">
       <div class="badge-container">
-        <span class="premium-badge">🎓 PREMIUM</span>
+        <span class="premium-badge">🎓 PREMIUM BATCH</span>
       </div>
-      <h1 class="main-title">D2D PREMium Batch</h1>
-      <p class="subtitle">Chapter Wise MCQ Practice - Master Every Concept</p>
+      <h1 class="main-title">D2D PREMium Batch 2025</h1>
+      <p class="subtitle">Chapter Wise MCQ Practice - Master Every Concept with Excellence</p>
       <div class="stats-row">
         <div class="stat-item">
-          <span class="stat-number">30+</span>
-          <span class="stat-label">Chapters</span>
+          <span class="stat-number" id="totalChapters">45+</span>
+          <span class="stat-label">Total Chapters</span>
         </div>
         <div class="stat-item">
           <span class="stat-number">6000+</span>
-          <span class="stat-label">Questions</span>
+          <span class="stat-label">Practice Questions</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">3</span>
-          <span class="stat-label">Subjects</span>
+          <span class="stat-number" id="completedCount">0</span>
+          <span class="stat-label">Completed</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="accuracyRate">0%</span>
+          <span class="stat-label">Accuracy</span>
         </div>
       </div>
+    </div>
+
+    <!-- Motivational Banner -->
+    <div class="motivation-banner">
+      <p class="motivation-text">"Success is the sum of small efforts repeated day in and day out."</p>
+      <p class="motivation-author">— Robert Collier</p>
+    </div>
+
+    <!-- Quick Stats Dashboard -->
+    <div class="quick-stats">
+      <div class="quick-stat-item">
+        <div class="quick-stat-number" id="todayStudy">0</div>
+        <div class="quick-stat-label">Minutes Today</div>
+      </div>
+      <div class="quick-stat-item">
+        <div class="quick-stat-number" id="weekStreak">0</div>
+        <div class="quick-stat-label">Day Streak</div>
+      </div>
+      <div class="quick-stat-item">
+        <div class="quick-stat-number" id="totalQuestions">0</div>
+        <div class="quick-stat-label">Questions Solved</div>
+      </div>
+      <div class="quick-stat-item">
+        <div class="quick-stat-number" id="rank">#--</div>
+        <div class="quick-stat-label">Your Rank</div>
+      </div>
+    </div>
+
+    <!-- Achievement Section -->
+    <div class="achievement-section">
+      <h3 style="margin-bottom: 10px; color: #333;">🏆 Your Achievements</h3>
+      <div class="achievement-grid">
+        <div class="achievement-badge" title="Complete 5 chapters">
+          <div class="achievement-icon">🌟</div>
+          <div class="achievement-title">Beginner</div>
+        </div>
+        <div class="achievement-badge locked" title="Complete 15 chapters">
+          <div class="achievement-icon">🔥</div>
+          <div class="achievement-title">On Fire</div>
+        </div>
+        <div class="achievement-badge locked" title="Complete all chapters">
+          <div class="achievement-icon">👑</div>
+          <div class="achievement-title">Champion</div>
+        </div>
+        <div class="achievement-badge locked" title="7 day streak">
+          <div class="achievement-icon">⚡</div>
+          <div class="achievement-title">Consistent</div>
+        </div>
+        <div class="achievement-badge locked" title="90% accuracy">
+          <div class="achievement-icon">🎯</div>
+          <div class="achievement-title">Sharpshooter</div>
+        </div>
+        <div class="achievement-badge locked" title="100% completion">
+          <div class="achievement-icon">💎</div>
+          <div class="achievement-title">Perfect</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div class="filter-bar">
+      <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search chapters...">
+      <button class="filter-btn active" onclick="filterChapters('all')">All</button>
+      <button class="filter-btn" onclick="filterChapters('easy')">Easy</button>
+      <button class="filter-btn" onclick="filterChapters('medium')">Medium</button>
+      <button class="filter-btn" onclick="filterChapters('hard')">Hard</button>
+      <button class="filter-btn" onclick="filterChapters('completed')">Completed</button>
     </div>
 
     <!-- Subject Selection -->
     <div class="section-title">
       <span class="title-icon">📚</span>
-      Select Your Subject
+      Choose Your Subject
     </div>
 
     <div class="subject-selection">
@@ -106,7 +623,7 @@
           <div class="subject-icon">⚛️</div>
           <div class="subject-text">
             <div class="subject-name">PHYSICS</div>
-            <div class="subject-count">12 Chapters</div>
+            <div class="subject-count">15 Chapters • 3000+ MCQs</div>
           </div>
         </div>
         <div class="subject-arrow">→</div>
@@ -118,7 +635,7 @@
           <div class="subject-icon">🔬</div>
           <div class="subject-text">
             <div class="subject-name">CHEMISTRY</div>
-            <div class="subject-count">12 Chapters</div>
+            <div class="subject-count">12 Chapters • 2400+ MCQs</div>
           </div>
         </div>
         <div class="subject-arrow">→</div>
@@ -129,8 +646,8 @@
         <div class="subject-content">
           <div class="subject-icon">📐</div>
           <div class="subject-text">
-            <div class="subject-name">MATH</div>
-            <div class="subject-count">14 Chapters</div>
+            <div class="subject-name">MATHEMATICS</div>
+            <div class="subject-count">14 Chapters • 2800+ MCQs</div>
           </div>
         </div>
         <div class="subject-arrow">→</div>
@@ -141,8 +658,8 @@
         <div class="subject-content">
           <div class="subject-icon">📋</div>
           <div class="subject-text">
-            <div class="subject-name">PYQ</div>
-            <div class="subject-count">6 Years</div>
+            <div class="subject-name">PYQ PAPERS</div>
+            <div class="subject-count">6 Years • 1800+ Questions</div>
           </div>
         </div>
         <div class="subject-arrow">→</div>
@@ -153,12 +670,12 @@
     <div class="chapters-container active" id="physics-chapters">
       <div class="chapters-header">
         <h2>⚛️ Physics Chapters</h2>
-        <p>Complete coverage of Class 11 & 12 Physics</p>
+        <p>Complete coverage of Engineering Physics with detailed MCQ practice</p>
       </div>
 
       <div class="chapters-grid">
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=1'" data-chapter="1">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=1'" data-chapter="1" data-difficulty="easy">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 1</span>
             <span class="difficulty easy">Easy</span>
@@ -172,9 +689,10 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=2'" data-chapter="2">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=2'" data-chapter="2" data-difficulty="easy">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 2</span>
             <span class="difficulty easy">Easy</span>
@@ -188,9 +706,10 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=3'" data-chapter="3">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=3'" data-chapter="3" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 3</span>
             <span class="difficulty medium">Medium</span>
@@ -204,9 +723,10 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=4'" data-chapter="4">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=4'" data-chapter="4" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 4</span>
             <span class="difficulty medium">Medium</span>
@@ -220,9 +740,10 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=5'" data-chapter="5">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=5'" data-chapter="5" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 5</span>
             <span class="difficulty medium">Medium</span>
@@ -236,9 +757,10 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=6'" data-chapter="6">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=6'" data-chapter="6" data-difficulty="easy">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 6</span>
             <span class="difficulty easy">Easy</span>
@@ -252,9 +774,10 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=7'" data-chapter="7">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=7'" data-chapter="7" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 7</span>
             <span class="difficulty medium">Medium</span>
@@ -268,9 +791,10 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=8'" data-chapter="8">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=8'" data-chapter="8" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 8</span>
             <span class="difficulty medium">Medium</span>
@@ -284,9 +808,10 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=9'" data-chapter="9">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=9'" data-chapter="9" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 9</span>
             <span class="difficulty medium">Medium</span>
@@ -300,10 +825,10 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=10'"
-          data-chapter="10">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=10'" data-chapter="10" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 10</span>
             <span class="difficulty medium">Medium</span>
@@ -317,10 +842,10 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=11'"
-          data-chapter="11">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=11'" data-chapter="11" data-difficulty="hard">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 11</span>
             <span class="difficulty hard">Hard</span>
@@ -334,10 +859,10 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=12'"
-          data-chapter="12">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=12'" data-chapter="12" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 12</span>
             <span class="difficulty medium">Medium</span>
@@ -351,10 +876,10 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=13'"
-          data-chapter="13">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=13'" data-chapter="13" data-difficulty="easy">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 13</span>
             <span class="difficulty easy">Easy</span>
@@ -368,10 +893,10 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=14'"
-          data-chapter="14">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=14'" data-chapter="14" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 14</span>
             <span class="difficulty medium">Medium</span>
@@ -385,10 +910,10 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
-        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=15'"
-          data-chapter="15">
+        <div class="premium-chapter-card physics" onclick="window.location.href='mcq.html?chapter=15'" data-chapter="15" data-difficulty="easy">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 15</span>
             <span class="difficulty easy">Easy</span>
@@ -402,21 +927,21 @@
           <div class="progress-bar">
             <div class="progress" style="width: 0%"></div>
           </div>
+          <div class="chapter-progress-text">Not Started</div>
         </div>
 
       </div>
-
     </div>
 
-    <!-- Chemistry & Math Chapters -->
+    <!-- Chemistry Chapters -->
     <div class="chapters-container" id="chemistry-chapters">
       <div class="chapters-header">
         <h2>🔬 Chemistry Chapters</h2>
-        <p>Complete coverage of Class 11 & 12 Chemistry</p>
+        <p>Complete coverage of Engineering Chemistry with detailed MCQ practice</p>
       </div>
       <div class="chapters-grid">
 
-        <div class="premium-chapter-card chemistry" onclick="alert('Atomic Structure MCQs coming soon!')">
+        <div class="premium-chapter-card chemistry" onclick="alert('Atomic Structure MCQs coming soon!')" data-difficulty="easy">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 1</span>
             <span class="difficulty easy">Easy</span>
@@ -431,7 +956,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card chemistry" onclick="alert('Electro Chemistry MCQs coming soon!')">
+        <div class="premium-chapter-card chemistry" onclick="alert('Electro Chemistry MCQs coming soon!')" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 2</span>
             <span class="difficulty medium">Medium</span>
@@ -446,7 +971,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card chemistry" onclick="alert('Water MCQs coming soon!')">
+        <div class="premium-chapter-card chemistry" onclick="alert('Water MCQs coming soon!')" data-difficulty="easy">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 3</span>
             <span class="difficulty easy">Easy</span>
@@ -461,7 +986,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card chemistry" onclick="alert('Material MCQs coming soon!')">
+        <div class="premium-chapter-card chemistry" onclick="alert('Material MCQs coming soon!')" data-difficulty="easy">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 4</span>
             <span class="difficulty easy">Easy</span>
@@ -476,7 +1001,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card chemistry" onclick="alert('Alloys MCQs coming soon!')">
+        <div class="premium-chapter-card chemistry" onclick="alert('Alloys MCQs coming soon!')" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 5</span>
             <span class="difficulty medium">Medium</span>
@@ -491,7 +1016,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card chemistry" onclick="alert('Corrosion MCQs coming soon!')">
+        <div class="premium-chapter-card chemistry" onclick="alert('Corrosion MCQs coming soon!')" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 6</span>
             <span class="difficulty medium">Medium</span>
@@ -506,7 +1031,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card chemistry" onclick="alert('Atmospheric Corrosion MCQs coming soon!')">
+        <div class="premium-chapter-card chemistry" onclick="alert('Atmospheric Corrosion MCQs coming soon!')" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 7</span>
             <span class="difficulty medium">Medium</span>
@@ -521,7 +1046,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card chemistry" onclick="alert('Electro-Chemical Corrosion MCQs coming soon!')">
+        <div class="premium-chapter-card chemistry" onclick="alert('Electro-Chemical Corrosion MCQs coming soon!')" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 8</span>
             <span class="difficulty medium">Medium</span>
@@ -536,7 +1061,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card chemistry" onclick="alert('Paint & Varnishes MCQs coming soon!')">
+        <div class="premium-chapter-card chemistry" onclick="alert('Paint & Varnishes MCQs coming soon!')" data-difficulty="easy">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 9</span>
             <span class="difficulty easy">Easy</span>
@@ -551,7 +1076,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card chemistry" onclick="alert('Lubricants MCQs coming soon!')">
+        <div class="premium-chapter-card chemistry" onclick="alert('Lubricants MCQs coming soon!')" data-difficulty="easy">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 10</span>
             <span class="difficulty easy">Easy</span>
@@ -566,7 +1091,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card chemistry" onclick="alert('Non-Metallic Materials MCQs coming soon!')">
+        <div class="premium-chapter-card chemistry" onclick="alert('Non-Metallic Materials MCQs coming soon!')" data-difficulty="easy">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 11</span>
             <span class="difficulty easy">Easy</span>
@@ -581,7 +1106,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card chemistry" onclick="alert('Pollution & Its Control MCQs coming soon!')">
+        <div class="premium-chapter-card chemistry" onclick="alert('Pollution & Its Control MCQs coming soon!')" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 12</span>
             <span class="difficulty medium">Medium</span>
@@ -597,17 +1122,17 @@
         </div>
 
       </div>
-
     </div>
 
+    <!-- Math Chapters -->
     <div class="chapters-container" id="math-chapters">
       <div class="chapters-header">
         <h2>📐 Mathematics Chapters</h2>
-        <p>Complete coverage of Class 11 & 12 Mathematics</p>
+        <p>Complete coverage of Engineering Mathematics with detailed MCQ practice</p>
       </div>
       <div class="chapters-grid">
 
-        <div class="premium-chapter-card math" onclick="alert('Math MCQs Coming Soon!')">
+        <div class="premium-chapter-card math" onclick="alert('Math MCQs Coming Soon!')" data-difficulty="easy">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 1</span>
             <span class="difficulty easy">Easy</span>
@@ -622,7 +1147,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card math" onclick="alert('Algebra MCQs Coming Soon!')">
+        <div class="premium-chapter-card math" onclick="alert('Algebra MCQs Coming Soon!')" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 2</span>
             <span class="difficulty medium">Medium</span>
@@ -637,7 +1162,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card math" onclick="alert('Logarithms MCQs Coming Soon!')">
+        <div class="premium-chapter-card math" onclick="alert('Logarithms MCQs Coming Soon!')" data-difficulty="easy">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 3</span>
             <span class="difficulty easy">Easy</span>
@@ -652,7 +1177,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card math" onclick="alert('Partial Fractions MCQs Coming Soon!')">
+        <div class="premium-chapter-card math" onclick="alert('Partial Fractions MCQs Coming Soon!')" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 4</span>
             <span class="difficulty medium">Medium</span>
@@ -667,7 +1192,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card math" onclick="alert('Determinant & Matrices MCQs Coming Soon!')">
+        <div class="premium-chapter-card math" onclick="alert('Determinant & Matrices MCQs Coming Soon!')" data-difficulty="hard">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 5</span>
             <span class="difficulty hard">Hard</span>
@@ -682,7 +1207,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card math" onclick="alert('Binomial Theorem MCQs Coming Soon!')">
+        <div class="premium-chapter-card math" onclick="alert('Binomial Theorem MCQs Coming Soon!')" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 6</span>
             <span class="difficulty medium">Medium</span>
@@ -697,7 +1222,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card math" onclick="alert('Trigonometry MCQs Coming Soon!')">
+        <div class="premium-chapter-card math" onclick="alert('Trigonometry MCQs Coming Soon!')" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 7</span>
             <span class="difficulty medium">Medium</span>
@@ -712,7 +1237,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card math" onclick="alert('Point & Distance MCQs Coming Soon!')">
+        <div class="premium-chapter-card math" onclick="alert('Point & Distance MCQs Coming Soon!')" data-difficulty="easy">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 8</span>
             <span class="difficulty easy">Easy</span>
@@ -727,7 +1252,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card math" onclick="alert('Straight Line MCQs Coming Soon!')">
+        <div class="premium-chapter-card math" onclick="alert('Straight Line MCQs Coming Soon!')" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 9</span>
             <span class="difficulty medium">Medium</span>
@@ -742,7 +1267,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card math" onclick="alert('Circle MCQs Coming Soon!')">
+        <div class="premium-chapter-card math" onclick="alert('Circle MCQs Coming Soon!')" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 10</span>
             <span class="difficulty medium">Medium</span>
@@ -757,7 +1282,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card math" onclick="alert('Vector MCQs Coming Soon!')">
+        <div class="premium-chapter-card math" onclick="alert('Vector MCQs Coming Soon!')" data-difficulty="hard">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 11</span>
             <span class="difficulty hard">Hard</span>
@@ -772,7 +1297,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card math" onclick="alert('Function MCQs Coming Soon!')">
+        <div class="premium-chapter-card math" onclick="alert('Function MCQs Coming Soon!')" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 12</span>
             <span class="difficulty medium">Medium</span>
@@ -787,13 +1312,13 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card math" onclick="alert('Limit MCQs Coming Soon!')">
+        <div class="premium-chapter-card math" onclick="alert('Limit MCQs Coming Soon!')" data-difficulty="medium">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 13</span>
             <span class="difficulty medium">Medium</span>
           </div>
           <h3 class="chapter-name">Limit</h3>
-          <p class="chapter-desc">Basic limit concepts and L'Hospital’s rule</p>
+          <p class="chapter-desc">Basic limit concepts and L'Hospital's rule</p>
           <div class="chapter-stats">
             <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
           </div>
@@ -802,7 +1327,7 @@
           </div>
         </div>
 
-        <div class="premium-chapter-card math" onclick="alert('Differentiation MCQs Coming Soon!')">
+        <div class="premium-chapter-card math" onclick="alert('Differentiation MCQs Coming Soon!')" data-difficulty="hard">
           <div class="chapter-header">
             <span class="chapter-badge">Ch 14</span>
             <span class="difficulty hard">Hard</span>
@@ -818,284 +1343,352 @@
         </div>
 
       </div>
-
-      <!-- Previous Year Questions Section -->
-      <div class="chapters-container" id="pyq-chapters">
-        <div class="chapters-header">
-          <h2>📋 Previous Year Questions (PYQ)</h2>
-          <p>Practice with actual exam questions from previous years</p>
-        </div>
-
-        <div class="chapters-grid">
-
-          <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2025 Coming Soon!')">
-            <div class="chapter-header">
-              <span class="chapter-badge">PYQ 2025</span>
-              <span class="difficulty hard">Latest</span>
-            </div>
-            <h3 class="chapter-name">D2D 2025 Questions</h3>
-            <p class="chapter-desc">Most recent exam questions from 2025</p>
-            <div class="chapter-stats">
-              <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-            </div>
-            <div class="progress-bar">
-              <div class="progress" style="width:0%"></div>
-            </div>
-          </div>
-
-          <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2024 Coming Soon!')">
-            <div class="chapter-header">
-              <span class="chapter-badge">PYQ 2024</span>
-              <span class="difficulty hard">Hard</span>
-            </div>
-            <h3 class="chapter-name">D2D 2024 Questions</h3>
-            <p class="chapter-desc">Complete question set from 2024 examination</p>
-            <div class="chapter-stats">
-              <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-            </div>
-            <div class="progress-bar">
-              <div class="progress" style="width:0%"></div>
-            </div>
-          </div>
-
-          <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2023 Coming Soon!')">
-            <div class="chapter-header">
-              <span class="chapter-badge">PYQ 2023</span>
-              <span class="difficulty hard">Hard</span>
-            </div>
-            <h3 class="chapter-name">D2D 2023 Questions</h3>
-            <p class="chapter-desc">Complete question set from 2023 examination</p>
-            <div class="chapter-stats">
-              <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-            </div>
-            <div class="progress-bar">
-              <div class="progress" style="width:0%"></div>
-            </div>
-          </div>
-
-          <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2022 Coming Soon!')">
-            <div class="chapter-header">
-              <span class="chapter-badge">PYQ 2022</span>
-              <span class="difficulty medium">Medium</span>
-            </div>
-            <h3 class="chapter-name">D2D 2022 Questions</h3>
-            <p class="chapter-desc">Complete question set from 2022 examination</p>
-            <div class="chapter-stats">
-              <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-            </div>
-            <div class="progress-bar">
-              <div class="progress" style="width:0%"></div>
-            </div>
-          </div>
-
-          <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2021 Coming Soon!')">
-            <div class="chapter-header">
-              <span class="chapter-badge">PYQ 2021</span>
-              <span class="difficulty medium">Medium</span>
-            </div>
-            <h3 class="chapter-name">D2D 2021 Questions</h3>
-            <p class="chapter-desc">Complete question set from 2021 examination</p>
-            <div class="chapter-stats">
-              <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-            </div>
-            <div class="progress-bar">
-              <div class="progress" style="width:0%"></div>
-            </div>
-          </div>
-
-          <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2020 Coming Soon!')">
-            <div class="chapter-header">
-              <span class="chapter-badge">PYQ 2020</span>
-              <span class="difficulty medium">Medium</span>
-            </div>
-            <h3 class="chapter-name">D2D 2020 Questions</h3>
-            <p class="chapter-desc">Complete question set from 2020 examination</p>
-            <div class="chapter-stats">
-              <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
-            </div>
-            <div class="progress-bar">
-              <div class="progress" style="width:0%"></div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
     </div>
 
-    <!-- Firebase & Custom Scripts -->
-    <script type="module">
-      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-      import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-      import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+    <!-- Previous Year Questions Section -->
+    <div class="chapters-container" id="pyq-chapters">
+      <div class="chapters-header">
+        <h2>📋 Previous Year Questions (PYQ)</h2>
+        <p>Practice with actual exam questions from previous years</p>
+      </div>
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
-        authDomain: "premium-mind-fcb16.firebaseapp.com",
-        projectId: "premium-mind-fcb16",
-        storageBucket: "premium-mind-fcb16.firebasestorage.app",
-        messagingSenderId: "864874199521",
-        appId: "1:864874199521:web:5deb96a956dc404a077aa0"
-      };
+      <div class="chapters-grid">
 
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const storage = getStorage(app);
+        <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2025 Coming Soon!')" data-difficulty="hard">
+          <div class="chapter-header">
+            <span class="chapter-badge pyq-badge">PYQ 2025</span>
+            <span class="difficulty hard">Latest</span>
+          </div>
+          <h3 class="chapter-name">D2D 2025 Questions</h3>
+          <p class="chapter-desc">Most recent exam questions from 2025</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress pyq-progress" style="width:0%"></div>
+          </div>
+        </div>
 
-      // Check authentication state
-      onAuthStateChanged(auth, (user) => {
-        const userProfile = document.getElementById('userProfile');
-        const loginPrompt = document.getElementById('loginPrompt');
-        const coursesLink = document.getElementById('coursesLink');
-        const coursesLinkNav = document.getElementById('coursesLinkNav');
+        <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2024 Coming Soon!')" data-difficulty="hard">
+          <div class="chapter-header">
+            <span class="chapter-badge pyq-badge">PYQ 2024</span>
+            <span class="difficulty hard">Hard</span>
+          </div>
+          <h3 class="chapter-name">D2D 2024 Questions</h3>
+          <p class="chapter-desc">Complete question set from 2024 examination</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress pyq-progress" style="width:0%"></div>
+          </div>
+        </div>
 
-        if (user) {
-          // User is logged in
-          userProfile.style.display = 'block';
-          loginPrompt.style.display = 'none';
+        <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2023 Coming Soon!')" data-difficulty="hard">
+          <div class="chapter-header">
+            <span class="chapter-badge pyq-badge">PYQ 2023</span>
+            <span class="difficulty hard">Hard</span>
+          </div>
+          <h3 class="chapter-name">D2D 2023 Questions</h3>
+          <p class="chapter-desc">Complete question set from 2023 examination</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress pyq-progress" style="width:0%"></div>
+          </div>
+        </div>
 
-          // Update user info
-          document.getElementById('userName').textContent = user.displayName || 'User';
-          document.getElementById('userEmail').textContent = user.email;
+        <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2022 Coming Soon!')" data-difficulty="medium">
+          <div class="chapter-header">
+            <span class="chapter-badge pyq-badge">PYQ 2022</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">D2D 2022 Questions</h3>
+          <p class="chapter-desc">Complete question set from 2022 examination</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress pyq-progress" style="width:0%"></div>
+          </div>
+        </div>
 
-          // Load profile photo
-          const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
-          if (photoURL) {
-            document.getElementById('profilePhoto').src = photoURL;
-          } else {
-            document.getElementById('profilePhoto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=000&color=fff&size=80`;
-          }
+        <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2021 Coming Soon!')" data-difficulty="medium">
+          <div class="chapter-header">
+            <span class="chapter-badge pyq-badge">PYQ 2021</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">D2D 2021 Questions</h3>
+          <p class="chapter-desc">Complete question set from 2021 examination</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress pyq-progress" style="width:0%"></div>
+          </div>
+        </div>
 
-          // Enable protected routes
-          if (coursesLink) {
-            coursesLink.classList.remove('locked');
-            coursesLink.onclick = null;
-          }
-          if (coursesLinkNav) {
-            coursesLinkNav.classList.remove('locked');
-            coursesLinkNav.onclick = null;
-          }
-        } else {
-          // User is not logged in
-          userProfile.style.display = 'none';
-          loginPrompt.style.display = 'block';
+        <div class="premium-chapter-card pyq" onclick="alert('D2D PYQ 2020 Coming Soon!')" data-difficulty="medium">
+          <div class="chapter-header">
+            <span class="chapter-badge pyq-badge">PYQ 2020</span>
+            <span class="difficulty medium">Medium</span>
+          </div>
+          <h3 class="chapter-name">D2D 2020 Questions</h3>
+          <p class="chapter-desc">Complete question set from 2020 examination</p>
+          <div class="chapter-stats">
+            <div class="stat"><span class="icon">📝</span><span>Coming Soon</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress pyq-progress" style="width:0%"></div>
+          </div>
+        </div>
 
-          // Lock protected routes
-          if (coursesLink) {
-            coursesLink.classList.add('locked');
-            coursesLink.onclick = (e) => {
-              e.preventDefault();
-              alert('Please login to access PREMium Courses!');
-              window.location.href = 'login.html';
-            };
-          }
-          if (coursesLinkNav) {
-            coursesLinkNav.classList.add('locked');
-            coursesLinkNav.onclick = (e) => {
-              e.preventDefault();
-              alert('Please login to access PREMium Courses!');
-              window.location.href = 'login.html';
-            };
-          }
-        }
-      });
+      </div>
+    </div>
 
-      // Photo upload handler
-      document.getElementById('photo-input').addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+  </div>
 
-        const user = auth.currentUser;
-        if (!user) return;
+  <!-- Firebase & Custom Scripts -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
-        try {
-          // Upload to Firebase Storage
-          const storageRef = ref(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
-          await uploadBytes(storageRef, file);
-          const photoURL = await getDownloadURL(storageRef);
+    const firebaseConfig = {
+      apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
+      authDomain: "premium-mind-fcb16.firebaseapp.com",
+      projectId: "premium-mind-fcb16",
+      storageBucket: "premium-mind-fcb16.firebasestorage.app",
+      messagingSenderId: "864874199521",
+      appId: "1:864874199521:web:5deb96a956dc404a077aa0"
+    };
 
-          // Save to localStorage and update UI
-          localStorage.setItem('profilePhoto_' + user.uid, photoURL);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const storage = getStorage(app);
+
+    // Check authentication state
+    onAuthStateChanged(auth, (user) => {
+      const userProfile = document.getElementById('userProfile');
+      const loginPrompt = document.getElementById('loginPrompt');
+      const coursesLink = document.getElementById('coursesLink');
+      const coursesLinkNav = document.getElementById('coursesLinkNav');
+
+      if (user) {
+        userProfile.style.display = 'block';
+        loginPrompt.style.display = 'none';
+
+        document.getElementById('userName').textContent = user.displayName || 'User';
+        document.getElementById('userEmail').textContent = user.email;
+
+        const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
+        if (photoURL) {
           document.getElementById('profilePhoto').src = photoURL;
-
-          alert('Profile photo updated successfully!');
-        } catch (error) {
-          console.error('Error uploading photo:', error);
-          alert('Error uploading photo. Please try again.');
+        } else {
+          document.getElementById('profilePhoto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=000&color=fff&size=80`;
         }
-      });
 
-      // Logout function
-      window.handleLogout = async () => {
-        try {
-          await signOut(auth);
-          alert('Logged out successfully!');
-          window.location.reload();
-        } catch (error) {
-          alert('Error logging out!');
+        if (coursesLink) {
+          coursesLink.classList.remove('locked');
+          coursesLink.onclick = null;
         }
-      };
-    </script>
+        if (coursesLinkNav) {
+          coursesLinkNav.classList.remove('locked');
+          coursesLinkNav.onclick = null;
+        }
+      } else {
+        userProfile.style.display = 'none';
+        loginPrompt.style.display = 'block';
 
-    <script>
-      // Menu handlers
-      const menuBtn = document.getElementById("menu-btn");
-      const sidebar = document.getElementById("sidebar");
-      const overlay = document.getElementById("overlay");
+        if (coursesLink) {
+          coursesLink.classList.add('locked');
+          coursesLink.onclick = (e) => {
+            e.preventDefault();
+            alert('Please login to access PREMium Courses!');
+            window.location.href = 'login.html';
+          };
+        }
+        if (coursesLinkNav) {
+          coursesLinkNav.classList.add('locked');
+          coursesLinkNav.onclick = (e) => {
+            e.preventDefault();
+            alert('Please login to access PREMium Courses!');
+            window.location.href = 'login.html';
+          };
+        }
+      }
+    });
 
-      menuBtn.addEventListener("click", () => {
-        sidebar.classList.add("active");
-        overlay.classList.add("active");
-      });
+    document.getElementById('photo-input').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
 
-      overlay.addEventListener("click", () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      try {
+        const storageRef = ref(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
+        await uploadBytes(storageRef, file);
+        const photoURL = await getDownloadURL(storageRef);
+
+        localStorage.setItem('profilePhoto_' + user.uid, photoURL);
+        document.getElementById('profilePhoto').src = photoURL;
+
+        alert('Profile photo updated successfully!');
+      } catch (error) {
+        console.error('Error uploading photo:', error);
+        alert('Error uploading photo. Please try again.');
+      }
+    });
+
+    window.handleLogout = async () => {
+      try {
+        await signOut(auth);
+        alert('Logged out successfully!');
+        window.location.reload();
+      } catch (error) {
+        alert('Error logging out!');
+      }
+    };
+  </script>
+
+  <script>
+    // Menu handlers
+    const menuBtn = document.getElementById("menu-btn");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+
+    menuBtn.addEventListener("click", () => {
+      sidebar.classList.add("active");
+      overlay.classList.add("active");
+    });
+
+    overlay.addEventListener("click", () => {
+      sidebar.classList.remove("active");
+      overlay.classList.remove("active");
+    });
+
+    document.querySelectorAll(".sidebar ul li a").forEach(link => {
+      link.addEventListener("click", () => {
         sidebar.classList.remove("active");
         overlay.classList.remove("active");
       });
+    });
 
-      document.querySelectorAll(".sidebar ul li a").forEach(link => {
-        link.addEventListener("click", () => {
-          sidebar.classList.remove("active");
-          overlay.classList.remove("active");
-        });
+    // Subject Switch
+    function showSubject(subject) {
+      document.querySelectorAll('.subject-card').forEach(card => {
+        card.classList.remove('active');
+      });
+      document.querySelectorAll('.chapters-container').forEach(container => {
+        container.classList.remove('active');
       });
 
-      // Subject Switch
-      function showSubject(subject) {
-        document.querySelectorAll('.subject-card').forEach(card => {
-          card.classList.remove('active');
-        });
-        document.querySelectorAll('.chapters-container').forEach(container => {
-          container.classList.remove('active');
-        });
+      event.target.closest('.subject-card').classList.add('active');
+      document.getElementById(subject + '-chapters').classList.add('active');
+    }
 
-        event.target.closest('.subject-card').classList.add('active');
-        document.getElementById(subject + '-chapters').classList.add('active');
-      }
+    // Study Timer
+    let seconds = 0;
+    setInterval(() => {
+      seconds++;
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      document.getElementById('timerDisplay').textContent = 
+        `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }, 1000);
 
-      // LOAD PROGRESS ON PAGE LOAD
-      function loadProgress() {
-        const progress = JSON.parse(sessionStorage.getItem('chapterProgress') || '{}');
+    // Load Progress
+    function loadProgress() {
+      const progress = JSON.parse(sessionStorage.getItem('chapterProgress') || '{}');
+      let completedCount = 0;
 
-        document.querySelectorAll('.premium-chapter-card[data-chapter]').forEach(card => {
-          const chapter = card.getAttribute('data-chapter');
-          if (progress[chapter]) {
-            const progressBar = card.querySelector('.progress');
-            progressBar.style.width = progress[chapter] + '%';
+      document.querySelectorAll('.premium-chapter-card[data-chapter]').forEach(card => {
+        const chapter = card.getAttribute('data-chapter');
+        if (progress[chapter]) {
+          const progressBar = card.querySelector('.progress');
+          const progressText = card.querySelector('.chapter-progress-text');
+          progressBar.style.width = progress[chapter] + '%';
 
-            // Add completion badge if 100%
-            if (progress[chapter] >= 100) {
-              card.style.borderColor = '#22c55e';
-              const badge = card.querySelector('.chapter-badge');
-              badge.innerHTML = 'Ch ' + chapter + ' ✓';
-              badge.style.background = '#22c55e';
-            }
+          if (progress[chapter] >= 100) {
+            completedCount++;
+            card.style.borderColor = '#22c55e';
+            const completedBadge = document.createElement('div');
+            completedBadge.className = 'completed-badge';
+            completedBadge.innerHTML = '✓';
+            card.appendChild(completedBadge);
+            progressText.textContent = 'Completed!';
+            progressText.style.color = '#22c55e';
+          } else if (progress[chapter] > 0) {
+            progressText.textContent = progress[chapter] + '% Complete';
           }
-        });
-      }
-      // Load progress when page loads
-      window.addEventListener('DOMContentLoaded', loadProgress);
-    </script>
+        }
+      });
+
+      document.getElementById('completedCount').textContent = completedCount;
+    }
+
+    // Search Functionality
+    document.getElementById('searchBox').addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      document.querySelectorAll('.premium-chapter-card').forEach(card => {
+        const title = card.querySelector('.chapter-name').textContent.toLowerCase();
+        const desc = card.querySelector('.chapter-desc').textContent.toLowerCase();
+        if (title.includes(searchTerm) || desc.includes(searchTerm)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+
+    // Filter by Difficulty
+    window.filterChapters = function(filter) {
+      // Update active button
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      // Filter cards
+      document.querySelectorAll('.premium-chapter-card').forEach(card => {
+        const difficulty = card.getAttribute('data-difficulty');
+        const progress = card.querySelector('.progress').style.width;
+        
+        if (filter === 'all') {
+          card.style.display = 'block';
+        } else if (filter === 'completed') {
+          card.style.display = progress === '100%' ? 'block' : 'none';
+        } else {
+          card.style.display = difficulty === filter ? 'block' : 'none';
+        }
+      });
+    };
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      loadProgress();
+      // Mock data for demo
+      document.getElementById('todayStudy').textContent = '45';
+      document.getElementById('weekStreak').textContent = '7';
+      document.getElementById('totalQuestions').textContent = '124';
+      document.getElementById('rank').textContent = '#23';
+      document.getElementById('accuracyRate').textContent = '87%';
+    });
+
+    // Active sidebar link
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.sidebar ul li a').forEach(link => {
+        const linkHref = link.getAttribute('href');
+        if (linkHref === currentPage) {
+          link.classList.add('active-sidebar');
+        }
+      });
+    });
+  </script>
 
 </body>
 
