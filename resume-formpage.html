@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Resume Data Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #000;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      padding: 20px;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.03) 2px,
+        rgba(255,255,255,0.03) 4px
+      );
+      animation: scan 8s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes scan {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(50px); }
+    }
+    .form-container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #fff;
+      border: 3px solid #000;
+      position: relative;
+      padding: 0;
+      box-shadow: 12px 12px 0 #000;
+    }
+    .header {
+      background: #000;
+      color: #fff;
+      padding: 30px 20px;
+      text-align: center;
+      border-bottom: 3px solid #000;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      animation: shine 3s infinite;
+    }
+    @keyframes shine {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    h2 {
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin: 0;
+      text-transform: uppercase;
+    }
+    .tagline {
+      font-size: 0.85rem;
+      margin-top: 8px;
+      opacity: 0.8;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .form-content {
+      padding: 30px;
+    }
+    .field-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #000;
+    }
+    .required {
+      color: #fff;
+      background: #ff0000;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.7rem;
+      margin-left: 6px;
+    }
+    input, select, textarea {
+      width: 100%;
+      border: 2px solid #000;
+      padding: 12px 15px;
+      font-size: 1rem;
+      background: #fff;
+      transition: all 0.3s;
+      font-family: inherit;
+      font-weight: 500;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      background: #000;
+      color: #fff;
+      transform: translateX(5px);
+    }
+    input::placeholder, textarea::placeholder {
+      color: #999;
+      font-weight: 400;
+    }
+    input:focus::placeholder, textarea:focus::placeholder {
+      color: #666;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .section-header {
+      background: #000;
+      color: #fff;
+      padding: 12px 20px;
+      margin: 30px -30px 20px -30px;
+      font-weight: 900;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+      clip-path: polygon(0 0, 100% 0, 98% 100%, 0% 100%);
+    }
+    .section-header::after {
+      content: '';
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 30px;
+      height: 2px;
+      background: #fff;
+    }
+    input[type="submit"] {
+      background: #000;
+      color: #fff;
+      border: 3px solid #000;
+      cursor: pointer;
+      padding: 18px 0;
+      margin-top: 20px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    input[type="submit"]::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      transition: left 0.3s;
+      z-index: 0;
+    }
+    input[type="submit"]:hover::before {
+      left: 0;
+    }
+    input[type="submit"]:hover {
+      color: #000;
+    }
+    input[type="submit"] span {
+      position: relative;
+      z-index: 1;
+    }
+    .note {
+      background: #fff3cd;
+      border-left: 4px solid #ff0000;
+      padding: 15px;
+      margin-bottom: 25px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      font-weight: 600;
+      color: #000;
+    }
+    .file-upload {
+      border: 2px dashed #000;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: #f9f9f9;
+    }
+    .file-upload:hover {
+      background: #000;
+      color: #fff;
+    }
+    .file-upload input {
+      display: none;
+    }
+    .file-label {
+      cursor: pointer;
+      font-weight: 600;
+      display: block;
+    }
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      .form-container {
+        box-shadow: 6px 6px 0 #000;
+      }
+      .form-content {
+        padding: 20px;
+      }
+      .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr;
+      }
+      h2 {
+        font-size: 1.6rem;
+      }
+      .section-header {
+        margin: 20px -20px 15px -20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <div class="header">
+      <h2>Resume Builder</h2>
+      <div class="tagline">Professional Data Collection</div>
+    </div>
+
+    <div class="form-content">
+      <div class="note">
+        ⚠️ NOTE: All fields are mandatory. If certain information is not available, please enter “NO ANSWER”. Our admin team will review your submission and assist you accordingly.
+      </div>
+
+      <form id="resumeForm">
+        <!-- Essential Information -->
+        <div class="field-group">
+          <label for="name">Full Name (in English) <span class="required">Required</span></label>
+          <input type="text" id="name" required placeholder="Enter your complete name in English">
+        </div>
+
+        <div class="grid-2">
+          <div class="field-group">
+            <label for="phone">Phone Number <span class="required">Required</span></label>
+            <input type="tel" id="phone" required placeholder="10-digit number">
+          </div>
+
+          <div class="field-group">
+            <label for="email">Email Address <span class="required">Required</span></label>
+            <input type="email" id="email" required placeholder="your.email@example.com">
+          </div>
+        </div>
+
+        <!-- Personal Details -->
+        <div class="section-header">Personal Details</div>
+
+        <div class="grid-2">
+          <div class="field-group">
+            <label for="dob">Date of Birth <span class="required">Required</span></label>
+            <input type="date" id="dob" required>
+          </div>
+
+          <div class="field-group">
+            <label for="gender">Gender <span class="required">Required</span></label>
+            <select id="gender" required>
+              <option value="">Select Gender</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field-group">
+            <label for="blood">Blood Group <span class="required">Required</span></label>
+            <input type="text" id="blood" required placeholder="e.g., O+, A+, B+ or NO ANSWER">
+          </div>
+
+          <div class="field-group">
+            <label for="marital">Marital Status <span class="required">Required</span></label>
+            <select id="marital" required>
+              <option value="">Select Status</option>
+              <option>Single</option>
+              <option>Married</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field-group">
+            <label for="nationality">Nationality <span class="required">Required</span></label>
+            <input type="text" id="nationality" required placeholder="e.g., Indian">
+          </div>
+
+          <div class="field-group">
+            <label for="language">Languages Known <span class="required">Required</span></label>
+            <input type="text" id="language" required placeholder="e.g., Hindi, English">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="address">Complete Address <span class="required">Required</span></label>
+          <textarea id="address" required rows="2" placeholder="Enter your full residential address in English"></textarea>
+        </div>
+
+        <!-- Family Background -->
+        <div class="section-header">Family Background</div>
+
+        <div class="field-group">
+          <label for="father">Father's Name <span class="required">Required</span></label>
+          <input type="text" id="father" required placeholder="Enter father's full name in English">
+        </div>
+
+        <div class="field-group">
+          <label for="mother">Mother's Name <span class="required">Required</span></label>
+          <input type="text" id="mother" required placeholder="Enter mother's full name in English">
+        </div>
+
+        <div class="field-group">
+          <label for="foccupation">Father's Occupation <span class="required">Required</span></label>
+          <input type="text" id="foccupation" required placeholder="Enter father's profession or NO ANSWER">
+        </div>
+
+        <!-- Academic Records -->
+        <div class="section-header">Academic Records - Class 10th</div>
+
+        <div class="grid-2">
+          <div class="field-group">
+            <label for="10board">10th Board Name <span class="required">Required</span></label>
+            <input type="text" id="10board" required placeholder="e.g., CBSE, ICSE, State Board">
+          </div>
+
+          <div class="field-group">
+            <label for="10school">10th School Name <span class="required">Required</span></label>
+            <input type="text" id="10school" required placeholder="Full school name in English">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field-group">
+            <label for="10year">10th Passing Year <span class="required">Required</span></label>
+            <input type="number" id="10year" required placeholder="e.g., 2019">
+          </div>
+
+          <div class="field-group">
+            <label for="10percentage">10th Percentage <span class="required">Required</span></label>
+            <input type="number" step="0.01" id="10percentage" required placeholder="e.g., 85.5">
+          </div>
+        </div>
+
+        <!-- Class 12th -->
+        <div class="section-header">Academic Records - Class 12th (Optional)</div>
+
+        <div class="grid-2">
+          <div class="field-group">
+            <label for="12board">12th Board Name</label>
+            <input type="text" id="12board" placeholder="e.g., CBSE, ICSE, State Board or NO ANSWER">
+          </div>
+
+          <div class="field-group">
+            <label for="12school">12th School Name</label>
+            <input type="text" id="12school" placeholder="Full school name in English or NO ANSWER">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field-group">
+            <label for="12year">12th Passing Year</label>
+            <input type="text" id="12year" placeholder="e.g., 2021 or NO ANSWER">
+          </div>
+
+          <div class="field-group">
+            <label for="12percentage">12th Percentage</label>
+            <input type="text" id="12percentage" placeholder="e.g., 75.8 or NO ANSWER">
+          </div>
+        </div>
+
+        <!-- College Details -->
+        <div class="section-header">College Education</div>
+
+        <div class="field-group">
+          <label for="collegename">College/Institute Name <span class="required">Required</span></label>
+          <input type="text" id="collegename" required placeholder="Full college name in English">
+        </div>
+
+        <div class="field-group">
+          <label for="branch">Branch/Stream <span class="required">Required</span></label>
+          <input type="text" id="branch" required placeholder="e.g., Mechanical Engineering, Civil Engineering">
+        </div>
+
+        <div class="field-group">
+          <label>Semester-wise SGPA (Optional)</label>
+          <div class="grid-3">
+            <input type="text" id="sem1sgpa" placeholder="Semester 1 or NO ANSWER">
+            <input type="text" id="sem2sgpa" placeholder="Semester 2 or NO ANSWER">
+            <input type="text" id="sem3sgpa" placeholder="Semester 3 or NO ANSWER">
+          </div>
+        </div>
+
+        <!-- Training Details -->
+        <div class="section-header">Training Details</div>
+
+        <div class="field-group">
+          <label for="trainingorg">Training Organization Name <span class="required">Required</span></label>
+          <input type="text" id="trainingorg" required placeholder="Name of organization/institute or NO ANSWER">
+        </div>
+
+        <div class="field-group">
+          <label for="trainingcourse">Training Course Name <span class="required">Required</span></label>
+          <input type="text" id="trainingcourse" required placeholder="Name of course or NO ANSWER">
+        </div>
+
+        <div class="field-group">
+          <label for="trainingduration">Training Duration <span class="required">Required</span></label>
+          <input type="text" id="trainingduration" required placeholder="e.g., 6 months, 1 year or NO ANSWER">
+        </div>
+
+        <!-- Internship Details -->
+        <div class="section-header">Internship Experience</div>
+
+        <div class="field-group">
+          <label for="internshiporg">Internship Organization <span class="required">Required</span></label>
+          <input type="text" id="internshiporg" required placeholder="Company/organization name or NO ANSWER">
+        </div>
+
+        <div class="field-group">
+          <label for="internshiptopics">Topics/Skills Learned in Internship <span class="required">Required</span></label>
+          <textarea id="internshiptopics" required placeholder="e.g., AutoCAD, Project Management, Quality Control, Site Supervision, Safety Protocols or NO ANSWER"></textarea>
+        </div>
+
+        <!-- Professional Skills -->
+        <div class="section-header">Professional Skills</div>
+
+        <div class="field-group">
+          <label for="skills">Soft Skills <span class="required">Required</span></label>
+          <textarea id="skills" required placeholder="Communication, Leadership, Teamwork, Time Management"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label for="hobbies">Hobbies & Interests <span class="required">Required</span></label>
+          <textarea id="hobbies" required placeholder="Reading, Sports, Music, etc."></textarea>
+        </div>
+
+        <div class="field-group">
+          <label for="strengths">Key Strengths <span class="required">Required</span></label>
+          <textarea id="strengths" required placeholder="Your core competencies and strengths"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label for="declaration">Declaration Statement <span class="required">Required</span></label>
+          <textarea id="declaration" required placeholder="I hereby declare that all information provided is true and correct to the best of my knowledge"></textarea>
+        </div>
+
+        <!-- Document Upload -->
+        <div class="section-header">Document Upload</div>
+
+        <div class="field-group">
+          <label>Passport Size Photo <span class="required">Required</span></label>
+          <div class="file-upload" onclick="document.getElementById('photo').click()">
+            <label class="file-label" id="photoLabel">Click to upload passport size photo</label>
+            <input type="file" id="photo" accept="image/*" required onchange="updateFileName('photo', 'photoLabel')">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label>Signature <span class="required">Required</span></label>
+          <div class="file-upload" onclick="document.getElementById('signature').click()">
+            <label class="file-label" id="signatureLabel">Click to upload signature image</label>
+            <input type="file" id="signature" accept="image/*" required onchange="updateFileName('signature', 'signatureLabel')">
+          </div>
+        </div>
+
+        <input type="submit" value="Send to WhatsApp ➜">
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function updateFileName(inputId, labelId) {
+      const input = document.getElementById(inputId);
+      const label = document.getElementById(labelId);
+      if (input.files.length > 0) {
+        label.textContent = '✓ ' + input.files[0].name;
+      }
+    }
+
+    document.getElementById('resumeForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      var data = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        dob: document.getElementById('dob').value,
+        gender: document.getElementById('gender').value,
+        blood: document.getElementById('blood').value,
+        marital: document.getElementById('marital').value,
+        nationality: document.getElementById('nationality').value,
+        language: document.getElementById('language').value,
+        address: document.getElementById('address').value,
+        father: document.getElementById('father').value,
+        mother: document.getElementById('mother').value,
+        foccupation: document.getElementById('foccupation').value,
+        
+        // 10th Details
+        board10: document.getElementById('10board').value,
+        school10: document.getElementById('10school').value,
+        year10: document.getElementById('10year').value,
+        percentage10: document.getElementById('10percentage').value,
+        
+        // 12th Details
+        board12: document.getElementById('12board').value,
+        school12: document.getElementById('12school').value,
+        year12: document.getElementById('12year').value,
+        percentage12: document.getElementById('12percentage').value,
+        
+        // College
+        collegename: document.getElementById('collegename').value,
+        branch: document.getElementById('branch').value,
+        
+        // Training
+        trainingorg: document.getElementById('trainingorg').value,
+        trainingcourse: document.getElementById('trainingcourse').value,
+        trainingduration: document.getElementById('trainingduration').value,
+        
+        // Internship
+        internshiporg: document.getElementById('internshiporg').value,
+        internshiptopics: document.getElementById('internshiptopics').value,
+        
+        // Skills
+        skills: document.getElementById('skills').value,
+        hobbies: document.getElementById('hobbies').value,
+        strengths: document.getElementById('strengths').value,
+        declaration: document.getElementById('declaration').value,
+        
+        sgpa: []
+      };
+
+      // SGPA Collection
+      for(let i=1; i<=3; i++){
+        var val = document.getElementById(`sem${i}sgpa`).value;
+        if(val && val !== '' && val.toLowerCase() !== 'no answer') {
+          data.sgpa.push(`Sem ${i}: ${val}`);
+        }
+      }
+
+      var whatsappNumber = "919153950552";
+
+      var messageParts = [];
+      messageParts.push(`━━━━━━━━━━━━━━━━━━━━━━━━━`);
+      messageParts.push(`📋 *RESUME DATA SUBMISSION*`);
+      messageParts.push(`━━━━━━━━━━━━━━━━━━━━━━━━━`);
+      
+      messageParts.push(`\n*PERSONAL INFORMATION*`);
+      messageParts.push(`• Name: ${data.name}`);
+      messageParts.push(`• Phone: ${data.phone}`);
+      messageParts.push(`• Email: ${data.email}`);
+      messageParts.push(`• DOB: ${data.dob}`);
+      messageParts.push(`• Gender: ${data.gender}`);
+      messageParts.push(`• Blood Group: ${data.blood}`);
+      messageParts.push(`• Marital Status: ${data.marital}`);
+      messageParts.push(`• Nationality: ${data.nationality}`);
+      messageParts.push(`• Languages: ${data.language}`);
+      messageParts.push(`• Address: ${data.address}`);
+      
+      messageParts.push(`\n*FAMILY BACKGROUND*`);
+      messageParts.push(`• Father: ${data.father}`);
+      messageParts.push(`• Mother: ${data.mother}`);
+      messageParts.push(`• Father's Occupation: ${data.foccupation}`);
+      
+      messageParts.push(`\n*ACADEMIC - CLASS 10th*`);
+      messageParts.push(`• Board: ${data.board10}`);
+      messageParts.push(`• School: ${data.school10}`);
+      messageParts.push(`• Year: ${data.year10}`);
+      messageParts.push(`• Percentage: ${data.percentage10}%`);
+      
+      messageParts.push(`\n*ACADEMIC - CLASS 12th*`);
+      if(data.board12 && data.board12.toLowerCase() !== 'no answer') {
+        messageParts.push(`• Board: ${data.board12}`);
+      }
+      if(data.school12 && data.school12.toLowerCase() !== 'no answer') {
+        messageParts.push(`• School: ${data.school12}`);
+      }
+      if(data.year12 && data.year12.toLowerCase() !== 'no answer') {
+        messageParts.push(`• Year: ${data.year12}`);
+      }
+      if(data.percentage12 && data.percentage12.toLowerCase() !== 'no answer') {
+        messageParts.push(`• Percentage: ${data.percentage12}%`);
+      }
+      if(!data.board12 || data.board12.toLowerCase() === 'no answer') {
+        messageParts.push(`• Not Applicable (Diploma Student)`);
+      }
+      
+      messageParts.push(`\n*COLLEGE EDUCATION*`);
+      messageParts.push(`• College: ${data.collegename}`);
+      messageParts.push(`• Branch: ${data.branch}`);
+      if(data.sgpa.length > 0) {
+        messageParts.push(`• SGPA: ${data.sgpa.join(', ')}`);
+      }
+      
+      messageParts.push(`\n*TRAINING DETAILS*`);
+      messageParts.push(`• Organization: ${data.trainingorg}`);
+      messageParts.push(`• Course: ${data.trainingcourse}`);
+      messageParts.push(`• Duration: ${data.trainingduration}`);
+      
+      messageParts.push(`\n*INTERNSHIP EXPERIENCE*`);
+      messageParts.push(`• Organization: ${data.internshiporg}`);
+      messageParts.push(`• Topics/Skills: ${data.internshiptopics}`);
+      
+      messageParts.push(`\n*PROFESSIONAL SKILLS*`);
+      messageParts.push(`• Soft Skills: ${data.skills}`);
+      messageParts.push(`• Hobbies: ${data.hobbies}`);
+      messageParts.push(`• Strengths: ${data.strengths}`);
+      
+      messageParts.push(`\n*DECLARATION*`);
+      messageParts.push(`${data.declaration}`);
+
+      messageParts.push(`\n━━━━━━━━━━━━━━━━━━━━━━━━━`);
+      messageParts.push(`📸 *Photo & Signature will be sent separately*`);
+      messageParts.push(`━━━━━━━━━━━━━━━━━━━━━━━━━`);
+
+      var message = encodeURIComponent(messageParts.join('\n'));
+      var url = `https://wa.me/${whatsappNumber}?text=${message}`;
+      
+      alert('✅ Form submitted successfully!\n\n📸 Please send your Passport Photo and Signature images to WhatsApp after sending this form data.\n\nThank you!');
+      
+      window.open(url, '_blank');
+    });
+  </script>
+</body>
+</html>
