@@ -1,322 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Terms & Conditions | PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
+  
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
   <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      background: #f9f9f9;
-      color: #222;
-      margin: 0;
-      padding: 0;
-    }
+    /* Global fixes to match Page 1 */
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Poppins', sans-serif; background-color: #f9f9f9; margin: 0; }
 
-    .navbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.5rem 1rem;
-      /* 👈 yaha add karna hai */
-      background: #ffffff;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Terms Section */
-    .terms-section {
-      max-width: 900px;
-      margin: 100px auto 50px auto;
-      padding: 30px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .terms-section h1 {
+    /* Hero Section for Terms (Dark Gradient like Index) */
+    .terms-hero {
+      background: linear-gradient(135deg, #000000 0%, #434343 100%);
+      color: white;
+      padding: 100px 20px 80px;
       text-align: center;
-      margin-bottom: 25px;
-      font-size: 28px;
-      color: #111;
+      position: relative;
     }
 
-    .terms-section h2 {
-      margin-top: 25px;
-      font-size: 20px;
-      color: #0073e6;
+    .terms-hero h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      font-family: 'Montserrat', sans-serif;
     }
 
-    .terms-section p {
-      line-height: 1.6;
-      margin: 12px 0;
-      font-size: 15px;
+    /* Content Card */
+    .terms-container {
+      max-width: 1000px;
+      margin: -50px auto 60px;
+      padding: 40px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 5;
     }
 
-    .terms-section ul {
-      margin: 12px 0 12px 20px;
-      font-size: 15px;
+    .terms-content h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #000;
+      margin-top: 30px;
+      border-left: 5px solid #000;
+      padding-left: 15px;
     }
 
-    .terms-section ul li {
-      margin: 6px 0;
+    .terms-content p, .terms-content li {
+      color: #666;
+      line-height: 1.8;
+      font-size: 1.05rem;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .terms-section {
-        margin: 40px 15px 30px 15px;
-        padding: 20px;
-      }
-
-      .terms-section h1 {
-        font-size: 22px;
-      }
+    /* Responsive adjustments */
+    @media screen and (max-width: 768px) {
+      .terms-hero h1 { font-size: 2.2rem; }
+      .terms-container { margin: -30px 15px 40px; padding: 25px; }
     }
   </style>
 </head>
-
 <body>
 
-  <!-- ✅ Navbar -->
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="logo-container">
-      <img src="small-logo.png" alt="PM Logo" class="logo-image" />
-      <div class="logo-text">PREMium Minds</div>
-    </div>
-
-    <!-- Normal Nav Links (Desktop ke liye) -->
-    <ul class="nav-links">
-      <li><a href="index.html">PREMium Store</a></li>
-      <li><a href="courses.html" class="protected-route" id="coursesLinkNav">PREMium Courses</a></li>
-      <li><a href="#help-form">CONTACT US</a></li>
-      <li><a href="#help-form">HELP</a></li>
-    </ul>
-    <div class="menu-btn" id="menu-btn">☰</div>
-  </nav>
-
-  <!-- Sidebar Menu -->
-  <!-- Sidebar Menu -->
-  <!-- Sidebar Menu -->
-  <div class="sidebar" id="sidebar">
-    <!-- User Profile Section (Shows when logged in) -->
-    <div class="user-profile" id="userProfile" style="display: none;">
-      <div class="profile-photo-container">
-        <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile"
-          class="profile-photo" id="profilePhoto" onclick="document.getElementById('photo-input').click()">
-        <button class="change-photo-btn" onclick="document.getElementById('photo-input').click()">📷</button>
-      </div>
-      <input type="file" id="photo-input" accept="image/*">
-      <div class="user-name" id="userName">User Name</div>
-      <div class="user-email" id="userEmail">user@example.com</div>
-      <button class="logout-btn-sidebar" onclick="handleLogout()">Logout</button>
-    </div>
-
-    <!-- Login Prompt (Shows when not logged in) -->
-    <div class="login-prompt" id="loginPrompt">
-      <h3>Welcome to PREMium Mind</h3>
-      <button class="login-btn" onclick="window.location.href='login.html'">Login / Sign Up</button>
-    </div>
-
-    <ul>
-      <li><a href="index.html">🏠 Home</a></li>
-      <li><a href="courses.html" class="protected-route" id="coursesLink">📚 PREMium Courses</a></li>
-      <li><a href="#help-form">📞 Contact</a></li>
-      <li><a href="#help-form">❓ Help</a></li>
-      <li><a href="termcondition.html">⚙️ Terms & Privacy</a></li>
-    </ul>
+<nav class="navbar">
+  <div class="logo-container">
+    <img src="small-logo.png" alt="PM Logo" class="logo-image" />
+    <div class="logo-text">PREMium Mind</div>
   </div>
 
-  <!-- Overlay -->
-  <div class="overlay" id="overlay"></div>
+  <ul class="nav-links">
+    <li><a href="index.html">PREMium Store</a></li>
+    <li><a href="courses.html" class="protected-route" id="coursesLinkNav">PREMium Courses</a></li>
+    <li><a href="index.html#help-form">Contact us</a></li>
+    <li><a href="index.html#help-form">Report Problem</a></li>
+  </ul>
+  <div class="menu-btn" id="menu-btn">☰</div>
+</nav>
 
-  <!-- ✅ Terms Content -->
-  <section class="terms-section">
-    <h1>Terms & Conditions</h1>
+<div class="sidebar" id="sidebar">
+  <button class="close-sidebar-btn" onclick="document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active');">×</button>
 
-    <p>Welcome to <strong>PREMium Mind</strong>. By accessing or using our website, you agree to comply with and be
-      bound by the following terms and conditions. Please read them carefully before proceeding.</p>
+  <div class="user-profile" id="userProfile" style="display: none;">
+    <div class="profile-photo-container">
+      <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" 
+           alt="Profile" class="profile-photo" id="profilePhoto" onclick="document.getElementById('photo-input').click()">
+      <button class="change-photo-btn" onclick="document.getElementById('photo-input').click()">📷</button>
+    </div>
+    <input type="file" id="photo-input" accept="image/*">
+    <div class="user-name" id="userName">User Name</div>
+    <div class="user-email" id="userEmail">user@example.com</div>
+    <button class="logout-btn-sidebar" onclick="handleLogout()">Logout</button>
+  </div>
+
+  <div class="login-prompt" id="loginPrompt">
+    <h3>Welcome to PREMium Mind</h3>
+    <p>Access your courses and profile.</p>
+    <button class="login-btn" onclick="window.location.href='login.html'">Login / Sign Up</button>
+  </div>
+
+  <ul>
+    <li><a href="index.html"><span class="icon">🏠</span> Home</a></li>
+    <li><a href="courses.html" class="protected-route" id="coursesLink"><span class="icon">📚</span> PREMium Courses</a></li>
+    <li><a href="lecture.html" class="protected-route" id="courseAccessLink"><span class="icon">🎓</span> My Course</a></li>
+    <li><a href="index.html#help-form"><span class="icon">📞</span> Contact</a></li>
+    <li><a href="index.html#help-form"><span class="icon">❓</span> Help</a></li>
+    <li><a href="termcondition.html"><span class="icon">⚙️</span> Terms & Privacy</a></li>
+  </ul>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<section class="terms-hero">
+  <h1>Terms & Conditions</h1>
+  <p style="opacity: 0.9;">Professional Standards & User Agreements</p>
+</section>
+
+<main class="terms-container">
+  <div class="terms-content">
+    <p>Welcome to <strong>PREMium Mind</strong>. By accessing or using our website, you agree to comply with and be bound by the following terms and conditions.</p>
 
     <h2>1. Acceptance of Terms</h2>
-    <p>By using our services, you confirm that you accept these terms and agree to abide by them. If you do not agree,
-      please refrain from using our website.</p>
+    <p>By using our services, you confirm that you accept these terms and agree to abide by them. If you do not agree, please refrain from using our website.</p>
 
-    <h2>2. Services</h2>
-    <p>We provide educational content, resume templates, and resources for students and professionals. All purchases are
-      for personal use only and must not be resold without permission.</p>
+    <h2>2. Services & Digital Goods</h2>
+    <p>We provide educational content, resume templates, and resources. All purchases are for personal use only and must not be resold or distributed without written permission.</p>
 
     <h2>3. Payments</h2>
-    <p>All payments are processed securely. Once purchased, digital products are delivered instantly and are
-      non-refundable unless specified under our Refund Policy.</p>
+    <p>All payments are processed securely via third-party gateways. Once a digital product is purchased, it is delivered instantly to your account or email.</p>
 
     <h2>4. Refund Policy</h2>
-    <p>Refunds are applicable only in cases of duplicate payment or technical error. Please contact our support team for
-      assistance.</p>
+    <p>Because our products are digital and delivered instantly, we generally do not offer refunds. However, exceptions are made for duplicate payments or technical errors during the transaction.</p>
 
     <h2>5. User Responsibilities</h2>
     <ul>
-      <li>Do not misuse or distribute our content without authorization.</li>
-      <li>Ensure that your provided information is accurate and up-to-date.</li>
-      <li>Comply with all applicable laws when using our services.</li>
+      <li>You must provide accurate information during registration.</li>
+      <li>You are responsible for maintaining the confidentiality of your account.</li>
+      <li>Sharing course access or premium materials with others is strictly prohibited.</li>
     </ul>
 
-    <h2>6. Changes to Terms</h2>
-    <p>We reserve the right to modify or update these terms at any time. Users are advised to check this page
-      periodically for updates.</p>
+    <h2>6. Contact Us</h2>
+    <p>For any queries regarding these terms, please contact our support team via WhatsApp at <strong>+91 9153950552</strong> or use the help form on our home page.</p>
+  </div>
+</main>
 
-    <h2>7. Contact Us</h2>
-    <p>If you have any questions regarding these Terms & Conditions, please reach out via the Help or Contact section on
-      our website.</p>
-  </section>
+<footer class="footer">
+  <div class="footer-bottom">
+    <p>&copy; 2025 PREMium Mind | <a href="termcondition.html">Privacy Policy</a></p>
+  </div>
+</footer>
 
-  <!-- ✅ Sidebar Toggle Script -->
-  <!-- Firebase & Custom Scripts -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
-      authDomain: "premium-mind-fcb16.firebaseapp.com",
-      projectId: "premium-mind-fcb16",
-      storageBucket: "premium-mind-fcb16.firebasestorage.app",
-      messagingSenderId: "864874199521",
-      appId: "1:864874199521:web:5deb96a956dc404a077aa0"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
+    authDomain: "premium-mind-fcb16.firebaseapp.com",
+    projectId: "premium-mind-fcb16",
+    storageBucket: "premium-mind-fcb16.firebasestorage.app",
+    messagingSenderId: "864874199521",
+    appId: "1:864874199521:web:5deb96a956dc404a077aa0"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const storage = getStorage(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    // Check authentication state
-    onAuthStateChanged(auth, (user) => {
-      const userProfile = document.getElementById('userProfile');
-      const loginPrompt = document.getElementById('loginPrompt');
-      const coursesLink = document.getElementById('coursesLink');
-      const coursesLinkNav = document.getElementById('coursesLinkNav');
+  onAuthStateChanged(auth, (user) => {
+    const userProfile = document.getElementById('userProfile');
+    const loginPrompt = document.getElementById('loginPrompt');
+    if (user) {
+      userProfile.style.display = 'block';
+      loginPrompt.style.display = 'none';
+      document.getElementById('userName').textContent = user.displayName || 'User';
+      document.getElementById('userEmail').textContent = user.email;
+      const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
+      if (photoURL) document.getElementById('profilePhoto').src = photoURL;
+    } else {
+      userProfile.style.display = 'none';
+      loginPrompt.style.display = 'block';
+    }
+  });
 
-      if (user) {
-        // User is logged in
-        userProfile.style.display = 'block';
-        loginPrompt.style.display = 'none';
+  window.handleLogout = async () => {
+    await signOut(auth);
+    window.location.reload();
+  };
 
-        // Update user info
-        document.getElementById('userName').textContent = user.displayName || 'User';
-        document.getElementById('userEmail').textContent = user.email;
+  // Sidebar Controls
+  const menuBtn = document.getElementById("menu-btn");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
 
-        // Load profile photo
-        const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
-        if (photoURL) {
-          document.getElementById('profilePhoto').src = photoURL;
-        } else {
-          document.getElementById('profilePhoto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=000&color=fff&size=80`;
-        }
+  menuBtn.addEventListener("click", () => {
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
+  });
 
-        // Enable protected routes
-        if (coursesLink) {
-          coursesLink.classList.remove('locked');
-          coursesLink.onclick = null;
-        }
-        if (coursesLinkNav) {
-          coursesLinkNav.classList.remove('locked');
-          coursesLinkNav.onclick = null;
-        }
-      } else {
-        // User is not logged in
-        userProfile.style.display = 'none';
-        loginPrompt.style.display = 'block';
-
-        // Lock protected routes
-        if (coursesLink) {
-          coursesLink.classList.add('locked');
-          coursesLink.onclick = (e) => {
-            e.preventDefault();
-            alert('Please login to access PREMium Courses!');
-            window.location.href = 'login.html';
-          };
-        }
-        if (coursesLinkNav) {
-          coursesLinkNav.classList.add('locked');
-          coursesLinkNav.onclick = (e) => {
-            e.preventDefault();
-            alert('Please login to access PREMium Courses!');
-            window.location.href = 'login.html';
-          };
-        }
-      }
-    });
-
-    // Photo upload handler
-    document.getElementById('photo-input').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const user = auth.currentUser;
-      if (!user) return;
-
-      try {
-        // Upload to Firebase Storage
-        const storageRef = ref(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
-        await uploadBytes(storageRef, file);
-        const photoURL = await getDownloadURL(storageRef);
-
-        // Save to localStorage and update UI
-        localStorage.setItem('profilePhoto_' + user.uid, photoURL);
-        document.getElementById('profilePhoto').src = photoURL;
-
-        alert('Profile photo updated successfully!');
-      } catch (error) {
-        console.error('Error uploading photo:', error);
-        alert('Error uploading photo. Please try again.');
-      }
-    });
-
-    // Logout function
-    window.handleLogout = async () => {
-      try {
-        await signOut(auth);
-        alert('Logged out successfully!');
-        window.location.reload();
-      } catch (error) {
-        alert('Error logging out!');
-      }
-    };
-  </script>
-
-  <script>
-    const menuBtn = document.getElementById("menu-btn");
-    const sidebar = document.getElementById("sidebar");
-    const overlay = document.getElementById("overlay");
-
-    menuBtn.addEventListener("click", () => {
-      sidebar.classList.add("active");
-      overlay.classList.add("active");
-    });
-
-    overlay.addEventListener("click", () => {
-      sidebar.classList.remove("active");
-      overlay.classList.remove("active");
-    });
-
-    document.querySelectorAll(".sidebar ul li a").forEach(link => {
-      link.addEventListener("click", () => {
-        sidebar.classList.remove("active");
-        overlay.classList.remove("active");
-      });
-    });
-  </script>
+  overlay.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+  });
+</script>
 
 </body>
-
 </html>
