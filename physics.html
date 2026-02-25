@@ -18,15 +18,9 @@
             --card-hover: #f4f4f0;
         }
 
-        *, *::before, *::after {
-            margin: 0; padding: 0;
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html {
-            scroll-behavior: smooth;
-            scroll-padding-top: 2.5rem;
-        }
+        html { scroll-behavior: smooth; scroll-padding-top: 2.5rem; }
 
         body {
             background: var(--paper);
@@ -77,23 +71,14 @@
             color: #fff;
         }
 
-        .sidebar-title em {
-            font-style: italic;
-            color: var(--accent);
-        }
+        .sidebar-title em { font-style: italic; color: var(--accent); }
 
-        .nav-list {
-            list-style: none;
-            padding: 1.2rem 1rem;
-            flex: 1;
-        }
-
+        .nav-list { list-style: none; padding: 1.2rem 1rem; flex: 1; }
         .nav-item { margin-bottom: 2px; }
 
         .nav-link {
             display: flex;
             align-items: center;
-            gap: 0;
             text-decoration: none;
             color: rgba(255,255,255,0.5);
             font-weight: 400;
@@ -119,82 +104,59 @@
             position: absolute;
             left: 0; top: 50%;
             transform: translateY(-50%) scaleY(0);
-            width: 3px;
-            height: 60%;
+            width: 3px; height: 60%;
             background: var(--accent);
             border-radius: 0 3px 3px 0;
             transition: transform 0.22s ease;
         }
 
-        .nav-link:hover {
-            background: rgba(255,255,255,0.06);
-            color: rgba(255,255,255,0.9);
-            padding-left: 1.25rem;
-        }
-
+        .nav-link:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.9); padding-left: 1.25rem; }
         .nav-link:hover .num { color: var(--accent); }
         .nav-link:hover::before { transform: translateY(-50%) scaleY(1); }
-
-        .nav-link.active {
-            background: rgba(230,57,70,0.15);
-            color: #fff;
-        }
-
+        .nav-link.active { background: rgba(230,57,70,0.15); color: #fff; }
         .nav-link.active .num { color: var(--accent); }
         .nav-link.active::before { transform: translateY(-50%) scaleY(1); }
 
-        /* ── HAMBURGER BUTTON ── */
-        .menu-btn {
+        /* ── MENU BUTTON — small chevron tab on left edge ── */
+.menu-btn {
             display: none;
             position: fixed;
-            top: 1.25rem;
-            left: 1.25rem;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
             z-index: 500;
-            background: var(--ink);
+            background: rgba(15, 14, 23, 0.35);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             border: none;
             cursor: pointer;
-            padding: 0;
-            width: 46px;
-            height: 46px;
-            border-radius: 12px;
+            width: 22px;
+            height: 56px;
+            border-radius: 0 10px 10px 0;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 3px 0 10px rgba(0,0,0,0.12);
+            transition: width 0.2s ease, background 0.2s ease;
+            padding: 0;
         }
 
-        .menu-btn:hover {
-            transform: scale(1.06);
-            box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+        .menu-btn:hover { width: 27px; background: rgba(15, 14, 23, 0.55); }
+        .menu-btn:active { background: rgba(15, 14, 23, 0.7); }
+
+        .chevron-icon {
+            width: 8px;
+            height: 8px;
+            border-top: 2px solid rgba(255,255,255,0.85);
+            border-right: 2px solid rgba(255,255,255,0.85);
+            transform: rotate(45deg);
+            margin-left: 1px;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            flex-shrink: 0;
         }
 
-        .menu-btn:active { transform: scale(0.96); }
-
-        .hamburger {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            width: 20px;
-        }
-
-        .hamburger span {
-            display: block;
-            height: 2px;
-            background: #fff;
-            border-radius: 2px;
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            transform-origin: center;
-        }
-
-        .menu-btn.open .hamburger span:nth-child(1) {
-            transform: translateY(7px) rotate(45deg);
-        }
-        .menu-btn.open .hamburger span:nth-child(2) {
-            opacity: 0;
-            transform: scaleX(0);
-        }
-        .menu-btn.open .hamburger span:nth-child(3) {
-            transform: translateY(-7px) rotate(-45deg);
+        .menu-btn.open .chevron-icon {
+            transform: rotate(225deg);
+            margin-left: -3px;
         }
 
         /* Overlay */
@@ -208,7 +170,6 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-
         .overlay.active { opacity: 1; }
 
         /* ── MAIN CONTENT ── */
@@ -283,12 +244,13 @@
         }
 
         .card-header {
-            padding: 1.8rem 2rem 1.4rem;
+            padding: 1.6rem 1.8rem 1.3rem;
             display: flex;
             align-items: flex-start;
-            gap: 1.2rem;
+            gap: 1rem;
             cursor: pointer;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .unit-badge {
@@ -301,19 +263,19 @@
             white-space: nowrap;
             margin-top: 3px;
             letter-spacing: 0.05em;
+            flex-shrink: 0;
         }
 
         .card-title-text {
             font-family: 'DM Serif Display', serif;
-            font-size: 1.35rem;
+            font-size: 1.3rem;
             color: var(--ink);
             line-height: 1.3;
             flex: 1;
         }
 
         .expand-icon {
-            width: 28px;
-            height: 28px;
+            width: 28px; height: 28px;
             border-radius: 50%;
             background: var(--card-hover);
             display: flex;
@@ -325,8 +287,7 @@
         }
 
         .expand-icon svg {
-            width: 14px;
-            height: 14px;
+            width: 14px; height: 14px;
             stroke: var(--muted);
             fill: none;
             stroke-width: 2;
@@ -335,30 +296,22 @@
             transition: stroke 0.2s;
         }
 
-        .module-card.open .expand-icon {
-            transform: rotate(180deg);
-            background: var(--accent-soft);
-        }
-
+        .module-card.open .expand-icon { transform: rotate(180deg); background: var(--accent-soft); }
         .module-card.open .expand-icon svg { stroke: var(--accent); }
 
-        /* Collapsible body */
+        /* ── COLLAPSIBLE BODY — JS driven, works on all mobile browsers ── */
         .card-body {
-            max-height: 0;
+            height: 0;
             overflow: hidden;
-            transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .module-card.open .card-body {
-            max-height: 2000px;
+            transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .card-body-inner {
-            padding: 0 2rem 2rem;
+            padding: 1.5rem 1.8rem 1.8rem;
             border-top: 1px solid var(--border);
-            padding-top: 1.5rem;
         }
 
+        /* ── CONTENT ── */
         .content-text {
             color: #3c3c48;
             font-size: 0.95rem;
@@ -368,16 +321,40 @@
 
         .content-text p { margin-bottom: 0.75rem; }
 
-        .sub-topic {
-            font-weight: 600;
-            font-size: 0.78rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--muted);
+        /* Numbered sub-sections */
+        .sub-section {
             margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.4rem;
-            border-bottom: 1px solid var(--border);
+            padding-left: 1rem;
+            border-left: 2px solid var(--border);
+        }
+
+        .sub-section:first-child { margin-top: 0; }
+
+        .sub-topic {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.65rem;
+        }
+
+        .sub-num {
+            font-family: 'DM Serif Display', serif;
+            font-size: 0.76rem;
+            color: var(--accent);
+            background: var(--accent-soft);
+            border: 1px solid rgba(230,57,70,0.2);
+            padding: 2px 8px;
+            border-radius: 5px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .sub-label {
+            font-weight: 600;
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #3a3a48;
         }
 
         .badge {
@@ -386,17 +363,16 @@
             gap: 6px;
             background: var(--accent-soft);
             color: var(--accent);
-            padding: 0.45rem 1rem;
+            padding: 0.4rem 0.9rem;
             border-radius: 30px;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 600;
-            margin-top: 1rem;
+            margin-top: 0.85rem;
             border: 1px solid rgba(230,57,70,0.15);
-            letter-spacing: 0.01em;
         }
 
         .badge svg {
-            width: 13px; height: 13px;
+            width: 12px; height: 12px;
             fill: none;
             stroke: currentColor;
             stroke-width: 2;
@@ -409,9 +385,7 @@
             .menu-btn { display: flex; }
             .overlay { display: block; }
 
-            .sidebar {
-                transform: translateX(-100%);
-            }
+            .sidebar { transform: translateX(-100%); }
             .sidebar.active {
                 transform: translateX(0);
                 box-shadow: 8px 0 40px rgba(0,0,0,0.3);
@@ -420,30 +394,27 @@
             .main-content {
                 margin-left: 0;
                 width: 100%;
-                padding: 5rem 1.5rem 3rem;
+                padding: 2.5rem 1.2rem 3rem;
             }
-        }
 
-        @media (max-width: 600px) {
-            .page-header h1 { font-size: 2.2rem; }
-            .card-title-text { font-size: 1.15rem; }
+            .page-header { margin-bottom: 2.5rem; padding-bottom: 2rem; }
+            .page-header h1 { font-size: 2rem; }
+
+            .card-header { padding: 1.1rem 1.1rem 0.9rem; gap: 0.75rem; }
+            .card-title-text { font-size: 1.05rem; }
+            .card-body-inner { padding: 1.1rem 1.1rem 1.4rem; }
+            .module-card { border-radius: 12px; margin-bottom: 1rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Mobile Toggle -->
     <button class="menu-btn" id="menuBtn" aria-label="Toggle navigation">
-        <div class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
+        <div class="chevron-icon"></div>
     </button>
 
     <div class="overlay" id="overlay"></div>
 
-    <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-top">
             <div class="sidebar-label">Course Overview</div>
@@ -463,183 +434,256 @@
         </ul>
     </nav>
 
-    <!-- Main -->
     <main class="main-content">
         <div class="page-header">
             <div class="eyebrow">Diploma Engineering &nbsp;·&nbsp; First Year</div>
             <h1>Engineering<br>Physics</h1>
-            <p>Master each concept unit by unit. Click any chapter to expand the full syllabus.</p>
+            <p>Master each concept unit by unit. Tap any chapter to expand.</p>
         </div>
 
-        <!-- Cards -->
-
+        <!-- UNIT 1 -->
         <div class="module-card open" id="unit1">
             <div class="card-header">
                 <span class="unit-badge">Unit 01</span>
                 <span class="card-title-text">Units and Measurements</span>
                 <div class="expand-icon"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
             </div>
-            <div class="card-body"><div class="card-body-inner content-text">
-                <p>Need of measurement and unit in engineering and science, definition of unit, requirements of standard unit, systems of units — CGS, MKS and SI, fundamental and derived quantities and their units.</p>
-                <p>Definition of dimensions with examples, principle of homogeneity of dimensions, limitations of dimensions.</p>
-                <p>Definition of accuracy, precision and error, estimation of errors — absolute error, relative error and percentage error, rules and identification of significant figures.</p>
-                <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Percentage error &amp; significant figures</span>
-            </div></div>
+            <div class="card-body">
+                <div class="card-body-inner content-text">
+                    <p>Need of measurement and unit in engineering and science, definition of unit, requirements of standard unit, systems of units — CGS, MKS and SI, fundamental and derived quantities and their units.</p>
+                    <div class="sub-section">
+                        <div class="sub-topic"><span class="sub-num">1.1</span><span class="sub-label">Dimensions</span></div>
+                        <p>Definition of dimensions with examples, principle of homogeneity of dimensions, limitations of dimensions.</p>
+                    </div>
+                    <div class="sub-section">
+                        <div class="sub-topic"><span class="sub-num">1.2</span><span class="sub-label">Errors &amp; Significant Figures</span></div>
+                        <p>Definition of accuracy, precision and error, estimation of errors — absolute error, relative error and percentage error, rules and identification of significant figures.</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Percentage error &amp; significant figures</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- UNIT 2 -->
         <div class="module-card" id="unit2">
             <div class="card-header">
                 <span class="unit-badge">Unit 02</span>
                 <span class="card-title-text">Mechanics</span>
                 <div class="expand-icon"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
             </div>
-            <div class="card-body"><div class="card-body-inner content-text">
-                <div class="sub-topic">2.1 Kinetics</div>
-                <p>Definitions of momentum, impulse, impulsive force. Statements of Newton's laws of motion with equations. Applications — recoil of gun, motion of two connected bodies by light inextensible string passing over a smooth pulley, motion of lift.</p>
-                <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Impulse, recoil velocity &amp; motion of lift</span>
-
-                <div class="sub-topic">2.2 Angular Motion</div>
-                <p>Definition of angular displacement, angular velocity and angular acceleration, relation between linear velocity and angular velocity. Definition of simple harmonic motion (SHM), SHM as a projection of uniform circular motion on any diameter, equation of SHM, derivation of displacement, velocity and acceleration of a body executing SHM.</p>
-            </div></div>
+            <div class="card-body">
+                <div class="card-body-inner content-text">
+                    <div class="sub-section" style="margin-top:0">
+                        <div class="sub-topic"><span class="sub-num">2.1</span><span class="sub-label">Kinetics</span></div>
+                        <p>Definitions of momentum, impulse, impulsive force. Statements of Newton's laws of motion with equations. Applications — recoil of gun, motion of two connected bodies by light inextensible string passing over a smooth pulley, motion of lift.</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Impulse, recoil velocity &amp; motion of lift</span>
+                    </div>
+                    <div class="sub-section">
+                        <div class="sub-topic"><span class="sub-num">2.2</span><span class="sub-label">Angular Motion &amp; SHM</span></div>
+                        <p>Definition of angular displacement, angular velocity and angular acceleration, relation between linear and angular velocity. Definition of simple harmonic motion (SHM), SHM as projection of uniform circular motion on any diameter, equation of SHM, derivation of displacement, velocity and acceleration of a body executing SHM.</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- UNIT 3 -->
         <div class="module-card" id="unit3">
             <div class="card-header">
                 <span class="unit-badge">Unit 03</span>
                 <span class="card-title-text">Work, Power &amp; Energy</span>
                 <div class="expand-icon"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
             </div>
-            <div class="card-body"><div class="card-body-inner content-text">
-                <p>Definition of work, power and energy, equations for P.E. &amp; K.E., Work–Energy principle.</p>
-                <p>Representation of work using a graph, work done by a torque (no derivation).</p>
-                <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Work, potential &amp; kinetic energy</span>
-            </div></div>
+            <div class="card-body">
+                <div class="card-body-inner content-text">
+                    <div class="sub-section" style="margin-top:0">
+                        <div class="sub-topic"><span class="sub-num">3.1</span><span class="sub-label">Definitions &amp; Equations</span></div>
+                        <p>Definition of work, power and energy, equations for P.E. &amp; K.E., Work–Energy principle.</p>
+                    </div>
+                    <div class="sub-section">
+                        <div class="sub-topic"><span class="sub-num">3.2</span><span class="sub-label">Graphical &amp; Rotational Work</span></div>
+                        <p>Representation of work using a graph, work done by a torque (no derivation).</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Work, potential &amp; kinetic energy</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- UNIT 4 -->
         <div class="module-card" id="unit4">
             <div class="card-header">
                 <span class="unit-badge">Unit 04</span>
                 <span class="card-title-text">General Properties of Matter</span>
                 <div class="expand-icon"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
             </div>
-            <div class="card-body"><div class="card-body-inner content-text">
-                <div class="sub-topic">4.1 Elasticity</div>
-                <p>Deforming force, restoring force, elastic and plastic body, stress and strain with their types, elastic limit, Hooke's law, Young's modulus, bulk modulus, modulus of rigidity and relation between them (no derivation).</p>
-                <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Stress, strain &amp; Young's modulus</span>
-
-                <div class="sub-topic">4.2 Surface Tension</div>
-                <p>Molecular force, cohesive and adhesive force, molecular range, sphere of influence, Laplace's molecular theory. Definition of surface tension and its SI unit, angle of contact, capillary action with examples, shape of meniscus for water and mercury, relation between surface tension, capillary rise and radius of capillary (no derivation), effect of impurity and temperature on surface tension.</p>
-                <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Surface tension, capillary rise &amp; radius</span>
-
-                <div class="sub-topic">4.3 Viscosity</div>
-                <p>Definition of viscosity, viscous force, velocity gradient, Newton's law of viscosity, coefficient of viscosity and its SI unit, streamline and turbulent flow with examples, critical velocity, Reynolds number and its significance, derivation of viscous force for free fall of spherical body through viscous medium, upthrust, terminal velocity, Stoke's law.</p>
-                <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Coefficient of viscosity, Reynolds number &amp; Stoke's formula</span>
-            </div></div>
+            <div class="card-body">
+                <div class="card-body-inner content-text">
+                    <div class="sub-section" style="margin-top:0">
+                        <div class="sub-topic"><span class="sub-num">4.1</span><span class="sub-label">Elasticity</span></div>
+                        <p>Deforming force, restoring force, elastic and plastic body, stress and strain with their types, elastic limit, Hooke's law, Young's modulus, bulk modulus, modulus of rigidity and relation between them (no derivation).</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Stress, strain &amp; Young's modulus</span>
+                    </div>
+                    <div class="sub-section">
+                        <div class="sub-topic"><span class="sub-num">4.2</span><span class="sub-label">Surface Tension</span></div>
+                        <p>Molecular force, cohesive and adhesive force, molecular range, sphere of influence, Laplace's molecular theory. Definition of surface tension and its SI unit, angle of contact, capillary action with examples, shape of meniscus for water and mercury, relation between surface tension, capillary rise and radius of capillary (no derivation), effect of impurity and temperature on surface tension.</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Surface tension, capillary rise &amp; radius</span>
+                    </div>
+                    <div class="sub-section">
+                        <div class="sub-topic"><span class="sub-num">4.3</span><span class="sub-label">Viscosity</span></div>
+                        <p>Definition of viscosity, viscous force, velocity gradient, Newton's law of viscosity, coefficient of viscosity and its SI unit, streamline and turbulent flow with examples, critical velocity, Reynolds number and its significance, derivation of viscous force for free fall of spherical body through viscous medium, upthrust, terminal velocity, Stoke's law.</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Coefficient of viscosity, Reynolds number &amp; Stoke's formula</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- UNIT 5 -->
         <div class="module-card" id="unit5">
             <div class="card-header">
                 <span class="unit-badge">Unit 05</span>
                 <span class="card-title-text">Heat</span>
                 <div class="expand-icon"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
             </div>
-            <div class="card-body"><div class="card-body-inner content-text">
-                <p>Three modes of transmission of heat — conduction, convection and radiation. Good and bad conductors of heat with examples, law of thermal conductivity, coefficient of thermal conductivity and its SI unit.</p>
-                <p>Definition of linear, aerial and cubical expansion and relation between them (no derivation).</p>
-                <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Law of thermal conductivity &amp; coefficients of expansion</span>
-            </div></div>
+            <div class="card-body">
+                <div class="card-body-inner content-text">
+                    <div class="sub-section" style="margin-top:0">
+                        <div class="sub-topic"><span class="sub-num">5.1</span><span class="sub-label">Transmission of Heat</span></div>
+                        <p>Three modes — conduction, convection and radiation. Good and bad conductors of heat with examples, law of thermal conductivity, coefficient of thermal conductivity and its SI unit.</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Law of thermal conductivity</span>
+                    </div>
+                    <div class="sub-section">
+                        <div class="sub-topic"><span class="sub-num">5.2</span><span class="sub-label">Expansion of Solids</span></div>
+                        <p>Definition of linear, aerial and cubical expansion and relation between them (no derivation).</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Coefficients of expansion</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- UNIT 6 -->
         <div class="module-card" id="unit6">
             <div class="card-header">
                 <span class="unit-badge">Unit 06</span>
                 <span class="card-title-text">Sound &amp; Acoustics</span>
                 <div class="expand-icon"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
             </div>
-            <div class="card-body"><div class="card-body-inner content-text">
-                <div class="sub-topic">6.1 Sound</div>
-                <p>Definition of wave motion, amplitude, period, frequency and wavelength, relation between velocity, frequency and wavelength, longitudinal and transverse waves. Definition of stationary wave, node and antinode, forced and free vibrations, definition of resonance with examples, derivation of formula for velocity of sound with end correction.</p>
-                <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Relation v = n&#955; and resonance</span>
-
-                <div class="sub-topic">6.2 Acoustics of Buildings</div>
-                <p>Acoustics — concept and definition, intensity and loudness of sound, echo, reverberation, standard reverberation time, Sabine's formula, conditions for good acoustics, factors affecting acoustical planning of auditorium.</p>
-                <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Sabine's formula</span>
-            </div></div>
+            <div class="card-body">
+                <div class="card-body-inner content-text">
+                    <div class="sub-section" style="margin-top:0">
+                        <div class="sub-topic"><span class="sub-num">6.1</span><span class="sub-label">Sound Waves</span></div>
+                        <p>Definition of wave motion, amplitude, period, frequency and wavelength, relation between velocity, frequency and wavelength, longitudinal and transverse waves. Definition of stationary wave, node and antinode, forced and free vibrations, definition of resonance with examples, derivation of formula for velocity of sound with end correction.</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Relation v = n&#955; and resonance</span>
+                    </div>
+                    <div class="sub-section">
+                        <div class="sub-topic"><span class="sub-num">6.2</span><span class="sub-label">Acoustics of Buildings</span></div>
+                        <p>Acoustics — concept and definition, intensity and loudness of sound, echo, reverberation, standard reverberation time, Sabine's formula, conditions for good acoustics, factors affecting acoustical planning of auditorium.</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Sabine's formula</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- UNIT 7 -->
         <div class="module-card" id="unit7">
             <div class="card-header">
                 <span class="unit-badge">Unit 07</span>
                 <span class="card-title-text">Light</span>
                 <div class="expand-icon"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
             </div>
-            <div class="card-body"><div class="card-body-inner content-text">
-                <div class="sub-topic">7.1 Properties of Light</div>
-                <p>Reflection, refraction, Snell's law, physical significance of refractive index, definition of dispersion of light along with ray diagram.</p>
-                <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Refractive Index</span>
-            </div></div>
+            <div class="card-body">
+                <div class="card-body-inner content-text">
+                    <div class="sub-section" style="margin-top:0">
+                        <div class="sub-topic"><span class="sub-num">7.1</span><span class="sub-label">Properties of Light</span></div>
+                        <p>Reflection, refraction, Snell's law, physical significance of refractive index, definition of dispersion of light along with ray diagram.</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Refractive Index</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- UNIT 8 -->
         <div class="module-card" id="unit8">
             <div class="card-header">
                 <span class="unit-badge">Unit 08</span>
                 <span class="card-title-text">Electric Field &amp; Potential</span>
                 <div class="expand-icon"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
             </div>
-            <div class="card-body"><div class="card-body-inner content-text">
-                <div class="sub-topic">8.1 Electric Field</div>
-                <p>Electric charge, Coulomb's inverse square law, definition of unit charge, electric field, electric lines of force and their properties, electric field intensity, electric flux, electric flux density.</p>
-                <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Coulomb's law, electrical intensity</span>
-
-                <div class="sub-topic">8.2 Electric Potential</div>
-                <p>Concept of potential, definition and unit, potential due to point charge using integration method, potential difference between two points, definition of dielectric strength and breakdown potential.</p>
-                <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Electric potential</span>
-            </div></div>
+            <div class="card-body">
+                <div class="card-body-inner content-text">
+                    <div class="sub-section" style="margin-top:0">
+                        <div class="sub-topic"><span class="sub-num">8.1</span><span class="sub-label">Electric Field</span></div>
+                        <p>Electric charge, Coulomb's inverse square law, definition of unit charge, electric field, electric lines of force and their properties, electric field intensity, electric flux, electric flux density.</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Coulomb's law, electrical intensity</span>
+                    </div>
+                    <div class="sub-section">
+                        <div class="sub-topic"><span class="sub-num">8.2</span><span class="sub-label">Electric Potential</span></div>
+                        <p>Concept of potential, definition and unit, potential due to point charge using integration method, potential difference between two points, definition of dielectric strength and breakdown potential.</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Electric potential</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- UNIT 9 -->
         <div class="module-card" id="unit9">
             <div class="card-header">
                 <span class="unit-badge">Unit 09</span>
                 <span class="card-title-text">Modern Physics</span>
                 <div class="expand-icon"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
             </div>
-            <div class="card-body"><div class="card-body-inner content-text">
-                <div class="sub-topic">Band Theory of Solids</div>
-                <p>Energy levels in solids, valence &amp; conduction bands, forbidden gap, conductors, semiconductors and insulators, intrinsic and extrinsic semiconductors, p-type and n-type semiconductors, P-N junction diode — forward and reverse biased characteristics. (No numericals)</p>
-
-                <div class="sub-topic">9.1.2 Photo-electricity</div>
-                <p>Concept of photon, Planck's hypothesis, properties of photon, photo electric effect, laws of photoelectric effect, work function, Einstein's photoelectric equation (no derivation), basic concept of solar energy.</p>
-                <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Energy of photon, work function, photoelectric equation</span>
-
-                <div class="sub-topic">9.1.3 LASER</div>
-                <p>Properties of laser, characteristics and applications of laser.</p>
-
-                <div class="sub-topic">9.1.4 X-Rays</div>
-                <p>Introduction to X-rays, production using Coolidge tube, minimum wavelength of X-rays, properties and applications of X-rays.</p>
-                <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Minimum wavelength of X-rays</span>
-
-                <div class="sub-topic">9.1.5 Nanotechnology</div>
-                <p>Definition of nanoscale, nanometer &amp; nanoparticle, applications of nanotechnology — electronics, automobiles, medical, textile, cosmetics, environmental, space and defence.</p>
-            </div></div>
+            <div class="card-body">
+                <div class="card-body-inner content-text">
+                    <div class="sub-section" style="margin-top:0">
+                        <div class="sub-topic"><span class="sub-num">9.1</span><span class="sub-label">Band Theory of Solids</span></div>
+                        <p>Energy levels in solids, valence &amp; conduction bands, forbidden gap, conductors, semiconductors and insulators, intrinsic and extrinsic semiconductors, p-type and n-type semiconductors, P-N junction diode — forward and reverse biased characteristics. (No numericals)</p>
+                    </div>
+                    <div class="sub-section">
+                        <div class="sub-topic"><span class="sub-num">9.2</span><span class="sub-label">Photo-Electricity</span></div>
+                        <p>Concept of photon, Planck's hypothesis, properties of photon, photo electric effect, laws of photoelectric effect, work function, Einstein's photoelectric equation (no derivation), basic concept of solar energy.</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Energy of photon, work function, photoelectric equation</span>
+                    </div>
+                    <div class="sub-section">
+                        <div class="sub-topic"><span class="sub-num">9.3</span><span class="sub-label">LASER</span></div>
+                        <p>Properties of laser, characteristics and applications of laser.</p>
+                    </div>
+                    <div class="sub-section">
+                        <div class="sub-topic"><span class="sub-num">9.4</span><span class="sub-label">X-Rays</span></div>
+                        <p>Introduction to X-rays, production using Coolidge tube, minimum wavelength of X-rays, properties and applications of X-rays.</p>
+                        <span class="badge"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Numericals: Minimum wavelength of X-rays</span>
+                    </div>
+                    <div class="sub-section">
+                        <div class="sub-topic"><span class="sub-num">9.5</span><span class="sub-label">Nanotechnology</span></div>
+                        <p>Definition of nanoscale, nanometer &amp; nanoparticle, applications of nanotechnology — electronics, automobiles, medical, textile, cosmetics, environmental, space and defence.</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- UNIT 11 -->
         <div class="module-card" id="unit11">
             <div class="card-header">
                 <span class="unit-badge">Unit 11</span>
                 <span class="card-title-text">Non-Conventional Sources of Energy</span>
                 <div class="expand-icon"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
             </div>
-            <div class="card-body"><div class="card-body-inner content-text">
-                <p>Introduction — non-renewable and renewable (alternate) energy sources. Examples: Solar Energy, Wind Energy, Tidal Energy, Geo-Thermal Energy and Bio-Mass.</p>
-                <p>Advantages and disadvantages of renewable energy.</p>
-            </div></div>
+            <div class="card-body">
+                <div class="card-body-inner content-text">
+                    <div class="sub-section" style="margin-top:0">
+                        <div class="sub-topic"><span class="sub-num">11.1</span><span class="sub-label">Energy Sources</span></div>
+                        <p>Introduction — non-renewable and renewable (alternate) energy sources. Examples: Solar Energy, Wind Energy, Tidal Energy, Geo-Thermal Energy and Bio-Mass.</p>
+                    </div>
+                    <div class="sub-section">
+                        <div class="sub-topic"><span class="sub-num">11.2</span><span class="sub-label">Pros &amp; Cons</span></div>
+                        <p>Advantages and disadvantages of renewable energy.</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </main>
 
     <script>
-        // ── Mobile sidebar toggle
-        const menuBtn  = document.getElementById('menuBtn');
+        // ── Sidebar toggle
+        const menuBtn = document.getElementById('menuBtn');
         const sidebar  = document.getElementById('sidebar');
         const overlay  = document.getElementById('overlay');
 
@@ -648,35 +692,57 @@
             overlay.classList.add('active');
             menuBtn.classList.add('open');
         }
-
         function closeSidebar() {
             sidebar.classList.remove('active');
             overlay.classList.remove('active');
             menuBtn.classList.remove('open');
         }
 
-        menuBtn.addEventListener('click', () => {
-            sidebar.classList.contains('active') ? closeSidebar() : openSidebar();
-        });
-
+        menuBtn.addEventListener('click', () =>
+            sidebar.classList.contains('active') ? closeSidebar() : openSidebar()
+        );
         overlay.addEventListener('click', closeSidebar);
-
-        // Close on nav link click (mobile)
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth <= 900) closeSidebar();
             });
         });
 
-        // ── Card accordion toggle
+        // ── Accordion — explicit JS height for reliable mobile behaviour
+        function openCard(card) {
+            const body  = card.querySelector('.card-body');
+            const inner = card.querySelector('.card-body-inner');
+            card.classList.add('open');
+            body.style.height = inner.scrollHeight + 'px';
+        }
+
+        function closeCard(card) {
+            const body = card.querySelector('.card-body');
+            // Snapshot current rendered height, then animate to 0
+            body.style.height = body.scrollHeight + 'px';
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    body.style.height = '0px';
+                    card.classList.remove('open');
+                });
+            });
+        }
+
         document.querySelectorAll('.card-header').forEach(header => {
             header.addEventListener('click', () => {
                 const card = header.closest('.module-card');
-                card.classList.toggle('open');
+                card.classList.contains('open') ? closeCard(card) : openCard(card);
             });
         });
 
-        // ── Active nav link on scroll
+        // Init pre-opened cards
+        document.querySelectorAll('.module-card.open').forEach(card => {
+            const body  = card.querySelector('.card-body');
+            const inner = card.querySelector('.card-body-inner');
+            body.style.height = inner.scrollHeight + 'px';
+        });
+
+        // ── Active nav on scroll
         const sections = document.querySelectorAll('.module-card[id]');
         const navLinks  = document.querySelectorAll('.nav-link');
 
@@ -685,13 +751,12 @@
                 if (entry.isIntersecting) {
                     navLinks.forEach(link => {
                         link.classList.remove('active');
-                        if (link.getAttribute('href') === '#' + entry.target.id) {
+                        if (link.getAttribute('href') === '#' + entry.target.id)
                             link.classList.add('active');
-                        }
                     });
                 }
             });
-        }, { threshold: 0.35 });
+        }, { threshold: 0.3 });
 
         sections.forEach(sec => observer.observe(sec));
     </script>
