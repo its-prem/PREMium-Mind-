@@ -160,6 +160,8 @@
         }
 
         /* Overlay */
+
+     /* Overlay */
         .overlay {
             display: none;
             position: fixed;
@@ -168,16 +170,14 @@
             backdrop-filter: blur(2px);
             z-index: 150;
             opacity: 0;
+            /* YEH LINE ADD KI HAI: Invisible hone pe clicks block nahi karega */
+            pointer-events: none; 
             transition: opacity 0.3s ease;
         }
-        .overlay.active { opacity: 1; }
-
-        /* ── MAIN CONTENT ── */
-        .main-content {
-            margin-left: var(--sidebar-w);
-            padding: 3.5rem 4rem 5rem;
-            width: calc(100% - var(--sidebar-w));
-            min-height: 100vh;
+        .overlay.active { 
+            opacity: 1; 
+            /* YEH LINE ADD KI HAI: Jab sidebar khulega tab clicks catch karega */
+            pointer-events: auto; 
         }
 
         .page-header {
@@ -709,11 +709,18 @@
         });
 
         // ── Accordion — explicit JS height for reliable mobile behaviour
-        function openCard(card) {
+function openCard(card) {
             const body  = card.querySelector('.card-body');
             const inner = card.querySelector('.card-body-inner');
             card.classList.add('open');
             body.style.height = inner.scrollHeight + 'px';
+            
+            // Wait for transition to finish, then set to auto so text doesn't cut off on resize
+            setTimeout(() => {
+                if(card.classList.contains('open')){
+                    body.style.height = 'auto';
+                }
+            }, 400); // 400ms is the duration of your CSS transition
         }
 
         function closeCard(card) {
