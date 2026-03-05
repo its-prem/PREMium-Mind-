@@ -2,123 +2,169 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LearnTrack | Glass Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LearnTrack | Mobile Outreach</title>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
         :root {
-            --glass: rgba(255, 255, 255, 0.2);
-            --glass-border: rgba(255, 255, 255, 0.3);
-            --primary: #6366f1;
-            --accent: #a855f7;
-            --success: #22c55e;
-            --text-dark: #1e293b;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            --primary: #4f46e5;
+            --success: #10b981;
+            --text-main: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
             background-attachment: fixed;
+            color: var(--text-main);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            color: white;
         }
 
-        .container {
-            width: 95%;
-            max-width: 1000px;
-            margin: 40px 10px;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+        .app-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 15px;
+        }
+
+        /* Sticky Header for Mobile */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 20px;
+            border-radius: 20px;
             border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 2.5rem;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .header p { opacity: 0.9; font-weight: 300; }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+            box-shadow: var(--glass-shadow);
             margin-bottom: 25px;
         }
 
-        .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 15px;
+        .brand {
             text-align: center;
-            border: 1px solid var(--glass-border);
+            margin-bottom: 15px;
         }
 
-        .search-container {
-            margin-bottom: 20px;
+        .brand h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .search-box {
-            width: 100%;
-            padding: 15px 20px;
+        .brand p {
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-box {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
             border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-box span {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .stat-box strong {
+            font-size: 1.4rem;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
             border: 1px solid var(--glass-border);
-            background: rgba(255, 255, 255, 0.1);
+            padding: 14px 20px;
+            border-radius: 12px;
             color: white;
-            font-size: 16px;
+            font-size: 1rem;
             outline: none;
             transition: 0.3s;
         }
 
-        .search-box::placeholder { color: rgba(255,255,255,0.6); }
-        .search-box:focus { background: rgba(255, 255, 255, 0.25); box-shadow: 0 0 15px rgba(255,255,255,0.1); }
+        .search-input::placeholder { color: rgba(255,255,255,0.6); }
+        .search-input:focus { background: rgba(255, 255, 255, 0.3); }
 
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: 15px;
+        /* Card List Layout */
+        .student-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 40px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: transparent;
+        .student-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 16px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s, background 0.3s;
         }
 
-        th {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 18px;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            text-align: left;
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
         }
 
-        td {
-            padding: 15px 18px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            transition: 0.3s;
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #333;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        tr:hover td {
-            background: rgba(255, 255, 255, 0.15);
-            transform: scale(1.005);
-            cursor: pointer;
+        .email-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+            word-break: break-all;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .btn-send {
@@ -126,162 +172,172 @@
             color: var(--primary);
             border: none;
             padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: bold;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: 0.2s;
+            flex-shrink: 0;
         }
 
-        .btn-send:hover {
-            background: var(--accent);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        .btn-send:active { transform: scale(0.95); }
+
+        /* Sent State */
+        .student-card.sent-status {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.4);
         }
 
-        tr.is-sent {
-            background: rgba(34, 197, 94, 0.2);
-            color: #bbf7d0;
-        }
-
-        tr.is-sent .btn-send {
+        .student-card.sent-status .btn-send {
             background: var(--success);
             color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 600px) {
-            .header h1 { font-size: 1.8rem; }
-            .container { padding: 15px; }
-            td, th { padding: 12px; font-size: 0.9rem; }
-            .btn-send { padding: 8px 12px; font-size: 0.8rem; }
+        /* Mobile Optimization */
+        @media (max-width: 480px) {
+            .student-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            .btn-send {
+                width: 100%;
+                padding: 14px;
+                font-size: 1rem;
+            }
+            .email-text {
+                white-space: normal;
+                word-break: break-all;
+            }
         }
     </style>
 
     <script>
         let sentCount = 0;
 
-        function updateUI() {
-            const rows = document.querySelectorAll('tbody tr');
-            document.getElementById('totalCount').innerText = rows.length;
-            document.getElementById('sentDisplay').innerText = sentCount;
+        function updateStats() {
+            const cards = document.querySelectorAll('.student-card');
+            document.getElementById('totalCount').innerText = cards.length;
+            document.getElementById('sentCount').innerText = sentCount;
+        }
+
+        function getInitials(email) {
+            return email.charAt(0).toUpperCase();
         }
 
         function sendMail(email, btn) {
-            const subject = "Selection Confirmed: Welcome to LearnTrack Internship Program";
+            // Highly optimized plain-text email for mailto:
+            const subject = "🚀 Action Required: LearnTrack Internship Selection Confirmation";
             const body = `Dear Student,
 
-Congratulations! 
+🎉 Congratulations on your selection!
 
-Team LearnTrack is happy to inform you that you have been selected for our Internship Program. This is a significant step toward building your professional career.
+Team LearnTrack is thrilled to officially welcome you to our Internship Program. Your application stood out, and we are excited to see you grow with us.
 
-Please join the Official WhatsApp Group to receive class schedules and further instructions:
+📌 NEXT STEPS (URGENT):
+To complete your onboarding and receive your daily class schedules, assignments, and meeting links, you must join our official communication group immediately.
 
-🔗 Group Link: https://chat.whatsapp.com/H9N68jNP6e2Ep4VzN0f0Nb
+👉 Official WhatsApp Group Link:
+https://chat.whatsapp.com/H9N68jNP6e2Ep4VzN0f0Nb
 
-Kindly join as soon as possible to ensure you don't miss the orientation.
 
-Best Regards,
-Team LearnTrack`;
+We look forward to a fantastic learning journey with you!
+
+Warm Regards,
+Team LearnTrack
+`;
 
             window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-            const row = btn.closest('tr');
-            if (!row.classList.contains("is-sent")) {
-                row.classList.add("is-sent");
-                btn.innerText = "Sent ✓";
+            const card = btn.closest('.student-card');
+            if (!card.classList.contains("sent-status")) {
+                card.classList.add("sent-status");
+                btn.innerHTML = "Sent ✓";
                 sentCount++;
-                updateUI();
+                updateStats();
             }
         }
 
-        function filterList() {
+        function filterEmails() {
             const query = document.getElementById("searchInput").value.toLowerCase();
-            const rows = document.querySelectorAll("tbody tr");
-            rows.forEach(row => {
-                row.style.display = row.innerText.toLowerCase().includes(query) ? "" : "none";
+            const cards = document.querySelectorAll(".student-card");
+            cards.forEach(card => {
+                const email = card.querySelector(".email-text").innerText.toLowerCase();
+                card.style.display = email.includes(query) ? "flex" : "none";
             });
         }
+
+        // Initialize avatars on load
+        window.onload = () => {
+            document.querySelectorAll('.student-card').forEach(card => {
+                const email = card.querySelector('.email-text').innerText;
+                card.querySelector('.avatar').innerText = getInitials(email);
+            });
+            updateStats();
+        };
     </script>
 </head>
+<body>
 
-<body onload="updateUI()">
-
-<div class="container">
-    <div class="header">
-        <h1>LearnTrack</h1>
-        <p>Student Selection & Outreach Portal</p>
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-card">
-            <small>Total Students</small>
-            <div id="totalCount" style="font-size: 1.5rem; font-weight: bold;">0</div>
+<div class="app-container">
+    
+    <div class="sticky-header">
+        <div class="brand">
+            <h1>LearnTrack</h1>
+            <p>Internship Outreach Portal</p>
         </div>
-        <div class="stat-card">
-            <small>Emails Sent</small>
-            <div id="sentDisplay" style="font-size: 1.5rem; font-weight: bold; color: #4ade80;">0</div>
+
+        <div class="stats-row">
+            <div class="stat-box">
+                <span>Total</span>
+                <strong id="totalCount">0</strong>
+            </div>
+            <div class="stat-box">
+                <span>Sent</span>
+                <strong id="sentCount" style="color: #6ee7b7;">0</strong>
+            </div>
         </div>
+
+        <input type="text" id="searchInput" class="search-input" onkeyup="filterEmails()" placeholder="🔍 Search email...">
     </div>
 
-    <div class="search-container">
-        <input type="text" id="searchInput" class="search-box" onkeyup="filterList()" placeholder="🔍 Search student email...">
-    </div>
+    <div class="student-list" id="listContainer">
+        
+        <script>
+            const emails = [
+                "amanraaz1230@gmail.com", "mahimodo009060@gmail.com", "kumaripriya7585@gmail.com", 
+                "gitak5442@gmail.com", "vishalmishra6992@gmail.com", "sangamkumar6535@gmail.com", 
+                "dilipekka1998@gmail.com", "bitud4236@gmail.com", "thesandeepkumar004@gmail.com", 
+                "sinhavineet177@gmail.com", "premk70917@gmail.com", "tabrejalam7864@gmail.com", 
+                "rajkishorpatel940@gmail.com", "gk647387@gmail.com", "ksoren054@gmail.com", 
+                "abdulsohrab05@gmail.com", "shaktisnd22@gmail.com", "rajan828122@gmail.com", 
+                "mdsaifullaha456@gmail.com", "ujjalkumar99cky@gmail.com", "vikramkumar06042004@gmail.com", 
+                "shaziarashid95148@gmail.com", "sanjanasoren132@gmail.com", "Simran20april@gmail.com", 
+                "diyakumari7762@gmail.com", "megha821088@gmail.com", "somya191513@gmail.com", 
+                "abhag951@gmail.com", "khushikumari8568898@gmail.com", "sawnishu2005@gmail.com", 
+                "sachinsunny2003@gmail.com", "cspriyanka2005@gmail.com", "palaksinghrajput584@gmail.com", 
+                "anchalsighh2308@gmail.com", "tannukumari0402@gmail.com", "sk.shiva6256@gmail.com", 
+                "shekharayush06@gmail.com", "manishkumarg392@gmail.com", "sagarchatterjee202@gmail.com", 
+                "aryankumarrawani20@gmail.com", "bineethpro@gmail.com", "jameslakra1205@gmail.com"
+            ];
 
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>Student Details</th>
-                    <th style="text-align:right;">Action</th>
-                </tr>
-            </thead>
-            <tbody id="studentTable">
-                <tr><td>amanraaz1230@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('amanraaz1230@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>mahimodo009060@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('mahimodo009060@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>kumaripriya7585@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('kumaripriya7585@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>gitak5442@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('gitak5442@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>vishalmishra6992@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('vishalmishra6992@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>sangamkumar6535@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sangamkumar6535@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>dilipekka1998@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('dilipekka1998@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>bitud4236@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('bitud4236@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>thesandeepkumar004@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('thesandeepkumar004@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>sinhavineet177@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sinhavineet177@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>premk70917@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('premk70917@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>tabrejalam7864@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('tabrejalam7864@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>rajkishorpatel940@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('rajkishorpatel940@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>gk647387@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('gk647387@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>ksoren054@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('ksoren054@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>abdulsohrab05@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('abdulsohrab05@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>shaktisnd22@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('shaktisnd22@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>rajan828122@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('rajan828122@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>mdsaifullaha456@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('mdsaifullaha456@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>ujjalkumar99cky@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('ujjalkumar99cky@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>vikramkumar06042004@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('vikramkumar06042004@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>shaziarashid95148@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('shaziarashid95148@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>sanjanasoren132@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sanjanasoren132@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>Simran20april@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('Simran20april@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>diyakumari7762@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('diyakumari7762@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>megha821088@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('megha821088@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>somya191513@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('somya191513@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>abhag951@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('abhag951@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>khushikumari8568898@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('khushikumari8568898@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>sawnishu2005@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sawnishu2005@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>sachinsunny2003@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sachinsunny2003@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>cspriyanka2005@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('cspriyanka2005@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>palaksinghrajput584@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('palaksinghrajput584@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>anchalsighh2308@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('anchalsighh2308@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>tannukumari0402@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('tannukumari0402@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>sk.shiva6256@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sk.shiva6256@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>shekharayush06@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('shekharayush06@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>manishkumarg392@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('manishkumarg392@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>sagarchatterjee202@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sagarchatterjee202@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>aryankumarrawani20@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('aryankumarrawani20@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>bineethpro@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('bineethpro@gmail.com',this)">Send Mail</button></td></tr>
-                <tr><td>jameslakra1205@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('jameslakra1205@gmail.com',this)">Send Mail</button></td></tr>
-            </tbody>
-        </table>
+            const container = document.getElementById('listContainer');
+            emails.forEach(email => {
+                const card = document.createElement('div');
+                card.className = 'student-card';
+                card.innerHTML = `
+                    <div class="student-info">
+                        <div class="avatar"></div>
+                        <div class="email-text">${email}</div>
+                    </div>
+                    <button class="btn-send" onclick="sendMail('${email}', this)">Send Mail</button>
+                `;
+                container.appendChild(card);
+            });
+        </script>
+        
     </div>
 </div>
 
