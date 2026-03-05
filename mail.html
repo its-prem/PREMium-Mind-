@@ -3,241 +3,286 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LearnTrack | Internship Outreach</title>
+    <title>LearnTrack | Glass Portal</title>
 
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1e40af;
+            --glass: rgba(255, 255, 255, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --primary: #6366f1;
+            --accent: #a855f7;
             --success: #22c55e;
-            --bg: #f8fafc;
-            --text: #1e293b;
+            --text-dark: #1e293b;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
             margin: 0;
-            padding: 40px 20px;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            color: white;
         }
 
         .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
+            width: 95%;
+            max-width: 1000px;
+            margin: 40px 10px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         }
 
         .header {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 20px;
         }
 
-        .header h2 {
+        .header h1 {
             margin: 0;
-            color: var(--primary);
-            font-size: 28px;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
-        .stats-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #eff6ff;
-            padding: 15px 25px;
-            border-radius: 8px;
+        .header p { opacity: 0.9; font-weight: 300; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+        }
+
+        .search-container {
             margin-bottom: 20px;
-            font-weight: bold;
         }
 
         .search-box {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            box-sizing: border-box;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-box::placeholder { color: rgba(255,255,255,0.6); }
+        .search-box:focus { background: rgba(255, 255, 255, 0.25); box-shadow: 0 0 15px rgba(255,255,255,0.1); }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 15px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            background: transparent;
         }
 
         th {
-            background: #f1f5f9;
-            text-align: left;
-            padding: 15px;
-            font-size: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 18px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-align: left;
         }
 
         td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #f1f5f9;
+            padding: 15px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: 0.3s;
         }
 
-        tr:hover {
-            background-color: #f8fafc;
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.005);
+            cursor: pointer;
         }
 
         .btn-send {
-            padding: 8px 16px;
+            background: white;
+            color: var(--primary);
             border: none;
-            background: var(--primary);
-            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
             cursor: pointer;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: all 0.2s;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .btn-send:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
+            background: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
 
-        tr.sent-row {
-            background-color: #f0fdf4 !important;
-            color: #166534;
+        tr.is-sent {
+            background: rgba(34, 197, 94, 0.2);
+            color: #bbf7d0;
         }
 
-        tr.sent-row .btn-send {
+        tr.is-sent .btn-send {
             background: var(--success);
+            color: white;
         }
 
-        .badge {
-            background: #dbeafe;
-            color: var(--primary);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.8rem; }
+            .container { padding: 15px; }
+            td, th { padding: 12px; font-size: 0.9rem; }
+            .btn-send { padding: 8px 12px; font-size: 0.8rem; }
         }
     </style>
 
     <script>
         let sentCount = 0;
 
-        function updateCounter() {
-            const total = document.querySelectorAll('tbody tr').length;
-            document.getElementById('counter').innerText = `Sent: ${sentCount} / Total: ${total}`;
+        function updateUI() {
+            const rows = document.querySelectorAll('tbody tr');
+            document.getElementById('totalCount').innerText = rows.length;
+            document.getElementById('sentDisplay').innerText = sentCount;
         }
 
         function sendMail(email, btn) {
-            const subject = "Offer Letter: Internship Selection Confirmation - LearnTrack";
-            
+            const subject = "Selection Confirmed: Welcome to LearnTrack Internship Program";
             const body = `Dear Student,
 
-Congratulations! We are pleased to inform you that you have been officially selected for the Internship Program at LearnTrack.
+Congratulations! 
 
-To begin your journey and receive daily class updates, please join our official communication channel immediately:
+Team LearnTrack is happy to inform you that you have been selected for our Internship Program. This is a significant step toward building your professional career.
 
-Official WhatsApp Group Link:
-https://chat.whatsapp.com/H9N68jNP6e2Ep4VzN0f0Nb
+Please join the Official WhatsApp Group to receive class schedules and further instructions:
 
+🔗 Group Link: https://chat.whatsapp.com/H9N68jNP6e2Ep4VzN0f0Nb
 
-We are excited to have you on board!
+Kindly join as soon as possible to ensure you don't miss the orientation.
 
 Best Regards,
-Internship Coordination Team
-LearnTrack Education`;
+Team LearnTrack`;
 
-            window.location.href = "mailto:" + email + 
-                                   "?subject=" + encodeURIComponent(subject) + 
-                                   "&body=" + encodeURIComponent(body);
+            window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-            const row = btn.parentElement.parentElement;
-            if (!row.classList.contains("sent-row")) {
-                row.classList.add("sent-row");
+            const row = btn.closest('tr');
+            if (!row.classList.contains("is-sent")) {
+                row.classList.add("is-sent");
                 btn.innerText = "Sent ✓";
                 sentCount++;
-                updateCounter();
+                updateUI();
             }
         }
 
-        function filterTable() {
-            const input = document.getElementById("searchInput").value.toLowerCase();
+        function filterList() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
             const rows = document.querySelectorAll("tbody tr");
             rows.forEach(row => {
-                row.style.display = row.innerText.toLowerCase().includes(input) ? "" : "none";
+                row.style.display = row.innerText.toLowerCase().includes(query) ? "" : "none";
             });
         }
     </script>
 </head>
 
-<body onload="updateCounter()">
+<body onload="updateUI()">
 
 <div class="container">
     <div class="header">
-        <h2>LearnTrack</h2>
-        <p>Internship Selection Outreach Portal</p>
+        <h1>LearnTrack</h1>
+        <p>Student Selection & Outreach Portal</p>
     </div>
 
-    <div class="stats-bar">
-        <span id="counter">Sent: 0 / Total: 0</span>
-        <span class="badge">Campaign Active</span>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <small>Total Students</small>
+            <div id="totalCount" style="font-size: 1.5rem; font-weight: bold;">0</div>
+        </div>
+        <div class="stat-card">
+            <small>Emails Sent</small>
+            <div id="sentDisplay" style="font-size: 1.5rem; font-weight: bold; color: #4ade80;">0</div>
+        </div>
     </div>
 
-    <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="Search by email...">
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-box" onkeyup="filterList()" placeholder="🔍 Search student email...">
+    </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Student Email</th>
-                <th style="text-align:right;">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td>amanraaz1230@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('amanraaz1230@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>mahimodo009060@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('mahimodo009060@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>kumaripriya7585@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('kumaripriya7585@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>gitak5442@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('gitak5442@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>vishalmishra6992@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('vishalmishra6992@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>sangamkumar6535@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sangamkumar6535@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>dilipekka1998@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('dilipekka1998@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>bitud4236@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('bitud4236@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>thesandeepkumar004@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('thesandeepkumar004@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>sinhavineet177@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sinhavineet177@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>premk70917@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('premk70917@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>tabrejalam7864@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('tabrejalam7864@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>rajkishorpatel940@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('rajkishorpatel940@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>gk647387@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('gk647387@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>ksoren054@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('ksoren054@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>abdulsohrab05@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('abdulsohrab05@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>shaktisnd22@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('shaktisnd22@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>rajan828122@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('rajan828122@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>mdsaifullaha456@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('mdsaifullaha456@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>ujjalkumar99cky@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('ujjalkumar99cky@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>vikramkumar06042004@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('vikramkumar06042004@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>shaziarashid95148@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('shaziarashid95148@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>sanjanasoren132@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sanjanasoren132@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>Simran20april@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('Simran20april@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>diyakumari7762@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('diyakumari7762@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>megha821088@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('megha821088@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>somya191513@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('somya191513@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>abhag951@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('abhag951@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>khushikumari8568898@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('khushikumari8568898@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>sawnishu2005@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sawnishu2005@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>sachinsunny2003@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sachinsunny2003@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>cspriyanka2005@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('cspriyanka2005@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>palaksinghrajput584@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('palaksinghrajput584@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>anchalsighh2308@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('anchalsighh2308@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>tannukumari0402@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('tannukumari0402@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>sk.shiva6256@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sk.shiva6256@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>shekharayush06@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('shekharayush06@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>manishkumarg392@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('manishkumarg392@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>sagarchatterjee202@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sagarchatterjee202@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>aryankumarrawani20@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('aryankumarrawani20@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>bineethpro@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('bineethpro@gmail.com',this)">Send Email</button></td></tr>
-            <tr><td>jameslakra1205@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('jameslakra1205@gmail.com',this)">Send Email</button></td></tr>
-        </tbody>
-    </table>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student Details</th>
+                    <th style="text-align:right;">Action</th>
+                </tr>
+            </thead>
+            <tbody id="studentTable">
+                <tr><td>amanraaz1230@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('amanraaz1230@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>mahimodo009060@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('mahimodo009060@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>kumaripriya7585@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('kumaripriya7585@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>gitak5442@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('gitak5442@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>vishalmishra6992@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('vishalmishra6992@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>sangamkumar6535@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sangamkumar6535@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>dilipekka1998@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('dilipekka1998@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>bitud4236@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('bitud4236@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>thesandeepkumar004@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('thesandeepkumar004@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>sinhavineet177@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sinhavineet177@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>premk70917@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('premk70917@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>tabrejalam7864@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('tabrejalam7864@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>rajkishorpatel940@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('rajkishorpatel940@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>gk647387@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('gk647387@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>ksoren054@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('ksoren054@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>abdulsohrab05@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('abdulsohrab05@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>shaktisnd22@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('shaktisnd22@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>rajan828122@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('rajan828122@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>mdsaifullaha456@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('mdsaifullaha456@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>ujjalkumar99cky@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('ujjalkumar99cky@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>vikramkumar06042004@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('vikramkumar06042004@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>shaziarashid95148@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('shaziarashid95148@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>sanjanasoren132@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sanjanasoren132@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>Simran20april@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('Simran20april@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>diyakumari7762@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('diyakumari7762@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>megha821088@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('megha821088@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>somya191513@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('somya191513@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>abhag951@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('abhag951@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>khushikumari8568898@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('khushikumari8568898@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>sawnishu2005@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sawnishu2005@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>sachinsunny2003@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sachinsunny2003@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>cspriyanka2005@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('cspriyanka2005@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>palaksinghrajput584@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('palaksinghrajput584@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>anchalsighh2308@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('anchalsighh2308@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>tannukumari0402@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('tannukumari0402@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>sk.shiva6256@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sk.shiva6256@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>shekharayush06@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('shekharayush06@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>manishkumarg392@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('manishkumarg392@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>sagarchatterjee202@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('sagarchatterjee202@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>aryankumarrawani20@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('aryankumarrawani20@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>bineethpro@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('bineethpro@gmail.com',this)">Send Mail</button></td></tr>
+                <tr><td>jameslakra1205@gmail.com</td><td align="right"><button class="btn-send" onclick="sendMail('jameslakra1205@gmail.com',this)">Send Mail</button></td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 </body>
