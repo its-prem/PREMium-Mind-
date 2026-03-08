@@ -3,124 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LearnTrack | Mobile Outreach</title>
+    <title>LearnTrack | Cloud Computing</title>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.15);
-            --glass-border: rgba(255, 255, 255, 0.25);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-            --primary: #4f46e5;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            --primary: #38bdf8;
+            --primary-dark: #0284c7;
             --success: #10b981;
-            --text-main: #ffffff;
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
         }
 
         * {
             box-sizing: border-box;
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            /* Premium Dark Theme Background */
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
             background-attachment: fixed;
             color: var(--text-main);
             min-height: 100vh;
         }
 
         .app-container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 0 auto;
             padding: 20px 15px;
         }
 
-        /* Sticky Header for Mobile */
-        .sticky-header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 20px;
-            border-radius: 20px;
+        /* Standard Header (No longer sticky) */
+        .top-header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 25px 20px;
+            border-radius: 24px;
             border: 1px solid var(--glass-border);
             box-shadow: var(--glass-shadow);
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .brand {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .brand h1 {
-            margin: 0;
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 700;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
         }
 
         .brand p {
-            margin: 5px 0 0;
-            font-size: 0.9rem;
-            opacity: 0.8;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
         .stats-row {
             display: flex;
             justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         .stat-box {
             flex: 1;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 12px;
-            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 15px;
+            border-radius: 16px;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.08);
         }
 
         .stat-box span {
             display: block;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            opacity: 0.8;
-            margin-bottom: 4px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
         }
 
         .stat-box strong {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .search-wrapper {
+            position: relative;
         }
 
         .search-input {
             width: 100%;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.2);
             border: 1px solid var(--glass-border);
-            padding: 14px 20px;
-            border-radius: 12px;
+            padding: 16px 20px 16px 45px;
+            border-radius: 14px;
             color: white;
             font-size: 1rem;
             outline: none;
-            transition: 0.3s;
+            transition: all 0.3s ease;
         }
 
-        .search-input::placeholder { color: rgba(255,255,255,0.6); }
-        .search-input:focus { background: rgba(255, 255, 255, 0.3); }
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            opacity: 0.6;
+        }
 
-        /* Card List Layout */
+        .search-input::placeholder { color: rgba(255,255,255,0.4); }
+        .search-input:focus { 
+            background: rgba(255, 255, 255, 0.1); 
+            border-color: var(--primary);
+        }
+
+        /* Enhanced Student List for Mobile */
         .student-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 15px;
             padding-bottom: 40px;
         }
 
@@ -129,87 +148,94 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
-            padding: 16px;
-            border-radius: 16px;
+            padding: 18px;
+            border-radius: 20px;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: transform 0.2s, background 0.3s;
+            flex-direction: column;
+            gap: 15px;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease backwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .student-info {
             display: flex;
             align-items: center;
-            gap: 12px;
-            overflow: hidden;
+            gap: 15px;
         }
 
         .avatar {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: #333;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
             flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         .email-text {
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 500;
             word-break: break-all;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            color: var(--text-main);
         }
 
         .btn-send {
             background: white;
-            color: var(--primary);
+            color: #0f172a;
             border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
+            padding: 14px;
+            border-radius: 12px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 1rem;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            transition: 0.2s;
-            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
         }
 
-        .btn-send:active { transform: scale(0.95); }
+        .btn-send:active { transform: scale(0.97); }
 
-        /* Sent State */
+        /* Sent Status Styling */
         .student-card.sent-status {
-            background: rgba(16, 185, 129, 0.2);
-            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .student-card.sent-status .avatar {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
 
         .student-card.sent-status .btn-send {
             background: var(--success);
             color: white;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
         }
 
-        /* Mobile Optimization */
-        @media (max-width: 480px) {
+        /* Desktop slight adjustments just in case */
+        @media (min-width: 600px) {
             .student-card {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
             }
             .btn-send {
-                width: 100%;
-                padding: 14px;
-                font-size: 1rem;
-            }
-            .email-text {
-                white-space: normal;
-                word-break: break-all;
+                width: auto;
+                padding: 12px 24px;
             }
         }
     </style>
@@ -228,33 +254,29 @@
         }
 
         function sendMail(email, btn) {
-            // Highly optimized plain-text email for mailto:
-            const subject = "🚀 Action Required: LearnTrack Internship Selection Confirmation";
+            const subject = "Urgent: Cloud Computing Class Updates & WhatsApp Group Link";
             const body = `Dear Student,
 
-🎉 Congratulations on your selection!
+We are excited to inform you that your Cloud Computing classes are going to start very soon!
 
-Team LearnTrack is thrilled to officially welcome you to our Internship Program. Your application stood out, and we are excited to see you grow with us.
+Please join the official WhatsApp group using the link below as soon as possible. All class schedules, meeting links, and important updates will be shared in this group only.
 
-📌 NEXT STEPS (URGENT):
-To complete your onboarding and receive your daily class schedules, assignments, and meeting links, you must join our official communication group immediately.
+👉 Join the WhatsApp Group here:
+https://chat.whatsapp.com/ExfRgX0anv53vdci6gkfPy?mode=gi_t
 
-👉 Official WhatsApp Group Link:
-https://chat.whatsapp.com/H9N68jNP6e2Ep4VzN0f0Nb
+Please join immediately so you don't miss any announcements.
 
+Best Regards,
+Team LearnTrack`;
 
-We look forward to a fantastic learning journey with you!
-
-Warm Regards,
-Team LearnTrack
-`;
-
+            // Open mail client
             window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
+            // Update UI to show sent status
             const card = btn.closest('.student-card');
             if (!card.classList.contains("sent-status")) {
                 card.classList.add("sent-status");
-                btn.innerHTML = "Sent ✓";
+                btn.innerHTML = "✓ Sent Successfully";
                 sentCount++;
                 updateStats();
             }
@@ -269,9 +291,12 @@ Team LearnTrack
             });
         }
 
-        // Initialize avatars on load
         window.onload = () => {
-            document.querySelectorAll('.student-card').forEach(card => {
+            const cards = document.querySelectorAll('.student-card');
+            cards.forEach((card, index) => {
+                // Add staggered animation delay
+                card.style.animationDelay = `${index * 0.05}s`;
+                
                 const email = card.querySelector('.email-text').innerText;
                 card.querySelector('.avatar').innerText = getInitials(email);
             });
@@ -283,44 +308,48 @@ Team LearnTrack
 
 <div class="app-container">
     
-    <div class="sticky-header">
+    <div class="top-header">
         <div class="brand">
             <h1>LearnTrack</h1>
-            <p>Internship Outreach Portal</p>
+            <p>Cloud Computing Batch</p>
         </div>
 
         <div class="stats-row">
             <div class="stat-box">
-                <span>Total</span>
+                <span>Total Students</span>
                 <strong id="totalCount">0</strong>
             </div>
             <div class="stat-box">
-                <span>Sent</span>
-                <strong id="sentCount" style="color: #6ee7b7;">0</strong>
+                <span>Mails Sent</span>
+                <strong id="sentCount" style="color: #34d399;">0</strong>
             </div>
         </div>
 
-        <input type="text" id="searchInput" class="search-input" onkeyup="filterEmails()" placeholder="🔍 Search email...">
+        <div class="search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="search-input" onkeyup="filterEmails()" placeholder="Search student email...">
+        </div>
     </div>
 
     <div class="student-list" id="listContainer">
         
         <script>
+            // List of students
             const emails = [
-                "amanraaz1230@gmail.com", "mahimodo009060@gmail.com", "kumaripriya7585@gmail.com", 
-                "gitak5442@gmail.com", "vishalmishra6992@gmail.com", "sangamkumar6535@gmail.com", 
-                "dilipekka1998@gmail.com", "bitud4236@gmail.com", "thesandeepkumar004@gmail.com", 
-                "sinhavineet177@gmail.com", "premk70917@gmail.com", "tabrejalam7864@gmail.com", 
-                "rajkishorpatel940@gmail.com", "gk647387@gmail.com", "ksoren054@gmail.com", 
-                "abdulsohrab05@gmail.com", "shaktisnd22@gmail.com", "rajan828122@gmail.com", 
-                "mdsaifullaha456@gmail.com", "ujjalkumar99cky@gmail.com", "vikramkumar06042004@gmail.com", 
-                "shaziarashid95148@gmail.com", "sanjanasoren132@gmail.com", "Simran20april@gmail.com", 
-                "diyakumari7762@gmail.com", "megha821088@gmail.com", "somya191513@gmail.com", 
-                "abhag951@gmail.com", "khushikumari8568898@gmail.com", "sawnishu2005@gmail.com", 
-                "sachinsunny2003@gmail.com", "cspriyanka2005@gmail.com", "palaksinghrajput584@gmail.com", 
-                "anchalsighh2308@gmail.com", "tannukumari0402@gmail.com", "sk.shiva6256@gmail.com", 
-                "shekharayush06@gmail.com", "manishkumarg392@gmail.com", "sagarchatterjee202@gmail.com", 
-                "aryankumarrawani20@gmail.com", "bineethpro@gmail.com", "jameslakra1205@gmail.com"
+                "abhag951@gmail.com",
+                "anchalsighh2308@gmail.com",
+                "cspriyanka2005@gmail.com",
+                "diyakumari7762@gmail.com",
+                "khushikumari8568898@gmail.com",
+                "megha821088@gmail.com",
+                "palaksinghrajput584@gmail.com",
+                "sachinsunny2003@gmail.com",
+                "sanjanasoren132@gmail.com",
+                "sawnishu2005@gmail.com",
+                "shaziarashid95148@gmail.com",
+                "simran20april@gmail.com",
+                "somya191513@gmail.com",
+                "tannukumari0402@gmail.com"
             ];
 
             const container = document.getElementById('listContainer');
@@ -332,7 +361,9 @@ Team LearnTrack
                         <div class="avatar"></div>
                         <div class="email-text">${email}</div>
                     </div>
-                    <button class="btn-send" onclick="sendMail('${email}', this)">Send Mail</button>
+                    <button class="btn-send" onclick="sendMail('${email}', this)">
+                        ✉️ Send Mail
+                    </button>
                 `;
                 container.appendChild(card);
             });
