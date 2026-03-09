@@ -6,18 +6,14 @@
   <title>PREMium Mind - Your Learning Partner</title>
   <link rel="icon" type="image/png" href="small-logo.png">
   
+  <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
   <style>
-    /* Reset & Base */
-    body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background-color: #fafafa; }
-    html { scroll-behavior: smooth; }
-
-    /* Layout & Responsiveness */
     @media screen and (max-width: 600px) {
-      .card-container, .navbar, .footer-container {
+      .card-container {
         padding-left: 10px !important;
         padding-right: 10px !important;
       }
@@ -25,18 +21,19 @@
         margin-left: 0 !important;
         margin-right: 0 !important;
       }
+      .navbar {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+      }
+      .footer-container {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+      }
     }
 
-    /* Navbar Basic Setup */
-    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
-    .logo-container { display: flex; align-items: center; gap: 10px; }
-    .logo-image { width: 40px; }
-    .logo-text { font-weight: 700; font-size: 1.2rem; }
-    .nav-links { display: flex; gap: 20px; list-style: none; }
-    .nav-links a { text-decoration: none; color: #333; font-weight: 500; transition: 0.3s; }
-    .nav-links a:hover { color: #000; }
-    .menu-btn { display: none; font-size: 1.5rem; cursor: pointer; }
-    @media (max-width: 768px) { .nav-links { display: none; } .menu-btn { display: block; } }
+    html {
+      scroll-behavior: smooth;
+    }
 
     /* Hero Section */
     .hero-section {
@@ -47,123 +44,574 @@
       position: relative;
       overflow: hidden;
     }
+
     .hero-section::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
       animation: pulse 4s ease-in-out infinite;
     }
-    @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-    .hero-content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
-    .hero-badge { display: inline-block; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 8px 20px; border-radius: 25px; font-size: 0.9rem; font-weight: 600; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.3); }
-    .hero-section h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 20px; line-height: 1.2; }
-    .hero-section p { font-size: 1.3rem; margin-bottom: 35px; opacity: 0.95; line-height: 1.6; }
-    
-    .cta-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
-    .cta-btn { padding: 15px 35px; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; }
-    .cta-primary { background: white; color: #000; }
-    .cta-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3); }
-    .cta-secondary { background: transparent; color: white; border: 2px solid white; }
-    .cta-secondary:hover { background: white; color: #000; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 8px 20px;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .hero-section h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+
+    .hero-section p {
+      font-size: 1.3rem;
+      margin-bottom: 35px;
+      opacity: 0.95;
+      line-height: 1.6;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .cta-btn {
+      padding: 15px 35px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .cta-primary {
+      background: white;
+      color: #000;
+    }
+
+    .cta-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
+    }
+
+    .cta-secondary {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+    }
+
+    .cta-secondary:hover {
+      background: white;
+      color: #000;
+    }
+
+    /* Stats Section */
+    .stats-section {
+      background: #f9f9f9;
+      padding: 60px 20px;
+    }
+
+    .stats-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 35px 25px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #000;
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      color: #666;
+      font-weight: 500;
+    }
 
     /* Features Section */
-    .features-section { padding: 80px 20px; background: white; }
-    .features-header { text-align: center; max-width: 800px; margin: 0 auto 60px; }
-    .features-header h2 { font-size: 2.8rem; font-weight: 800; margin-bottom: 15px; background: linear-gradient(135deg, #000000 0%, #434343 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .features-header p { font-size: 1.2rem; color: #666; }
-    .features-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 35px; }
-    .feature-card { padding: 35px; border-radius: 15px; background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%); border: 2px solid #f0f0f0; transition: all 0.3s ease; }
-    .feature-card:hover { border-color: #000; transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); }
-    .feature-icon { font-size: 3.5rem; margin-bottom: 20px; display: block; }
-    .feature-card h3 { font-size: 1.5rem; margin-bottom: 15px; font-weight: 700; }
-    .feature-card p { color: #666; line-height: 1.7; font-size: 1rem; }
-
-    /* Sidebar / Profile Settings */
-    .sidebar { position: fixed; top: 0; right: -300px; width: 300px; height: 100vh; background: white; box-shadow: -2px 0 10px rgba(0,0,0,0.1); z-index: 1000; transition: 0.3s; overflow-y: auto; }
-    .sidebar.active { right: 0; }
-    .close-sidebar-btn { font-size: 2rem; border: none; background: none; cursor: pointer; display: block; margin: 10px 10px 10px auto; }
-    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
-    .overlay.active { display: block; }
-    
-    .user-profile { text-align: center; padding: 20px 15px; border-bottom: 2px solid rgba(0,0,0,0.08); margin: 0 15px 20px 15px; background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%); border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .profile-photo-container { position: relative; width: 80px; height: 80px; margin: 0 auto 15px; }
-    .profile-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 4px solid #000; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
-    .profile-photo:hover { transform: scale(1.08); border-color: #333; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
-    .change-photo-btn { position: absolute; bottom: 2px; right: 2px; background: linear-gradient(135deg, #000 0%, #333 100%); color: #fff; border: 2px solid #fff; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
-    .change-photo-btn:hover { background: linear-gradient(135deg, #333 0%, #000 100%); transform: scale(1.15) rotate(15deg); }
-    .user-name { font-size: 1.1rem; font-weight: 700; color: #000; margin-bottom: 6px; }
-    .user-email { font-size: 0.85rem; color: #666; background: rgba(0,0,0,0.03); padding: 5px 10px; border-radius: 6px; display: inline-block; word-break: break-all; }
-    
-    .logout-btn-sidebar { width: 90%; margin: 15px auto 10px; padding: 11px; background: linear-gradient(135deg, #000 0%, #333 100%); color: #fff; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.95rem; transition: all 0.3s; }
-    .logout-btn-sidebar:hover { background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%); transform: translateY(-2px); }
-    
-    .login-prompt { text-align: center; padding: 25px 20px; background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%); margin: 0 15px 20px 15px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .login-prompt h3 { font-size: 1.2rem; margin-bottom: 10px; color:#111; font-weight: 800; }
-    .login-btn { background: linear-gradient(135deg, #000 0%, #333 100%); color: #fff; border: none; padding: 12px 30px; border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: 15px; font-size: 0.95rem; transition: all 0.3s; }
-    .login-btn:hover { background: linear-gradient(135deg, #333 0%, #000 100%); transform: translateY(-3px); }
-    
-    .sidebar ul { list-style: none; padding: 0 20px; }
-    .sidebar ul li { padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
-    .sidebar ul li a { text-decoration: none; color: #333; font-weight: 500; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
-    
-    #photo-input { display: none; }
-    .protected-route.locked::after { content: '🔒'; margin-left: 5px; }
-
-    /* Courses/Products Dynamic Cards CSS */
-    .course-section { padding: 40px 0; }
-    .course-section h1 { text-align: center; font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #000000 0%, #434343 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 40px 0 30px 0; padding: 0 20px; position: relative; }
-    .course-section h1::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 100px; height: 4px; background: linear-gradient(90deg, #000000, #666666); border-radius: 2px; }
-
-    .card-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; padding: 20px; max-width: 1200px; margin: 0 auto; }
-    
-    .course-card {
-      position: relative; width: 280px; border-radius: 12px; padding: 15px; background: #fff;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.1); overflow: hidden;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
-      display: flex; flex-direction: column; border: 1px solid #eaeaea;
+    .features-section {
+      padding: 80px 20px;
+      background: white;
     }
-    .course-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
-    
-    .course-card img { width: 100%; border-radius: 8px; margin-bottom: 10px; height: 180px; object-fit: cover; }
-    .course-card h2 { font-size: 18px; margin: 10px 0; line-height: 1.4; flex-grow: 1; }
-    .course-card p { font-size: 13px; color: #555; margin: 5px 0; }
-    .price { font-size: 20px; font-weight: bold; margin-top: 10px; color: #000; }
-    .price span { color: #888; text-decoration: line-through; font-size: 14px; margin-left: 6px; font-weight: normal; }
-    
-    .new-badge { position: absolute; top: 12px; right: -35px; background: red; color: #fff; font-size: 13px; font-weight: bold; padding: 6px 40px; transform: rotate(45deg); box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
 
-    .course-card button { width: 100%; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px; margin-top: 10px; transition: all 0.3s ease; border: none; }
-    .course-card button.btn-buy-normal { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
-    .course-card button.btn-buy-normal:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4); }
-    .disabled-btn { background: #ff9800; color: #fff; cursor: not-allowed !important; opacity: 0.9; }
-    .preview-btn { background: #333; color: #fff; margin-bottom: 5px; }
-    .preview-btn:hover { background: #000; transform: translateY(-2px); }
+    .features-header {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 60px;
+    }
 
-    /* Footer */
-    .footer { background: #111; color: white; padding: 50px 20px 20px; margin-top: 50px; }
-    .footer-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
-    .footer-column h3 { color: #fff; margin-bottom: 15px; }
-    .footer-column p, .contact-info p { color: #ccc; line-height: 1.6; }
-    .footer-form form { display: flex; flex-direction: column; gap: 10px; }
-    .footer-form input, .footer-form textarea { width: 100%; padding: 10px; border-radius: 5px; border: none; box-sizing: border-box; }
-    .footer-form button { background: white; color: black; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-    .footer-form button:hover { background: #ccc; }
-    .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid #333; margin-top: 30px; color: #888; }
-    .footer-bottom a { color: #aaa; text-decoration: none; }
-    .logo-part img { width: 80px; border-radius: 50%; }
+    .features-header h2 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #000000 0%, #434343 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .features-header p {
+      font-size: 1.2rem;
+      color: #666;
+    }
+
+    .features-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 35px;
+    }
+
+    .feature-card {
+      padding: 35px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+      border: 2px solid #f0f0f0;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      border-color: #000;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-icon {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .feature-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .feature-card p {
+      color: #666;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    /* User Profile in Sidebar */
+    .user-profile {
+      text-align: center;
+      padding: 20px 15px;
+      border-bottom: 2px solid rgba(0,0,0,0.08);
+      margin: 0 15px 20px 15px;
+      background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .profile-photo-container {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 15px;
+    }
+
+    .profile-photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #000;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    .profile-photo:hover {
+      transform: scale(1.08);
+      border-color: #333;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    }
+
+    .change-photo-btn {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      background: linear-gradient(135deg, #000 0%, #333 100%);
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+
+    .change-photo-btn:hover {
+      background: linear-gradient(135deg, #333 0%, #000 100%);
+      transform: scale(1.15) rotate(15deg);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .user-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #000;
+      margin-bottom: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    .user-email {
+      font-size: 0.85rem;
+      color: #666;
+      word-break: break-all;
+      background: rgba(0,0,0,0.03);
+      padding: 5px 10px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .logout-btn-sidebar {
+      width: 90%;
+      margin: 15px auto 10px;
+      padding: 11px;
+      background: linear-gradient(135deg, #000 0%, #333 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      letter-spacing: 0.5px;
+    }
+
+    .logout-btn-sidebar:hover {
+      background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255,68,68,0.4);
+    }
+
+    .logout-btn-sidebar:active {
+      transform: translateY(0);
+    }
+
+    .login-prompt {
+      text-align: center;
+      padding: 25px 20px;
+      background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+      margin: 0 15px 20px 15px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .login-prompt h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #000 0%, #333 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 800;
+    }
+
+    .login-prompt p {
+      margin: 10px 0;
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .login-btn {
+      background: linear-gradient(135deg, #000 0%, #333 100%);
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 15px;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      letter-spacing: 0.5px;
+    }
+
+    .login-btn:hover {
+      background: linear-gradient(135deg, #333 0%, #000 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    #photo-input {
+      display: none;
+    }
+
+    .protected-route {
+      position: relative;
+    }
+
+    .protected-route.locked::after {
+      content: '🔒';
+      margin-left: 5px;
+    }
+
+    /* Course Enrollment Badge */
+    .enrolled-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    .enroll-btn {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 10px;
+      transition: all 0.3s;
+    }
+
+    .enroll-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .buy-course-btn {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 10px;
+      transition: all 0.3s;
+    }
+
+    .buy-course-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+    }
+
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .course-card {
+      position: relative;
+      width: 280px;
+      border-radius: 12px;
+      padding: 15px;
+      background: #fff;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .course-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .course-card img {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    .course-card h2 {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+
+    .price {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .price span {
+      color: #888;
+      text-decoration: line-through;
+      font-size: 14px;
+      margin-left: 6px;
+    }
+
+    .disabled-btn {
+      width: 100%;
+      padding: 10px;
+      background: #ff9800;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .new-badge {
+      position: absolute;
+      top: 12px;
+      right: -35px;
+      background: red;
+      color: #fff;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 6px 40px;
+      transform: rotate(45deg);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    }
+
+    .course-section h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #000000 0%, #434343 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 40px 0 30px 0;
+      padding: 0 20px;
+      letter-spacing: 1px;
+      position: relative;
+    }
+
+    .course-section h1::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, #000000, #666666);
+      border-radius: 2px;
+    }
+
+    .mini-timer {
+      font-size: 12px;
+      font-weight: 700;
+      color: #d32f2f;
+      margin: 4px 0;
+      text-align: center;
+    }
+
+    .mini-timer span {
+      background: #fdecea;
+      color: #b71c1c;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
 
     @media screen and (max-width: 768px) {
-      .hero-section h1 { font-size: 2.2rem; }
-      .features-header h2 { font-size: 2rem; }
+      .hero-section h1 {
+        font-size: 2.2rem;
+      }
+
+      .hero-section p {
+        font-size: 1.1rem;
+      }
+
+      .features-header h2 {
+        font-size: 2rem;
+      }
+
+      .cta-buttons {
+        flex-direction: column;
+      }
+
+      .cta-btn {
+        width: 100%;
+      }
+
+      .stats-container {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
 
+<!-- Navbar -->
 <nav class="navbar">
   <div class="logo-container">
     <img src="small-logo.png" alt="PM Logo" class="logo-image" />
     <div class="logo-text">PREMium Mind</div>
   </div>
+
   <ul class="nav-links">
     <li><a href="index.html">PREMium Store</a></li>
     <li><a href="courses.html" class="protected-route" id="coursesLinkNav">PREMium Courses</a></li>
@@ -173,12 +621,14 @@
   <div class="menu-btn" id="menu-btn">☰</div>
 </nav>
 
+<!-- Sidebar Menu -->
 <div class="sidebar" id="sidebar">
   <button class="close-sidebar-btn" onclick="document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active');">×</button>
 
   <div class="user-profile" id="userProfile" style="display: none;">
     <div class="profile-photo-container">
-      <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile" class="profile-photo" id="profilePhoto" onclick="document.getElementById('photo-input').click()">
+      <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" 
+           alt="Profile" class="profile-photo" id="profilePhoto" onclick="document.getElementById('photo-input').click()">
       <button class="change-photo-btn" onclick="document.getElementById('photo-input').click()">📷</button>
     </div>
     <input type="file" id="photo-input" accept="image/*">
@@ -194,16 +644,18 @@
   </div>
 
   <ul>
-    <li><a href="index.html">🏠 Home</a></li>
-    <li><a href="courses.html" class="protected-route" id="coursesLink">📚 PREMium Courses</a></li>
-    <li><a href="lecture.html" class="protected-route" id="courseAccessLink">🎓 My Course</a></li>
-    <li><a href="#help-form">📞 Contact</a></li>
-    <li><a href="termcondition.html">⚙️ Terms & Privacy</a></li>
+    <li><a href="index.html"><span class="icon">🏠</span> Home</a></li>
+    <li><a href="courses.html" class="protected-route" id="coursesLink"><span class="icon">📚</span> PREMium Courses</a></li>
+    <li><a href="lecture.html" class="protected-route" id="courseAccessLink"><span class="icon">🎓</span> My Course</a></li>
+    <li><a href="#help-form"><span class="icon">📞</span> Contact</a></li>
+    <li><a href="#help-form"><span class="icon">❓</span> Help</a></li>
+    <li><a href="termcondition.html"><span class="icon">⚙️</span> Terms & Privacy</a></li>
   </ul>
 </div>
 
 <div class="overlay" id="overlay"></div>
 
+<!-- Hero Section -->
 <section class="hero-section">
   <div class="hero-content">
     <span class="hero-badge">🎓 Your Learning Partner</span>
@@ -216,6 +668,33 @@
   </div>
 </section>
 
+<!-- Stats Section -->
+<section class="stats-section">
+  <div class="stats-container">
+    <div class="stat-card">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-number">500+</div>
+      <div class="stat-label">Happy Students</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📚</div>
+      <div class="stat-number">50+</div>
+      <div class="stat-label">Study Resources</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-number">4.8/5</div>
+      <div class="stat-label">Average Rating</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💼</div>
+      <div class="stat-number">95%</div>
+      <div class="stat-label">Success Rate</div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
 <section class="features-section">
   <div class="features-header">
     <h2>Why Choose PREMium Mind?</h2>
@@ -237,19 +716,107 @@
       <h3>Affordable Pricing</h3>
       <p>Premium quality education shouldn't break the bank. We offer competitive prices with regular discounts.</p>
     </div>
-  </div>
-</section>
-
-<section class="course-section" id="products">
-  <h1>EXPLORE OUR PREMium Mind STORE</h1>
-  
-  <div class="card-container" id="dynamic-products-container">
-    <div style="text-align: center; width: 100%; padding: 40px; font-weight: bold; color: #666; font-size: 1.2rem;">
-        Loading Premium Store...
+    <div class="feature-card">
+      <span class="feature-icon">🎓</span>
+      <h3>Exam-Oriented</h3>
+      <p>Our materials are specifically designed to help you ace your exams with high-probability questions and answers.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📱</span>
+      <h3>Mobile Friendly</h3>
+      <p>Study anywhere, anytime on any device. Our platform works seamlessly on mobile, tablet, and desktop.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🤝</span>
+      <h3>24/7 Support</h3>
+      <p>Have questions? Our dedicated support team is always ready to help you through WhatsApp and email.</p>
     </div>
   </div>
 </section>
 
+<!-- Products Section -->
+<section class="course-section" id="products">
+  <h1>EXPLORE OUR PREMium Mind STORE</h1>
+  <div class="card-container">
+
+    <div class="course-card">
+      <img src="/IMAGES/PDD.png" alt="Product Design and Development Important Questions" />
+      <h2>PRODUCT DESIGN AND DEVELOPMENT IMP QUES</h2>
+      <span class="new-badge">NEW</span>
+      <p>🚧 High chance to come in exam | Exam Oriented | Diploma / Degree</p>
+      <p>📄 Total Pages: 3 | Questions with Answers</p>
+      <p class="price">₹30<span>₹49</span></p>
+      <button onclick="window.open('https://payments.cashfree.com/forms?code=metalpage','_blank')">Buy Now</button>
+    </div>
+
+    <div class="course-card">
+      <img src="/IMAGES/IA.png" alt="Industrial Automation Important Questions" />
+      <h2>INDUSTRIAL AUTOMATION IMP QUES</h2>
+      <span class="new-badge">NEW</span>
+      <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
+      <p>📄 Total Pages: 3 | Short & Easy Notes</p>
+      <p class="price">₹30<span>₹49</span></p>
+      <button onclick="window.open('https://payments.cashfree.com/forms?code=metalpage','_blank')">Buy Now</button>
+    </div>
+
+    <div class="course-card">
+      <img src="/IMAGES/TE.png" alt="Transportation Engineering Important Questions" />
+      <h2>TRANSPORTATION ENGINEERING IMP QUES</h2>
+      <span class="new-badge">NEW</span>
+      <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
+      <p>📄 Total Pages: 3 | Short & Easy Notes</p>
+      <p class="price">₹30<span>₹49</span></p>
+      <button onclick="window.open('https://payments.cashfree.com/forms?code=metalpage','_blank')">Buy Now</button>
+    </div>
+
+    <div class="course-card">
+      <img src="AI AND ML.png" alt="AI and ML Important Questions" />
+      <h2>AI AND ML IMPORTANT QUESTIONS</h2>
+      <span class="new-badge">NEW</span>
+      <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
+      <p>📄 Total Pages: 3 | Short & Easy Notes</p>
+      <p class="price">₹30<span>₹49</span></p>
+      <button onclick="window.open('https://payments.cashfree.com/forms/csepage','_blank')">Buy Now</button>
+    </div>
+
+    <div class="course-card">
+      <img src="cs-black2.jpg" alt="Production Processing of Steel" />
+      <h2>Production Processing of Steel – IMPORTANT QUESTIONS</h2>
+      <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
+      <p>📄 Total Pages: 3 | Short & Easy Notes</p>
+      <p class="price">₹30<span>₹49</span></p>
+      <button class="disabled-btn" onclick="window.location.href='https://payments.cashfree.com/forms?code=metalpage'">Buy Now</button>
+    </div>
+
+    <div class="course-card">
+      <img src="DEMO IOT PDF_1 (1).jpg" alt="IoT E-Book Cover" />
+      <h2>INTERNET OF THINGS (IOT) E-BOOK</h2>
+      <p>📘 Simple aur easy words me likhi hui IoT e-book — beginners ke liye perfect.</p>
+      <p class="date">Limited Offer for First 10 Students</p>
+      <p class="price">₹30<span>₹49</span></p>
+      <button class="preview-btn" onclick="window.open('https://drive.google.com/file/d/1c46E-5KX_xamR3EW1fk-2wjNpy5hAJIq/view?usp=drivesdk', '_blank')">Preview (Demo)</button>
+      <button onclick="window.open('https://payments.cashfree.com/forms?code=metalpage', '_blank')">Buy Now</button>
+    </div>
+
+    <div class="course-card">
+      <img src="resume2.png" alt="Resume Template 2" />
+      <h2>Modern Resume Template2</h2>
+      <p>🔥 Clean & Professional design for freshers students</p>
+      <p class="price">₹79<span>₹299</span></p>
+      <button onclick="window.location.href='https://payments.cashfree.com/forms/premiumstore'">Order Now</button>
+    </div>
+
+    <div class="course-card">
+      <img src="resume1.png" alt="Resume Template 3" />
+      <h2>Creative Resume Template3</h2>
+      <p>🚀 Eye-catching design to make you stand out</p>
+      <p class="price">₹99<span>₹349</span></p>
+      <button class="order-btn" disabled>Coming Soon</button>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
 <footer class="footer">
   <div class="footer-container">
     <div class="footer-part logo-part">
@@ -262,10 +829,15 @@
         <p>At <strong>PREMium Mind</strong>, we are committed to empowering students and freshers with job-ready skills through practical learning and expert-led courses.</p>
       </div>
 
+      <div class="footer-column">
+        <h3>Why Choose Us?</h3>
+        <p>With personalized mentorship, project-based learning, and lifetime support, we ensure your career doesn't just start — it accelerates.</p>
+      </div>
+
       <div class="contact-info">
         <h3>Contact Us on WhatsApp</h3>
         <p><strong>Contact course counsellor</strong></p>
-        <ul style="list-style: none; padding: 0;">
+        <ul style="list-style: none;">
           <li>📞 +91 9153950552</li>
         </ul>
       </div>
@@ -274,16 +846,16 @@
     <div class="footer-part form-part" id="help-form">
       <div class="footer-form">
         <form id="whForm">
-          <label style="display:none;">Full Name:</label>
-          <input type="text" id="name" required placeholder="Enter Full Name"/>
-          
-          <label style="display:none;">Phone Number:</label>
-          <input type="tel" id="phone" pattern="[0-9]{10}" required placeholder="Enter 10 Digit Phone Number" />
-          
-          <label style="display:none;">Report Problem:</label>
-          <textarea id="message" rows="4" placeholder="Your message / problem..." required></textarea>
-          
-          <button type="submit">Submit Request</button>
+          <label>Full Name:
+            <input type="text" id="name" required placeholder="Enter Full Name"/>
+          </label>
+          <label>Phone Number:
+            <input type="tel" id="phone" pattern="[0-9]{10}" required placeholder="Enter Phone Number" />
+          </label>
+          <label>Report Problem:
+            <textarea id="message" rows="4" placeholder="Your message..." required></textarea>
+          </label>
+          <button type="submit">Submit</button>
         </form>
       </div>
     </div>
@@ -294,14 +866,17 @@
   </div>
 </footer>
 
+<!-- Firebase & Custom Scripts -->
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
   import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+  import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
   const firebaseConfig = {
     apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
     authDomain: "premium-mind-fcb16.firebaseapp.com",
+    databaseURL: "https://premium-mind-fcb16-default-rtdb.firebaseio.com",
     projectId: "premium-mind-fcb16",
     storageBucket: "premium-mind-fcb16.firebasestorage.app",
     messagingSenderId: "864874199521",
@@ -311,6 +886,7 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const storage = getStorage(app);
+  const database = getDatabase(app);
 
   onAuthStateChanged(auth, async (user) => {
     const userProfile = document.getElementById('userProfile');
@@ -332,34 +908,52 @@
         document.getElementById('profilePhoto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=000&color=fff&size=80`;
       }
 
-      if (coursesLink) { coursesLink.classList.remove('locked'); coursesLink.onclick = null; }
-      if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
+      if (coursesLink) {
+        coursesLink.classList.remove('locked');
+        coursesLink.onclick = null;
+      }
+      if (coursesLinkNav) {
+        coursesLinkNav.classList.remove('locked');
+        coursesLinkNav.onclick = null;
+      }
     } else {
       userProfile.style.display = 'none';
       loginPrompt.style.display = 'block';
 
-      const lockMsg = (e) => {
-        e.preventDefault();
-        alert('Please login to access PREMium Courses!');
-        window.location.href = 'login.html';
-      };
-
-      if (coursesLink) { coursesLink.classList.add('locked'); coursesLink.onclick = lockMsg; }
-      if (coursesLinkNav) { coursesLinkNav.classList.add('locked'); coursesLinkNav.onclick = lockMsg; }
+      if (coursesLink) {
+        coursesLink.classList.add('locked');
+        coursesLink.onclick = (e) => {
+          e.preventDefault();
+          alert('Please login to access PREMium Courses!');
+          window.location.href = 'login.html';
+        };
+      }
+      if (coursesLinkNav) {
+        coursesLinkNav.classList.add('locked');
+        coursesLinkNav.onclick = (e) => {
+          e.preventDefault();
+          alert('Please login to access PREMium Courses!');
+          window.location.href = 'login.html';
+        };
+      }
     }
   });
 
   document.getElementById('photo-input').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     const user = auth.currentUser;
     if (!user) return;
+
     try {
       const photoStorageRef = storageRef(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
       await uploadBytes(photoStorageRef, file);
       const photoURL = await getDownloadURL(photoStorageRef);
+
       localStorage.setItem('profilePhoto_' + user.uid, photoURL);
       document.getElementById('profilePhoto').src = photoURL;
+      
       alert('Profile photo updated successfully!');
     } catch (error) {
       console.error('Error uploading photo:', error);
@@ -381,12 +975,16 @@
 <script>
   document.getElementById("whForm").addEventListener("submit", function(e){
     e.preventDefault();
+
     const name = encodeURIComponent(document.getElementById("name").value);
     const phone = encodeURIComponent(document.getElementById("phone").value);
     const msg = encodeURIComponent(document.getElementById("message").value);
+
     const owner = "918102525609";
     const text = `Name: ${name}%0APhone: ${phone}%0AMessage: ${msg}`;
-    window.open(`https://wa.me/${owner}?text=${text}`, "_blank");
+    const url = `https://wa.me/${owner}?text=${text}`;
+
+    window.open(url, "_blank");
   });
 
   const menuBtn = document.getElementById("menu-btn");
@@ -409,72 +1007,16 @@
       overlay.classList.remove("active");
     });
   });
-</script>
 
-<script>
-async function loadCourses() {
-    try {
-        // 🚨 IMPORTANT: YAHAN APNE HOSTINGER DOMAIN KA URL DAALEIN
-        const apiUrl = 'https://premind.diplomawallah.in/api.php';
-        
-        const response = await fetch(apiUrl);
-        const courses = await response.json();
-        
-        const container = document.getElementById('dynamic-products-container');
-        container.innerHTML = ''; // Loading text remove
-
-        if(courses.length === 0) {
-            container.innerHTML = '<p style="text-align:center; width:100%; color:#555;">No products available at the moment. Please check back later.</p>';
-            return;
-        }
-
-        courses.forEach(course => {
-            // Badge Logic
-            let badgeHTML = course.badge ? `<span class="new-badge">${course.badge}</span>` : '';
-            
-            // Description Logic
-            let desc1HTML = course.desc1 ? `<p>${course.desc1}</p>` : '';
-            let desc2HTML = course.desc2 ? `<p>${course.desc2}</p>` : '';
-            
-            // Button Logic based on 'btn_type'
-            let btnHTML = '';
-            if(course.btn_type === 'normal') {
-                btnHTML = `<button class="btn-buy-normal" onclick="window.open('${course.link}','_blank')">${course.btn_text}</button>`;
-            } else if (course.btn_type === 'disabled_look') {
-                btnHTML = `<button class="disabled-btn" onclick="window.location.href='${course.link}'">${course.btn_text}</button>`;
-            } else if (course.btn_type === 'preview_buy') {
-                btnHTML = `
-                    <button class="preview-btn" onclick="window.open('${course.demo_link}', '_blank')">Preview (Demo)</button>
-                    <button class="btn-buy-normal" onclick="window.open('${course.link}', '_blank')">${course.btn_text}</button>
-                `;
-            } else if (course.btn_type === 'disabled') {
-                btnHTML = `<button class="disabled-btn" disabled>${course.btn_text}</button>`;
-            }
-
-            // Create Card Template
-            const cardHTML = `
-                <div class="course-card">
-                  <img src="${course.image}" alt="${course.title}" onerror="this.src='small-logo.png'" />
-                  ${badgeHTML}
-                  <h2>${course.title}</h2>
-                  ${desc1HTML}
-                  ${desc2HTML}
-                  <p class="price">₹${course.price} <span>₹${course.old_price}</span></p>
-                  ${btnHTML}
-                </div>
-            `;
-            container.innerHTML += cardHTML;
-        });
-
-    } catch (error) {
-        console.error("Error fetching courses:", error);
-        document.getElementById('dynamic-products-container').innerHTML = 
-            '<p style="text-align:center; width:100%; color:red;">Connection error. Could not load store.</p>';
-    }
-}
-
-// Fetch content when HTML is fully loaded
-document.addEventListener('DOMContentLoaded', loadCourses);
+  document.addEventListener('DOMContentLoaded', function() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.sidebar ul li a').forEach(link => {
+      const linkHref = link.getAttribute('href');
+      if (linkHref === currentPage) {
+        link.classList.add('active-sidebar');
+      }
+    });
+  });
 </script>
 
 </body>
