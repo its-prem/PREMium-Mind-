@@ -2,252 +2,197 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reading - PREMium Mind</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Secure Reader - PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   
   <style>
-    /* Security: Prevent Printing */
-    @media print {
-        html, body { display: none !important; visibility: hidden !important; }
-    }
+    /* Security: Print Block */
+    @media print { html, body { display: none !important; } }
 
     body {
-      margin: 0; padding: 0;
-      font-family: 'Poppins', sans-serif;
-      background: #e5e7eb; 
-      /* Native scroll allow karne ke liye body ko handle karne de rahe hain */
-      user-select: none; 
-      -webkit-user-select: none;
-      transition: filter 0.2s ease;
+      margin: 0; padding: 0; font-family: 'Poppins', sans-serif;
+      background: #e5e7eb; user-select: none; -webkit-user-select: none;
+      transition: filter 0.3s ease;
     }
     
-    /* Header */
     .header {
-      background: #111; color: #fff;
-      padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
-      height: 60px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); z-index: 100; position: fixed; top: 0; width: 100%; box-sizing: border-box;
+      background: #111; color: #fff; padding: 0 20px; 
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px; z-index: 1000; position: fixed; top: 0; width: 100%; box-sizing: border-box;
     }
     
     .back-btn {
       color: #fff; text-decoration: none; font-weight: 600; font-size: 0.9rem;
-      display: flex; align-items: center; gap: 8px; background: #333;
-      padding: 8px 15px; border-radius: 8px; transition: background 0.3s;
+      background: #333; padding: 8px 15px; border-radius: 8px;
     }
-    .back-btn:hover { background: #555; }
-    
-    .header-actions { display: flex; gap: 10px; align-items: center; }
-    
-    #downloadBtn {
-      display: none; 
-      background: #10b981; color: white; border: none; font-family: 'Poppins';
-      font-weight: 600; padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: 0.3s;
-    }
-    #downloadBtn:hover { background: #059669; }
-    
-    .brand-name { font-weight: 700; font-size: 1.1rem; letter-spacing: 1px; color: #10b981; display:none;}
 
-    /* PDF Viewer Area */
     .pdf-viewer-container {
-      width: 100%; 
-      display: flex; flex-direction: column; align-items: center; 
-      padding: 80px 10px 30px 10px; /* Header ke niche se shuru karne ke liye padding-top 80px */
-      box-sizing: border-box;
-      gap: 20px;
+      width: 100%; display: flex; flex-direction: column; align-items: center; 
+      padding: 80px 10px 30px 10px; box-sizing: border-box; gap: 20px;
     }
 
-    .page-wrapper {
-      width: 100%; display: flex; justify-content: center;
-    }
+    .page-wrapper { position: relative; width: 100%; display: flex; justify-content: center; }
 
     canvas {
-      background: #ffffff; 
-      border-radius: 4px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.15); 
-      /* Mobile screen par fit karne ke liye */
-      width: 100% !important;
-      max-width: 900px;
-      height: auto !important;
-      display: block;
+      background: #fff; border-radius: 4px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
+      width: 100% !important; max-width: 900px; height: auto !important;
     }
     
-    /* Loading Screen */
+    /* 🛡️ MINIMAL, SMOOTH WATERMARK 🛡️ */
+    .watermark-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 900;
+      /* Grid to spread watermarks evenly */
+      display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr);
+      justify-items: center; align-items: center; 
+      overflow: hidden;
+    }
+    
+    .wm-item {
+      font-size: 12px; /* Chota font size */
+      font-weight: 600; /* Thoda kam bold kiya smooth look ke liye */
+      color: rgba(0, 0, 0, 0.08); /* Opacity bohot kam kar di hai (8%) */
+      transform: rotate(-35deg); 
+      text-align: center;
+      line-height: 1.4; 
+      letter-spacing: 0.8px;
+      white-space: nowrap;
+      /* Text shadow for a subtle blending effect */
+      text-shadow: 1px 1px 1px rgba(255,255,255,0.1);
+    }
+
+    /* Security: Blur / Quality Drop */
+    .secure-mode { filter: blur(25px) grayscale(100%); pointer-events: none; }
+
     .loader-container {
       position: fixed; inset: 0; background: #e5e7eb; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; z-index: 50;
+      align-items: center; justify-content: center; z-index: 2000;
     }
-    .loader {
-      border: 4px solid #f3f3f3; border-top: 4px solid #10b981; border-radius: 50%;
-      width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px;
-    }
+    .loader { border: 4px solid #f3f3f3; border-top: 4px solid #10b981; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    .drive-iframe { width: 100%; height: calc(100vh - 60px); border: none; display: none; margin-top: 60px; }
-
-    /* Security Overlay Message */
-    #securityOverlay {
-        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-        z-index: 9999; color: white; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;
-    }
-
-    @media (min-width: 768px) {
-        .brand-name { display: block; }
+    
+    @media (max-width: 768px) {
+       /* Mobile par aur bhi chota */
+       .wm-item { font-size: 10px; color: rgba(0,0,0,0.06); }
+       .watermark-overlay { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(5, 1fr); }
     }
   </style>
 </head>
 <body oncontextmenu="return false;">
 
-  <div id="securityOverlay">
-      <h2 style="color: #ef4444; margin-bottom: 10px;">⚠️ Security Alert</h2>
-      <p>Screenshots, screen recording, and exiting the window are protected to secure the content.</p>
-  </div>
-
   <div class="header">
     <a href="lecture.html" class="back-btn">← Back</a>
-    <div class="brand-name">PREMium Mind</div>
-    <div class="header-actions">
-        <button id="downloadBtn" onclick="downloadPDF()">Download ⬇️</button>
-    </div>
+    <div style="font-weight:700; color:#10b981;">PREMium Mind</div>
+    <div id="status" style="font-size: 10px; opacity: 0.5;">SECURE HD</div>
+  </div>
+
+  <div class="watermark-overlay" id="wmLayer">
+      <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
+      <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
+      <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
+      <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
   </div>
 
   <div class="loader-container" id="loadingState">
      <div class="loader"></div>
-     <div style="color: #666; font-weight: 600;" id="loadingText">Opening HD Document...</div>
+     <p style="margin-top:10px; color:#666;">Verifying Security & Loading...</p>
   </div>
 
-  <div class="pdf-viewer-container" id="pdfContainer">
-      </div>
-
-  <iframe class="drive-iframe" id="driveContainer" allow="autoplay"></iframe>
+  <div class="pdf-viewer-container" id="pdfContainer"></div>
 
   <script>
-     // ==========================================
-     // SECURITY & ANTI-PIRACY LOGIC
-     // ==========================================
-     document.addEventListener('keydown', function(e) {
-        if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'c' || e.key === 'u' || e.key === 'i')) {
-            e.preventDefault();
-            alert('Security Alert: This action is disabled.');
-        }
-        if (e.key === 'PrintScreen') {
-            navigator.clipboard.writeText('');
-            alert("Screenshots are protected!");
-        }
-     });
-
-     window.addEventListener('blur', function() {
-         document.body.style.filter = 'blur(20px)';
-         document.getElementById('securityOverlay').style.display = 'flex';
-     });
+     // 1. DYNAMIC WATERMARK (FETCH PHONE FROM DATABASE)
+     const userEmail = localStorage.getItem('customUserEmail');
      
-     window.addEventListener('focus', function() {
-         document.body.style.filter = 'none';
-         document.getElementById('securityOverlay').style.display = 'none';
+     if(!userEmail) {
+         alert("Unauthorized Access!");
+         window.location.href = "login.html";
+     }
+
+     async function fetchUserInfoAndSetWatermark() {
+         let userPhone = "No Phone Provided";
+         
+         try {
+             // API Call to get Phone Number
+             const response = await fetch(`https://premind.diplomawallah.in/get_user.php?email=${encodeURIComponent(userEmail)}`);
+             const data = await response.json();
+             
+             if (data.status === 'success' && data.phone && data.phone.trim() !== "") {
+                 userPhone = data.phone;
+             }
+         } catch (error) {
+             console.error("Failed to fetch phone number", error);
+         }
+
+         // Set Watermark 
+         const wmContent = `${userEmail}<br>+91 ${userPhone}`;
+         document.querySelectorAll('.wm-item').forEach(el => el.innerHTML = wmContent);
+     }
+
+     // Start Fetching User Info
+     fetchUserInfoAndSetWatermark();
+
+     // 2. ANTI-SCREENSHOT (BLUR ON FOCUS LOSS)
+     window.addEventListener('blur', () => {
+         document.body.classList.add('secure-mode');
+     });
+     window.addEventListener('focus', () => {
+         document.body.classList.remove('secure-mode');
      });
 
-     // ==========================================
-     // URL PARAMS & DOWNLOAD LOGIC
-     // ==========================================
+     // Disable Keyboard shortcuts
+     document.addEventListener('keydown', (e) => {
+         if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'c' || e.key === 'u')) e.preventDefault();
+         if (e.key === 'PrintScreen') {
+            navigator.clipboard.writeText('Screenshots not allowed');
+            document.body.classList.add('secure-mode');
+            setTimeout(() => document.body.classList.remove('secure-mode'), 2000);
+         }
+     });
+
+     // 3. HD PDF RENDER (Continuous Scroll)
      const urlParams = new URLSearchParams(window.location.search);
      let pdfUrl = urlParams.get('pdf');
-     const allowDownload = urlParams.get('dl');
 
-     if(allowDownload === '1') {
-         document.getElementById('downloadBtn').style.display = 'block';
-     }
-
-     function downloadPDF() {
-         if(pdfUrl) {
-             const link = document.createElement('a');
-             link.href = pdfUrl;
-             link.download = 'PREMium_Mind_Document.pdf';
-             document.body.appendChild(link);
-             link.click();
-             document.body.removeChild(link);
-         }
-     }
-
-     // ==========================================
-     // HD PDF RENDER LOGIC (MOBILE OPTIMIZED)
-     // ==========================================
      if(pdfUrl) {
-         if(pdfUrl.includes('drive.google.com')) {
-             document.getElementById('pdfContainer').style.display = 'none';
-             document.getElementById('loadingState').style.display = 'none';
-             
-             let driveUrl = pdfUrl;
-             if(driveUrl.includes('/view')) {
-                 driveUrl = driveUrl.replace(/\/view.*/, '/preview');
+         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+         const container = document.getElementById('pdfContainer');
+
+         pdfjsLib.getDocument({url: pdfUrl}).promise.then(async (pdfDoc) => {
+             for (let num = 1; num <= pdfDoc.numPages; num++) {
+                 const page = await pdfDoc.getPage(num);
+                 // Device Pixel Ratio for HD quality
+                 const scale = 2.0; 
+                 const viewport = page.getViewport({ scale });
+                 
+                 const wrapper = document.createElement('div');
+                 wrapper.className = 'page-wrapper';
+                 
+                 const canvas = document.createElement('canvas');
+                 const ctx = canvas.getContext('2d');
+                 const dpr = window.devicePixelRatio || 1;
+
+                 canvas.width = Math.floor(viewport.width * dpr);
+                 canvas.height = Math.floor(viewport.height * dpr);
+                 canvas.style.maxWidth = Math.floor(viewport.width) + "px";
+
+                 const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null;
+                 wrapper.appendChild(canvas);
+                 container.appendChild(wrapper);
+
+                 await page.render({ canvasContext: ctx, transform: transform, viewport: viewport }).promise;
              }
-             const iframe = document.getElementById('driveContainer');
-             iframe.src = driveUrl;
-             iframe.style.display = 'block';
-
-         } else {
-             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-
-             // High scale for HD rendering
-             const scale = 2.0; 
-             const container = document.getElementById('pdfContainer');
-             const loadingTask = pdfjsLib.getDocument({url: pdfUrl});
-             
-             loadingTask.promise.then(async (pdfDoc) => {
-                 document.getElementById('loadingText').innerText = "Rendering Pages...";
-                 const totalPages = pdfDoc.numPages;
-
-                 for (let num = 1; num <= totalPages; num++) {
-                     await renderPageHD(pdfDoc, num, scale, container);
-                 }
-
-                 document.getElementById('loadingState').style.opacity = '0';
-                 setTimeout(() => {
-                     document.getElementById('loadingState').style.display = 'none';
-                 }, 300);
-
-             }).catch(err => {
-                 console.error("PDF Load Error:", err);
-                 document.getElementById('loadingState').innerHTML = `<h3 style="color:#dc2626;">File Load Error</h3><p style="font-size:12px; color:#666;">Document could not be loaded.</p>`;
-             });
-         }
+             document.getElementById('loadingState').style.display = 'none';
+         }).catch(err => {
+             document.getElementById('loadingState').innerHTML = "Failed to load Document. Make sure link is valid.";
+         });
      } else {
-         document.getElementById('loadingState').innerHTML = `<h3 style="color:red;">Error: Document Missing!</h3>`;
-     }
-
-     async function renderPageHD(pdfDoc, num, scale, container) {
-         const page = await pdfDoc.getPage(num);
-         const viewport = page.getViewport({ scale });
-
-         const wrapper = document.createElement('div');
-         wrapper.className = 'page-wrapper';
-         
-         const canvas = document.createElement('canvas');
-         const ctx = canvas.getContext('2d');
-
-         // Physical HD Pixels based on device screen
-         const outputScale = window.devicePixelRatio || 1;
-         canvas.width = Math.floor(viewport.width * outputScale);
-         canvas.height = Math.floor(viewport.height * outputScale);
-         
-         // CSS Logic for native zoom support
-         // Width 100% rakhi hai taaki screen par fit ho aur finger se zoom ho sake
-         canvas.style.maxWidth = Math.floor(viewport.width) + "px";
-
-         const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
-
-         wrapper.appendChild(canvas);
-         container.appendChild(wrapper);
-
-         const renderCtx = { 
-             canvasContext: ctx, 
-             transform: transform, 
-             viewport: viewport 
-         };
-         await page.render(renderCtx).promise;
+         document.getElementById('loadingState').innerHTML = "No PDF URL Provided.";
      }
   </script>
-
 </body>
 </html>
