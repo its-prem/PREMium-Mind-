@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Secure Reader - PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -17,28 +17,17 @@
       margin: 0; padding: 0; font-family: 'Poppins', sans-serif;
       background: #e5e7eb; user-select: none; -webkit-user-select: none;
       transition: filter 0.3s ease;
+      overflow: hidden; /* Stop main page from scrolling */
+      touch-action: none; /* Disable native browser touch actions */
     }
     
-    /* 🛡️ STATIC UI WRAPPER 🛡️ 
-       Yeh wrapper Header aur Watermark ko screen par humesha fix rakhega 
-       chahe PDF kitna bhi zoom kyu na ho jaye */
-    #fixedUI {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      pointer-events: none; /* Clicks ko PDF tak jaane dega */
-      z-index: 1000;
-      transform-origin: top left;
-      overflow: hidden;
-    }
-
-    /* Header Styling */
+    /* 🛡️ 100% STATIC HEADER 🛡️ */
     .header {
       background: #111; color: #fff; padding: 0 20px; 
       display: flex; align-items: center; justify-content: space-between;
       height: 60px; width: 100%; box-sizing: border-box;
-      position: absolute; top: 0; left: 0;
-      pointer-events: auto; /* Back button click hone dega */
+      position: fixed; top: 0; left: 0; z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     
     .back-btn {
@@ -46,16 +35,17 @@
       background: #333; padding: 8px 15px; border-radius: 8px;
     }
 
-    /* Minimal & Smooth Watermark Grid */
+    /* 🛡️ STATIC WATERMARK 🛡️ */
     .watermark-overlay {
-      position: absolute; top: 60px; left: 0; width: 100%; height: calc(100% - 60px);
+      position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px);
       display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr);
       justify-items: center; align-items: center; 
+      overflow: hidden; z-index: 900; pointer-events: none;
     }
     
     .wm-item {
       font-size: 12px; font-weight: 600; 
-      color: rgba(0, 0, 0, 0.08); /* 8% Opacity - Very transparent */
+      color: rgba(0, 0, 0, 0.08); 
       transform: rotate(-35deg); text-align: center;
       line-height: 1.4; letter-spacing: 0.8px; white-space: nowrap;
       text-shadow: 1px 1px 1px rgba(255,255,255,0.1);
@@ -64,20 +54,31 @@
     /* Loader Styling */
     .loader-container {
       position: fixed; inset: 0; background: #e5e7eb; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; pointer-events: auto; z-index: 2000;
+      align-items: center; justify-content: center; z-index: 2000;
     }
     .loader { border: 4px solid #f3f3f3; border-top: 4px solid #10b981; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* PDF Rendering Area */
-    .pdf-viewer-container {
-      width: 100%; display: flex; flex-direction: column; align-items: center; 
-      padding: 80px 10px 30px 10px; box-sizing: border-box; gap: 20px;
+    /* 📄 ZOOMABLE PDF AREA 📄 */
+    .scroll-area {
+      position: fixed; top: 60px; left: 0;
+      width: 100vw; height: calc(100vh - 60px);
+      overflow: hidden; /* We handle scrolling via JS Transform */
+      z-index: 10;
     }
-    .page-wrapper { position: relative; width: 100%; display: flex; justify-content: center; }
+
+    .pdf-viewer-container {
+      display: flex; flex-direction: column; align-items: center; 
+      padding: 20px; box-sizing: border-box; gap: 20px;
+      transform-origin: 0 0;
+      will-change: transform; /* GPU Acceleration */
+    }
+
+    .page-wrapper { position: relative; width: 100%; display: flex; justify-content: center; max-width: 900px; }
+
     canvas {
       background: #fff; border-radius: 4px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
-      width: 100% !important; max-width: 900px; height: auto !important;
+      width: 100% !important; height: auto !important;
     }
 
     /* Security: Blur on focus lost */
@@ -91,19 +92,17 @@
 </head>
 <body oncontextmenu="return false;">
 
-  <div id="fixedUI">
-      <div class="header">
-        <a href="lecture.html" class="back-btn">← Back</a>
-        <div style="font-weight:700; color:#10b981;">PREMium Mind</div>
-        <div id="status" style="font-size: 10px; opacity: 0.5;">SECURE HD</div>
-      </div>
+  <div class="header">
+    <a href="lecture.html" class="back-btn">← Back</a>
+    <div style="font-weight:700; color:#10b981;">PREMium Mind</div>
+    <div id="status" style="font-size: 10px; opacity: 0.5;">SECURE HD</div>
+  </div>
 
-      <div class="watermark-overlay" id="wmLayer">
-          <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
-          <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
-          <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
-          <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
-      </div>
+  <div class="watermark-overlay" id="wmLayer">
+      <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
+      <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
+      <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
+      <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
   </div>
 
   <div class="loader-container" id="loadingState">
@@ -111,26 +110,115 @@
      <p style="margin-top:10px; color:#666;">Verifying Security & Loading...</p>
   </div>
 
-  <div class="pdf-viewer-container" id="pdfContainer"></div>
+  <div class="scroll-area" id="scrollArea">
+      <div class="pdf-viewer-container" id="pdfContainer"></div>
+  </div>
 
   <script>
      // =========================================================
-     // 1. ANTI-ZOOM LOCK (Keeps Watermark Static during Pinch Zoom)
+     // 1. CUSTOM PINCH-TO-ZOOM & PANNING (Transform Based)
      // =========================================================
-     if (window.visualViewport) {
-         const fixedUI = document.getElementById('fixedUI');
-         function lockUI() {
-             const vv = window.visualViewport;
-             // Browser jitna zoom in karega, hum UI ko utna hi zoom out (scale down) kar denge
-             const inverseScale = 1 / vv.scale;
-             fixedUI.style.transform = `translate(${vv.offsetLeft}px, ${vv.offsetTop}px) scale(${inverseScale})`;
-             fixedUI.style.width = `${vv.width * vv.scale}px`;
-             fixedUI.style.height = `${vv.height * vv.scale}px`;
-         }
-         window.visualViewport.addEventListener('resize', lockUI);
-         window.visualViewport.addEventListener('scroll', lockUI);
-         lockUI(); // Run once to set initial state
+     const scrollArea = document.getElementById('scrollArea');
+     const pdfContainer = document.getElementById('pdfContainer');
+     
+     let scale = 1;
+     let panX = 0;
+     let panY = 0;
+
+     let isDragging = false;
+     let startX, startY;
+     let initialPanX, initialPanY;
+
+     let initialDistance = null;
+     let initialScale = null;
+
+     let lastTap = 0;
+
+     function updateTransform() {
+         // Limit Pan logic so PDF doesn't go completely out of screen
+         const maxPanX = (scale - 1) * scrollArea.clientWidth / 2;
+         const maxPanY = (scale - 1) * scrollArea.clientHeight / 2;
+         
+         // If zooming out to 1, reset pan
+         if(scale <= 1) { panX = 0; panY = Math.min(panY, 0); } // Allow scrolling down when 1x
+         
+         pdfContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
      }
+
+     // Touch Start (Detect Drag vs Pinch)
+     scrollArea.addEventListener('touchstart', (e) => {
+         if (e.touches.length === 1) {
+             isDragging = true;
+             startX = e.touches[0].clientX;
+             startY = e.touches[0].clientY;
+             initialPanX = panX;
+             initialPanY = panY;
+         } else if (e.touches.length === 2) {
+             isDragging = false;
+             initialDistance = Math.hypot(
+                 e.touches[0].clientX - e.touches[1].clientX,
+                 e.touches[0].clientY - e.touches[1].clientY
+             );
+             initialScale = scale;
+         }
+     }, {passive: false});
+
+     // Touch Move (Handle Drag and Pinch)
+     scrollArea.addEventListener('touchmove', (e) => {
+         e.preventDefault(); // Stop native scrolling
+         
+         if (isDragging && e.touches.length === 1) {
+             // Calculate dragging (panning)
+             const dx = e.touches[0].clientX - startX;
+             const dy = e.touches[0].clientY - startY;
+             
+             // Allow horizontal pan only if zoomed
+             if (scale > 1) {
+                panX = initialPanX + dx;
+             }
+             // Always allow vertical scroll
+             panY = initialPanY + dy;
+             
+             updateTransform();
+         } 
+         else if (e.touches.length === 2 && initialDistance !== null) {
+             // Calculate pinch (zooming)
+             const currentDistance = Math.hypot(
+                 e.touches[0].clientX - e.touches[1].clientX,
+                 e.touches[0].clientY - e.touches[1].clientY
+             );
+             
+             let newScale = initialScale * (currentDistance / initialDistance);
+             scale = Math.max(1, Math.min(newScale, 4)); // Limit between 1x and 4x
+             
+             updateTransform();
+         }
+     }, {passive: false});
+
+     // Touch End (Handle Double Tap)
+     scrollArea.addEventListener('touchend', (e) => {
+         isDragging = false;
+         initialDistance = null;
+
+         let currentTime = new Date().getTime();
+         let tapLength = currentTime - lastTap;
+         
+         if (tapLength < 300 && tapLength > 0 && e.touches.length === 0) {
+             // Double tap logic
+             scale = scale > 1.5 ? 1 : 2.5;
+             if(scale === 1) { panX = 0; panY = 0; } // Reset position on double tap out
+             updateTransform();
+             e.preventDefault();
+         }
+         lastTap = currentTime;
+     }, {passive: false});
+
+     // Mouse Wheel for Desktop scrolling
+     scrollArea.addEventListener('wheel', (e) => {
+         panY -= e.deltaY;
+         updateTransform();
+     }, {passive: true});
+
 
      // =========================================================
      // 2. FETCH PHONE & SET WATERMARK
@@ -187,19 +275,18 @@
          pdfjsLib.getDocument({url: pdfUrl}).promise.then(async (pdfDoc) => {
              for (let num = 1; num <= pdfDoc.numPages; num++) {
                  const page = await pdfDoc.getPage(num);
-                 const scale = 2.0; // High Quality Render
-                 const viewport = page.getViewport({ scale });
+                 const scaleHD = 2.0; // HD Render
+                 const viewport = page.getViewport({ scale: scaleHD });
                  
                  const wrapper = document.createElement('div');
                  wrapper.className = 'page-wrapper';
                  
                  const canvas = document.createElement('canvas');
-                 const ctx = canvas.getContext('2d');
+                 const ctx = canvas.getContext('2d', { alpha: false }); 
                  const dpr = window.devicePixelRatio || 1;
 
                  canvas.width = Math.floor(viewport.width * dpr);
                  canvas.height = Math.floor(viewport.height * dpr);
-                 canvas.style.maxWidth = Math.floor(viewport.width) + "px";
 
                  const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null;
                  wrapper.appendChild(canvas);
