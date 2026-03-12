@@ -6,17 +6,20 @@
   <title>Terms & Conditions | PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
   
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="common.css" />
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
   <style>
-    /* Global fixes to match Page 1 */
+    /* ============================================================
+       PAGE SPECIFIC STYLES ONLY
+    ============================================================ */
     html { scroll-behavior: smooth; }
     body { font-family: 'Poppins', sans-serif; background-color: #f9f9f9; margin: 0; }
 
-    /* Hero Section for Terms (Dark Gradient like Index) */
+    /* Hero Section for Terms */
     .terms-hero {
       background: linear-gradient(135deg, #000000 0%, #434343 100%);
       color: white;
@@ -70,8 +73,7 @@
 
 <nav class="navbar">
   <div class="logo-container">
-    <img src="small-logo.png" alt="PM Logo" class="logo-image" />
-    <div class="logo-text">PREMium Mind</div>
+    <img src="PM-LOGO-TEXT.png" alt="PM Logo" class="logo-image" />
   </div>
 
   <ul class="nav-links">
@@ -84,7 +86,7 @@
 </nav>
 
 <div class="sidebar" id="sidebar">
-  <button class="close-sidebar-btn" onclick="document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active');">×</button>
+  <button class="close-sidebar-btn" id="closeSidebarBtn">×</button>
 
   <div class="user-profile" id="userProfile" style="display: none;">
     <div class="profile-photo-container">
@@ -110,7 +112,7 @@
     <li><a href="lecture.html" class="protected-route" id="courseAccessLink"><span class="icon">🎓</span> My Course</a></li>
     <li><a href="index.html#help-form"><span class="icon">📞</span> Contact</a></li>
     <li><a href="index.html#help-form"><span class="icon">❓</span> Help</a></li>
-    <li><a href="termcondition.html"><span class="icon">⚙️</span> Terms & Privacy</a></li>
+    <li><a href="termcondition.html" class="active-sidebar"><span class="icon">⚙️</span> Terms & Privacy</a></li>
   </ul>
 </div>
 
@@ -158,6 +160,7 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
   const firebaseConfig = {
     apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
@@ -170,41 +173,98 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const storage = getStorage(app);
 
-  onAuthStateChanged(auth, (user) => {
-    const userProfile = document.getElementById('userProfile');
-    const loginPrompt = document.getElementById('loginPrompt');
-    if (user) {
-      userProfile.style.display = 'block';
-      loginPrompt.style.display = 'none';
-      document.getElementById('userName').textContent = user.displayName || 'User';
-      document.getElementById('userEmail').textContent = user.email;
-      const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
-      if (photoURL) document.getElementById('profilePhoto').src = photoURL;
-    } else {
-      userProfile.style.display = 'none';
-      loginPrompt.style.display = 'block';
-    }
+  function updateUI(name, email, photoSrc) {
+    document.getElementById('userProfile').style.display = 'block';
+    document.getElementById('loginPrompt').style.display = 'none';
+    document.getElementById('userName').textContent = name || 'Student';
+    document.getElementById('userEmail').textContent = email || '';
+
+    document.getElementById('profilePhoto').src = photoSrc || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=000&color=fff&size=80`;
+
+    const coursesLinkNav = document.getElementById('coursesLinkNav');
+    const coursesLink = document.getElementById('coursesLink');
+    const courseAccessLink = document.getElementById('courseAccessLink');
+    
+    if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
+    if (coursesLink) { coursesLink.classList.remove('locked'); coursesLink.onclick = null; }
+    if (courseAccessLink) { courseAccessLink.classList.remove('locked'); courseAccessLink.onclick = null; }
+  }
+
+  function showLoggedOut() {
+    document.getElementById('userProfile').style.display = 'none';
+    document.getElementById('loginPrompt').style.display = 'block';
+
+    const handleLock = (e) => {
+        e.preventDefault();
+        alert('Please login to access PREMium Courses!');
+        window.location.href = 'login.html';
+      };
+
+    const coursesLinkNav = document.getElementById('coursesLinkNav');
+    const coursesLink = document.getElementById('coursesLink');
+    const courseAccessLink = document.getElementById('courseAccessLink');
+    
+    if (coursesLink) { coursesLink.classList.add('locked'); coursesLink.onclick = handleLock; }
+    if (coursesLinkNav) { coursesLinkNav.classList.add('locked'); coursesLinkNav.onclick = handleLock; }
+    if (courseAccessLink) { courseAccessLink.classList.add('locked'); courseAccessLink.onclick = handleLock; }
+  }
+
+  const customEmail = localStorage.getItem('customUserEmail');
+  const customName  = localStorage.getItem('customUserName');
+
+  if (customEmail) {
+      updateUI(customName, customEmail, null);
+  } else {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
+          updateUI(user.displayName, user.email, photoURL);
+        } else {
+          showLoggedOut();
+        }
+      });
+  }
+
+  document.getElementById('photo-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+      const photoStorageRef = storageRef(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
+      await uploadBytes(photoStorageRef, file);
+      const photoURL = await getDownloadURL(photoStorageRef);
+      localStorage.setItem('profilePhoto_' + user.uid, photoURL);
+      document.getElementById('profilePhoto').src = photoURL;
+      alert('Profile photo updated successfully!');
+    } catch (error) {}
   });
 
   window.handleLogout = async () => {
-    await signOut(auth);
-    window.location.reload();
+    localStorage.removeItem('customUserEmail');
+    localStorage.removeItem('customUserName');
+    try { await signOut(auth); } catch (error) {}
+    window.location.href = 'index.html';
   };
+</script>
 
-  // Sidebar Controls
+<script>
   const menuBtn = document.getElementById("menu-btn");
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("overlay");
+  const closeBtn = document.getElementById("closeSidebarBtn");
 
-  menuBtn.addEventListener("click", () => {
-    sidebar.classList.add("active");
-    overlay.classList.add("active");
-  });
+  function openSidebar() { sidebar.classList.add("active"); overlay.classList.add("active"); }
+  function closeSidebar() { sidebar.classList.remove("active"); overlay.classList.remove("active"); }
 
-  overlay.addEventListener("click", () => {
-    sidebar.classList.remove("active");
-    overlay.classList.remove("active");
+  menuBtn.addEventListener("click", openSidebar);
+  closeBtn.addEventListener("click", closeSidebar);
+  overlay.addEventListener("click", closeSidebar);
+
+  document.querySelectorAll(".sidebar ul li a").forEach(link => {
+    link.addEventListener("click", closeSidebar);
   });
 </script>
 
