@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Secure Reading - PREMium Mind</title>
+  <link rel="icon" type="image/png" href="small-logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  
+  <style>
+    /* Security: Prevent Printing completely */
+    @media print {
+        html, body { display: none !important; visibility: hidden !important; }
+    }
+
+    /* Base & Premium Reset */
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #e2e8f0; 
+      overflow: hidden; 
+      user-select: none; /* Prevent text copy */
+      -webkit-user-select: none;
+      transition: filter 0.2s ease; /* For Blur effect */
+    }
+    
+    /* Sleek Dark Header */
+    .header {
+      background: #0f172a; color: #fff;
+      padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
+      height: 65px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 100; position: relative;
+    }
+    
+    .back-btn {
+      color: #f8fafc; text-decoration: none; font-weight: 500; font-size: 0.95rem;
+      display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1);
+      padding: 8px 16px; border-radius: 10px; transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.2); transform: translateX(-2px); }
+    
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+    
+    #downloadBtn {
+      display: none; 
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; 
+      border: none; font-family: 'Poppins'; font-weight: 600; font-size: 0.9rem;
+      padding: 9px 18px; border-radius: 10px; cursor: pointer; transition: 0.3s;
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+    }
+    #downloadBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
+    
+    .brand-name { font-weight: 700; font-size: 1.2rem; letter-spacing: 0.5px; color: #10b981; display:none;}
+
+    /* Custom Scrollable PDF Container */
+    .pdf-viewer-container {
+      width: 100%; height: calc(100vh - 65px); 
+      overflow-y: auto; overflow-x: hidden;
+      display: flex; flex-direction: column; align-items: center; 
+      padding: 30px 15px; box-sizing: border-box;
+      gap: 25px; 
+      scroll-behavior: smooth;
+    }
+
+    /* Premium Custom Scrollbar */
+    .pdf-viewer-container::-webkit-scrollbar { width: 8px; }
+    .pdf-viewer-container::-webkit-scrollbar-track { background: #e2e8f0; }
+    .pdf-viewer-container::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+    .pdf-viewer-container::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    
+    /* Individual PDF Page Canvas styling */
+    .page-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      max-width: 1000px; /* Made slightly larger for better viewing */
+    }
+
+    .pdf-page-canvas {
+      background: #ffffff; 
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12); /* Crisp shadow */
+      display: block;
+      /* Dimensions will be handled by JS to maintain High Quality */
+    }
+    
+    /* Loading Screen - Modern Spinner */
+    .loader-container {
+      position: absolute; inset: 0; background: #e2e8f0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; z-index: 50;
+    }
+    .loader {
+      width: 50px; height: 50px;
+      border: 4px solid rgba(16, 185, 129, 0.2);
+      border-top: 4px solid #10b981;
+      border-radius: 50%;
+      animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    .loading-text { color: #475569; font-weight: 600; font-size: 1.1rem; letter-spacing: 0.5px;}
+    .loading-progress { color: #10b981; font-weight: 700; font-size: 0.9rem; margin-top: 5px; }
+
+    .drive-iframe { width: 100%; height: calc(100vh - 65px); border: none; display: none; }
+
+    /* Security Overlay Message */
+    #securityOverlay {
+        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+        z-index: 9999; color: white; flex-direction: column; align-items: center; justify-content: center;
+    }
+
+    @media (min-width: 768px) {
+        .brand-name { display: block; }
+    }
+  </style>
+</head>
+<body oncontextmenu="return false;">
+
+  <div id="securityOverlay">
+      <h2 style="color: #ef4444;">⚠️ Security Alert</h2>
+      <p>Screenshots and recording are not allowed.</p>
+  </div>
+
+  <div class="header">
+    <a href="lecture.html" class="back-btn">
+       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+       My Courses
+    </a>
+    <div class="brand-name">PREMium Mind</div>
+    <div class="header-actions">
+        <button id="downloadBtn" onclick="downloadPDF()">Download PDF ⬇️</button>
+    </div>
+  </div>
+
+  <div class="loader-container" id="loadingState">
+     <div class="loader"></div>
+     <div class="loading-text" id="loadingText">Preparing HD Document...</div>
+     <div class="loading-progress" id="loadingProgress"></div>
+  </div>
+
+  <div class="pdf-viewer-container" id="pdfContainer">
+      </div>
+
+  <iframe class="drive-iframe" id="driveContainer" allow="autoplay"></iframe>
+
+  <script>
+     // ==========================================
+     // SECURITY & ANTI-PIRACY LOGIC
+     // ==========================================
+
+     // 1. Block Print & Save shortcuts
+     document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'c' || e.key === 'u' || e.key === 'i')) {
+            e.preventDefault();
+            alert('Security Alert: This action is disabled to protect content.');
+        }
+        // Attempt to clear clipboard if PrintScreen is pressed
+        if (e.key === 'PrintScreen') {
+            navigator.clipboard.writeText('');
+            alert("Screenshots are not allowed!");
+        }
+     });
+
+     // 2. Blur on Window Focus Loss (Blocks Snipping tool/Screen recorders on PC)
+     window.addEventListener('blur', function() {
+         document.body.style.filter = 'blur(15px)';
+         document.getElementById('securityOverlay').style.display = 'flex';
+     });
+     
+     window.addEventListener('focus', function() {
+         document.body.style.filter = 'none';
+         document.getElementById('securityOverlay').style.display = 'none';
+     });
+
+     // ==========================================
+     // URL PARAMS & DOWNLOAD LOGIC
+     // ==========================================
+     const urlParams = new URLSearchParams(window.location.search);
+     let pdfUrl = urlParams.get('pdf');
+     const allowDownload = urlParams.get('dl');
+
+     if(allowDownload === '1') {
+         document.getElementById('downloadBtn').style.display = 'block';
+     }
+
+     function downloadPDF() {
+         if(pdfUrl) {
+             const link = document.createElement('a');
+             link.href = pdfUrl;
+             link.download = 'PREMium_Mind_Notes.pdf';
+             document.body.appendChild(link);
+             link.click();
+             document.body.removeChild(link);
+         }
+     }
+
+     // ==========================================
+     // HIGH DEFINITION (HD) PDF RENDER LOGIC
+     // ==========================================
+     if(pdfUrl) {
+         if(pdfUrl.includes('drive.google.com')) {
+             document.getElementById('pdfContainer').style.display = 'none';
+             document.getElementById('loadingState').style.display = 'none';
+             
+             let driveUrl = pdfUrl;
+             if(driveUrl.includes('/view')) {
+                 driveUrl = driveUrl.replace(/\/view.*/, '/preview');
+             }
+             const iframe = document.getElementById('driveContainer');
+             iframe.src = driveUrl;
+             iframe.style.display = 'block';
+
+         } else {
+             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+             const container = document.getElementById('pdfContainer');
+             const progressText = document.getElementById('loadingProgress');
+             
+             // HD Base Scale
+             const scale = 2.0; 
+
+             const loadingTask = pdfjsLib.getDocument({url: pdfUrl});
+             
+             loadingTask.promise.then(async (pdfDoc) => {
+                 document.getElementById('loadingText').innerText = "Rendering HD Pages...";
+                 
+                 const totalPages = pdfDoc.numPages;
+
+                 for (let num = 1; num <= totalPages; num++) {
+                     await renderPageHD(pdfDoc, num, scale, container);
+                     
+                     let progress = Math.round((num / totalPages) * 100);
+                     progressText.innerText = `${progress}% Loaded`;
+                 }
+
+                 document.getElementById('loadingState').style.opacity = '0';
+                 setTimeout(() => {
+                     document.getElementById('loadingState').style.display = 'none';
+                 }, 300);
+
+             }).catch(err => {
+                 console.error("PDF Load Error:", err);
+                 document.getElementById('loadingState').innerHTML = `<h3 style="color:#dc2626;">File Load Error</h3><p style="font-size:13px; color:#64748b;">Unable to load the document.</p>`;
+             });
+         }
+     } else {
+         document.getElementById('loadingState').innerHTML = `<h3 style="color:#dc2626;">Error: Document Missing!</h3>`;
+     }
+
+     // HD Render Function
+     async function renderPageHD(pdfDoc, num, scale, container) {
+         const page = await pdfDoc.getPage(num);
+         const viewport = page.getViewport({ scale });
+
+         const wrapper = document.createElement('div');
+         wrapper.className = 'page-wrapper';
+         
+         const canvas = document.createElement('canvas');
+         canvas.className = 'pdf-page-canvas';
+         const ctx = canvas.getContext('2d');
+
+         // 🌟 FIX FOR BLURRINESS (High-DPI / Retina Display Support) 🌟
+         const outputScale = window.devicePixelRatio || 1;
+
+         // Physical pixels (Actual Canvas Size)
+         canvas.width = Math.floor(viewport.width * outputScale);
+         canvas.height = Math.floor(viewport.height * outputScale);
+         
+         // Logical pixels (CSS Size on screen)
+         canvas.style.width = Math.floor(viewport.width) + "px";
+         canvas.style.height = Math.floor(viewport.height) + "px";
+
+         // Transform context to match the device pixel ratio
+         const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
+
+         wrapper.appendChild(canvas);
+         container.appendChild(wrapper);
+
+         // Render
+         const renderCtx = { 
+             canvasContext: ctx, 
+             transform: transform, 
+             viewport: viewport 
+         };
+         await page.render(renderCtx).promise;
+     }
+  </script>
+
+</body>
+</html>

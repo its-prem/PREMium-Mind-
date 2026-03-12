@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel – PREMium Mind</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Poppins', sans-serif; background: #f4f6fb; min-height: 100vh; }
+
+    #loginScreen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; background: linear-gradient(135deg, #000 0%, #434343 100%);
+    }
+
+    .login-box {
+      background: #fff; padding: 45px 40px; border-radius: 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 360px; text-align: center;
+    }
+    .login-box h2 { font-size: 1.7rem; font-weight: 800; margin-bottom: 6px; }
+    .login-box p  { color: #666; font-size: 0.9rem; margin-bottom: 26px; }
+    .login-box input {
+      width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb;
+      border-radius: 10px; font-size: 0.95rem; margin-bottom: 12px;
+      outline: none; transition: border 0.2s;
+    }
+    .login-box input:focus { border-color: #000; }
+    .login-box button {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, #000 0%, #333 100%);
+      color: #fff; border: none; border-radius: 10px;
+      font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s;
+    }
+    .login-box button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+    #loginError { color: #dc2626; font-size: 0.85rem; margin-top: 10px; }
+
+    #adminPanel { display: none; }
+
+    header {
+      background: linear-gradient(135deg, #000 0%, #333 100%);
+      color: #fff; padding: 18px 30px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    header h1 { font-size: 1.4rem; font-weight: 800; }
+    .admin-badge { background: rgba(255,255,255,0.2); padding: 5px 14px; border-radius: 20px; font-size: 0.85rem; }
+    .logout-btn {
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+      color: #fff; padding: 7px 18px; border-radius: 8px; cursor: pointer;
+      font-size: 0.9rem; font-weight: 600; transition: all 0.2s;
+    }
+    .logout-btn:hover { background: #dc2626; border-color: #dc2626; }
+
+    .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+
+    .stats-bar { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+    .stat-pill {
+      background: #fff; border-radius: 10px; padding: 12px 22px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07); font-size: 0.9rem; font-weight: 600; color: #333;
+    }
+    .stat-pill span { font-size: 1.3rem; font-weight: 800; color: #000; display: block; }
+
+    .toolbar { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+    .toolbar input, .toolbar select {
+      padding: 11px 16px; border: 2px solid #e5e7eb; border-radius: 10px;
+      font-size: 0.9rem; outline: none; transition: border 0.2s;
+    }
+    .toolbar input { flex: 1; min-width: 200px; }
+    .toolbar input:focus, .toolbar select:focus { border-color: #000; }
+
+    #studentList { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap: 20px; }
+
+    .student-card {
+      background: #fff; border-radius: 14px; padding: 22px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+      border: 2px solid transparent; transition: all 0.3s;
+    }
+    .student-card:hover { border-color: #000; transform: translateY(-3px); }
+
+    .student-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .student-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: linear-gradient(135deg, #000 0%, #444 100%);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; font-weight: 800; flex-shrink: 0;
+    }
+    .student-info h3 { font-size: 0.95rem; font-weight: 700; color: #111; margin-bottom: 3px; }
+    .student-info p  { font-size: 0.8rem; color: #888; }
+    .last-login { font-size: 0.75rem; color: #aaa; margin-bottom: 14px; }
+
+    .verified-badge {
+      display: inline-block; font-size: 0.72rem; padding: 2px 9px;
+      border-radius: 12px; font-weight: 700; margin-left: 6px;
+    }
+    .verified   { background: #dcfce7; color: #166534; }
+    .unverified { background: #fef3c7; color: #92400e; }
+
+    .courses-section h4 {
+      font-size: 0.82rem; font-weight: 700; color: #555;
+      margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .course-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 12px; border-radius: 9px; background: #f9fafb;
+      margin-bottom: 7px; border: 1px solid #e5e7eb; transition: background 0.2s;
+    }
+    .course-toggle:hover { background: #f0f0f0; }
+    .course-toggle label { font-size: 0.87rem; font-weight: 600; color: #333; cursor: pointer; flex: 1; }
+
+    .switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { display: none; }
+    .slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background: #d1d5db; border-radius: 24px; transition: 0.3s;
+    }
+    .slider::before {
+      content: ''; position: absolute; width: 18px; height: 18px;
+      border-radius: 50%; background: #fff; left: 3px; top: 3px;
+      transition: 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .switch input:checked + .slider { background: #16a34a; }
+    .switch input:checked + .slider::before { transform: translateX(20px); }
+
+    .save-btn {
+      width: 100%; margin-top: 14px; padding: 11px;
+      background: linear-gradient(135deg, #000 0%, #333 100%);
+      color: #fff; border: none; border-radius: 10px;
+      font-weight: 700; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;
+    }
+    .save-btn:hover { background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); }
+    .save-btn.saving { background: #6b7280; pointer-events: none; }
+    .save-btn.saved  { background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: #9ca3af; grid-column: 1/-1; }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+    .loading { text-align: center; padding: 60px; color: #666; grid-column: 1/-1; }
+
+    @media (max-width: 600px) {
+      header { flex-direction: column; gap: 12px; text-align: center; }
+      .toolbar { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <h2>🔐 Admin Panel</h2>
+    <p>PREMium Mind — Course Management</p>
+    <input type="password" id="adminSecret" placeholder="Admin Password" />
+    <button onclick="adminLogin()">Login</button>
+    <div id="loginError"></div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel">
+  <header>
+    <h1>🎓 PREMium Mind — Admin Panel</h1>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span class="admin-badge">Admin</span>
+      <button class="logout-btn" onclick="adminLogout()">Logout</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="stats-bar">
+      <div class="stat-pill"><span id="totalStudents">0</span>Total Students</div>
+      <div class="stat-pill"><span id="verifiedCount">0</span>Verified</div>
+      <div class="stat-pill"><span id="enrolledCount">0</span>Have Courses</div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="searchInput" placeholder="🔍 Search by name or email…" oninput="renderStudents()" />
+      <select id="filterSelect" onchange="renderStudents()">
+        <option value="all">All Students</option>
+        <option value="verified">Verified Only</option>
+        <option value="enrolled">Has Courses</option>
+        <option value="none">No Courses</option>
+      </select>
+    </div>
+
+    <div id="studentList"><div class="loading">⏳ Loading students…</div></div>
+  </div>
+</div>
+
+<script>
+  // ════ CONFIG ════
+  const API_BASE     = 'https://premind.diplomawallah.in/premind-api';
+  const ADMIN_SECRET = 'PremindAdmin@2025';  // Must match admin_api.php
+
+  const COURSES = [
+    { id: 'iot_course',     label: '🌐 Internet of Things (IoT)' },
+    { id: 'ai_ml_course',   label: '🤖 AI & ML Course' },
+    { id: 'web_dev_course', label: '💻 Web Development' },
+    { id: 'java_course',    label: '☕ Java Programming' },
+    { id: 'python_course',  label: '🐍 Python Course' },
+    { id: 'dsa_course',     label: '📊 DSA Course' },
+  ];
+
+  let allStudents = [];
+  let isLoggedIn  = false;
+
+  function adminLogin() {
+    const secret = document.getElementById('adminSecret').value;
+    if (secret === ADMIN_SECRET) {
+      isLoggedIn = true;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminPanel').style.display  = 'block';
+      loadStudents();
+    } else {
+      document.getElementById('loginError').textContent = '❌ Wrong password.';
+    }
+  }
+
+  function adminLogout() {
+    isLoggedIn = false;
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('adminPanel').style.display  = 'none';
+    document.getElementById('adminSecret').value = '';
+  }
+
+  async function loadStudents() {
+    const fd = new FormData();
+    fd.append('action', 'get_students');
+    fd.append('secret', ADMIN_SECRET);
+
+    try {
+      const res  = await fetch(`${API_BASE}/admin_api.php`, { method: 'POST', body: fd });
+      const data = await res.json();
+
+      if (data.status === 'success') {
+        allStudents = data.students;
+        renderStudents();
+        updateStats();
+      } else {
+        document.getElementById('studentList').innerHTML =
+          `<div class="empty-state"><div class="icon">❌</div><p>${data.message}</p></div>`;
+      }
+    } catch (err) {
+      document.getElementById('studentList').innerHTML =
+        '<div class="empty-state"><div class="icon">⚠️</div><p>Network error loading students.</p></div>';
+    }
+  }
+
+  function updateStats() {
+    document.getElementById('totalStudents').textContent = allStudents.length;
+    document.getElementById('verifiedCount').textContent = allStudents.filter(s => s.is_verified == 1).length;
+    document.getElementById('enrolledCount').textContent = allStudents.filter(s => s.enrolled_courses?.length > 0).length;
+  }
+
+  function renderStudents() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const filter = document.getElementById('filterSelect').value;
+    const listEl = document.getElementById('studentList');
+
+    let students = [...allStudents];
+
+    if (search) {
+      students = students.filter(s =>
+        s.name?.toLowerCase().includes(search) ||
+        s.email?.toLowerCase().includes(search)
+      );
+    }
+    if (filter === 'verified')  students = students.filter(s => s.is_verified == 1);
+    if (filter === 'enrolled')  students = students.filter(s => s.enrolled_courses?.length > 0);
+    if (filter === 'none')      students = students.filter(s => !s.enrolled_courses?.length);
+
+    if (!students.length) {
+      listEl.innerHTML = `<div class="empty-state"><div class="icon">👤</div><p>No students found.</p></div>`;
+      return;
+    }
+
+    listEl.innerHTML = students.map(student => {
+      const initials  = (student.name || 'U').charAt(0).toUpperCase();
+      const lastLogin = student.last_login
+        ? new Date(student.last_login).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+        : 'Never';
+      const verified  = student.is_verified == 1;
+
+      const toggles = COURSES.map(c => {
+        const checked = student.enrolled_courses?.includes(c.id) ? 'checked' : '';
+        return `
+          <div class="course-toggle">
+            <label for="s${student.id}_${c.id}">${c.label}</label>
+            <label class="switch">
+              <input type="checkbox" id="s${student.id}_${c.id}"
+                     data-student="${student.id}" data-course="${c.id}" ${checked}>
+              <span class="slider"></span>
+            </label>
+          </div>`;
+      }).join('');
+
+      return `
+        <div class="student-card">
+          <div class="student-header">
+            <div class="student-avatar">${initials}</div>
+            <div class="student-info">
+              <h3>${student.name || 'Unknown'}
+                <span class="verified-badge ${verified ? 'verified' : 'unverified'}">
+                  ${verified ? '✓ Verified' : '⚠ Unverified'}
+                </span>
+              </h3>
+              <p>${student.email || 'No email'}</p>
+            </div>
+          </div>
+          <div class="last-login">🕐 Last login: ${lastLogin}</div>
+          <div class="courses-section">
+            <h4>Course Access</h4>
+            ${toggles}
+          </div>
+          <button class="save-btn" id="save_${student.id}"
+                  onclick="saveEnrollment(${student.id})">
+            💾 Save Changes
+          </button>
+        </div>`;
+    }).join('');
+  }
+
+  async function saveEnrollment(userId) {
+    const btn = document.getElementById('save_' + userId);
+    btn.textContent = '⏳ Saving…'; btn.classList.add('saving');
+
+    // Collect all toggle states for this student
+    const courses = {};
+    COURSES.forEach(c => {
+      const cb = document.getElementById(`s${userId}_${c.id}`);
+      if (cb) courses[c.id] = cb.checked;
+    });
+
+    const fd = new FormData();
+    fd.append('action',  'save_enrollment');
+    fd.append('secret',  ADMIN_SECRET);
+    fd.append('user_id', userId);
+    fd.append('courses', JSON.stringify(courses));
+
+    try {
+      const res  = await fetch(`${API_BASE}/admin_api.php`, { method: 'POST', body: fd });
+      const data = await res.json();
+
+      if (data.status === 'success') {
+        btn.textContent = '✅ Saved!'; btn.classList.remove('saving'); btn.classList.add('saved');
+        // Update local state
+        const student = allStudents.find(s => s.id == userId);
+        if (student) student.enrolled_courses = Object.keys(courses).filter(k => courses[k]);
+        updateStats();
+        setTimeout(() => { btn.textContent = '💾 Save Changes'; btn.classList.remove('saved'); }, 2500);
+      } else {
+        btn.textContent = '❌ Error'; btn.classList.remove('saving');
+      }
+    } catch {
+      btn.textContent = '❌ Network Error'; btn.classList.remove('saving');
+    }
+  }
+</script>
+
+</body>
+</html>

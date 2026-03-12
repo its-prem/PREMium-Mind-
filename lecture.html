@@ -1,538 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>My Courses | PREMium Mind</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" href="small-logo.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Courses - PREMium Mind</title>
+  <link rel="icon" type="image/png" href="small-logo.png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:wght@400;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+  <style>
+    /* ============================================================
+       BASE & VARIABLES
+    ============================================================ */
+    :root {
+      --primary-color: #000000;
+      --secondary-color: #434343;
+      --accent-green: #10b981;
+      --white: #ffffff;
+      --bg-light: #f9f9f9;
+      --text-dark: #333333;
+      --text-muted: #666666;
+    }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-}
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+    html { scroll-behavior: smooth; }
+    body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: hidden; }
+    a { text-decoration: none; color: inherit; }
 
-header {
-  background: rgba(0, 0, 0, 0.9);
-  padding: 20px 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
+    /* NAVBAR */
+    .navbar {
+      position: sticky; top: 0; z-index: 1000; height: 80px;
+      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,0,0,.04); box-shadow: 0 4px 14px rgba(0,0,0,.04);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 40px;
+    }
+    .logo-container { display: flex; align-items: center; gap: 10px; transition: transform 0.3s; }
+    .logo-container:hover { transform: scale(1.03); }
+    .logo-image { height: 60px; width: auto; object-fit: contain; }
 
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: white;
-}
+    .nav-links { display: flex; align-items: center; gap: 20px; list-style: none; }
+    .nav-links li a {
+      color: var(--primary-color); font-size: 0.95rem; font-weight: 600;
+      padding: 8px 15px; border-radius: 8px; transition: 0.3s;
+    }
+    .nav-links li a:hover { background: var(--bg-light); }
+    .nav-links li a.active-sidebar { background: var(--primary-color); color: var(--white); }
 
-.logo-section img {
-  width: 45px;
-  height: 45px;
-  border-radius: 8px;
-}
+    .menu-btn {
+      display: none; font-size: 1.8rem; font-weight: bold; cursor: pointer; 
+      padding: 5px 12px; border-radius: 8px; background: var(--primary-color); 
+      color: var(--white); border: none; transition: 0.3s;
+    }
+    .menu-btn:hover { background: #333; }
 
-.logo-section h1 {
-  font-size: 1.5rem;
-}
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed; top: 0; right: -360px; width: 320px; max-width: 85vw; height: 100%;
+      background: var(--white); box-shadow: -10px 0 40px rgba(0,0,0,.1); z-index: 1002;
+      overflow-y: auto; padding-top: 60px; padding-bottom: 30px; transition: right 0.4s ease; 
+      border-top-left-radius: 20px; border-bottom-left-radius: 20px;
+    }
+    .sidebar.active { right: 0; }
+    
+    .close-sidebar-btn {
+      position: absolute; top: 15px; right: 15px; width: 40px; height: 40px; 
+      border-radius: 50%; background: var(--bg-light); border: none;
+      font-size: 20px; font-weight: bold; display: flex; align-items: center; 
+      justify-content: center; cursor: pointer; transition: 0.3s;
+    }
+    .close-sidebar-btn:hover { background: #fee2e2; color: #e11d48; transform: rotate(90deg); }
 
-.header-actions {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
+    .user-profile {
+      text-align: center; padding: 20px 15px; margin: 0 15px 20px 15px; 
+      background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+      border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,.05);
+      border-bottom: 2px solid rgba(0,0,0,0.08);
+    }
+    .profile-photo-container { position: relative; width: 80px; height: 80px; margin: 0 auto 15px; }
+    .profile-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color); cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+    .change-photo-btn { position: absolute; bottom: 2px; right: 2px; background: linear-gradient(135deg, #000 0%, #333 100%); color: #fff; border: 2px solid #fff; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+    
+    .user-name { font-size: 1.1rem; font-weight: 700; color: var(--primary-color); margin-bottom: 6px; }
+    .user-email { font-size: 0.85rem; color: var(--text-muted); background: rgba(0,0,0,.03); padding: 5px 10px; border-radius: 6px; display: inline-block; word-break: break-all; }
+    .logout-btn-sidebar { width: 90%; margin: 15px auto 10px; padding: 11px; background: linear-gradient(135deg, #000 0%, #333 100%); color: var(--white); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
-.user-info {
-  color: white;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 8px 15px;
-  border-radius: 8px;
-}
+    .login-prompt { text-align: center; padding: 25px 20px; background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%); margin: 0 15px 20px 15px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .login-prompt h3 { font-size: 1.2rem; margin-bottom: 10px; background: linear-gradient(135deg, #000 0%, #333 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+    .login-btn { background: linear-gradient(135deg, #000 0%, #333 100%); color: #fff; border: none; padding: 12px 30px; border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: 15px; font-size: 0.95rem; }
+    
+    .sidebar ul { list-style: none; padding: 0 20px; }
+    .sidebar ul li a { display: flex; align-items: center; gap: 15px; color: var(--primary-color); font-size: 1rem; font-weight: 600; padding: 12px 15px; border-radius: 8px; margin-bottom: 5px; transition: 0.3s; }
+    .sidebar ul li a:hover { background: var(--bg-light); transform: translateX(5px); }
+    .sidebar ul li a.active-sidebar { background: var(--primary-color); color: var(--white); }
 
-.btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-size: 0.9rem;
-}
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); backdrop-filter: blur(3px); display: none; z-index: 1001; }
+    .overlay.active { display: block; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-.btn-primary {
-  background: #3b82f6;
-  color: white;
-}
+    #photo-input { display: none; }
+    .protected-route { position: relative; }
+    .protected-route.locked::after { content: '🔒'; margin-left: 5px; }
 
-.btn-primary:hover {
-  background: #2563eb;
-  transform: translateY(-2px);
-}
+    /* DASHBOARD HEADER */
+    .dashboard-header {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      color: var(--white); padding: 60px 20px; text-align: center; margin-bottom: 40px;
+    }
+    .dashboard-header h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 10px; }
+    .dashboard-header p { font-size: clamp(1rem, 2vw, 1.1rem); color: #ccc; max-width: 600px; margin: 0 auto; }
 
-.btn-danger {
-  background: #ef4444;
-  color: white;
-}
+    /* COURSES GRID & CARDS */
+    .card-container {
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 30px; padding: 0 20px 60px 20px; max-width: 1200px; margin: 0 auto;
+    }
+    .course-card {
+      position: relative; background: var(--white); border-radius: 16px; padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06); border: 1px solid #eaeaea; overflow: hidden;
+      display: flex; flex-direction: column; transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .course-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.12); }
+    .course-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; }
+    .course-card h2 { font-size: 1.15rem; margin-bottom: 10px; color: var(--primary-color); line-height: 1.4; flex-grow: 1; }
+    .course-progress { width: 100%; height: 6px; background: #eee; border-radius: 3px; margin-bottom: 15px; overflow: hidden; }
+    .progress-bar { height: 100%; background: var(--accent-green); width: 15%; border-radius: 3px; }
 
-.btn-danger:hover {
-  background: #dc2626;
-}
+    /* Buttons */
+    .btn-access {
+      width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 700;
+      cursor: pointer; font-size: 1rem; transition: all 0.3s ease; text-align: center;
+      background: linear-gradient(135deg, var(--accent-green) 0%, #059669 100%); color: var(--white);
+    }
+    .btn-access:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3); }
+    .btn-browse {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      color: var(--white); padding: 12px 30px; border: none; border-radius: 50px;
+      font-weight: 700; cursor: pointer; font-size: 1rem; transition: all 0.3s; margin-top: 10px;
+    }
+    .new-badge {
+      position: absolute; top: 15px; right: -35px; background: var(--accent-green); color: #fff;
+      font-size: 0.8rem; font-weight: 800; padding: 5px 40px; transform: rotate(45deg);
+      box-shadow: 0 3px 10px rgba(16, 185, 129, 0.4); letter-spacing: 1px;
+    }
+    .empty-state {
+      grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: var(--white);
+      border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; width: 100%;
+    }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 20px;
-}
-
-.page-header {
-  text-align: center;
-  margin-bottom: 40px;
-  color: white;
-}
-
-.page-header h2 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-}
-
-.page-header p {
-  font-size: 1.1rem;
-  opacity: 0.9;
-}
-
-.loading {
-  text-align: center;
-  padding: 80px 20px;
-  color: white;
-}
-
-.spinner {
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid white;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.empty-state {
-  text-align: center;
-  padding: 80px 20px;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-}
-
-.empty-state h3 {
-  font-size: 2rem;
-  color: #1f2937;
-  margin-bottom: 15px;
-}
-
-.empty-state p {
-  font-size: 1.1rem;
-  color: #6b7280;
-  margin-bottom: 30px;
-  line-height: 1.6;
-}
-
-.courses-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 30px;
-}
-
-.course-card {
-  background: white;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s;
-}
-
-.course-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-}
-
-.course-image {
-  width: 100%;
-  height: 180px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 4rem;
-  color: white;
-}
-
-.course-content {
-  padding: 20px;
-}
-
-.course-badge {
-  display: inline-block;
-  background: #d1fae5;
-  color: #065f46;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-
-.course-title {
-  font-size: 1.4rem;
-  color: #1f2937;
-  margin-bottom: 10px;
-  line-height: 1.3;
-}
-
-.course-meta {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 15px;
-  color: #6b7280;
-  font-size: 0.85rem;
-  flex-wrap: wrap;
-}
-
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.course-description {
-  color: #4b5563;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-
-.course-progress {
-  margin-bottom: 15px;
-}
-
-.progress-bar-bg {
-  width: 100%;
-  height: 8px;
-  background: #e5e7eb;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #2563eb);
-  border-radius: 10px;
-  transition: width 0.3s;
-}
-
-.progress-text {
-  font-size: 0.85rem;
-  color: #6b7280;
-  margin-top: 5px;
-}
-
-.course-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.action-btn {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-size: 0.9rem;
-}
-
-.btn-continue {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-}
-
-.btn-continue:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
-}
-
-@media (max-width: 768px) {
-  header {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .page-header h2 {
-    font-size: 1.8rem;
-  }
-
-  .courses-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .header-actions {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .user-info {
-    font-size: 0.8rem;
-  }
-}
-</style>
+    @media (max-width: 768px) {
+      .navbar { padding: 0 20px; height: 70px; }
+      .logo-image { height: 40px; }
+      .nav-links { display: none; } 
+      .menu-btn { display: block; } 
+      .dashboard-header { padding: 40px 15px; }
+      .card-container { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 0 15px 40px 15px; }
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <div class="logo-section">
-    <img src="small-logo.png" alt="PM Logo">
-    <h1>🎓 My Courses</h1>
+<nav class="navbar">
+  <div class="logo-container">
+    <img src="PM-LOGO-TEXT.png" alt="PM Logo" class="logo-image" />
   </div>
-  <div class="header-actions">
-    <div class="user-info">
-      <span>👤</span>
-      <span id="userEmail">Loading...</span>
+  <ul class="nav-links">
+    <li><a href="index.html">PREMium Store</a></li>
+    <li><a href="courses.html" class="protected-route" id="coursesLinkNav">PREMium Courses</a></li>
+    <li><a href="index.html#help-form">Contact us</a></li>
+    <li><a href="index.html#help-form">Report Problem</a></li>
+  </ul>
+  <div class="menu-btn" id="menu-btn">☰</div>
+</nav>
+
+<div class="sidebar" id="sidebar">
+  <button class="close-sidebar-btn" id="closeSidebarBtn">×</button>
+
+  <div class="user-profile" id="userProfile" style="display: none;">
+    <div class="profile-photo-container">
+      <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile" class="profile-photo" id="profilePhoto" onclick="document.getElementById('photo-input').click()">
+      <button class="change-photo-btn" onclick="document.getElementById('photo-input').click()">📷</button>
     </div>
-    <button class="btn btn-primary" onclick="window.location.href='index.html'">🏠 Home</button>
-    <button class="btn btn-danger" onclick="handleLogout()">Logout</button>
-  </div>
-</header>
-
-<div class="container">
-  
-  <div class="page-header">
-    <h2>My Learning Journey</h2>
-    <p>Continue where you left off and explore your courses</p>
+    <input type="file" id="photo-input" accept="image/*">
+    <div class="user-name" id="userName">User Name</div>
+    <div class="user-email" id="userEmail">user@example.com</div>
+    <button class="logout-btn-sidebar" onclick="handleLogout()">Logout</button>
   </div>
 
-  <div class="loading" id="loadingState">
-    <div class="spinner"></div>
-    <h3>Loading your courses...</h3>
+  <div class="login-prompt" id="loginPrompt">
+    <h3>Welcome to PREMium Mind</h3>
+    <p>Access your courses and profile.</p>
+    <button class="login-btn" onclick="window.location.href='login.html'">Login / Sign Up</button>
   </div>
 
-  <div class="empty-state" id="emptyState" style="display: none;">
-    <h3>📚 No Courses Yet</h3>
-    <p>You haven't purchased any courses yet.<br>Explore our course library and start your learning journey!</p>
-    <button class="btn btn-primary" onclick="window.location.href='index.html'" style="padding: 15px 40px; font-size: 1.1rem;">
-      Browse Courses
-    </button>
-  </div>
-
-  <div class="courses-grid" id="coursesGrid" style="display: none;">
-    <!-- Courses will be loaded here dynamically -->
-  </div>
-
+  <ul>
+    <li><a href="index.html"><span class="icon">🏠</span> Home</a></li>
+    <li><a href="courses.html" class="protected-route" id="coursesLink"><span class="icon">📚</span> PREMium Courses</a></li>
+    <li><a href="lecture.html" class="protected-route active-sidebar" id="courseAccessLink"><span class="icon">🎓</span> My Course</a></li>
+    <li><a href="index.html#help-form"><span class="icon">📞</span> Contact</a></li>
+    <li><a href="index.html#help-form"><span class="icon">❓</span> Help</a></li>
+    <li><a href="termcondition.html"><span class="icon">⚙️</span> Terms & Privacy</a></li>
+  </ul>
 </div>
 
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+<div class="overlay" id="overlay"></div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
-  authDomain: "premium-mind-fcb16.firebaseapp.com",
-  databaseURL: "https://premium-mind-fcb16-default-rtdb.firebaseio.com",
-  projectId: "premium-mind-fcb16",
-  storageBucket: "premium-mind-fcb16.firebasestorage.app",
-  messagingSenderId: "864874199521",
-  appId: "1:864874199521:web:5deb96a956dc404a077aa0"
-};
+<div class="dashboard-header">
+  <h1>My Learning Dashboard</h1>
+  <p>Welcome back! Pick up right where you left off and master your skills.</p>
+</div>
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const database = getDatabase(app);
+<div class="card-container" id="my-courses-container">
+    <p style="text-align: center; width: 100%; color: #666; font-size: 1.1rem; grid-column: 1/-1;">Checking your enrollments...</p>
+</div>
 
-// Courses Master Data
-const coursesDatabase = {
-  'web-development': {
-    id: 'web-development',
-    title: 'Web Development Full Course',
-    description: 'Master HTML, CSS, JavaScript & Firebase. Build real-world projects and launch your web development career.',
-    icon: '🚀',
-    totalLessons: 15,
-    duration: '30+ hours',
-    level: 'Beginner to Advanced',
-    url: 'lecture.html?course=web-development'
-  },
-  'react-course': {
-    id: 'react-course',
-    title: 'React JS Mastery',
-    description: 'Learn React from scratch. Build modern web applications with hooks, routing, and state management.',
-    icon: '⚛️',
-    totalLessons: 20,
-    duration: '40+ hours',
-    level: 'Intermediate',
-    url: 'lecture.html?course=react-course'
-  },
-  'python-course': {
-    id: 'python-course',
-    title: 'Python Programming',
-    description: 'Complete Python course from basics to advanced. Data structures, OOP, and real projects.',
-    icon: '🐍',
-    totalLessons: 25,
-    duration: '50+ hours',
-    level: 'Beginner',
-    url: 'lecture.html?course=python-course'
-  },
-  'data-science': {
-    id: 'data-science',
-    title: 'Data Science Bootcamp',
-    description: 'Master data analysis, visualization, machine learning & AI with Python.',
-    icon: '📊',
-    totalLessons: 30,
-    duration: '60+ hours',
-    level: 'Advanced',
-    url: 'lecture.html?course=data-science'
-  }
-};
-
-onAuthStateChanged(auth, async (user) => {
-  const loadingState = document.getElementById('loadingState');
-  const emptyState = document.getElementById('emptyState');
-  const coursesGrid = document.getElementById('coursesGrid');
-  const userEmailEl = document.getElementById('userEmail');
-
-  if (!user) {
-    alert('⚠️ Please login first to view your courses!');
-    window.location.href = 'login.html';
-    return;
-  }
-
-  userEmailEl.textContent = user.email;
-
-  try {
-    const userRef = ref(database, 'users/' + user.uid);
-    const snapshot = await get(userRef);
-
-    loadingState.style.display = 'none';
-
-    if (snapshot.exists()) {
-      const userData = snapshot.val();
-      const purchasedCourses = userData.purchasedCourses || {};
-      
-      // Convert purchased courses to array
-      const coursesArray = [];
-      Object.keys(purchasedCourses).forEach(courseId => {
-        if (coursesDatabase[courseId]) {
-          coursesArray.push({
-            ...coursesDatabase[courseId],
-            ...purchasedCourses[courseId],
-            courseId: courseId
-          });
-        }
-      });
-
-      if (coursesArray.length > 0) {
-        displayCourses(coursesArray);
-        coursesGrid.style.display = 'grid';
-      } else {
-        emptyState.style.display = 'block';
-      }
-
-    } else {
-      emptyState.style.display = 'block';
+<script>
+window.loadMyCourses = async function(userEmail) {
+    if (!userEmail) {
+        window.location.href = 'login.html';
+        return;
     }
 
-  } catch (error) {
-    console.error('Error loading courses:', error);
-    loadingState.style.display = 'none';
-    emptyState.style.display = 'block';
-  }
-});
-
-function displayCourses(courses) {
-  const coursesGrid = document.getElementById('coursesGrid');
-  coursesGrid.innerHTML = '';
-
-  courses.forEach(course => {
-    const progress = course.progress || 0;
-    const purchaseDate = new Date(course.purchaseDate || Date.now());
-    const formattedDate = purchaseDate.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
-    });
-
-    const courseCard = document.createElement('div');
-    courseCard.className = 'course-card';
-    courseCard.innerHTML = `
-      <div class="course-image">
-        ${course.icon || '📚'}
-      </div>
-      <div class="course-content">
-        <span class="course-badge">✅ Enrolled</span>
-        <h3 class="course-title">${course.title}</h3>
+    try {
+        const container = document.getElementById('my-courses-container');
+        const apiUrl = `https://premind.diplomawallah.in/api.php?email=${encodeURIComponent(userEmail)}`; 
+        const response = await fetch(apiUrl);
+        const courses = await response.json();
         
-        <div class="course-meta">
-          <div class="meta-item">
-            <span>📚</span>
-            <span>${course.totalLessons} Lessons</span>
-          </div>
-          <div class="meta-item">
-            <span>⏱️</span>
-            <span>${course.duration}</span>
-          </div>
-          <div class="meta-item">
-            <span>📊</span>
-            <span>${course.level}</span>
-          </div>
-        </div>
+        const enrolledCourses = courses.filter(course => course.is_enrolled == 1);
+        container.innerHTML = ''; 
 
-        <p class="course-description">${course.description}</p>
+        if(enrolledCourses.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                  <h2>No Courses Yet 😢</h2>
+                  <p>You haven't enrolled in any premium courses yet. Explore our store to upgrade your skills!</p>
+                  <button class="btn-browse" onclick="window.location.href='index.html#products'">Explore Store</button>
+                </div>
+            `;
+            return;
+        }
 
-        <div class="course-progress">
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" style="width: ${progress}%"></div>
-          </div>
-          <p class="progress-text">${progress}% Complete • Enrolled on ${formattedDate}</p>
-        </div>
+        enrolledCourses.forEach(course => {
+            let pdfUrl = '';
+            
+            // 🔥 CORS Proxy ka use karke link generate karna 🔥
+            if (course.pdf_file && course.pdf_file.trim() !== '') {
+                pdfUrl = 'https://premind.diplomawallah.in/proxy_pdf.php?file=' + encodeURIComponent(course.pdf_file);
+            } else if (course.pdf_link && course.pdf_link.trim() !== '') {
+                pdfUrl = course.pdf_link;
+            }
+            
+            // Watch.html par link bhejna allow_download parameter ke sath
+            let btnAction = pdfUrl ? `window.location.href='watch.html?pdf=${encodeURIComponent(pdfUrl)}&dl=${course.allow_download}'` : `alert('PDF material is being uploaded and will be available very soon!')`;
 
-        <div class="course-actions">
-          <button class="action-btn btn-continue" onclick="window.location.href='${course.url}'">
-            ${progress > 0 ? '▶️ Continue Learning' : '🎬 Start Course'}
-          </button>
-        </div>
-      </div>
-    `;
-
-    coursesGrid.appendChild(courseCard);
-  });
+            const cardHTML = `
+                <div class="course-card">
+                  <span class="new-badge">Enrolled</span>
+                  <img src="${course.image}" alt="${course.title}" onerror="this.src='small-logo.png'"/>
+                  <h2>${course.title}</h2>
+                  <p style="color:#666; font-size:0.9rem; margin-bottom:5px;">Keep going, you're doing great!</p>
+                  <div class="course-progress">
+                     <div class="progress-bar"></div>
+                  </div>
+                  <button class="btn-access" onclick="${btnAction}">Start Learning ▶️</button>
+                </div>
+            `;
+            container.innerHTML += cardHTML;
+        });
+    } catch (error) {
+        console.error(error);
+        document.getElementById('my-courses-container').innerHTML = '<p style="text-align:center; width:100%; grid-column:1/-1; color:red;">Failed to load courses. Check connection.</p>';
+    }
 }
+</script>
 
-window.handleLogout = async () => {
-  try {
-    await signOut(auth);
-    alert('✅ Logged out successfully!');
-    window.location.href = 'index.html';
-  } catch (error) {
-    alert('❌ Error logging out');
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
+    authDomain: "premium-mind-fcb16.firebaseapp.com",
+    projectId: "premium-mind-fcb16",
+    storageBucket: "premium-mind-fcb16.firebasestorage.app",
+    messagingSenderId: "864874199521",
+    appId: "1:864874199521:web:5deb96a956dc404a077aa0"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const storage = getStorage(app);
+
+  function setupProfile(email, name, uid) {
+    document.getElementById('userProfile').style.display = 'block';
+    document.getElementById('loginPrompt').style.display = 'none';
+    document.getElementById('userName').textContent = name || 'Student';
+    document.getElementById('userEmail').textContent = email;
+    
+    const savedPhoto = uid ? localStorage.getItem('profilePhoto_' + uid) : null;
+    if(savedPhoto) { document.getElementById('profilePhoto').src = savedPhoto; } 
+    else { document.getElementById('profilePhoto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=000&color=fff&size=80`; }
+    
+    const coursesLinkNav = document.getElementById('coursesLinkNav');
+    const coursesLink = document.getElementById('coursesLink');
+    if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
+    if (coursesLink) { coursesLink.classList.remove('locked'); coursesLink.onclick = null; }
+
+    window.loadMyCourses(email);
   }
-};
+
+  const customEmail = localStorage.getItem('customUserEmail');
+  const customName = localStorage.getItem('customUserName');
+
+  if (customEmail) {
+      setupProfile(customEmail, customName, 'custom');
+  } else {
+      onAuthStateChanged(auth, (user) => {
+        if (user) { setupProfile(user.email, user.displayName, user.uid); } 
+        else { window.location.href = 'login.html'; }
+      });
+  }
+
+  document.getElementById('photo-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+      const photoStorageRef = storageRef(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
+      await uploadBytes(photoStorageRef, file);
+      const photoURL = await getDownloadURL(photoStorageRef);
+      localStorage.setItem('profilePhoto_' + user.uid, photoURL);
+      document.getElementById('profilePhoto').src = photoURL;
+      alert('Profile photo updated successfully!');
+    } catch (error) {}
+  });
+
+  window.handleLogout = async () => {
+    try {
+      localStorage.removeItem('customUserEmail');
+      localStorage.removeItem('customUserName');
+      await signOut(auth);
+      window.location.href = 'index.html';
+    } catch (error) {}
+  };
+</script>
+
+<script>
+  const menuBtn = document.getElementById("menu-btn");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+  const closeBtn = document.getElementById("closeSidebarBtn");
+
+  function openSidebar() { sidebar.classList.add("active"); overlay.classList.add("active"); }
+  function closeSidebar() { sidebar.classList.remove("active"); overlay.classList.remove("active"); }
+
+  menuBtn.addEventListener("click", openSidebar);
+  closeBtn.addEventListener("click", closeSidebar);
+  overlay.addEventListener("click", closeSidebar);
+
+  document.querySelectorAll(".sidebar ul li a").forEach(link => {
+    link.addEventListener("click", closeSidebar);
+  });
 </script>
 
 </body>

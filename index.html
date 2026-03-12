@@ -585,10 +585,6 @@
         font-size: 1.1rem;
       }
 
-      .features-header h2 {
-        font-size: 2rem;
-      }
-
       .cta-buttons {
         flex-direction: column;
       }
@@ -596,20 +592,16 @@
       .cta-btn {
         width: 100%;
       }
-
-      .stats-container {
-        grid-template-columns: 1fr;
-      }
     }
   </style>
+
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 </head>
 <body>
 
-<!-- Navbar -->
 <nav class="navbar">
   <div class="logo-container">
-    <img src="small-logo.png" alt="PM Logo" class="logo-image" />
-    <div class="logo-text">PREMium Mind</div>
+    <img src="PM-LOGO-TEXT.png" alt="PM Logo" class="logo-image" />
   </div>
 
   <ul class="nav-links">
@@ -621,7 +613,6 @@
   <div class="menu-btn" id="menu-btn">☰</div>
 </nav>
 
-<!-- Sidebar Menu -->
 <div class="sidebar" id="sidebar">
   <button class="close-sidebar-btn" onclick="document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active');">×</button>
 
@@ -655,7 +646,6 @@
 
 <div class="overlay" id="overlay"></div>
 
-<!-- Hero Section -->
 <section class="hero-section">
   <div class="hero-content">
     <span class="hero-badge">🎓 Your Learning Partner</span>
@@ -668,155 +658,13 @@
   </div>
 </section>
 
-<!-- Stats Section -->
-<section class="stats-section">
-  <div class="stats-container">
-    <div class="stat-card">
-      <div class="stat-icon">🎯</div>
-      <div class="stat-number">500+</div>
-      <div class="stat-label">Happy Students</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">📚</div>
-      <div class="stat-number">50+</div>
-      <div class="stat-label">Study Resources</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">⭐</div>
-      <div class="stat-number">4.8/5</div>
-      <div class="stat-label">Average Rating</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">💼</div>
-      <div class="stat-number">95%</div>
-      <div class="stat-label">Success Rate</div>
-    </div>
-  </div>
-</section>
-
-<!-- Features Section -->
-<section class="features-section">
-  <div class="features-header">
-    <h2>Why Choose PREMium Mind?</h2>
-    <p>We provide everything you need to excel in your academic and professional journey</p>
-  </div>
-  <div class="features-grid">
-    <div class="feature-card">
-      <span class="feature-icon">📖</span>
-      <h3>Expert-Crafted Content</h3>
-      <p>All our study materials are created by subject matter experts with years of teaching experience to ensure accuracy and clarity.</p>
-    </div>
-    <div class="feature-card">
-      <span class="feature-icon">⚡</span>
-      <h3>Instant Access</h3>
-      <p>Get immediate access to all purchased materials. No waiting, no delays - start studying right away.</p>
-    </div>
-    <div class="feature-card">
-      <span class="feature-icon">💰</span>
-      <h3>Affordable Pricing</h3>
-      <p>Premium quality education shouldn't break the bank. We offer competitive prices with regular discounts.</p>
-    </div>
-    <div class="feature-card">
-      <span class="feature-icon">🎓</span>
-      <h3>Exam-Oriented</h3>
-      <p>Our materials are specifically designed to help you ace your exams with high-probability questions and answers.</p>
-    </div>
-    <div class="feature-card">
-      <span class="feature-icon">📱</span>
-      <h3>Mobile Friendly</h3>
-      <p>Study anywhere, anytime on any device. Our platform works seamlessly on mobile, tablet, and desktop.</p>
-    </div>
-    <div class="feature-card">
-      <span class="feature-icon">🤝</span>
-      <h3>24/7 Support</h3>
-      <p>Have questions? Our dedicated support team is always ready to help you through WhatsApp and email.</p>
-    </div>
-  </div>
-</section>
-
-<!-- Products Section -->
 <section class="course-section" id="products">
   <h1>EXPLORE OUR PREMium Mind STORE</h1>
-  <div class="card-container">
-
-    <div class="course-card">
-      <img src="/IMAGES/PDD.png" alt="Product Design and Development Important Questions" />
-      <h2>PRODUCT DESIGN AND DEVELOPMENT IMP QUES</h2>
-      <span class="new-badge">NEW</span>
-      <p>🚧 High chance to come in exam | Exam Oriented | Diploma / Degree</p>
-      <p>📄 Total Pages: 3 | Questions with Answers</p>
-      <p class="price">₹30<span>₹49</span></p>
-      <button onclick="window.open('https://payments.cashfree.com/forms?code=metalpage','_blank')">Buy Now</button>
-    </div>
-
-    <div class="course-card">
-      <img src="/IMAGES/IA.png" alt="Industrial Automation Important Questions" />
-      <h2>INDUSTRIAL AUTOMATION IMP QUES</h2>
-      <span class="new-badge">NEW</span>
-      <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
-      <p>📄 Total Pages: 3 | Short & Easy Notes</p>
-      <p class="price">₹30<span>₹49</span></p>
-      <button onclick="window.open('https://payments.cashfree.com/forms?code=metalpage','_blank')">Buy Now</button>
-    </div>
-
-    <div class="course-card">
-      <img src="/IMAGES/TE.png" alt="Transportation Engineering Important Questions" />
-      <h2>TRANSPORTATION ENGINEERING IMP QUES</h2>
-      <span class="new-badge">NEW</span>
-      <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
-      <p>📄 Total Pages: 3 | Short & Easy Notes</p>
-      <p class="price">₹30<span>₹49</span></p>
-      <button onclick="window.open('https://payments.cashfree.com/forms?code=metalpage','_blank')">Buy Now</button>
-    </div>
-
-    <div class="course-card">
-      <img src="AI AND ML.png" alt="AI and ML Important Questions" />
-      <h2>AI AND ML IMPORTANT QUESTIONS</h2>
-      <span class="new-badge">NEW</span>
-      <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
-      <p>📄 Total Pages: 3 | Short & Easy Notes</p>
-      <p class="price">₹30<span>₹49</span></p>
-      <button onclick="window.open('https://payments.cashfree.com/forms/csepage','_blank')">Buy Now</button>
-    </div>
-
-    <div class="course-card">
-      <img src="cs-black2.jpg" alt="Production Processing of Steel" />
-      <h2>Production Processing of Steel – IMPORTANT QUESTIONS</h2>
-      <p>🚧 Important Questions | Exam Oriented | Diploma / Degree</p>
-      <p>📄 Total Pages: 3 | Short & Easy Notes</p>
-      <p class="price">₹30<span>₹49</span></p>
-      <button class="disabled-btn" onclick="window.location.href='https://payments.cashfree.com/forms?code=metalpage'">Buy Now</button>
-    </div>
-
-    <div class="course-card">
-      <img src="DEMO IOT PDF_1 (1).jpg" alt="IoT E-Book Cover" />
-      <h2>INTERNET OF THINGS (IOT) E-BOOK</h2>
-      <p>📘 Simple aur easy words me likhi hui IoT e-book — beginners ke liye perfect.</p>
-      <p class="date">Limited Offer for First 10 Students</p>
-      <p class="price">₹30<span>₹49</span></p>
-      <button class="preview-btn" onclick="window.open('https://drive.google.com/file/d/1c46E-5KX_xamR3EW1fk-2wjNpy5hAJIq/view?usp=drivesdk', '_blank')">Preview (Demo)</button>
-      <button onclick="window.open('https://payments.cashfree.com/forms?code=metalpage', '_blank')">Buy Now</button>
-    </div>
-
-    <div class="course-card">
-      <img src="resume2.png" alt="Resume Template 2" />
-      <h2>Modern Resume Template2</h2>
-      <p>🔥 Clean & Professional design for freshers students</p>
-      <p class="price">₹79<span>₹299</span></p>
-      <button onclick="window.location.href='https://payments.cashfree.com/forms/premiumstore'">Order Now</button>
-    </div>
-
-    <div class="course-card">
-      <img src="resume1.png" alt="Resume Template 3" />
-      <h2>Creative Resume Template3</h2>
-      <p>🚀 Eye-catching design to make you stand out</p>
-      <p class="price">₹99<span>₹349</span></p>
-      <button class="order-btn" disabled>Coming Soon</button>
-    </div>
+  <div class="card-container" id="dynamic-products-container">
+      <p style="text-align: center; width: 100%;">Loading Premium Store...</p>
   </div>
 </section>
 
-<!-- Footer -->
 <footer class="footer">
   <div class="footer-container">
     <div class="footer-part logo-part">
@@ -866,7 +714,6 @@
   </div>
 </footer>
 
-<!-- Firebase & Custom Scripts -->
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -883,77 +730,84 @@
     appId: "1:864874199521:web:5deb96a956dc404a077aa0"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const storage = getStorage(app);
+  const app      = initializeApp(firebaseConfig);
+  const auth     = getAuth(app);
+  const storage  = getStorage(app);
   const database = getDatabase(app);
 
-  onAuthStateChanged(auth, async (user) => {
-    const userProfile = document.getElementById('userProfile');
-    const loginPrompt = document.getElementById('loginPrompt');
-    const coursesLink = document.getElementById('coursesLink');
+  function updateUI(name, email, photoSrc) {
+    const userProfile    = document.getElementById('userProfile');
+    const loginPrompt    = document.getElementById('loginPrompt');
+    const coursesLink    = document.getElementById('coursesLink');
     const coursesLinkNav = document.getElementById('coursesLinkNav');
 
-    if (user) {
-      userProfile.style.display = 'block';
-      loginPrompt.style.display = 'none';
-      
-      document.getElementById('userName').textContent = user.displayName || 'User';
-      document.getElementById('userEmail').textContent = user.email;
-      
-      const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
-      if (photoURL) {
-        document.getElementById('profilePhoto').src = photoURL;
-      } else {
-        document.getElementById('profilePhoto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=000&color=fff&size=80`;
-      }
+    userProfile.style.display = 'block';
+    loginPrompt.style.display = 'none';
 
-      if (coursesLink) {
-        coursesLink.classList.remove('locked');
-        coursesLink.onclick = null;
-      }
-      if (coursesLinkNav) {
-        coursesLinkNav.classList.remove('locked');
-        coursesLinkNav.onclick = null;
-      }
-    } else {
-      userProfile.style.display = 'none';
-      loginPrompt.style.display = 'block';
+    document.getElementById('userName').textContent  = name  || 'User';
+    document.getElementById('userEmail').textContent = email || '';
 
-      if (coursesLink) {
-        coursesLink.classList.add('locked');
-        coursesLink.onclick = (e) => {
-          e.preventDefault();
-          alert('Please login to access PREMium Courses!');
-          window.location.href = 'login.html';
-        };
-      }
-      if (coursesLinkNav) {
-        coursesLinkNav.classList.add('locked');
-        coursesLinkNav.onclick = (e) => {
-          e.preventDefault();
-          alert('Please login to access PREMium Courses!');
-          window.location.href = 'login.html';
-        };
-      }
+    document.getElementById('profilePhoto').src = photoSrc ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=000&color=fff&size=80`;
+
+    if (coursesLink)    { coursesLink.classList.remove('locked');    coursesLink.onclick    = null; }
+    if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
+    
+    if(typeof window.loadCourses === 'function') {
+        window.loadCourses(email);
     }
-  });
+  }
+
+  function showLoggedOut() {
+    const userProfile    = document.getElementById('userProfile');
+    const loginPrompt    = document.getElementById('loginPrompt');
+    const coursesLink    = document.getElementById('coursesLink');
+    const coursesLinkNav = document.getElementById('coursesLinkNav');
+
+    userProfile.style.display = 'none';
+    loginPrompt.style.display = 'block';
+
+    const handleLock = (e) => {
+        e.preventDefault();
+        alert('Please login to access PREMium Courses!');
+        window.location.href = 'login.html';
+      };
+
+    if (coursesLink) { coursesLink.classList.add('locked'); coursesLink.onclick = handleLock; }
+    if (coursesLinkNav) { coursesLinkNav.classList.add('locked'); coursesLinkNav.onclick = handleLock; }
+    
+    if(typeof window.loadCourses === 'function') {
+        window.loadCourses('');
+    }
+  }
+
+  const customEmail = localStorage.getItem('customUserEmail');
+  const customName  = localStorage.getItem('customUserName');
+
+  if (customEmail) {
+    updateUI(customName, customEmail, null);
+  } else {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
+        updateUI(user.displayName, user.email, photoURL);
+      } else {
+        showLoggedOut();
+      }
+    });
+  }
 
   document.getElementById('photo-input').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const user = auth.currentUser;
     if (!user) return;
-
     try {
       const photoStorageRef = storageRef(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
       await uploadBytes(photoStorageRef, file);
       const photoURL = await getDownloadURL(photoStorageRef);
-
       localStorage.setItem('profilePhoto_' + user.uid, photoURL);
       document.getElementById('profilePhoto').src = photoURL;
-      
       alert('Profile photo updated successfully!');
     } catch (error) {
       console.error('Error uploading photo:', error);
@@ -962,60 +816,179 @@
   });
 
   window.handleLogout = async () => {
-    try {
-      await signOut(auth);
-      alert('Logged out successfully!');
-      window.location.reload();
-    } catch (error) {
-      alert('Error logging out!');
-    }
+    localStorage.removeItem('customUserEmail');
+    localStorage.removeItem('customUserName');
+    try { await signOut(auth); } catch (error) {}
+    alert('Logged out successfully!');
+    window.location.reload();
   };
+</script>
+
+<script>
+// -------------------------------------------------------------
+// PAYMENT SDK & ENROLLMENT LOGIC (FRONTEND)
+// -------------------------------------------------------------
+
+const cashfree = Cashfree({
+    mode: "sandbox", // Live hone par isko "production" kar dena
+});
+
+window.enrollCourse = async function(courseId, price) {
+    const customEmail = localStorage.getItem('customUserEmail');
+    const userEmailText = document.getElementById('userEmail').textContent;
+    const emailToUse = customEmail || userEmailText;
+
+    if (!emailToUse || document.getElementById('userProfile').style.display === 'none') {
+        alert("Please Login / Sign Up first to buy this course.");
+        window.location.href = 'login.html';
+        return;
+    }
+
+    try {
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = "Processing...";
+        btn.disabled = true;
+
+        // 1. Order Create karna
+        const response = await fetch("https://premind.diplomawallah.in/create_order.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                email: emailToUse, 
+                course_id: courseId, 
+                price: price 
+            })
+        });
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+
+        if (data.payment_session_id) {
+            let checkoutOptions = {
+                paymentSessionId: data.payment_session_id,
+                redirectTarget: "_modal", 
+            };
+            
+            // 2. Cashfree Popup Kholna
+            cashfree.checkout(checkoutOptions).then((result) => {
+                if(result.error){
+                    alert("Payment Failed: " + result.error.message);
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+                if(result.paymentDetails){
+                    
+                    // 💥 YAHAN MAIN JADOO HOTA HAI 💥
+                    // Payment success hote hi background mein verification start
+                    btn.innerText = "Verifying...";
+                    
+                    fetch(`https://premind.diplomawallah.in/verify_payment.php?order_id=${data.order_id}&course_id=${courseId}&email=${emailToUse}`)
+                    .then(res => res.json())
+                    .then(verifyData => {
+                        if(verifyData.status === 'success') {
+                            alert("🎉 Payment Successful! Course is now added to your account.");
+                            // UI refresh karke "Access Now" dikhayega bina page ghume
+                            window.loadCourses(emailToUse);
+                        } else {
+                            alert("Payment verification failed.");
+                            btn.innerText = originalText;
+                            btn.disabled = false;
+                        }
+                    })
+                    .catch(err => {
+                        // Agar connection tut jaye par cashfree se success ho
+                        window.loadCourses(emailToUse);
+                    });
+                }
+            });
+        } else {
+            alert("Error initializing payment.");
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+
+    } catch (error) {
+        alert("Connection issue. Please try again.");
+    }
+}
+
+window.loadCourses = async function(userEmail = '') {
+    try {
+        const container = document.getElementById('dynamic-products-container');
+        container.innerHTML = '<p style="text-align:center; width:100%;">Loading Premium Store...</p>';
+
+        const apiUrl = userEmail ? `https://premind.diplomawallah.in/api.php?email=${encodeURIComponent(userEmail)}` : 'https://premind.diplomawallah.in/api.php'; 
+        
+        const response = await fetch(apiUrl);
+        const courses = await response.json();
+        container.innerHTML = ''; 
+
+        if(courses.length === 0) {
+            container.innerHTML = '<p style="text-align:center; width:100%;">No courses available right now.</p>';
+            return;
+        }
+
+        courses.forEach(course => {
+            let badgeHTML = course.badge ? `<span class="new-badge">${course.badge}</span>` : '';
+            let desc1HTML = course.desc1 ? `<p>${course.desc1}</p>` : '';
+            let desc2HTML = course.desc2 ? `<p>${course.desc2}</p>` : '';
+            let oldPriceHTML = course.old_price ? `<span>₹${course.old_price}</span>` : '';
+            let btnHTML = '';
+
+            // Check DB to display appropriate button
+            if (course.is_enrolled == 1) {
+                btnHTML = `<button style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.location.href='lecture.html?id=${course.id}'">Access Now 🎓</button>`;
+            } else {
+                if(course.btn_type === 'disabled_look') {
+                    btnHTML = `<button class="disabled-btn">${course.btn_text}</button>`;
+                } else if (course.btn_type === 'preview_buy') {
+                    btnHTML = `
+                        <button style="background: transparent; color: #111; border: 2px solid #111; padding: 5px; border-radius: 8px; font-weight: bold; margin-bottom: 10px; cursor: pointer; width: 100%;" onclick="window.open('${course.demo_link}', '_blank')">Preview (Demo)</button>
+                        <button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.enrollCourse(${course.id}, ${course.price})">${course.btn_text}</button>
+                    `;
+                } else if (course.btn_type === 'disabled') {
+                    btnHTML = `<button class="disabled-btn" disabled>${course.btn_text}</button>`;
+                } else {
+                    btnHTML = `<button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.enrollCourse(${course.id}, ${course.price})">${course.btn_text}</button>`;
+                }
+            }
+
+            const cardHTML = `
+                <div class="course-card">
+                  <img src="${course.image}" alt="${course.title}" onerror="this.src='small-logo.png'"/>
+                  ${badgeHTML}
+                  <h2>${course.title}</h2>
+                  ${desc1HTML}
+                  ${desc2HTML}
+                  <p class="price">₹${course.price}${oldPriceHTML}</p>
+                  ${btnHTML}
+                </div>
+            `;
+            container.innerHTML += cardHTML;
+        });
+    } catch (error) {
+        document.getElementById('dynamic-products-container').innerHTML = '<p style="text-align:center; width:100%; color:red;">Database Connection Error.</p>';
+    }
+}
 </script>
 
 <script>
   document.getElementById("whForm").addEventListener("submit", function(e){
     e.preventDefault();
-
     const name = encodeURIComponent(document.getElementById("name").value);
     const phone = encodeURIComponent(document.getElementById("phone").value);
     const msg = encodeURIComponent(document.getElementById("message").value);
-
-    const owner = "918102525609";
-    const text = `Name: ${name}%0APhone: ${phone}%0AMessage: ${msg}`;
-    const url = `https://wa.me/${owner}?text=${text}`;
-
-    window.open(url, "_blank");
+    window.open(`https://wa.me/918102525609?text=Name: ${name}%0APhone: ${phone}%0AMessage: ${msg}`, "_blank");
   });
 
   const menuBtn = document.getElementById("menu-btn");
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("overlay");
-
-  menuBtn.addEventListener("click", () => {
-    sidebar.classList.add("active");
-    overlay.classList.add("active");
-  });
-
-  overlay.addEventListener("click", () => {
-    sidebar.classList.remove("active");
-    overlay.classList.remove("active");
-  });
-
+  menuBtn.addEventListener("click", () => { sidebar.classList.add("active"); overlay.classList.add("active"); });
+  overlay.addEventListener("click", () => { sidebar.classList.remove("active"); overlay.classList.remove("active"); });
   document.querySelectorAll(".sidebar ul li a").forEach(link => {
-    link.addEventListener("click", () => {
-      sidebar.classList.remove("active");
-      overlay.classList.remove("active");
-    });
-  });
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    document.querySelectorAll('.sidebar ul li a').forEach(link => {
-      const linkHref = link.getAttribute('href');
-      if (linkHref === currentPage) {
-        link.classList.add('active-sidebar');
-      }
-    });
+    link.addEventListener("click", () => { sidebar.classList.remove("active"); overlay.classList.remove("active"); });
   });
 </script>
 
