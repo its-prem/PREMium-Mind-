@@ -700,7 +700,7 @@ Screenshots from other groups or personal chats will be rejected.</p>
       <input type="text" id="wa_branch" class="wa-input" placeholder="e.g. Mechanical" required>
       <div style="background:#e8f5e9; padding:15px; border-radius:12px; text-align:center; margin-bottom:20px; border: 1px dashed #22c55e;">
         <p style="font-size:11px; color:#15803d; margin-bottom:8px; font-weight:600;">STEP 1: Share Link to WhatsApp Group</p>
-        <a href="https://wa.me/?text=Check+out+this+amazing+notes+platform:+https://premind.diplomawallah.in" target="_blank" style="text-decoration:none; background:#22c55e; color:white; padding:8px 15px; border-radius:8px; font-weight:700; font-size:13px; display:inline-block;">📱 Click to Share</a>
+        <a href="https://wa.me/?text=%F0%9F%8E%93%20DIPLOMA%20WALLAH%20%E2%80%93%20Biggest%20Platform%20for%20Diploma%20Students%0A%0A%F0%9F%93%9A%20Yahan%20aapko%20milega%3A%0A%E2%80%A2%20Latest%20information%20without%20any%20delay%0A%E2%80%A2%20Proper%20guidance%20throughout%20your%20diploma%20journey%0A%E2%80%A2%20Complete%20notes%20for%20subjects%0A%E2%80%A2%20PYQ%20%28Previous%20Year%20Questions%29%0A%E2%80%A2%20Exam%20important%20questions%0A%E2%80%A2%20Helpful%20resources%20for%20better%20preparation%0A%0A%F0%9F%92%A1%20Agar%20aap%20diploma%20kar%20rahe%20hain%2C%20to%20ye%20group%20aapki%20study%20aur%20preparation%20me%20bahut%20help%20karega.%0A%0A%F0%9F%9A%80%20Abhi%20join%20karein%20aur%20hamari%20family%20ka%20hissa%20banei%21%0A%0A%F0%9F%94%97%20Group%20Link%3A%0Ahttps%3A%2F%2Fchat.whatsapp.com%2FKpGfetOB0oiHvlgfKhPOUd%3Fmode%3Dhq1tcla" target="_blank" style="text-decoration:none; background:#22c55e; color:white; padding:8px 15px; border-radius:8px; font-weight:700; font-size:13px; display:inline-block;">📱 Click to Share</a>
       </div>
       <label style="font-size:12px; font-weight:600;">STEP 2: Upload Share Screenshot*</label>
       <input type="file" id="wa_file" accept="image/*" required style="margin-bottom:20px; font-size:12px; width: 100%;">
@@ -1073,7 +1073,7 @@ window.loadCourses = async function(userEmail = '') {
           const res = await fetch('https://premind.diplomawallah.in/submit_review.php', { method: 'POST', body: fd });
           const data = await res.json();
           if(data.status === 'success') {
-              alert("✅ Submitted Successfully! Please wait 12-24 hours for review.");
+              alert("✅ Submitted Successfully! Please wait 2-4 hours for review.");
               window.location.reload();
           } else { 
               alert("Error: " + data.message); 
