@@ -580,19 +580,40 @@
       .hero-section h1 {
         font-size: 2.2rem;
       }
-
       .hero-section p {
         font-size: 1.1rem;
       }
-
       .cta-buttons {
         flex-direction: column;
       }
-
       .cta-btn {
         width: 100%;
       }
     }
+
+    /* --- 💥 NEW WHATSAPP MODAL & BUTTON STYLES 💥 --- */
+    .wa-unlock-btn {
+        width: 100%; background: #f0fdf4; color: #15803d; border: 1.5px dashed #22c55e;
+        padding: 10px; border-radius: 8px; font-weight: 700; font-size: 0.85rem;
+        cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
+        transition: 0.3s; margin-bottom: 10px;
+    }
+    .wa-unlock-btn:hover { background: #dcfce7; transform: translateY(-2px); }
+
+    .btn-reviewing {
+        width: 100%; background: #94a3b8 !important; color: white !important; 
+        border: none !important; padding: 12px; border-radius: 8px; cursor: not-allowed !important;
+        font-weight: bold; margin-bottom: 10px;
+    }
+
+    .wa-modal {
+        display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); 
+        z-index: 10001; align-items:center; justify-content:center; padding:15px;
+        backdrop-filter: blur(5px);
+    }
+    .wa-content { background:white; width:100%; max-width:400px; padding:30px; border-radius:20px; position:relative; }
+    .wa-input { width:100%; padding:12px; margin-bottom:15px; border:1.5px solid #eee; border-radius:10px; outline:none; font-family: 'Poppins'; box-sizing: border-box; }
+    .wa-submit-btn { width:100%; padding:14px; background:#000; color:#fff; border:none; border-radius:12px; font-weight:700; cursor:pointer; }
   </style>
 
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
@@ -664,6 +685,28 @@
       <p style="text-align: center; width: 100%;">Loading Premium Store...</p>
   </div>
 </section>
+
+<div id="waModal" class="wa-modal">
+  <div class="wa-content">
+    <span onclick="document.getElementById('waModal').style.display='none'" style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
+    <h3 style="margin-bottom:8px; font-size:1.4rem;">Unlock for Free 🎁</h3>
+    <p style="font-size:13px; color:#666; margin-bottom:20px;">Share to a WhatsApp Group & upload screenshot.</p>
+    <form id="waForm">
+      <input type="hidden" id="wa_cid">
+      <label style="font-size:12px; font-weight:600;">College Name*</label>
+      <input type="text" id="wa_college" class="wa-input" placeholder="e.g. Govt Polytechnic" required>
+      <label style="font-size:12px; font-weight:600;">Branch*</label>
+      <input type="text" id="wa_branch" class="wa-input" placeholder="e.g. Mechanical" required>
+      <div style="background:#e8f5e9; padding:15px; border-radius:12px; text-align:center; margin-bottom:20px; border: 1px dashed #22c55e;">
+        <p style="font-size:11px; color:#15803d; margin-bottom:8px; font-weight:600;">STEP 1: Share Link to WhatsApp Group</p>
+        <a href="https://wa.me/?text=Check+out+this+amazing+notes+platform:+https://premind.diplomawallah.in" target="_blank" style="text-decoration:none; background:#22c55e; color:white; padding:8px 15px; border-radius:8px; font-weight:700; font-size:13px; display:inline-block;">📱 Click to Share</a>
+      </div>
+      <label style="font-size:12px; font-weight:600;">STEP 2: Upload Share Screenshot*</label>
+      <input type="file" id="wa_file" accept="image/*" required style="margin-bottom:20px; font-size:12px; width: 100%;">
+      <button type="submit" id="waSubmit" class="wa-submit-btn">Submit for Review →</button>
+    </form>
+  </div>
+</div>
 
 <footer class="footer">
   <div class="footer-container">
@@ -879,8 +922,6 @@ window.enrollCourse = async function(courseId, price) {
                 }
                 if(result.paymentDetails){
                     
-                    // 💥 YAHAN MAIN JADOO HOTA HAI 💥
-                    // Payment success hote hi background mein verification start
                     btn.innerText = "Verifying...";
                     
                     fetch(`https://premind.diplomawallah.in/verify_payment.php?order_id=${data.order_id}&course_id=${courseId}&email=${emailToUse}`)
@@ -888,7 +929,6 @@ window.enrollCourse = async function(courseId, price) {
                     .then(verifyData => {
                         if(verifyData.status === 'success') {
                             alert("🎉 Payment Successful! Course is now added to your account.");
-                            // UI refresh karke "Access Now" dikhayega bina page ghume
                             window.loadCourses(emailToUse);
                         } else {
                             alert("Payment verification failed.");
@@ -897,7 +937,6 @@ window.enrollCourse = async function(courseId, price) {
                         }
                     })
                     .catch(err => {
-                        // Agar connection tut jaye par cashfree se success ho
                         window.loadCourses(emailToUse);
                     });
                 }
@@ -936,10 +975,14 @@ window.loadCourses = async function(userEmail = '') {
             let oldPriceHTML = course.old_price ? `<span>₹${course.old_price}</span>` : '';
             let btnHTML = '';
 
-            // Check DB to display appropriate button
+            // 🔥 LOGIC TO DISPLAY APPROPRIATE BUTTONS 🔥
             if (course.is_enrolled == 1) {
                 btnHTML = `<button style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.location.href='lecture.html?id=${course.id}'">Access Now 🎓</button>`;
+            } else if (course.req_status === 'pending') {
+                btnHTML = `<button class="btn-reviewing" disabled>Reviewing... ⏳</button>`;
             } else {
+                
+                // Standard Logic mapping based on database type
                 if(course.btn_type === 'disabled_look') {
                     btnHTML = `<button class="disabled-btn">${course.btn_text}</button>`;
                 } else if (course.btn_type === 'preview_buy') {
@@ -951,6 +994,33 @@ window.loadCourses = async function(userEmail = '') {
                     btnHTML = `<button class="disabled-btn" disabled>${course.btn_text}</button>`;
                 } else {
                     btnHTML = `<button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.enrollCourse(${course.id}, ${course.price})">${course.btn_text}</button>`;
+                }
+
+                // 💥 TARGET ONLY "PROFESSION" OR "SKILLS" RELATED COURSE FOR WHATSAPP BUTTON 💥
+                let courseName = course.title.toLowerCase();
+                if (courseName.includes('profession') || courseName.includes('skill')) {
+                    
+                    // Agar Preview wala course hai, toh WhatsApp aur Preview ko side-by-side (ik line) mein kar do
+                    if (course.btn_type === 'preview_buy') {
+                        btnHTML = `
+                            <div style="display: flex; gap: 8px; margin-bottom: 10px; width: 100%;">
+                                <button style="flex: 1; background: transparent; color: #111; border: 1.5px solid #111; padding: 6px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;" onclick="window.open('${course.demo_link}', '_blank')">Preview</button>
+                                
+                                <button class="wa-unlock-btn" style="flex: 1; margin-bottom: 0; padding: 6px; border-radius: 6px; font-size: 13px;" onclick="openWaModal(${course.id})">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:14px !important; height:14px !important; margin-bottom:0 !important; display:inline-block; border-radius:0 !important;"> WA Unlock
+                                </button>
+                            </div>
+                            <button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.enrollCourse(${course.id}, ${course.price})">${course.btn_text}</button>
+                        `;
+                    } else {
+                        // Agar simple Buy Now course hai, to normal uper WhatsApp Button lagayenge
+                        let waBtn = `
+                            <button class="wa-unlock-btn" onclick="openWaModal(${course.id})">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:18px !important; height:18px !important; margin-bottom:0 !important; display:inline-block; border-radius:0 !important;"> Unlock via WhatsApp
+                            </button>
+                        `;
+                        btnHTML = waBtn + btnHTML;
+                    }
                 }
             }
 
@@ -974,6 +1044,46 @@ window.loadCourses = async function(userEmail = '') {
 </script>
 
 <script>
+  // 💥 WHATSAPP MODAL LOGIC 💥
+  function openWaModal(cid) {
+      if(!localStorage.getItem('customUserEmail')) {
+          alert("Please login first to unlock via WhatsApp!"); 
+          window.location.href = 'login.html'; 
+          return;
+      }
+      document.getElementById('wa_cid').value = cid;
+      document.getElementById('waModal').style.display = 'flex';
+  }
+
+  document.getElementById('waForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('waSubmit');
+      btn.innerText = "Processing..."; btn.disabled = true;
+
+      const fd = new FormData();
+      fd.append('email', localStorage.getItem('customUserEmail'));
+      fd.append('phone', localStorage.getItem('customUserPhone') || '0000000000');
+      fd.append('course_id', document.getElementById('wa_cid').value);
+      fd.append('college', document.getElementById('wa_college').value);
+      fd.append('branch', document.getElementById('wa_branch').value);
+      fd.append('screenshot', document.getElementById('wa_file').files[0]);
+
+      try {
+          const res = await fetch('https://premind.diplomawallah.in/submit_review.php', { method: 'POST', body: fd });
+          const data = await res.json();
+          if(data.status === 'success') {
+              alert("✅ Submitted Successfully! Please wait 12-24 hours for review.");
+              window.location.reload();
+          } else { 
+              alert("Error: " + data.message); 
+          }
+      } catch (error) { 
+          alert("Server Error. Please try again later."); 
+      }
+      btn.innerText = "Submit for Review →"; btn.disabled = false;
+  };
+
+  // Footer WhatsApp Contact Form logic
   document.getElementById("whForm").addEventListener("submit", function(e){
     e.preventDefault();
     const name = encodeURIComponent(document.getElementById("name").value);
@@ -990,6 +1100,7 @@ window.loadCourses = async function(userEmail = '') {
   document.querySelectorAll(".sidebar ul li a").forEach(link => {
     link.addEventListener("click", () => { sidebar.classList.remove("active"); overlay.classList.remove("active"); });
   });
+
 </script>
 
 </body>
