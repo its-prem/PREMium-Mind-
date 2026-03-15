@@ -5,206 +5,288 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Login / Sign Up - PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
+    /* ── Animated Premium Background ── */
     body {
-      background: linear-gradient(135deg, #000000 0%, #434343 100%);
-      min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 15px;
+      background: linear-gradient(-45deg, #0f172a, #1e293b, #000000, #334155);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
+    /* ── Main Container with Float Animation ── */
+    .auth-wrapper {
+      background: white; width: 100%; max-width: 900px; border-radius: 24px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.25); overflow: hidden; display: flex; position: relative;
+      animation: slideUpFade 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    /* Entry Animations */
+    @keyframes slideUpFade {
+      0% { opacity: 0; transform: translateY(40px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-enter { animation: screenFadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+    @keyframes screenFadeIn {
+      0% { opacity: 0; transform: translateX(20px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ── Left Side (Branding for PC) ── */
+    .auth-banner {
+      flex: 1.2; background: linear-gradient(135deg, #000 0%, #222 100%); color: white;
+      padding: 50px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .auth-banner::after {
+      content: ''; position: absolute; width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.05) 10%, transparent 20%);
+      background-size: 20px 20px; opacity: 0.5; animation: moveBg 20s linear infinite;
+    }
+    @keyframes moveBg { 100% { transform: translateY(-50px); } }
+    
+    .auth-banner img { width: 110px; margin-bottom: 25px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); z-index: 2; transition: transform 0.5s ease;}
+    .auth-banner img:hover { transform: scale(1.05); }
+    .auth-banner h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 15px; line-height: 1.2; z-index: 2; }
+    .auth-banner p { font-size: 1rem; color: #cbd5e1; line-height: 1.6; z-index: 2; }
+
+    /* ── Right Side (Forms) ── */
     .auth-container {
-      background: white; width: 100%; max-width: 420px; border-radius: 20px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.3); overflow: hidden; padding: 40px 35px; position: relative;
+      flex: 1; padding: 45px 40px; position: relative; background: #fff; width: 100%; margin: 0 auto;
     }
 
-    .logo-container { text-align: center; margin-bottom: 25px; }
-    .logo-container img { width: 55px; margin-bottom: 10px; }
-    .logo-container h2 { font-size: 1.4rem; font-weight: 700; color: #000; }
+    /* Mobile Logo */
+    .mobile-logo { display: none; text-align: center; margin-bottom: 25px; animation: slideUpFade 0.5s ease; }
+    .mobile-logo img { width: 55px; margin-bottom: 8px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));}
+    .mobile-logo h2 { font-size: 1.4rem; font-weight: 800; color: #111; }
 
-    .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #eee; }
-    .tab { flex: 1; text-align: center; padding: 12px 10px; cursor: pointer; font-weight: 600; color: #888; transition: all 0.3s ease; font-size: 0.95rem; }
-    .tab.active { color: #000; border-bottom: 3px solid #000; }
+    /* ── Tabs (Animated) ── */
+    .tabs { display: flex; margin-bottom: 30px; position: relative; background: #f1f5f9; border-radius: 12px; padding: 4px; }
+    .tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; font-weight: 600; color: #64748b; transition: all 0.3s ease; font-size: 0.95rem; border-radius: 10px; z-index: 2; }
+    .tab.active { color: #111; }
+    .tab-slider { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; }
+    .tabs[data-active="register"] .tab-slider { transform: translateX(100%); }
 
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: #444; font-weight: 600; }
-    .form-group input { width: 100%; padding: 14px 15px; border: 1.5px solid #ddd; border-radius: 10px; font-size: 0.95rem; transition: border-color 0.3s; }
-    .form-group input:focus { outline: none; border-color: #000; }
+    /* ── Forms ── */
+    .form-group { margin-bottom: 18px; position: relative; }
+    .form-group label { display: block; margin-bottom: 6px; font-size: 0.8rem; color: #475569; font-weight: 600; transition: 0.3s; }
+    .form-group input { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem; transition: all 0.3s ease; background: #f8fafc; color:#1e293b; box-sizing: border-box;}
+    .form-group input:focus { outline: none; border-color: #111; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transform: translateY(-1px); }
+    .form-group input:focus + label { color: #111; }
 
+    /* Buttons with click effect */
     .auth-btn {
-      width: 100%; padding: 14px; background: linear-gradient(135deg, #000 0%, #333 100%);
-      color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700;
-      cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; margin-top: 5px;
+      width: 100%; padding: 15px; background: linear-gradient(135deg, #111 0%, #000 100%);
+      color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700;
+      cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); margin-top: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-    .auth-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+    .auth-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+    .auth-btn:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .auth-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    .divider { display: flex; align-items: center; text-align: center; margin: 20px 0; color: #aaa; }
-    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #eee; }
-    .divider span { padding: 0 10px; font-size: 0.8rem; font-weight: 600; }
+    .divider { display: flex; align-items: center; text-align: center; margin: 25px 0; color: #94a3b8; }
+    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #e2e8f0; }
+    .divider span { padding: 0 12px; font-size: 0.8rem; font-weight: 600; }
 
     .google-login-btn {
-      width: 100%; background: #ffffff; color: #333; border: 1.5px solid #ddd;
-      padding: 13px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.95rem;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+      width: 100%; background: #fff; color: #1e293b; border: 2px solid #e2e8f0;
+      padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 0.95rem;
+      display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s ease;
     }
-    .google-login-btn img { width: 20px; height: 20px; }
-    .google-login-btn:hover { background: #f8f9fa; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-color: #ccc; }
+    .google-login-btn img { width: 22px; height: 22px; }
+    .google-login-btn:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.05); }
+    .google-login-btn:active { transform: translateY(0); }
 
-    .message { text-align: center; margin-top: 15px; font-size: 0.85rem; display: none; padding: 10px; border-radius: 8px; font-weight: 600; }
-    .error { color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; }
-    .success { color: #16a34a; background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .message { text-align: center; margin-top: 15px; font-size: 0.85rem; display: none; padding: 12px; border-radius: 10px; font-weight: 600; animation: screenFadeIn 0.3s ease; }
+    .error { color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; }
+    .success { color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; }
 
-    #registerForm, #otpForm { display: none; }
+    #registerForm, #otpForm, #forgotScreen, #resetScreen { display: none; }
 
-    .back-btn { text-align: center; margin-top: 20px; display: block; color: #666; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
-    .back-btn:hover { color: #000; text-decoration: underline; }
+    .back-btn { text-align: center; margin-top: 20px; display: block; color: #64748b; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: 0.3s; }
+    .back-btn:hover { color: #111; text-decoration: underline; }
 
-    .forgot-link { text-align: right; margin-bottom: 8px; }
-    .forgot-link a { font-size: 0.8rem; color: #666; text-decoration: none; font-weight: 600; cursor: pointer; }
-    .forgot-link a:hover { color: #000; text-decoration: underline; }
+    .forgot-link { text-align: right; margin-bottom: 12px; }
+    .forgot-link a { font-size: 0.8rem; color: #64748b; text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.3s; }
+    .forgot-link a:hover { color: #111; }
 
-    #forgotScreen, #resetScreen { display: none; }
     .screen-header { text-align: center; margin-bottom: 25px; }
-    .screen-header .icon { font-size: 2.5rem; display: block; margin-bottom: 8px; }
-    .screen-header h3 { font-size: 1.3rem; font-weight: 800; }
-    .screen-header p { font-size: 0.85rem; color: #888; margin-top: 5px; line-height: 1.4; }
+    .screen-header .icon { font-size: 3rem; display: block; margin-bottom: 8px; animation: pulse 2s infinite; }
+    .screen-header h3 { font-size: 1.4rem; font-weight: 800; color: #111;}
+    .screen-header p { font-size: 0.85rem; color: #64748b; margin-top: 5px; line-height: 1.5;}
 
-    /* Mobile View Adjustments */
-    @media (max-width: 480px) {
-      .auth-container { padding: 30px 20px; border-radius: 15px; }
-      .logo-container img { width: 45px; }
-      .logo-container h2 { font-size: 1.25rem; }
-      .form-group input { padding: 12px 14px; font-size: 0.9rem; }
-      .auth-btn, .google-login-btn { padding: 12px; font-size: 0.95rem; }
+    /* ── COMPACT MOBILE VIEW OPTIMIZATION ── */
+    @media (max-width: 768px) {
+      body { padding: 15px; }
+      .auth-wrapper { flex-direction: column; max-width: 400px; border-radius: 20px; }
+      .auth-banner { display: none; } /* Hide side banner on phones */
+      
+      .mobile-logo { display: block; margin-bottom: 15px; } 
+      .mobile-logo img { width: 45px; margin-bottom: 4px; }
+      .mobile-logo h2 { font-size: 1.2rem; }
+      
+      .auth-container { padding: 25px 20px; border-radius: 20px; }
+      
+      .tabs { margin-bottom: 15px; }
+      .tab { padding: 8px; font-size: 0.85rem; }
+      
+      .form-group { margin-bottom: 12px; }
+      .form-group label { margin-bottom: 4px; font-size: 0.75rem; }
+      .form-group input { padding: 10px 14px; font-size: 0.85rem; border-radius: 10px; }
+      
+      .auth-btn, .google-login-btn { padding: 12px; font-size: 0.9rem; border-radius: 10px; margin-top: 0; }
+      .google-login-btn img { width: 18px; height: 18px; }
+      
+      .divider { margin: 15px 0; }
+      
+      .screen-header { margin-bottom: 15px; }
+      .screen-header .icon { font-size: 2.2rem; margin-bottom: 5px; }
+      .screen-header h3 { font-size: 1.2rem; }
+      
+      .back-btn { margin-top: 15px; padding-top: 12px; }
     }
   </style>
 </head>
 <body>
 
-<div class="auth-container">
-  <div class="logo-container">
-    <img src="small-logo.png" alt="Logo" onerror="this.src='https://ui-avatars.com/api/?name=PM&background=000&color=fff'">
-    <h2>PREMium Mind</h2>
+<div class="auth-wrapper">
+  <div class="auth-banner">
+    <img src="small-logo.png" alt="PREMium Mind" onerror="this.src='https://ui-avatars.com/api/?name=PM&background=000&color=fff'">
+    <h1>PREMium Mind</h1>
+    <p>Unlock premium study materials, notes, and expert courses designed for your success.</p>
   </div>
 
-  <div id="mainScreen">
-    <div class="tabs" id="authTabs">
-      <div class="tab active" id="loginTab" onclick="switchTab('login')">Login</div>
-      <div class="tab" id="registerTab" onclick="switchTab('register')">Sign Up</div>
+  <div class="auth-container">
+    
+    <div class="mobile-logo">
+      <img src="small-logo.png" alt="Logo" onerror="this.src='https://ui-avatars.com/api/?name=PM&background=000&color=fff'">
+      <h2>PREMium Mind</h2>
     </div>
 
-    <form id="loginForm">
-      <div class="form-group">
-        <label>Email Address</label>
-        <input type="email" id="loginEmail" required placeholder="Enter your email">
+    <div id="mainScreen" class="animate-enter">
+      <div class="tabs" id="authTabs" data-active="login">
+        <div class="tab-slider"></div>
+        <div class="tab active" id="loginTab" onclick="switchTab('login')">Login</div>
+        <div class="tab" id="registerTab" onclick="switchTab('register')">Sign Up</div>
       </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="loginPassword" required placeholder="Enter password">
-      </div>
-      <div class="forgot-link"><a onclick="showScreen('forgotScreen')">Forgot Password?</a></div>
-      <button type="submit" class="auth-btn" id="loginBtn">Login with Email</button>
 
-      <div class="divider"><span>OR</span></div>
+      <form id="loginForm" class="animate-enter">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="loginEmail" required placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" required placeholder="Enter password">
+        </div>
+        <div class="forgot-link"><a onclick="showScreen('forgotScreen')">Forgot Password?</a></div>
+        
+        <button type="submit" class="auth-btn" id="loginBtn">Login to Continue</button>
 
-      <button type="button" class="google-login-btn" id="googleLoginBtn">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
-        Continue with Google
-      </button>
+        <div class="divider"><span>OR</span></div>
 
-      <div id="loginMsg" class="message"></div>
-    </form>
+        <button type="button" class="google-login-btn" id="googleLoginBtn">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+          Continue with Google
+        </button>
 
-    <form id="registerForm">
-      <div class="form-group">
-        <label>Full Name</label>
-        <input type="text" id="regName" required placeholder="John Doe">
-      </div>
-      <div class="form-group">
-        <label>Email Address</label>
-        <input type="email" id="regEmail" required placeholder="john@example.com">
-      </div>
-      <div class="form-group">
-        <label>Phone Number</label>
-        <input type="tel" id="regPhone" required placeholder="10-digit mobile number" pattern="[0-9]{10}" title="Please enter valid 10 digit number">
-      </div>
-      <div class="form-group">
-        <label>Create Password</label>
-        <input type="password" id="regPassword" required placeholder="Min 6 characters">
-      </div>
-      <button type="submit" class="auth-btn" id="regBtn">Create Account</button>
-      <div id="regMsg" class="message"></div>
-    </form>
-  </div>
+        <div id="loginMsg" class="message"></div>
+      </form>
 
-  <div id="otpForm">
-    <h3 style="text-align:center; margin-bottom:10px;">Verify Your Email</h3>
-    <p style="text-align:center; font-size:0.85rem; color:#666; margin-bottom:20px;">We've sent a 6-digit OTP to your email.</p>
-    <div class="form-group">
-      <label>Enter OTP</label>
-      <input type="text" id="otpInput" required placeholder="123456" maxlength="6"
-             style="text-align:center; font-size:1.3rem; letter-spacing:6px; font-weight:bold;">
+      <form id="registerForm">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="regName" required placeholder="John Doe">
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="regEmail" required placeholder="john@example.com">
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="regPhone" required placeholder="10-digit mobile number" pattern="[0-9]{10}">
+        </div>
+        <div class="form-group">
+          <label>Create Password</label>
+          <input type="password" id="regPassword" required placeholder="Min 6 characters">
+        </div>
+        
+        <button type="submit" class="auth-btn" id="regBtn">Create Account</button>
+        <div id="regMsg" class="message"></div>
+      </form>
     </div>
-    <input type="hidden" id="otpEmail">
-    <button type="button" class="auth-btn" id="otpBtn" onclick="submitOTP()">Verify & Activate</button>
-    <div id="otpMsg" class="message"></div>
-    <a class="back-btn" onclick="showScreen('mainScreen')" style="cursor:pointer;">← Back to Login</a>
-  </div>
 
-  <div id="forgotScreen">
-    <div class="screen-header">
-      <span class="icon">🔑</span>
-      <h3>Forgot Password</h3>
-      <p>Enter your email — we'll send you a reset OTP</p>
+    <div id="otpForm">
+      <div class="screen-header">
+        <span class="icon">✉️</span>
+        <h3>Verify Email</h3>
+        <p>We've sent a 6-digit OTP to <br><b id="displayOtpEmail" style="color:#111;"></b></p>
+      </div>
+      <div class="form-group">
+        <input type="text" id="otpInput" required placeholder="123456" maxlength="6" style="text-align:center; font-size:1.8rem; letter-spacing:10px; font-weight:800; padding:15px;">
+      </div>
+      <input type="hidden" id="otpEmail">
+      <button type="button" class="auth-btn" id="otpBtn" onclick="submitOTP()">Verify & Save Data</button>
+      <div id="otpMsg" class="message"></div>
+      <a class="back-btn" onclick="showScreen('mainScreen')" style="cursor:pointer;">← Change Email</a>
     </div>
-    <form id="forgotForm">
-      <div class="form-group">
-        <label>Email Address</label>
-        <input type="email" id="forgotEmail" required placeholder="you@example.com">
-      </div>
-      <button type="submit" class="auth-btn" id="forgotBtn">Send Reset OTP</button>
-      <div id="forgotMsg" class="message"></div>
-    </form>
-    <a class="back-btn" onclick="showScreen('mainScreen')" style="cursor:pointer;">← Back to Login</a>
-  </div>
 
-  <div id="resetScreen">
-    <div class="screen-header">
-      <span class="icon">🔐</span>
-      <h3>Reset Password</h3>
-      <p>Enter the OTP from your email + new password</p>
+    <div id="forgotScreen">
+      <div class="screen-header">
+        <span class="icon">🔑</span>
+        <h3>Forgot Password</h3>
+        <p>Enter your registered email address.</p>
+      </div>
+      <form id="forgotForm">
+        <div class="form-group">
+          <input type="email" id="forgotEmail" required placeholder="you@example.com">
+        </div>
+        <button type="submit" class="auth-btn" id="forgotBtn">Send Reset OTP</button>
+        <div id="forgotMsg" class="message"></div>
+      </form>
+      <a class="back-btn" onclick="showScreen('mainScreen')" style="cursor:pointer;">← Back to Login</a>
     </div>
-    <form id="resetForm">
-      <div class="form-group">
-        <label>OTP Code</label>
-        <input type="text" id="resetOtp" required maxlength="6" placeholder="123456"
-               style="text-align:center; font-size:1.3rem; letter-spacing:6px; font-weight:bold;">
-      </div>
-      <div class="form-group">
-        <label>New Password</label>
-        <input type="password" id="newPassword" required placeholder="Min 6 characters">
-      </div>
-      <button type="submit" class="auth-btn" id="resetBtn">Reset Password</button>
-      <div id="resetMsg" class="message"></div>
-    </form>
-    <a class="back-btn" onclick="showScreen('mainScreen')" style="cursor:pointer;">← Back to Login</a>
-  </div>
 
-  <a href="index.html" class="back-btn">← Back to Home</a>
+    <div id="resetScreen">
+      <div class="screen-header">
+        <span class="icon">🔐</span>
+        <h3>Reset Password</h3>
+        <p>Check your email for the OTP code.</p>
+      </div>
+      <form id="resetForm">
+        <div class="form-group">
+          <label>OTP Code</label>
+          <input type="text" id="resetOtp" required maxlength="6" placeholder="123456" style="text-align:center; font-size:1.5rem; letter-spacing:8px; font-weight:800;">
+        </div>
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" id="newPassword" required placeholder="Min 6 characters">
+        </div>
+        <button type="submit" class="auth-btn" id="resetBtn">Update Password</button>
+        <div id="resetMsg" class="message"></div>
+      </form>
+      <a class="back-btn" onclick="showScreen('mainScreen')" style="cursor:pointer;">← Back to Login</a>
+    </div>
+
+    <a href="index.html" class="back-btn" style="margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px;">← Back to Home</a>
+  </div>
 </div>
 
 <script type="module">
   import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-  import { getAuth, GoogleAuthProvider, signInWithPopup }
-                              from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
   const firebaseConfig = {
     apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
     authDomain: "premium-mind-fcb16.firebaseapp.com",
-    databaseURL: "https://premium-mind-fcb16-default-rtdb.firebaseio.com",
     projectId: "premium-mind-fcb16",
     storageBucket: "premium-mind-fcb16.firebasestorage.app",
     messagingSenderId: "864874199521",
@@ -220,11 +302,10 @@
     googleBtn.addEventListener('click', async () => {
       const originalBtnContent = googleBtn.innerHTML;
       try {
-        googleBtn.textContent = 'Verifying account...';
+        googleBtn.textContent = 'Verifying...';
         const result = await signInWithPopup(auth, provider);
         const user   = result.user;
 
-        // NEW LOGIC: Check if user exists in Database before allowing login
         const fd = new FormData();
         fd.append('email', user.email);
 
@@ -232,28 +313,20 @@
         const checkData = await checkRes.json();
 
         if (checkData.exists) {
-          // User verified, login successful
           localStorage.setItem('customUserEmail', user.email);
           localStorage.setItem('customUserName',  user.displayName || 'User');
+          localStorage.setItem('customUserPhone', checkData.phone || '0000000000');
           window.location.href = 'index.html';
         } else {
-          // User not found in DB -> Sign out from Firebase immediately
           await auth.signOut();
-          
-          alert('Aapka account system mein nahi mila. Kripya pehle Sign Up karein.');
-          
+          alert('Account not found in our database. Please Sign Up first.');
           googleBtn.innerHTML = originalBtnContent;
-          
-          // Redirect UI to Sign Up tab
-          document.getElementById('regEmail').value = user.email; // Pre-fill email for convenience
+          document.getElementById('regEmail').value = user.email;
           document.getElementById('regName').value = user.displayName || '';
           window.switchTab('register'); 
         }
       } catch (error) {
-        console.error(error);
-        if(error.code !== 'auth/popup-closed-by-user') {
-          alert('Google login failed: ' + error.message);
-        }
+        if(error.code !== 'auth/popup-closed-by-user') alert('Google login failed.');
         googleBtn.innerHTML = originalBtnContent;
       }
     });
@@ -264,18 +337,39 @@
   const BASE_URL    = 'https://premind.diplomawallah.in';
   let   pendingEmail = '';
 
-  // ── Screen switcher ──
+  // ── Screen switcher with Smooth Animation ──
   window.showScreen = function(screenId) {
     ['mainScreen','otpForm','forgotScreen','resetScreen'].forEach(id => {
-      document.getElementById(id).style.display = (id === screenId) ? 'block' : 'none';
+      const el = document.getElementById(id);
+      if (id === screenId) {
+        el.style.display = 'block';
+        el.classList.add('animate-enter');
+      } else {
+        el.style.display = 'none';
+        el.classList.remove('animate-enter');
+      }
     });
   }
 
+  // ── Tab Switcher with Slider Animation ──
   window.switchTab = function(tab) {
+    const tabsContainer = document.getElementById('authTabs');
+    tabsContainer.setAttribute('data-active', tab);
+    
     document.getElementById('loginForm').style.display    = tab === 'login'    ? 'block' : 'none';
     document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+    
+    if (tab === 'login') {
+      document.getElementById('loginForm').classList.add('animate-enter');
+      document.getElementById('registerForm').classList.remove('animate-enter');
+    } else {
+      document.getElementById('registerForm').classList.add('animate-enter');
+      document.getElementById('loginForm').classList.remove('animate-enter');
+    }
+
     document.getElementById('loginTab').classList.toggle('active',    tab === 'login');
     document.getElementById('registerTab').classList.toggle('active', tab === 'register');
+    
     document.getElementById('loginMsg').style.display = 'none';
     document.getElementById('regMsg').style.display   = 'none';
   }
@@ -287,7 +381,7 @@
     el.className     = 'message ' + (isError ? 'error' : 'success');
   }
 
-  // ══ 1. REGISTER ══
+  // ══ 1. REGISTER (TEMPORARY SAVE & SEND OTP) ══
   document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('regBtn');
@@ -306,20 +400,21 @@
       if (data.status === 'success') {
         pendingEmail = document.getElementById('regEmail').value;
         document.getElementById('otpEmail').value = pendingEmail;
+        document.getElementById('displayOtpEmail').innerText = pendingEmail;
         showScreen('otpForm');
         showMessage('otpMsg', data.message, false);
       } else {
         showMessage('regMsg', data.message, true);
       }
-    } catch { showMessage('regMsg', 'Network error. Please try again.', true); }
+    } catch { showMessage('regMsg', 'Network error.', true); }
 
     btn.textContent = 'Create Account'; btn.disabled = false;
   });
 
-  // ══ 2. OTP VERIFY ══
+  // ══ 2. OTP VERIFY (FINAL DATABASE INSERT) ══
   window.submitOTP = function() {
     const btn = document.getElementById('otpBtn');
-    btn.textContent = 'Verifying...'; btn.disabled = true;
+    btn.textContent = 'Verifying & Saving...'; btn.disabled = true;
 
     const formData = new FormData();
     formData.append('email', document.getElementById('otpEmail').value);
@@ -329,7 +424,7 @@
       .then(r => r.json())
       .then(data => {
         if (data.status === 'success') {
-          alert('Account verified successfully! Please login.');
+          alert('✅ Account created successfully! Please login now.');
           showScreen('mainScreen');
           switchTab('login');
         } else {
@@ -337,7 +432,7 @@
         }
       })
       .catch(() => showMessage('otpMsg', 'Network error.', true))
-      .finally(() => { btn.textContent = 'Verify & Activate'; btn.disabled = false; });
+      .finally(() => { btn.textContent = 'Verify & Save Data'; btn.disabled = false; });
   }
 
   // ══ 3. LOGIN ══
@@ -346,9 +441,8 @@
     const btn = document.getElementById('loginBtn');
     btn.textContent = 'Logging in...'; btn.disabled = true;
 
-    const email    = document.getElementById('loginEmail').value;
     const formData = new FormData();
-    formData.append('email',    email);
+    formData.append('email',    document.getElementById('loginEmail').value);
     formData.append('password', document.getElementById('loginPassword').value);
 
     try {
@@ -358,19 +452,14 @@
       if (data.status === 'success') {
         localStorage.setItem('customUserEmail', data.email);
         localStorage.setItem('customUserName',  data.name);
-        showMessage('loginMsg', 'Login successful! Redirecting...', false);
-        setTimeout(() => { window.location.href = 'index.html'; }, 1000);
-      } else if (data.needs_verification) {
-        pendingEmail = email;
-        document.getElementById('otpEmail').value = email;
-        showScreen('otpForm');
-        showMessage('otpMsg', '⚠️ Please verify your email first.', true);
+        localStorage.setItem('customUserPhone', data.phone || '0000000000');
+        window.location.href = 'index.html';
       } else {
         showMessage('loginMsg', data.message, true);
       }
-    } catch { showMessage('loginMsg', 'Network error. Please try again.', true); }
+    } catch { showMessage('loginMsg', 'Network error.', true); }
 
-    btn.textContent = 'Login with Email'; btn.disabled = false;
+    btn.textContent = 'Login to Continue'; btn.disabled = false;
   });
 
   // ══ 4. FORGOT PASSWORD ══
@@ -390,9 +479,7 @@
       if (data.status === 'success') {
         showMessage('forgotMsg', '✅ OTP sent! Check your email.', false);
         setTimeout(() => { showScreen('resetScreen'); }, 1500);
-      } else {
-        showMessage('forgotMsg', data.message, true);
-      }
+      } else { showMessage('forgotMsg', data.message, true); }
     } catch { showMessage('forgotMsg', 'Network error.', true); }
 
     btn.textContent = 'Send Reset OTP'; btn.disabled = false;
@@ -416,12 +503,10 @@
       if (data.status === 'success') {
         showMessage('resetMsg', '✅ Password reset! Redirecting to login...', false);
         setTimeout(() => { showScreen('mainScreen'); switchTab('login'); }, 1500);
-      } else {
-        showMessage('resetMsg', data.message, true);
-      }
+      } else { showMessage('resetMsg', data.message, true); }
     } catch { showMessage('resetMsg', 'Network error.', true); }
 
-    btn.textContent = 'Reset Password'; btn.disabled = false;
+    btn.textContent = 'Update Password'; btn.disabled = false;
   });
 </script>
 
