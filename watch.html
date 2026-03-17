@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <title>Secure Reader - PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   
@@ -26,24 +26,63 @@
       touch-action: none; /* Native gestures global block */
     }
     
-    /* 🛡️ 100% STATIC HEADER (Rock Solid) 🛡️ */
+    /* 🛡️ 100% STATIC HEADER (Rock Solid & Modern) 🛡️ */
     .header {
-      background: #111; color: #fff; padding: 0 20px; 
+      background: #111827; color: #fff; padding: 0 15px; 
       display: flex; align-items: center; justify-content: space-between;
-      height: 60px; width: 100%; box-sizing: border-box;
+      height: 65px; width: 100%; box-sizing: border-box;
       position: absolute; top: 0; left: 0; z-index: 1000;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
       pointer-events: auto;
     }
     
     .back-btn {
-      color: #fff; text-decoration: none; font-weight: 600; font-size: 0.9rem;
-      background: #333; padding: 8px 15px; border-radius: 8px;
+      color: #fff; text-decoration: none; font-weight: 500; font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.1); padding: 8px 14px; border-radius: 50px;
+      display: flex; align-items: center; gap: 5px; transition: 0.3s;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .back-btn:hover { background: rgba(255, 255, 255, 0.2); }
+
+    .brand-title {
+      font-weight: 700; color: #10b981; font-size: 1rem;
+      letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px;
+    }
+
+    /* 🟢 DOWNLOAD BUTTON STYLES 🟢 */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .download-btn {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: none; /* By default hide rahega */
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+      transition: all 0.3s ease;
+      align-items: center;
+      gap: 6px;
+    }
+    .download-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
+    .download-btn:active { transform: translateY(0); }
+
+    #status {
+      background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 6px;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; color: #9ca3af;
+      border: 1px solid rgba(255,255,255,0.1);
     }
 
     /* 🛡️ STATIC WATERMARK (Never Moves) 🛡️ */
     .watermark-overlay {
-      position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px);
+      position: absolute; top: 65px; left: 0; width: 100%; height: calc(100vh - 65px);
       display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr);
       justify-items: center; align-items: center; 
       overflow: hidden; z-index: 900; pointer-events: none;
@@ -61,13 +100,13 @@
       position: fixed; inset: 0; background: #e5e7eb; display: flex; flex-direction: column;
       align-items: center; justify-content: center; z-index: 2000;
     }
-    .loader { border: 4px solid #f3f3f3; border-top: 4px solid #10b981; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+    .loader { border: 4px solid #d1d5db; border-top: 4px solid #10b981; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     /* 📄 PDF SCROLL AREA 📄 */
     .scroll-area {
-      position: absolute; top: 60px; left: 0;
-      width: 100vw; height: calc(100vh - 60px);
+      position: absolute; top: 65px; left: 0;
+      width: 100vw; height: calc(100vh - 65px);
       overflow: auto; /* Allows native scrolling */
       -webkit-overflow-scrolling: touch;
       touch-action: pan-x pan-y; /* Allow scroll but block pinch-zoom natively */
@@ -75,11 +114,9 @@
       pointer-events: auto;
     }
 
-    /* PDF container that scales smoothly */
     .pdf-viewer-container {
       display: flex; flex-direction: column; align-items: center; 
-      padding: 20px; box-sizing: border-box; gap: 20px;
-      /* Dynamic width sizing for perfect scrollbars when zoomed */
+      padding: 15px; box-sizing: border-box; gap: 15px;
       width: calc(100% * var(--pdf-scale)); 
       transform-origin: top left;
     }
@@ -87,30 +124,50 @@
     .page-wrapper { 
       position: relative; width: 100%; display: flex; justify-content: center; 
       max-width: 900px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-      border-radius: 4px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      border-radius: 8px;
       background: #fff;
+      overflow: hidden;
     }
 
     canvas {
       width: 100% !important; height: auto !important;
-      display: block; border-radius: 4px;
+      display: block; border-radius: 8px;
     }
 
     .secure-mode { filter: blur(25px) grayscale(100%); pointer-events: none; }
 
-    @media (max-width: 768px) {
+    /* Mobile Optimizations */
+    @media (max-width: 600px) {
        .wm-item { font-size: 10px; color: rgba(0,0,0,0.06); }
        .watermark-overlay { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(5, 1fr); }
+       
+       .header { padding: 0 12px; height: 60px; }
+       .scroll-area { top: 60px; height: calc(100vh - 60px); }
+       .watermark-overlay { top: 60px; height: calc(100vh - 60px); }
+       
+       .brand-title { display: none; } /* Hide title on very small screens to save space */
+       .back-btn span { display: none; } /* Hide "Back" text, show only icon */
+       .back-btn { padding: 8px 12px; }
+       .download-btn { padding: 8px 14px; font-size: 0.8rem; }
     }
   </style>
 </head>
 <body oncontextmenu="return false;">
 
   <div class="header">
-    <a href="lecture.html" class="back-btn">← Back</a>
-    <div style="font-weight:700; color:#10b981;">PREMium Mind</div>
-    <div id="status" style="font-size: 10px; opacity: 0.5;">SECURE HD</div>
+    <a href="lecture.html" class="back-btn" onclick="window.history.back(); return false;">
+      <span>←</span> <span>Back</span>
+    </a>
+    <div class="brand-title">PREMium Mind</div>
+    
+    <div class="header-actions">
+      <div id="status">SECURE HD</div>
+      <button id="downloadBtn" class="download-btn">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        Save
+      </button>
+    </div>
   </div>
 
   <div class="watermark-overlay" id="wmLayer">
@@ -122,7 +179,7 @@
 
   <div class="loader-container" id="loadingState">
      <div class="loader"></div>
-     <p style="margin-top:10px; color:#666;">Loading Secure PDF...</p>
+     <p style="margin-top:15px; color:#4b5563; font-weight: 500;">Loading Secure PDF...</p>
   </div>
 
   <div class="scroll-area" id="scrollArea">
@@ -131,10 +188,9 @@
 
   <script>
      // =========================================================
-     // 1. GLOBAL NATIVE ZOOM BLOCKER (Kills the jiggling effect)
+     // 1. GLOBAL NATIVE ZOOM BLOCKER
      // =========================================================
      document.addEventListener('touchmove', function(e) {
-         // Agar 2 ungliya lagayi hain, toh browser ko kuch mat karne do
          if (e.touches && e.touches.length > 1) {
              e.preventDefault();
          }
@@ -161,17 +217,15 @@
 
      scrollArea.addEventListener('touchmove', (e) => {
          if (e.touches.length === 2) {
-             e.preventDefault(); // Stop native scrolling while zooming
+             e.preventDefault(); 
              const currentDistance = Math.hypot(
                  e.touches[0].clientX - e.touches[1].clientX,
                  e.touches[0].clientY - e.touches[1].clientY
              );
              
-             // Calculate scale (Limit between 1x and 3.5x)
              currentScale = initialScale * (currentDistance / initialDistance);
              currentScale = Math.max(1, Math.min(currentScale, 3.5));
              
-             // Apply Zoom natively via CSS variable (Super Smooth)
              document.documentElement.style.setProperty('--pdf-scale', currentScale);
          }
      }, {passive: false});
@@ -219,11 +273,82 @@
      });
 
      // =========================================================
-     // 5. RENDER HD PDF
+     // 5. PDF INITIALIZATION & BRANDED DOWNLOAD LOGIC
      // =========================================================
      const urlParams = new URLSearchParams(window.location.search);
      let pdfUrl = urlParams.get('pdf');
+     let allowDownload = urlParams.get('download') === 'true' || urlParams.get('download') === '1'; 
+     let customTitle = urlParams.get('title'); // Agar URL mein title bheja ho
 
+     if (pdfUrl && allowDownload) {
+         const downloadBtn = document.getElementById('downloadBtn');
+         downloadBtn.style.display = 'flex'; 
+         
+         downloadBtn.addEventListener('click', async () => {
+             const originalHtml = downloadBtn.innerHTML;
+             downloadBtn.innerHTML = "⏳ Wait...";
+             downloadBtn.disabled = true;
+
+             try {
+                 const response = await fetch(pdfUrl);
+                 const blob = await response.blob();
+                 const blobUrl = window.URL.createObjectURL(blob);
+                 
+                 // 🔥 PREMium Mind Branding Name Logic 🔥
+                 let baseName = "Premium_Notes"; 
+
+                 if (customTitle) {
+                     // Agar lecture.html ne URL mein title bheja hai (e.g., "Maths Chapter 1")
+                     baseName = decodeURIComponent(customTitle).replace(/[^a-zA-Z0-9 ]/g, "_");
+                 } else {
+                     // URL se extract karna
+                     let extractedName = "";
+                     if (pdfUrl.includes('proxy_pdf.php?file=')) {
+                         let realPath = decodeURIComponent(pdfUrl.split('file=')[1]);
+                         extractedName = realPath.substring(realPath.lastIndexOf('/') + 1).split('?')[0];
+                     } else {
+                         extractedName = pdfUrl.substring(pdfUrl.lastIndexOf('/') + 1).split('?')[0];
+                     }
+
+                     // Remove .pdf extension from extracted name if it exists so we don't get .pdf_PREMium_Mind.pdf
+                     if (extractedName.toLowerCase().endsWith('.pdf')) {
+                         extractedName = extractedName.substring(0, extractedName.length - 4);
+                     }
+                     
+                     if (extractedName && !extractedName.includes('.php')) {
+                         baseName = extractedName;
+                     }
+                 }
+                 
+                 // FINAL FILE NAME 
+                 let finalFileName = `${baseName}_PREMium_Mind.pdf`;
+                 
+                 const a = document.createElement('a');
+                 a.href = blobUrl;
+                 a.download = finalFileName;
+                 
+                 document.body.appendChild(a);
+                 a.click();
+                 document.body.removeChild(a);
+                 
+                 window.URL.revokeObjectURL(blobUrl);
+                 
+                 downloadBtn.innerHTML = "✅ Done";
+             } catch (error) {
+                 window.open(pdfUrl, '_blank');
+                 downloadBtn.innerHTML = "✅ Opened";
+             }
+             
+             setTimeout(() => {
+                 downloadBtn.innerHTML = originalHtml;
+                 downloadBtn.disabled = false;
+             }, 2000);
+         });
+     }
+
+     // =========================================================
+     // 6. RENDER HD PDF
+     // =========================================================
      if(pdfUrl) {
          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
          const container = document.getElementById('pdfContainer');
@@ -231,7 +356,7 @@
          pdfjsLib.getDocument({url: pdfUrl}).promise.then(async (pdfDoc) => {
              for (let num = 1; num <= pdfDoc.numPages; num++) {
                  const page = await pdfDoc.getPage(num);
-                 const scale = 2.0; // High Quality Render Level
+                 const scale = 2.0; 
                  const viewport = page.getViewport({ scale });
                  
                  const wrapper = document.createElement('div');

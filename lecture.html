@@ -195,7 +195,8 @@ window.loadMyCourses = async function(userEmail) {
                 pdfUrl = course.pdf_link;
             }
             
-            let btnAction = pdfUrl ? `window.location.href='watch.html?pdf=${encodeURIComponent(pdfUrl)}&dl=${course.allow_download}'` : `alert('Content is being prepared and will be available soon!')`;
+            // 🔥 NAYA CODE: Yahan parameter ko dl ki jagah download kar diya gaya hai 🔥
+            let btnAction = pdfUrl ? `window.location.href='watch.html?pdf=${encodeURIComponent(pdfUrl)}&download=${course.allow_download}'` : `alert('Content is being prepared and will be available soon!')`;
 
             const desc1HTML = course.desc1 ? `<span>• ${course.desc1}</span>` : '';
             const desc2HTML = course.desc2 ? `<span>• ${course.desc2}</span>` : '';
