@@ -14,16 +14,16 @@
 
   <style>
     /* ============================================================
-       PAGE SPECIFIC STYLES (Variables inherited from common.css conceptually)
+       PAGE SPECIFIC STYLES: MY COURSES DASHBOARD
     ============================================================ */
     :root {
       --primary-color: #000000;
       --secondary-color: #434343;
       --accent-green: #10b981;
       --white: #ffffff;
-      --bg-light: #f9f9f9;
-      --text-dark: #333333;
-      --text-muted: #666666;
+      --bg-light: #f4f7f6;
+      --text-dark: #111827;
+      --text-muted: #6b7280;
     }
 
     body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: hidden; }
@@ -31,54 +31,71 @@
     /* DASHBOARD HEADER */
     .dashboard-header {
       background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-      color: var(--white); padding: 60px 20px; text-align: center; margin-bottom: 40px;
+      color: var(--white); padding: 50px 20px; text-align: center; margin-bottom: 30px;
     }
-    .dashboard-header h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 10px; }
+    .dashboard-header h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 10px; font-family: 'Montserrat', sans-serif;}
     .dashboard-header p { font-size: clamp(1rem, 2vw, 1.1rem); color: #ccc; max-width: 600px; margin: 0 auto; }
 
-    /* COURSES GRID & CARDS */
+    /* NEW PREMIUM LIBRARY CARD DESIGN */
     .card-container {
       display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 30px; padding: 0 20px 60px 20px; max-width: 1200px; margin: 0 auto;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 25px; padding: 0 20px 60px 20px; max-width: 1200px; margin: 0 auto;
     }
+    
     .course-card {
-      position: relative; background: var(--white); border-radius: 16px; padding: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.06); border: 1px solid #eaeaea; overflow: hidden;
-      display: flex; flex-direction: column; transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background: var(--white); border-radius: 16px; padding: 12px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06); border: 1px solid #eaeaea;
+      display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
     }
-    .course-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.12); }
-    .course-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; }
-    .course-card h2 { font-size: 1.15rem; margin-bottom: 10px; color: var(--primary-color); line-height: 1.4; flex-grow: 1; }
-    .course-progress { width: 100%; height: 6px; background: #eee; border-radius: 3px; margin-bottom: 15px; overflow: hidden; }
-    .progress-bar { height: 100%; background: var(--accent-green); width: 15%; border-radius: 3px; }
+    .course-card:hover { transform: translateY(-6px); box-shadow: 0 15px 30px rgba(0,0,0,0.12); border-color: #d1d5db; }
+    
+    .card-img-box {
+      width: 100%; height: 160px; border-radius: 12px; overflow: hidden; position: relative; margin-bottom: 15px;
+    }
+    .card-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .course-card:hover .card-img-box img { transform: scale(1.05); }
 
-    /* Buttons */
+    .status-badge {
+      position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #fff;
+      font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; backdrop-filter: blur(4px); text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .course-card h2 { 
+      font-size: 1.1rem; margin-bottom: 8px; color: var(--primary-color); line-height: 1.3; font-weight: 700;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    
+    .course-meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px; display: flex; flex-direction: column; gap: 4px; flex-grow: 1;}
+
+    /* Premium Button */
     .btn-access {
-      width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 700;
-      cursor: pointer; font-size: 1rem; transition: all 0.3s ease; text-align: center;
-      background: linear-gradient(135deg, var(--accent-green) 0%, #059669 100%); color: var(--white);
+      width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 700;
+      cursor: pointer; font-size: 0.95rem; transition: all 0.3s ease; text-align: center;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: var(--white);
+      display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: auto;
     }
-    .btn-access:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3); }
-    .btn-browse {
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-      color: var(--white); padding: 12px 30px; border: none; border-radius: 50px;
-      font-weight: 700; cursor: pointer; font-size: 1rem; transition: all 0.3s; margin-top: 10px;
-    }
-    .btn-browse:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-    .new-badge {
-      position: absolute; top: 15px; right: -35px; background: var(--accent-green); color: #fff;
-      font-size: 0.8rem; font-weight: 800; padding: 5px 40px; transform: rotate(45deg);
-      box-shadow: 0 3px 10px rgba(16, 185, 129, 0.4); letter-spacing: 1px;
-    }
+    .btn-access:hover { box-shadow: 0 6px 15px rgba(0,0,0,0.2); transform: translateY(-2px); }
+
+    /* EMPTY STATE */
     .empty-state {
       grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: var(--white);
       border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; width: 100%;
     }
+    .empty-state h2 { font-size: 1.8rem; margin-bottom: 12px; color: var(--primary-color); }
+    .empty-state p { color: var(--text-muted); margin-bottom: 25px; font-size: 1rem; }
+    .btn-browse {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      color: var(--white); padding: 12px 30px; border: none; border-radius: 50px;
+      font-weight: 700; cursor: pointer; font-size: 1rem; transition: all 0.3s; display: inline-block;
+    }
+    .btn-browse:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
     @media (max-width: 768px) {
       .dashboard-header { padding: 40px 15px; }
-      .card-container { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 0 15px 40px 15px; }
+      .card-container { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; padding: 0 15px 40px 15px; }
+      .card-img-box { height: 180px; }
     }
   </style>
 </head>
@@ -130,13 +147,17 @@
 <div class="overlay" id="overlay"></div>
 
 <div class="dashboard-header">
-  <h1>My Learning Dashboard</h1>
-  <p>Welcome back! Pick up right where you left off and master your skills.</p>
+  <h1>My Learning Library</h1>
+  <p>Your premium courses, all in one place. Pick up right where you left off.</p>
 </div>
 
 <div class="card-container" id="my-courses-container">
-    <p style="text-align: center; width: 100%; color: #666; font-size: 1.1rem; grid-column: 1/-1;">Checking your enrollments...</p>
+    <div style="text-align: center; width: 100%; padding: 40px; grid-column: 1/-1;">
+        <div style="width: 40px; height: 40px; border: 4px solid #ddd; border-top-color: #111; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
+        <p style="color: #666; font-size: 1.1rem;">Syncing your library...</p>
+    </div>
 </div>
+<style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
 
 <script>
 window.loadMyCourses = async function(userEmail) {
@@ -159,7 +180,7 @@ window.loadMyCourses = async function(userEmail) {
                 <div class="empty-state">
                   <h2>No Courses Yet 😢</h2>
                   <p>You haven't enrolled in any premium courses yet. Explore our store to upgrade your skills!</p>
-                  <button class="btn-browse" onclick="window.location.href='index.html#products'">Explore Store</button>
+                  <a href="index.html#products" class="btn-browse">Explore Store</a>
                 </div>
             `;
             return;
@@ -168,26 +189,29 @@ window.loadMyCourses = async function(userEmail) {
         enrolledCourses.forEach(course => {
             let pdfUrl = '';
             
-            // Generate link
             if (course.pdf_file && course.pdf_file.trim() !== '') {
                 pdfUrl = 'https://premind.diplomawallah.in/proxy_pdf.php?file=' + encodeURIComponent(course.pdf_file);
             } else if (course.pdf_link && course.pdf_link.trim() !== '') {
                 pdfUrl = course.pdf_link;
             }
             
-            // Watch.html redirect
-            let btnAction = pdfUrl ? `window.location.href='watch.html?pdf=${encodeURIComponent(pdfUrl)}&dl=${course.allow_download}'` : `alert('PDF material is being uploaded and will be available very soon!')`;
+            let btnAction = pdfUrl ? `window.location.href='watch.html?pdf=${encodeURIComponent(pdfUrl)}&dl=${course.allow_download}'` : `alert('Content is being prepared and will be available soon!')`;
+
+            const desc1HTML = course.desc1 ? `<span>• ${course.desc1}</span>` : '';
+            const desc2HTML = course.desc2 ? `<span>• ${course.desc2}</span>` : '';
 
             const cardHTML = `
                 <div class="course-card">
-                  <span class="new-badge">Enrolled</span>
-                  <img src="${course.image}" alt="${course.title}" onerror="this.src='small-logo.png'"/>
-                  <h2>${course.title}</h2>
-                  <p style="color:#666; font-size:0.9rem; margin-bottom:5px;">Keep going, you're doing great!</p>
-                  <div class="course-progress">
-                     <div class="progress-bar"></div>
+                  <div class="card-img-box">
+                     <span class="status-badge">Unlocked</span>
+                     <img src="${course.image}" alt="${course.title}" onerror="this.src='small-logo.png'"/>
                   </div>
-                  <button class="btn-access" onclick="${btnAction}">Start Learning ▶️</button>
+                  <h2>${course.title}</h2>
+                  <div class="course-meta">
+                     ${desc1HTML}
+                     ${desc2HTML}
+                  </div>
+                  <button class="btn-access" onclick="${btnAction}">▶ Continue Learning</button>
                 </div>
             `;
             container.innerHTML += cardHTML;
