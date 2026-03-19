@@ -481,6 +481,8 @@
       box-shadow: 0 6px 15px rgba(0,0,0,0.15);
       overflow: hidden;
       transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
     }
 
     .course-card:hover {
@@ -606,12 +608,53 @@
         font-weight: bold; margin-bottom: 10px;
     }
 
+    /* --- 🚩 REPORT BUTTON & SOLVING STATES (BULLETPROOF FIX - COMPACT, RED & RIGHT-ALIGNED) 🚩 --- */
+    .course-card .report-btn {
+        width: max-content !important; 
+        align-self: flex-end !important; /* Pushes button to right side in flex container */
+        margin: 0 0 10px auto !important; 
+        background: #fff1f2 !important; 
+        color: #e11d48 !important; 
+        border: 1.5px dashed #f43f5e !important;
+        padding: 6px 14px !important; 
+        border-radius: 8px !important; 
+        font-weight: 700 !important; 
+        font-size: 0.75rem !important;
+        cursor: pointer !important; 
+        display: inline-flex !important; 
+        align-items: center !important; 
+        justify-content: center !important; 
+        gap: 4px !important;
+        transition: 0.3s !important;
+    }
+    .course-card .report-btn:hover { 
+        background: #ffe4e6 !important; 
+        transform: translateY(-2px) !important; 
+    }
+    
+    .course-card .btn-solving {
+        width: max-content !important; 
+        align-self: flex-end !important; /* Pushes button to right side */
+        margin: 0 0 10px auto !important; 
+        background: #fef08a !important; 
+        color: #854d0e !important;
+        border: 1.5px dashed #eab308 !important; 
+        padding: 6px 14px !important; 
+        border-radius: 8px !important; 
+        cursor: not-allowed !important; 
+        font-weight: bold !important; 
+        font-size: 0.75rem !important; 
+        display: inline-flex !important;
+    }
+
+    /* MODAL BASE */
     .wa-modal {
         display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); 
         z-index: 10001; align-items:center; justify-content:center; padding:15px;
         backdrop-filter: blur(5px);
     }
-    .wa-content { background:white; width:100%; max-width:400px; padding:30px; border-radius:20px; position:relative; }
+    /* Updated Modal Content for scrolling */
+    .wa-content { background:white; width:100%; max-width:400px; padding:30px; border-radius:20px; position:relative; max-height: 90vh; overflow-y: auto;}
     .wa-input { width:100%; padding:12px; margin-bottom:15px; border:1.5px solid #eee; border-radius:10px; outline:none; font-family: 'Poppins'; box-sizing: border-box; }
     .wa-submit-btn { width:100%; padding:14px; background:#000; color:#fff; border:none; border-radius:12px; font-weight:700; cursor:pointer; }
   </style>
@@ -706,6 +749,56 @@ Screenshots from other groups or personal chats will be rejected.</p>
       <input type="file" id="wa_file" accept="image/*" required style="margin-bottom:20px; font-size:12px; width: 100%;">
       <button type="submit" id="waSubmit" class="wa-submit-btn">Submit for Review →</button>
     </form>
+  </div>
+</div>
+
+<div id="reportModal" class="wa-modal">
+  <div class="wa-content">
+    <span onclick="document.getElementById('reportModal').style.display='none'" style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
+    <h3 style="margin-bottom:8px; font-size:1.4rem; color: #be123c;">Report an Issue 🚩</h3>
+    <p style="font-size:13px; color:#666; margin-bottom:20px;">Describe your problem below. If it's a payment issue, please attach a screenshot.</p>
+    <form id="reportForm">
+      <input type="hidden" id="report_cid">
+      <label style="font-size:12px; font-weight:600;">Your Message*</label>
+      <textarea id="report_msg" class="wa-input" rows="3" placeholder="Explain your issue here..." required></textarea>
+      
+      <label style="font-size:12px; font-weight:600;">Upload Payment Screenshot (Optional for Payment Issues)</label>
+      <input type="file" id="report_file" accept="image/*" style="margin-bottom:15px; font-size:12px; width: 100%;">
+      
+      <div style="margin-bottom: 15px; display: flex; gap: 8px; align-items: start; background: #fef2f2; padding: 10px; border-radius: 8px; border: 1px dashed #fda4af;">
+          <input type="checkbox" id="report_agree" required style="margin-top: 2px;">
+          <label for="report_agree" style="font-size: 11px; color: #be123c; font-weight: 600; cursor: pointer;">I understand that my problem will be reviewed and resolved within 1-2 hours.</label>
+      </div>
+      
+      <button type="submit" id="reportSubmit" class="wa-submit-btn" style="background: #be123c;">Submit Report</button>
+    </form>
+  </div>
+</div>
+
+<div id="tncModal" class="wa-modal">
+  <div class="wa-content">
+    <span onclick="document.getElementById('tncModal').style.display='none'" style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
+    <h3 style="margin-bottom:8px; font-size:1.4rem;">Terms & Conditions 📜</h3>
+    <p style="font-size:13px; color:#666; margin-bottom:15px;">Please read and accept our terms before proceeding to payment.</p>
+    
+<div style="background:#f9fafb; padding:15px; border-radius:8px; font-size:11px; color:#444; margin-bottom:15px; border:1px solid #eee; line-height: 1.6;">
+    <strong>1. Non-Refundable:</strong> All sales are final. No refunds will be provided once the course access is granted.<br>
+    
+    <strong>2. No Sharing:</strong> Sharing your account details with others is strictly prohibited and will lead to an instant permanent ban without refund.<br>
+    
+    <strong>3. Personal Use:</strong> The study material is for your personal use only. Distribution or piracy will invite legal actions.<br>
+    
+    <strong>4. Important Notice:</strong> This content is prepared based on syllabus analysis and important question prediction. It is created using expert analysis and past trends, but it is not guaranteed that the same questions will appear in the exam. By purchasing, you agree that you are buying this material at your own risk.<br>
+    
+    <strong>5. Agreement:</strong> By proceeding, you agree to PREMium Mind's standard terms of service.
+</div>
+    
+    <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+        <input type="checkbox" id="tnc_agree" style="width: 16px; height: 16px;">
+        <label for="tnc_agree" style="font-size: 13px; font-weight: 700; color: #111; cursor: pointer;">I agree to the Terms & Conditions</label>
+    </div>
+    
+    <button type="button" id="tncProceedBtn" class="wa-submit-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Accept & Proceed to Payment</button>
   </div>
 </div>
 
@@ -877,7 +970,42 @@ const cashfree = Cashfree({
     mode: "production", 
 });
 
+// 🔥 FIX: Modal T&C Strict Check 🔥
+let currentPurchaseInfo = {};
+window.initiatePurchase = function(cid, price, showTnc) {
+    if(!localStorage.getItem('customUserEmail') && document.getElementById('userProfile').style.display === 'none') {
+        alert("Please Login / Sign Up first to buy this course.");
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    // Yahan strict check lagaya hai ki string me '1' hai ya normal number 1
+    if (showTnc === '1' || showTnc === 1) {
+        currentPurchaseInfo = { cid, price };
+        document.getElementById('tnc_agree').checked = false; 
+        document.getElementById('tncModal').style.display = 'flex';
+    } else {
+        window.enrollCourse(cid, price);
+    }
+}
+
+document.getElementById('tncProceedBtn').onclick = function() {
+    if (!document.getElementById('tnc_agree').checked) {
+        alert("Please check the box to agree to the Terms & Conditions.");
+        return;
+    }
+    document.getElementById('tncModal').style.display = 'none';
+    window.enrollCourse(currentPurchaseInfo.cid, currentPurchaseInfo.price);
+}
+
+
 window.enrollCourse = async function(courseId, price) {
+    // 🔥 FIX: CASHFREE LOCALHOST BLOCKER ALERT 🔥
+    if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+        alert("⚠️ WARNING: Cashfree Payments strictly block localhost/127.0.0.1 for security reasons.\n\nTo test payments, please deploy/upload this HTML file to your live server (Netlify or Hostinger).");
+        return;
+    }
+
     const customEmail = localStorage.getItem('customUserEmail');
     const userEmailText = document.getElementById('userEmail').textContent;
     const emailToUse = customEmail || userEmailText;
@@ -894,15 +1022,10 @@ window.enrollCourse = async function(courseId, price) {
         btn.innerText = "Processing...";
         btn.disabled = true;
 
-        // 1. Order Create karna
         const response = await fetch("https://premind.diplomawallah.in/create_order.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                email: emailToUse, 
-                course_id: courseId, 
-                price: price 
-            })
+            body: JSON.stringify({ email: emailToUse, course_id: courseId, price: price })
         });
         
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -914,7 +1037,6 @@ window.enrollCourse = async function(courseId, price) {
                 redirectTarget: "_modal", 
             };
             
-            // 2. Cashfree Popup Kholna
             cashfree.checkout(checkoutOptions).then((result) => {
                 if(result.error){
                     alert("Payment Failed: " + result.error.message);
@@ -922,9 +1044,7 @@ window.enrollCourse = async function(courseId, price) {
                     btn.disabled = false;
                 }
                 if(result.paymentDetails){
-                    
                     btn.innerText = "Verifying...";
-                    
                     fetch(`https://premind.diplomawallah.in/verify_payment.php?order_id=${data.order_id}&course_id=${courseId}&email=${emailToUse}`)
                     .then(res => res.json())
                     .then(verifyData => {
@@ -976,32 +1096,37 @@ window.loadCourses = async function(userEmail = '') {
             let oldPriceHTML = course.old_price ? `<span>₹${course.old_price}</span>` : '';
             let btnHTML = '';
 
-            // 🔥 LOGIC TO DISPLAY APPROPRIATE BUTTONS 🔥
+            let reportBtnHTML = '';
+            if (course.show_report_btn == 1 || course.show_report_btn == "1") {
+                if (course.report_status === 'pending') {
+                    reportBtnHTML = `<button class="btn-solving" disabled>Solving... ⏳</button>`;
+                } else {
+                    reportBtnHTML = `<button class="report-btn" onclick="openReportModal(${course.id})">🚩 Report</button>`;
+                }
+            }
+
             if (course.is_enrolled == 1) {
                 btnHTML = `<button style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.location.href='lecture.html?id=${course.id}'">Access Now 🎓</button>`;
             } else if (course.req_status === 'pending') {
                 btnHTML = `<button class="btn-reviewing" disabled>Reviewing... ⏳</button>`;
             } else {
                 
-                // Standard Logic mapping based on database type
                 if(course.btn_type === 'disabled_look') {
                     btnHTML = `<button class="disabled-btn">${course.btn_text}</button>`;
                 } else if (course.btn_type === 'preview_buy') {
+                    // 🔥 FIX: Added strictly mapped TNC parameter in click function 🔥
                     btnHTML = `
                         <button style="background: transparent; color: #111; border: 2px solid #111; padding: 5px; border-radius: 8px; font-weight: bold; margin-bottom: 10px; cursor: pointer; width: 100%;" onclick="window.open('${course.demo_link}', '_blank')">Preview (Demo)</button>
-                        <button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.enrollCourse(${course.id}, ${course.price})">${course.btn_text}</button>
+                        <button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase(${course.id}, ${course.price}, '${course.show_tnc || 0}')">${course.btn_text}</button>
                     `;
                 } else if (course.btn_type === 'disabled') {
                     btnHTML = `<button class="disabled-btn" disabled>${course.btn_text}</button>`;
                 } else {
-                    btnHTML = `<button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.enrollCourse(${course.id}, ${course.price})">${course.btn_text}</button>`;
+                    btnHTML = `<button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase(${course.id}, ${course.price}, '${course.show_tnc || 0}')">${course.btn_text}</button>`;
                 }
 
-                // 💥 TARGET ONLY "PROFESSION" OR "SKILLS" RELATED COURSE FOR WHATSAPP BUTTON 💥
                 let courseName = course.title.toLowerCase();
                 if (courseName.includes('profession') || courseName.includes('skill')) {
-                    
-                    // Agar Preview wala course hai, toh WhatsApp aur Preview ko side-by-side (ik line) mein kar do
                     if (course.btn_type === 'preview_buy') {
                         btnHTML = `
                             <div style="display: flex; gap: 8px; margin-bottom: 10px; width: 100%;">
@@ -1011,10 +1136,9 @@ window.loadCourses = async function(userEmail = '') {
                                     <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:14px !important; height:14px !important; margin-bottom:0 !important; display:inline-block; border-radius:0 !important;"> WA Unlock
                                 </button>
                             </div>
-                            <button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.enrollCourse(${course.id}, ${course.price})">${course.btn_text}</button>
+                            <button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase(${course.id}, ${course.price}, '${course.show_tnc || 0}')">${course.btn_text}</button>
                         `;
                     } else {
-                        // Agar simple Buy Now course hai, to normal uper WhatsApp Button lagayenge
                         let waBtn = `
                             <button class="wa-unlock-btn" onclick="openWaModal(${course.id})">
                                 <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:18px !important; height:18px !important; margin-bottom:0 !important; display:inline-block; border-radius:0 !important;"> Unlock via WhatsApp
@@ -1024,6 +1148,8 @@ window.loadCourses = async function(userEmail = '') {
                     }
                 }
             }
+
+            btnHTML = reportBtnHTML + btnHTML;
 
             const cardHTML = `
                 <div class="course-card">
@@ -1082,6 +1208,50 @@ window.loadCourses = async function(userEmail = '') {
           alert("Server Error. Please try again later."); 
       }
       btn.innerText = "Submit for Review →"; btn.disabled = false;
+  };
+
+  // 🚩 REPORT ISSUE MODAL LOGIC 🚩
+  window.openReportModal = function(cid) {
+      if(!localStorage.getItem('customUserEmail')) {
+          alert("Please login first to report an issue!");
+          window.location.href = 'login.html';
+          return;
+      }
+      document.getElementById('report_cid').value = cid;
+      document.getElementById('reportModal').style.display = 'flex';
+  }
+
+  document.getElementById('reportForm').onsubmit = async (e) => {
+      e.preventDefault();
+      if (!document.getElementById('report_agree').checked) {
+          alert("Please acknowledge the resolution time by checking the box.");
+          return;
+      }
+      const btn = document.getElementById('reportSubmit');
+      btn.innerText = "Submitting..."; btn.disabled = true;
+
+      const fd = new FormData();
+      fd.append('email', localStorage.getItem('customUserEmail'));
+      fd.append('course_id', document.getElementById('report_cid').value);
+      fd.append('message', document.getElementById('report_msg').value);
+      
+      if (document.getElementById('report_file').files[0]) {
+          fd.append('screenshot', document.getElementById('report_file').files[0]);
+      }
+
+      try {
+          const res = await fetch('https://premind.diplomawallah.in/submit_report.php', { method: 'POST', body: fd });
+          const data = await res.json();
+          if(data.status === 'success') {
+              alert("✅ Report Submitted! We will look into it within 1-2 hours.");
+              window.location.reload();
+          } else {
+              alert("Error: " + data.message);
+          }
+      } catch (error) {
+          alert("Server Error. Please check backend API.");
+      }
+      btn.innerText = "Submit Report"; btn.disabled = false;
   };
 
   // Footer WhatsApp Contact Form logic
