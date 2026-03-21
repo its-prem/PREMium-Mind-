@@ -1126,7 +1126,7 @@ window.loadCourses = async function(userEmail = '') {
                 }
 
                 let courseName = course.title.toLowerCase();
-                if (courseName.includes('professional') || courseName.includes('skills')) {
+                if ((courseName.includes('professional') || courseName.includes('skill')) && !courseName.includes('important questions')) {
                     if (course.btn_type === 'preview_buy') {
                         btnHTML = `
                             <div style="display: flex; gap: 8px; margin-bottom: 10px; width: 100%;">
