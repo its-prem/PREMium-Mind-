@@ -65,14 +65,20 @@
       font-weight: 600;
       font-size: 0.85rem;
       cursor: pointer;
-      display: none; /* By default hide rahega */
       box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
       transition: all 0.3s ease;
       align-items: center;
       gap: 6px;
+      display: flex; /* 🔥 Isko show karne ke liye block kiya 🔥 */
     }
     .download-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
     .download-btn:active { transform: translateY(0); }
+
+    /* Agar download off ho toh thoda gray/lock type feel dene ke liye class */
+    .download-btn.locked {
+      background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
 
     #status {
       background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 6px;
@@ -165,7 +171,7 @@
       <div id="status">SECURE HD</div>
       <button id="downloadBtn" class="download-btn">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-        Save
+        <span id="dl-text">Save</span>
       </button>
     </div>
   </div>
@@ -273,18 +279,29 @@
      });
 
      // =========================================================
-     // 5. PDF INITIALIZATION & BRANDED DOWNLOAD LOGIC
+     // 5. PDF INITIALIZATION & BRANDED DOWNLOAD LOGIC (UPDATED)
      // =========================================================
      const urlParams = new URLSearchParams(window.location.search);
      let pdfUrl = urlParams.get('pdf');
      let allowDownload = urlParams.get('download') === 'true' || urlParams.get('download') === '1'; 
-     let customTitle = urlParams.get('title'); // Agar URL mein title bheja ho
+     let customTitle = urlParams.get('title');
 
-     if (pdfUrl && allowDownload) {
+     if (pdfUrl) {
          const downloadBtn = document.getElementById('downloadBtn');
-         downloadBtn.style.display = 'flex'; 
+         
+         // Agar access nahi hai, toh lock wala look de do
+         if(!allowDownload) {
+             downloadBtn.classList.add('locked');
+             document.getElementById('dl-text').innerText = "Locked";
+         }
          
          downloadBtn.addEventListener('click', async () => {
+             // 🔥 AGAR ALLOW NAHI HAI TOH MESSAGE DIKHAO AUR ROK DO 🔥
+             if(!allowDownload) {
+                 alert("⚠️ Download available one day before exam at 2:00 PM only.");
+                 return; // Yahan se code aage nahi jayega
+             }
+
              const originalHtml = downloadBtn.innerHTML;
              downloadBtn.innerHTML = "⏳ Wait...";
              downloadBtn.disabled = true;
@@ -294,14 +311,11 @@
                  const blob = await response.blob();
                  const blobUrl = window.URL.createObjectURL(blob);
                  
-                 // 🔥 PREMium Mind Branding Name Logic 🔥
                  let baseName = "Premium_Notes"; 
 
                  if (customTitle) {
-                     // Agar lecture.html ne URL mein title bheja hai (e.g., "Maths Chapter 1")
                      baseName = decodeURIComponent(customTitle).replace(/[^a-zA-Z0-9 ]/g, "_");
                  } else {
-                     // URL se extract karna
                      let extractedName = "";
                      if (pdfUrl.includes('proxy_pdf.php?file=')) {
                          let realPath = decodeURIComponent(pdfUrl.split('file=')[1]);
@@ -310,7 +324,6 @@
                          extractedName = pdfUrl.substring(pdfUrl.lastIndexOf('/') + 1).split('?')[0];
                      }
 
-                     // Remove .pdf extension from extracted name if it exists so we don't get .pdf_PREMium_Mind.pdf
                      if (extractedName.toLowerCase().endsWith('.pdf')) {
                          extractedName = extractedName.substring(0, extractedName.length - 4);
                      }
@@ -320,7 +333,6 @@
                      }
                  }
                  
-                 // FINAL FILE NAME 
                  let finalFileName = `${baseName}_PREMium_Mind.pdf`;
                  
                  const a = document.createElement('a');
