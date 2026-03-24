@@ -608,10 +608,10 @@
         font-weight: bold; margin-bottom: 10px;
     }
 
-    /* --- 🚩 REPORT BUTTON & SOLVING STATES (BULLETPROOF FIX - COMPACT, RED & RIGHT-ALIGNED) 🚩 --- */
+    /* --- 🚩 REPORT BUTTON & SOLVING STATES 🚩 --- */
     .course-card .report-btn {
         width: max-content !important; 
-        align-self: flex-end !important; /* Pushes button to right side in flex container */
+        align-self: flex-end !important; 
         margin: 0 0 10px auto !important; 
         background: #fff1f2 !important; 
         color: #e11d48 !important; 
@@ -634,7 +634,7 @@
     
     .course-card .btn-solving {
         width: max-content !important; 
-        align-self: flex-end !important; /* Pushes button to right side */
+        align-self: flex-end !important; 
         margin: 0 0 10px auto !important; 
         background: #fef08a !important; 
         color: #854d0e !important;
@@ -653,7 +653,6 @@
         z-index: 10001; align-items:center; justify-content:center; padding:15px;
         backdrop-filter: blur(5px);
     }
-    /* Updated Modal Content for scrolling */
     .wa-content { background:white; width:100%; max-width:400px; padding:30px; border-radius:20px; position:relative; max-height: 90vh; overflow-y: auto;}
     .wa-input { width:100%; padding:12px; margin-bottom:15px; border:1.5px solid #eee; border-radius:10px; outline:none; font-family: 'Poppins'; box-sizing: border-box; }
     .wa-submit-btn { width:100%; padding:14px; background:#000; color:#fff; border:none; border-radius:12px; font-weight:700; cursor:pointer; }
@@ -777,26 +776,35 @@ Screenshots from other groups or personal chats will be rejected.</p>
 
 <div id="tncModal" class="wa-modal">
   <div class="wa-content">
-    <span onclick="document.getElementById('tncModal').style.display='none'" style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
+    <span onclick="closeTncModal()" style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
     <h3 style="margin-bottom:8px; font-size:1.4rem;">Terms & Conditions 📜</h3>
-    <p style="font-size:13px; color:#666; margin-bottom:15px;">Please read and accept our terms before proceeding to payment.</p>
+    <p style="font-size:13px; color:#666; margin-bottom:15px;">Please read terms and watch the video before payment.</p>
     
-<div style="background:#f9fafb; padding:15px; border-radius:8px; font-size:11px; color:#444; margin-bottom:15px; border:1px solid #eee; line-height: 1.6;">
-<strong>1. Non-Refundable:</strong> All sales are final. No refunds will be provided once the course access is granted.<br>
+    <div style="background: #eef2ff; padding: 12px; border-radius: 10px; border: 1px dashed #3b82f6; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+        <button type="button" id="watchVideoBtn" style="background: #1d4ed8; color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; transition: 0.3s; width: max-content;">
+            ▶️ Play Video
+        </button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="checkbox" id="video_agree" style="width: 16px; height: 16px; cursor: not-allowed;" disabled>
+            <label for="video_agree" id="video_agree_label" style="font-size: 11px; font-weight: 700; color: #9ca3af; cursor: not-allowed; line-height: 1.2;">Must play video</label>
+        </div>
+    </div>
 
-<strong>2. No Sharing:</strong> Sharing your account details with others is strictly prohibited and will lead to an instant permanent ban without refund.<br>
-
-<strong>3. Personal Use:</strong> The study material is for your personal use only. Distribution or piracy will invite legal actions.<br>
-
-<strong>4. Download Policy:</strong> You can download the content only one day before the exam at 2:00 PM when the download button unlocks.<br>
-
-<strong>5. Payment Instruction:</strong> After successful payment, please wait for 10 seconds on the same page. Then check your profile for access to the purchased content.<br>
-
-<strong>6. Important Notice:</strong> This content is based on analysis and predictions; exact exam questions are not guaranteed.<br>
-
-<strong>7. Agreement:</strong> By proceeding, you agree to PREMium Mind's standard terms of service.
-
-</div>
+    <div id="videoContainer" style="display: none; background: #000; padding: 5px; border-radius: 12px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+        <div style="position: relative; width: 100%; max-width: 180px; margin: 0 auto; aspect-ratio: 9/16; border-radius: 8px; overflow: hidden;">
+            <iframe id="tutorialVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+    
+    <div style="background:#f9fafb; padding:15px; border-radius:8px; font-size:11px; color:#444; margin-bottom:15px; border:1px solid #eee; line-height: 1.6; height: 120px; overflow-y: auto;">
+        <strong>1. Non-Refundable:</strong> All sales are final. No refunds will be provided once the course access is granted.<br>
+        <strong>2. No Sharing:</strong> Sharing your account details with others is strictly prohibited and will lead to an instant permanent ban without refund.<br>
+        <strong>3. Personal Use:</strong> The study material is for your personal use only. Distribution or piracy will invite legal actions.<br>
+        <strong>4. Download Policy:</strong> You can download the content only one day before the exam at 2:00 PM when the download button unlocks.<br>
+        <strong>5. Payment Instruction:</strong> After successful payment, please wait for 10 seconds on the same page. Then check your profile for access to the purchased content.<br>
+        <strong>6. Important Notice:</strong> This content is based on analysis and predictions; exact exam questions are not guaranteed.<br>
+        <strong>7. Agreement:</strong> By proceeding, you agree to PREMium Mind's standard terms of service.
+    </div>
     
     <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
         <input type="checkbox" id="tnc_agree" style="width: 16px; height: 16px;">
@@ -975,8 +983,40 @@ const cashfree = Cashfree({
     mode: "production", 
 });
 
-// 🔥 FIX: Modal T&C Strict Check 🔥
+// 🔥 VIDEO PLAY LOGIC 🔥
+document.getElementById('watchVideoBtn').onclick = function() {
+    const videoContainer = document.getElementById('videoContainer');
+    const videoIframe = document.getElementById('tutorialVideo');
+    const videoAgree = document.getElementById('video_agree');
+    const videoLabel = document.getElementById('video_agree_label');
+
+    // Video show karo & Autoplay chalu karo
+    videoContainer.style.display = 'block';
+    videoIframe.src = "https://www.youtube.com/embed/-6-W7LiGpoM?rel=0&autoplay=1";
+
+    // Checkbox unlock karo & Auto tick karo
+    videoAgree.disabled = false;
+    videoAgree.checked = true;
+    videoAgree.style.cursor = 'pointer';
+    
+    videoLabel.style.color = '#1d4ed8';
+    videoLabel.style.cursor = 'pointer';
+    videoLabel.innerText = 'Watched';
+    
+    // Button styling change
+    this.innerHTML = '🔽 Playing...';
+    this.style.background = '#64748b';
+    this.disabled = true; 
+}
+
+// Close Modal Func (To stop background audio)
+window.closeTncModal = function() {
+    document.getElementById('tncModal').style.display = 'none';
+    document.getElementById('tutorialVideo').src = ''; // Video Stop
+}
+
 let currentPurchaseInfo = {};
+
 window.initiatePurchase = function(cid, price, showTnc) {
     if(!localStorage.getItem('customUserEmail') && document.getElementById('userProfile').style.display === 'none') {
         alert("Please Login / Sign Up first to buy this course.");
@@ -984,22 +1024,50 @@ window.initiatePurchase = function(cid, price, showTnc) {
         return;
     }
     
-    // Yahan strict check lagaya hai ki string me '1' hai ya normal number 1
     if (showTnc === '1' || showTnc === 1) {
         currentPurchaseInfo = { cid, price };
+        
+        // Modal khulte hi sab kuch purani (lock) state me daalo
         document.getElementById('tnc_agree').checked = false; 
+        
+        const videoAgree = document.getElementById('video_agree');
+        const videoLabel = document.getElementById('video_agree_label');
+        const watchBtn = document.getElementById('watchVideoBtn');
+        
+        videoAgree.checked = false;
+        videoAgree.disabled = true;
+        videoAgree.style.cursor = 'not-allowed';
+        
+        videoLabel.style.color = '#9ca3af';
+        videoLabel.style.cursor = 'not-allowed';
+        videoLabel.innerText = 'Must play video';
+        
+        document.getElementById('videoContainer').style.display = 'none';
+        document.getElementById('tutorialVideo').src = '';
+        
+        watchBtn.innerHTML = '▶️ Play Video';
+        watchBtn.style.background = '#1d4ed8';
+        watchBtn.disabled = false;
+
         document.getElementById('tncModal').style.display = 'flex';
     } else {
         window.enrollCourse(cid, price);
     }
 }
 
+// 🔥 Proceed Button Logic 🔥
 document.getElementById('tncProceedBtn').onclick = function() {
+    if (!document.getElementById('video_agree').checked) {
+        alert("Please click 'Play Video' button and confirm you have watched the tutorial.");
+        return;
+    }
     if (!document.getElementById('tnc_agree').checked) {
         alert("Please check the box to agree to the Terms & Conditions.");
         return;
     }
+    
     document.getElementById('tncModal').style.display = 'none';
+    document.getElementById('tutorialVideo').src = ''; // Background play band karna zaruri hai
     window.enrollCourse(currentPurchaseInfo.cid, currentPurchaseInfo.price);
 }
 
@@ -1119,7 +1187,6 @@ window.loadCourses = async function(userEmail = '') {
                 if(course.btn_type === 'disabled_look') {
                     btnHTML = `<button class="disabled-btn">${course.btn_text}</button>`;
                 } else if (course.btn_type === 'preview_buy') {
-                    // 🔥 FIX: Added strictly mapped TNC parameter in click function 🔥
                     btnHTML = `
                         <button style="background: transparent; color: #111; border: 2px solid #111; padding: 5px; border-radius: 8px; font-weight: bold; margin-bottom: 10px; cursor: pointer; width: 100%;" onclick="window.open('${course.demo_link}', '_blank')">Preview (Demo)</button>
                         <button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase(${course.id}, ${course.price}, '${course.show_tnc || 0}')">${course.btn_text}</button>
