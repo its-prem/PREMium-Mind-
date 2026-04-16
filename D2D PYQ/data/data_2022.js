@@ -1,4 +1,4 @@
-const data2022 = [
+export const data2022 = [
   { "id": "2022_101", "year": 2022, "subject": "Physics", "chapter": "Thermal Properties of Matter", "text": "A metal bar measures 50 cm at $0^{\\circ}C$ and 50.048 cm at $80^{\\circ}C$. The co-efficient of linear expansion of metal is", "options": ["$2.8\\times10^{-6}^{\\circ}C^{-1}$", "$4.2\\times10^{-5}^{\\circ}C^{-1}$", "$3.2\\times10^{-7}^{\\circ}C^{-1}$", "$1.2\\times10^{-5}^{\\circ}C^{-1}$"], "answer": 4 },
   { "id": "2022_102", "year": 2022, "subject": "Physics", "chapter": "Thermal Properties of Matter", "text": "A body cools in 7 minutes from $60^{\\circ}C$ to $40^{\\circ}C$. What time does it take to cool from $40^{\\circ}C$ to $28^{\\circ}C$, if the surrounding temperature is $10^{\\circ}C$?", "options": ["10 Minutes", "8 Minutes", "7 Minutes", "5 Minutes"], "answer": 3 },
   { "id": "2022_103", "year": 2022, "subject": "Physics", "chapter": "Waves", "text": "What is the velocity of a transverse wave along a wire of length 1000 m and weight 2.5 kg if the wire is pulled taut by a force of 196 N?", "options": ["$180~ms^{-1}$", "$380~ms^{-1}$", "$420~ms^{-1}$", "$280~ms^{-1}$"], "answer": 4 },
