@@ -20,130 +20,121 @@
             --black: #09090b; --black-muted: #27272a;
             --gray-dark: #52525b; --gray-light: #e4e4e7;
             --white: #ffffff;
-            --glass-bg: rgba(255, 255, 255, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.8);
-            --glass-blur: blur(24px);
-            --smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --primary: #2563eb;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --glass-blur: blur(20px);
+            --smooth: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
+
+        * { box-sizing: border-box; }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 100%);
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             background-attachment: fixed;
             color: var(--black); margin: 0; padding: 0;
             -webkit-font-smoothing: antialiased;
         }
 
-        .fade-in { animation: fadeIn 0.5s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ================= HOME DASHBOARD ================= */
         #home-view { padding: 40px 20px 100px 20px; max-width: 1000px; margin: 0 auto; }
         .hero-section { text-align: center; margin-bottom: 50px; }
-        .hero-section h1 { font-size: 38px; font-weight: 800; letter-spacing: -1px; margin-bottom: 10px; }
-        .hero-section p.funny-tag { font-size: 16px; color: var(--gray-dark); font-weight: 600; background: var(--glass-bg); display: inline-block; padding: 10px 20px; border-radius: 30px; border: 1px solid var(--glass-border); }
+        .hero-section h1 { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
+        .funny-tag { font-size: 15px; color: var(--gray-dark); font-weight: 600; background: var(--white); display: inline-block; padding: 10px 25px; border-radius: 30px; border: 1px solid var(--gray-light); box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
 
-        .section-title { font-size: 18px; font-weight: 800; text-transform: uppercase; color: var(--black-muted); margin: 40px 0 20px 0; border-bottom: 2px solid var(--black); display: inline-block; padding-bottom: 5px; }
+        .section-title { font-size: 18px; font-weight: 800; text-transform: uppercase; color: var(--black-muted); margin: 40px 0 20px 0; display: inline-block; }
 
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
 
         .combine-card {
-            background: var(--black); color: var(--white); padding: 35px; border-radius: 20px; cursor: pointer; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform var(--smooth); grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center;
+            background: var(--black); color: var(--white); padding: 30px; border-radius: 20px; cursor: pointer; text-align: left; box-shadow: 0 10px 20px rgba(0,0,0,0.15); transition: transform var(--smooth); grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center;
         }
-        .combine-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
-        .combine-card h2 { margin: 0 0 10px 0; font-size: 28px; font-weight: 800; }
-        .combine-card p { margin: 0; color: #a1a1aa; font-size: 15px; font-weight: 500; }
-        .combine-icon { background: var(--white); color: var(--black); padding: 15px 25px; border-radius: 50px; font-weight: 800; font-size: 14px; letter-spacing: 1px; }
+        .combine-card:hover { transform: translateY(-4px); box-shadow: 0 15px 30px rgba(0,0,0,0.25); }
+        .combine-card h2 { margin: 0 0 8px 0; font-size: 26px; font-weight: 800; }
+        .combine-card p { margin: 0; color: #a1a1aa; font-size: 14px; font-weight: 500; }
+        .combine-icon { background: var(--white); color: var(--black); padding: 12px 20px; border-radius: 30px; font-weight: 800; font-size: 13px; }
 
         .year-card {
             background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); padding: 30px 20px; border-radius: 20px; text-align: center; cursor: pointer; transition: all var(--smooth);
         }
-        .year-card:hover { transform: translateY(-5px); background: var(--white); box-shadow: 0 12px 30px rgba(0,0,0,0.08); border-color: var(--white); }
+        .year-card:hover { transform: translateY(-4px); background: var(--white); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         .year-card h3 { margin: 0; font-size: 32px; font-weight: 800; color: var(--black); }
-        .year-card p { margin: 5px 0 0 0; font-size: 12px; font-weight: 700; color: var(--gray-dark); text-transform: uppercase; }
+        .year-card p { margin: 8px 0 0 0; font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; }
 
         /* ================= TEST & FILTER VIEW ================= */
         #test-view { display: none; padding-bottom: 120px; }
 
         .top-nav {
-            position: sticky; top: 0; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); z-index: 1000; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); z-index: 1000; padding: 15px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
         }
-        .nav-left { display: flex; align-items: center; gap: 15px; }
-        .back-btn { background: var(--white); border: 1px solid var(--gray-light); padding: 8px 15px; border-radius: 10px; cursor: pointer; font-weight: 700; transition: all 0.2s; }
+        .back-btn { background: var(--white); border: 1px solid var(--gray-light); padding: 8px 16px; border-radius: 12px; cursor: pointer; font-weight: 700; transition: all 0.2s; display: flex; align-items: center; gap: 8px; font-size: 14px;}
         .back-btn:hover { background: var(--black); color: var(--white); }
 
-        /* Premium Filter UI */
-        .filter-panel {
-            background: var(--white); border-bottom: 1px solid var(--gray-light); padding: 30px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        /* Dropdown Filter Bar */
+        .filter-bar {
+            background: var(--white); padding: 15px 24px; border-bottom: 1px solid var(--gray-light); display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
-        .filter-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-width: 1000px; margin: 0 auto;
+        .filter-select {
+            padding: 10px 15px; border-radius: 12px; border: 2px solid var(--gray-light); background: #f8fafc; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--black-muted); cursor: pointer; outline: none; transition: border-color 0.2s; min-width: 150px;
         }
-        .filter-group h4 { margin: 0 0 15px 0; font-size: 14px; text-transform: uppercase; color: var(--gray-dark); letter-spacing: 1px; }
-        .chip-container { display: flex; flex-wrap: wrap; gap: 10px; }
-        
-        .chip {
-            background: var(--bg-body); border: 1px solid var(--gray-light); color: var(--gray-dark); padding: 8px 18px; border-radius: 50px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; user-select: none;
-        }
-        .chip:hover { background: var(--gray-light); color: var(--black); }
-        .chip.active { background: var(--black); color: var(--white); border-color: var(--black); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-        .toggle-filter-btn { background: transparent; border: 2px solid var(--black); font-weight: 800; padding: 8px 18px; border-radius: 20px; cursor: pointer; transition: all 0.2s;}
-        .toggle-filter-btn:hover { background: var(--black); color: var(--white); }
+        .filter-select:focus, .filter-select:hover { border-color: var(--black); background: var(--white); }
 
-        .container { max-width: 800px; margin: 0 auto; padding: 24px; }
+        .container { max-width: 800px; margin: 0 auto; padding: 30px 20px; }
 
-        /* Year & Subject Headers */
-        .year-header {
-            font-size: 24px; font-weight: 800; color: var(--black); margin: 50px 0 20px 0; display: flex; align-items: center; gap: 15px; border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;
-        }
-        .year-header::before { content: '📅'; font-size: 28px; }
-        .subject-badge {
-            display: inline-block; background: var(--black-muted); color: var(--white); padding: 6px 15px; border-radius: 8px; font-size: 14px; font-weight: 700; margin-bottom: 20px; letter-spacing: 1px; text-transform: uppercase;
-        }
+        /* Headers */
+        .year-header { font-size: 22px; font-weight: 800; color: var(--black); margin: 40px 0 15px 0; border-bottom: 2px solid var(--gray-light); padding-bottom: 8px; }
+        .subject-badge { display: inline-block; background: var(--black-muted); color: var(--white); padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; margin-bottom: 20px; letter-spacing: 0.5px; }
 
         /* Question Cards */
-        .q-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-radius: 24px; padding: 35px; margin-bottom: 24px; border: 1px solid var(--glass-border); box-shadow: 0 8px 32px rgba(0,0,0,0.03); transition: transform 0.2s; }
-        .q-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.06); }
-        .q-meta { font-size: 12px; font-weight: 800; color: var(--gray-dark); text-transform: uppercase; margin-bottom: 20px; display: flex; gap: 10px; }
-        .q-meta span { background: var(--white); padding: 5px 12px; border-radius: 12px; border: 1px solid var(--gray-light); }
-        .q-text { font-size: 18px; font-weight: 600; margin-bottom: 25px; line-height: 1.6; color: var(--black); }
+        .q-card { background: var(--white); border-radius: 20px; padding: 30px; margin-bottom: 25px; border: 1px solid var(--glass-border); box-shadow: 0 4px 20px rgba(0,0,0,0.03); transition: transform 0.2s; }
+        .q-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
+        .q-meta { font-size: 11px; font-weight: 700; color: var(--gray-dark); margin-bottom: 15px; display: flex; gap: 8px; flex-wrap: wrap;}
+        .q-meta span { background: #f1f5f9; padding: 4px 10px; border-radius: 8px; }
+        .q-text { font-size: 16px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; }
         
-        .options-grid { display: flex; flex-direction: column; gap: 14px; }
-        .opt-label { padding: 16px 20px; border-radius: 16px; border: 2px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.5); cursor: pointer; font-size: 16px; font-weight: 500; display: flex; align-items: center; transition: all var(--smooth); }
+        .options-grid { display: flex; flex-direction: column; gap: 12px; }
+        .opt-label { padding: 14px 18px; border-radius: 14px; border: 2px solid var(--gray-light); background: #f8fafc; cursor: pointer; font-size: 15px; font-weight: 500; display: flex; align-items: center; transition: all 0.2s; }
         .opt-label input { position: absolute; opacity: 0; }
-        .custom-radio { width: 22px; height: 22px; min-width: 22px; border: 2px solid var(--gray-dark); border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; }
+        .custom-radio { width: 20px; height: 20px; min-width: 20px; border: 2px solid var(--gray-dark); border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; }
         .opt-label input:checked ~ .custom-radio { border-color: var(--black); }
-        .opt-label input:checked ~ .custom-radio::after { content: ''; width: 12px; height: 12px; background: var(--black); border-radius: 50%; }
-        .opt-label.selected-bg { border-color: var(--black); background: var(--white); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .opt-label input:checked ~ .custom-radio::after { content: ''; width: 10px; height: 10px; background: var(--black); border-radius: 50%; }
+        .opt-label.selected-bg { border-color: var(--black); background: var(--white); }
 
-        /* Floating Submit Button */
+        /* Bottom Submit */
         .bottom-action-bar {
             position: fixed; bottom: 30px; right: 30px; z-index: 1000;
-            opacity: 0; transform: translateY(20px) scale(0.95); pointer-events: none;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0; transform: translateY(20px); pointer-events: none; transition: all 0.3s;
         }
-        .bottom-action-bar.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+        .bottom-action-bar.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
         .btn-submit {
-            background: var(--black); color: var(--white); border: none; padding: 18px 36px; border-radius: 50px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; transition: transform 0.2s;
+            background: var(--black); color: var(--white); border: none; padding: 16px 32px; border-radius: 50px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; transition: transform 0.2s;
         }
-        .btn-submit:hover { transform: translateY(-4px); box-shadow: 0 15px 40px rgba(0,0,0,0.4); }
-
-        /* End Anchor for Submit Trigger */
-        #scroll-anchor { height: 20px; width: 100%; margin-top: 20px; }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
+        #scroll-anchor { height: 10px; width: 100%; margin-top: 10px; }
 
         /* Results */
-        .correct-opt { border-color: var(--black) !important; background: var(--white) !important; color: var(--black); font-weight: 700; }
-        .wrong-opt { border-color: var(--gray-dark) !important; background: transparent !important; color: var(--gray-dark); opacity: 0.6; text-decoration: line-through; }
-        .result-dashboard { display: none; text-align: center; background: var(--glass-bg); backdrop-filter: var(--glass-blur); padding: 50px; border-radius: 30px; margin-top: 40px; border: 1px solid var(--glass-border); box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
-        .score-circle { width: 140px; height: 140px; border-radius: 50%; background: var(--white); display: flex; align-items: center; justify-content: center; font-size: 38px; font-weight: 800; margin: 0 auto 20px auto; border: 8px solid var(--black); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .correct-opt { border-color: #10b981 !important; background: #ecfdf5 !important; color: #065f46; font-weight: 700; }
+        .correct-opt .custom-radio { border-color: #10b981 !important; background: #10b981 !important; }
+        .correct-opt .custom-radio::after { display: none; }
+        
+        .wrong-opt { border-color: #ef4444 !important; background: #fef2f2 !important; color: #991b1b; text-decoration: line-through; }
+        .wrong-opt .custom-radio { border-color: #ef4444 !important; background: #ef4444 !important; }
+        .wrong-opt .custom-radio::after { display: none; }
+        
+        .result-dashboard { display: none; text-align: center; background: var(--white); padding: 40px 20px; border-radius: 24px; margin-top: 30px; border: 1px solid var(--gray-light); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--white); display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 800; margin: 0 auto 20px auto; border: 8px solid var(--black); }
 
-        @media (max-width: 800px) {
-            .filter-grid { grid-template-columns: 1fr; gap: 20px; }
+        @media (max-width: 600px) {
             .hero-section h1 { font-size: 30px; }
-            .combine-card { flex-direction: column; text-align: center; gap: 15px; }
-            .bottom-action-bar { bottom: 20px; right: 20px; }
-            .btn-submit { padding: 15px 25px; font-size: 14px; }
-            .q-card { padding: 25px; }
+            .filter-bar { padding: 15px; flex-direction: column; }
+            .filter-select { width: 100%; }
+            .bottom-action-bar { bottom: 20px; right: 20px; left: 20px; display: flex; justify-content: center; }
+            .btn-submit { width: 100%; justify-content: center; }
+            .q-card { padding: 20px; }
         }
     </style>
 </head>
@@ -151,19 +142,19 @@
 
     <div id="home-view" class="fade-in">
         <div class="hero-section">
-            <h1>Welcome to D2D PYQ! 🎓</h1>
-            <p class="funny-tag">Kyunki ratta maarne se achha hai previous year pel do! 😂🚀</p>
+            <h1>D2D PYQ Master 🎓</h1>
+            <p class="funny-tag">Kyunki ratta maarne se achha hai previous year pel do! 🚀</p>
         </div>
 
         <div class="combine-card" onclick="openCombineFilter()">
             <div>
                 <h2>Combine Research Lab 🧪</h2>
-                <p>Filter & mix questions by Year, Subject, and Chapter!</p>
+                <p>Mix & Filter across Years, Subjects, and Chapters!</p>
             </div>
-            <div class="combine-icon">ENTER LAB →</div>
+            <div class="combine-icon">ENTER →</div>
         </div>
 
-        <div class="section-title">Year-Wise Papers (2017 - 2025)</div>
+        <div class="section-title">Year-Wise Papers</div>
         <div class="grid-container" id="year-grid"></div>
     </div>
 
@@ -171,36 +162,32 @@
         <nav class="top-nav">
             <div class="nav-left">
                 <button class="back-btn" onclick="goHome()">← Back</button>
-                <div style="font-weight: 800; font-size: 18px;" id="test-title">Paper Setup</div>
+                <div style="font-weight: 800; font-size: 16px;" id="test-title">Paper Setup</div>
             </div>
-            <button class="toggle-filter-btn" onclick="toggleFilterPanel()" id="filter-btn">⚙️ Filters</button>
         </nav>
 
-        <div class="filter-panel" id="filter-panel">
-            <div class="filter-grid">
-                <div class="filter-group">
-                    <h4>Select Years</h4>
-                    <div class="chip-container" id="f-years"></div>
-                </div>
-                <div class="filter-group">
-                    <h4>Select Subjects</h4>
-                    <div class="chip-container" id="f-subjects"></div>
-                </div>
-                <div class="filter-group">
-                    <h4>Select Chapters</h4>
-                    <div class="chip-container" id="f-chapters"></div>
-                </div>
-            </div>
+        <div class="filter-bar" id="filter-bar">
+            <select class="filter-select" id="dd-year" onchange="applyFilters()">
+                <option value="All">All Years</option>
+            </select>
+            <select class="filter-select" id="dd-subject" onchange="applyFilters()">
+                <option value="All">All Subjects</option>
+                <option value="Physics">Physics</option>
+                <option value="Chemistry">Chemistry</option>
+                <option value="Math">Math</option>
+            </select>
+            <select class="filter-select" id="dd-chapter" onchange="applyFilters()">
+                <option value="All">All Chapters</option>
+            </select>
         </div>
 
         <div class="container" id="quiz-container"></div>
-        
         <div id="scroll-anchor"></div>
 
         <div class="bottom-action-bar" id="bottom-bar">
             <button class="btn-submit" onclick="submitTest()">
                 Submit Test
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
             </button>
@@ -209,498 +196,129 @@
 
     <script>
         // ==========================================
-        // 📥 MASTER DATA FORMAT 
+        // 📥 MASTER DATA FORMAT (id: "Year_Qno")
         // ==========================================
         const questionBank = [
             
             // --- 2025 MATH ---
-            { 
-                id: 2025101, year: 2025, subject: "Math", chapter: "Calculus", 
-                text: "Evaluate the integral: $$\\int_{0}^{\\frac{\\pi}{2}} \\sin(x) \\, dx$$", 
-                options: ["$0$", "$1$", "$-1$", "$\\frac{\\pi}{2}$"], 
-                answer: 1 
-            },
-            { 
-                id: 2025102, year: 2025, subject: "Math", chapter: "Algebra", 
-                text: "Find the roots of the quadratic equation $x^2 - 5x + 6 = 0$.", 
-                options: ["$x = 1, 6$", "$x = -2, -3$", "$x = 2, 3$", "$x = 0, 5$"], 
-                answer: 2 
-            },
-            { 
-                id: 2025103, year: 2025, subject: "Math", chapter: "Limits", 
-                text: "Find the limit: $\\lim_{x \\to 0} \\frac{\\sin x}{x}$", 
-                options: ["$\\infty$", "$0$", "$1$", "Does not exist"], 
-                answer: 2 
-            },
+            { id: "2025_101", year: 2025, subject: "Math", chapter: "Calculus", text: "Evaluate the integral: $$\\int_{0}^{\\frac{\\pi}{2}} \\sin(x) \\, dx$$", options: ["$0$", "$1$", "$-1$", "$\\frac{\\pi}{2}$"], answer: 1 },
+            { id: "2025_102", year: 2025, subject: "Math", chapter: "Algebra", text: "Find the roots of the quadratic equation $x^2 - 5x + 6 = 0$.", options: ["$x = 1, 6$", "$x = -2, -3$", "$x = 2, 3$", "$x = 0, 5$"], answer: 2 },
+            { id: "2025_103", year: 2025, subject: "Math", chapter: "Limits", text: "Find the limit: $\\lim_{x \\to 0} \\frac{\\sin x}{x}$", options: ["$\\infty$", "$0$", "$1$", "Does not exist"], answer: 2 },
 
             // --- 2024 CHEMISTRY ---
-            { 
-                id: 2024301, year: 2024, subject: "Chemistry", chapter: "Thermodynamics", 
-                text: "The ideal gas law equation is given as:", 
-                options: ["$PV = nRT$", "$P_1 V_1 = P_2 V_2$", "$V \\propto T$", "$E = mc^2$"], 
-                answer: 0 
-            }, // YAHAN COMMA MISSING THA PEHLE
+            { id: "2024_301", year: 2024, subject: "Chemistry", chapter: "Thermodynamics", text: "The ideal gas law equation is given as:", options: ["$PV = nRT$", "$P_1 V_1 = P_2 V_2$", "$V \\propto T$", "$E = mc^2$"], answer: 0 },
 
             // --- 2025 PHYSICS ---
-            { 
-                id: 2025201, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Optics", 
-                text: "The ability of optical instrument to resolve any two near objects and form separate images of those nearby objects is called", 
-                options: ["Magnification", "Distinguish power", "Focus", "Resolving power"], 
-                answer: 3 
-            },
-            { 
-                id: 2025202, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Optics", 
-                text: "The focal length of objective and eyepiece of telescope is 150 cm and 5 cm respectively. Find the distance between objective and eyepiece if the telescope is at normal adjustment.", 
-                options: ["155 cm", "750 cm", "145 cm", "30 cm"], 
-                answer: 0 
-            },
-            { 
-                id: 2025203, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Modern Physics", 
-                text: "The energy required to excite an electron from ground state to any of the excited state is known as", 
-                options: ["Ionisation energy", "Binding energy", "Excitation energy", "Kinetic energy"], 
-                answer: 2 
-            },
-            { 
-                id: 2025204, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Electrostatics", 
-                text: "A circular sheet of diameter 5 cm placed in a uniform electric field of $50 \\, N/C$ with its normal making an angle $30^\\circ$ with the field. Calculate the electric flux through the sheet.", 
-                options: ["$0.043 \\, Nm^2/C$", "$0.085 \\, Nm^2/C$", "$0.055 \\, Nm^2/C$", "$0.170 \\, Nm^2/C$"], 
-                answer: 1 
-            },
-            { 
-                id: 2025205, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Current Electricity", 
-                text: "The average velocity with which the free electrons get drifted towards the positive end of the conductor under the influence of an external electric field is called", 
-                options: ["Thermal velocity", "Electron mobility", "Current density", "Drift velocity"], 
-                answer: 3 
-            },
-            { 
-                id: 2025206, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Mechanics", 
-                text: "Find the torque of a force $\\vec{F} = 2\\hat{i} + 3\\hat{j}$ about origin when it acted upon a particle at a point $(1, 1, 0)$.", 
-                options: ["$5\\hat{k} \\, Nm$", "$-\\hat{k} \\, Nm$", "$\\hat{k} \\, Nm$", "$-5\\hat{k} \\, Nm$"], 
-                answer: 2 
-            },
-            { 
-                id: 2025207, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Properties of Matter", 
-                text: "Hooke's law states that within the elastic limit of a body", 
-                options: ["Stress is proportional to strain", "Force is proportional to displacement", "Pressure is proportional to volume", "Energy is proportional to temperature"], 
-                answer: 0 
-            },
-            { 
-                id: 2025208, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Properties of Matter", 
-                text: "Shear modulus is defined as the ratio of", 
-                options: ["Tensile stress to tensile strain", "Compressive stress to compressive strain", "Shear stress to shear strain", "Volume stress to volume strain"], 
-                answer: 2 
-            },
-            { 
-                id: 2025209, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Properties of Matter", 
-                text: "A stress of $5 \\, kg \\, wt/cm^2$ is applied to a wire. Find the percentage increase in its length if Young's modulus is $2 \\times 10^{11} \\, Pa$.", 
-                options: ["$2.45 \\times 10^{-4}$", "$2.45 \\times 10^{-6}$", "$2.45 \\times 10^{-2}$", "$2.45$"], 
-                answer: 0 
-            },
-            { 
-                id: 2025210, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Fluid Mechanics", 
-                text: "The angle between the tangent at the solid surface and the tangent at the liquid surface at the contact is called", 
-                options: ["Angle of refraction", "Angle of repose", "Angle of incidence", "Angle of contact"], 
-                answer: 3 
-            },
-            { 
-                id: 2025211, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Units & Measurements", 
-                text: "Find the dimensional formula of work.", 
-                options: ["$[M L^2 T^{-2}]$", "$[M^2 L^2 T^{-3}]$", "$[M L T^{-1}]$", "$[M L T^{-2}]$"], 
-                answer: 0 
-            },
-            { 
-                id: 2025212, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Units & Measurements", 
-                text: "What does the Least Count (LC) of a measuring instrument represent?", 
-                options: ["The maximum measurement it can take", "The smallest measurement it can accurately take", "The average value of multiple readings", "The error margin in all readings"], 
-                answer: 1 
-            },
-            { 
-                id: 2025213, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Vectors", 
-                text: "Two vectors have magnitudes of 10 units and 20 units and the angle between them is $120^\\circ$. What is the dot product of these two vectors?", 
-                options: ["200 units", "100 units", "-100 units", "-200 units"], 
-                answer: 2 
-            },
-            { 
-                id: 2025214, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Vectors", 
-                text: "Resolve in horizontal ($F_x$) and vertical components ($F_y$) of a force $F = 20 \\, N$ which is making an angle $60^\\circ$ with the horizontal.", 
-                options: ["$F_x = 10\\sqrt{3} \\, N, F_y = 10 \\, N$", "$F_x = 10 \\, N, F_y = 20 \\, N$", "$F_x = 20 \\, N, F_y = 10 \\, N$", "$F_x = 10 \\, N, F_y = 10\\sqrt{3} \\, N$"], 
-                answer: 3 
-            },
-            { 
-                id: 2025215, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Mechanics", 
-                text: "The impulse of a force acting on a body is equal to", 
-                options: ["The force multiplied by the mass of the body", "The rate of change of momentum of the body", "The change in kinetic energy of a body", "The change in linear momentum of the body"], 
-                answer: 3 
-            },
-            { 
-                id: 2025216, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Thermodynamics", 
-                text: "If the specific heat of silver is $0.235 \\, kJ/kg.K$. Find the quantity of heat energy required to raise the temperature of 100 g of silver by 50 K.", 
-                options: ["$1175 \\, J$", "$50 \\, J$", "$23.5 \\, J$", "$11.75 \\, J$"], 
-                answer: 0 
-            },
-            { 
-                id: 2025217, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Waves & Oscillations", 
-                text: "When a wave propagates through medium and the particles of a medium vibrate in a direction perpendicular to the travel of the wave, then the waves are called", 
-                options: ["Longitudinal waves", "Transverse waves", "Stationary waves", "Surface waves"], 
-                answer: 1 
-            },
-            { 
-                id: 2025218, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Thermodynamics", 
-                text: "Thermally insulated handles are used on hot utensils during cooking to avoid getting burns due to", 
-                options: ["Evaporation", "Conduction", "Convection", "Radiation"], 
-                answer: 1 
-            },
-            { 
-                id: 2025219, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Electrostatics", 
-                text: "Gauss's law provides a method to calculate", 
-                options: ["Electric potential due to a charge distribution", "Electric current through a closed surface", "Magnetic field due to a current-carrying wire", "Electric field from a charge distribution"], 
-                answer: 3 
-            },
-            { 
-                id: 2025220, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Waves & Oscillations", 
-                text: "Tuning of Radio Station is an example of", 
-                options: ["Damped oscillation", "Free vibration", "Resonant vibration", "None of the above"], 
-                answer: 2 
-            },
-            { 
-                id: 2025221, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Semiconductors", 
-                text: "When the positive terminal of a battery or DC power supply is connected to the n-side and the negative terminal is connected to the p-side of a semiconductor junction, this biasing is known as", 
-                options: ["Forward biasing", "Reverse biasing", "Neutral biasing", "Equilibrium"], 
-                answer: 1 
-            },
-            { 
-                id: 2025222, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Semiconductors", 
-                text: "For normal working of transistor, the emitter-base junction is typically", 
-                options: ["Forward biased", "Reverse biased", "Not biased", "Open-circuited"], 
-                answer: 0 
-            },
-            { 
-                id: 2025223, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Semiconductors", 
-                text: "A solar cell is a junction device, which is used to convert", 
-                options: ["Light energy into electrical energy", "Thermal energy into electrical energy", "Chemical energy into electrical energy", "Mechanical energy into electrical energy"], 
-                answer: 0 
-            },
-            { 
-                id: 2025224, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Atomic Physics", 
-                text: "The ionization potential required for ionization of hydrogen atom is", 
-                options: ["$3.4 \\, eV$", "$27.2 \\, eV$", "$10.2 \\, eV$", "$13.6 \\, eV$"], 
-                answer: 3 
-            },
-            { 
-                id: 2025225, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Optics", 
-                text: "Light wave propagates in optical fiber due to the phenomenon of", 
-                options: ["Refraction", "Diffraction", "Interference", "Total Internal Reflection (TIR)"], 
-                answer: 3 
-            },
-            { 
-                id: 2025226, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Fluid Mechanics", 
-                text: "The rise or depression of liquid in a capillary tube is called", 
-                options: ["Viscosity", "Surface tension", "Osmosis", "Capillarity"], 
-                answer: 3 
-            },
-            { 
-                id: 2025227, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Fluid Mechanics", 
-                text: "Bernoulli's theorem is based on the principle of", 
-                options: ["Conservation of energy", "Conservation of momentum", "Conservation of charge", "Conservation of mass"], 
-                answer: 0 
-            },
-            { 
-                id: 2025228, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Fluid Mechanics", 
-                text: "The Reynolds number (Re) is defined as the ratio of", 
-                options: ["Viscous forces to inertia forces", "Pressure forces to viscous forces", "Inertia forces to viscous forces", "Buoyant forces to gravitational forces"], 
-                answer: 2 
-            },
-            { 
-                id: 2025229, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Thermodynamics", 
-                text: "Heat energy always flows from", 
-                options: ["Cooler areas to warmer areas", "Region of lower temperature to higher temperature", "Hotter or warmer substances to cooler substances", "Substances with less energy to substances with more energy"], 
-                answer: 2 
-            },
-            { 
-                id: 2025230, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Thermodynamics", 
-                text: "In Kelvin scale, the freezing point of water is", 
-                options: ["$273.15 \\, K$", "$373.15 \\, K$", "$212 \\, K$", "$0 \\, K$"], 
-                answer: 0 
-            },
-            { 
-                id: 2025231, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Mechanics", 
-                text: "The relationship between coefficients of static friction ($\\mu_s$) and kinetic friction ($\\mu_k$) is given by", 
-                options: ["$\\mu_k > \\mu_s$", "$\\mu_k = \\mu_s$", "$\\mu_k < \\mu_s$", "There is no relationship between $\\mu_k$ and $\\mu_s$"], 
-                answer: 2 
-            },
-            { 
-                id: 2025232, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Modern Physics", 
-                text: "Convert 24.5 GeV to Joules. (Given $1 \\, eV = 1.6 \\times 10^{-19} \\, J$)", 
-                options: ["$39.2 \\times 10^{-11} \\, J$", "$39.2 \\times 10^{-10} \\, J$", "$39.2 \\times 10^{-9} \\, J$", "$39.2 \\times 10^{-8} \\, J$"], 
-                answer: 1 
-            },
-            { 
-                id: 2025233, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Rotational Motion", 
-                text: "The product of a force and its perpendicular distance from the axis of rotation is known as", 
-                options: ["Work", "Energy", "Power", "Torque"], 
-                answer: 3 
-            },
-            { 
-                id: 2025234, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Rotational Motion", 
-                text: "The moment of inertia of a particle about an axis of rotation is defined as the product of its", 
-                options: ["Mass and its distance from the axis of rotation", "Mass and the square of its distance from the axis of rotation", "Velocity and its distance from the axis of rotation", "Velocity and the square of its distance from the axis of rotation"], 
-                answer: 1 
-            },
-            { 
-                id: 2025235, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Rotational Motion", 
-                text: "A uniform ring of mass 200g and radius 20 cm is rotated about its diameter. What is the moment of inertia of the ring about this axis?", 
-                options: ["$4 \\times 10^{-3} \\, kgm^2$", "$2 \\times 10^{-3} \\, kgm^2$", "$8 \\times 10^{-3} \\, kgm^2$", "$4 \\times 10^{-2} \\, kgm^2$"], 
-                answer: 0 
-            },
-            { 
-                id: 2025236, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Waves", 
-                text: "An ultrasonic position sensor sends 40 kHz and detect the reflected signal from obstacle after 40ms. Find the distance of obstacle from sensor. (velocity of sound is $340 \\, m/s$)", 
-                options: ["$6.8 \\, m$", "$3.4 \\, m$", "$13.6 \\, m$", "$0.68 \\, m$"], 
-                answer: 0 
-            },
-            { 
-                id: 2025237, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Waves", 
-                text: "The range of frequencies that are audible to human ears is", 
-                options: ["Below 20 Hz", "Above 20,000 Hz", "20 Hz to 20,000 Hz", "20,000 Hz to 40,000 Hz"], 
-                answer: 2 
-            },
-            { 
-                id: 2025238, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Magnetism", 
-                text: "A point charge of $2.5 \\, C$ is moving perpendicular to magnetic field of $10 \\, amp/meter$ with a velocity $20 \\, m/s$. Find the Lorentz force acting on the charge.", 
-                options: ["$500 \\, N$", "$250 \\, N$", "$1000 \\, N$", "$25 \\, N$"], 
-                answer: 0 
-            },
-            { 
-                id: 2025239, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Optics", 
-                text: "Mathematically, power of a lens is defined as", 
-                options: ["Square of its focal length", "Product of its focal length and the speed of light", "Sum of its focal length and its diameter", "Reciprocal of focal length"], 
-                answer: 3 
-            },
-            { 
-                id: 2025240, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Optics", 
-                text: "Find refractive index of glass with respect to water. Given $_a\\mu_g = 3/2$ and $_a\\mu_w = 4/3$.", 
-                options: ["$9/8$", "$8/9$", "$1/2$", "$2$"], 
-                answer: 0 
-            },
-            { 
-                id: 2025241, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Mechanics", 
-                text: "A skier of 60 kg rests on an inclined surface of the mountain. The inclination angle $\\theta$ is $30^\\circ$ with the horizontal and the skier just begins to slide. What is the coefficient of static friction between the skier and the surface of the mountain?", 
-                options: ["$\\tan 30^\\circ$", "$\\tan 60^\\circ$", "$\\sin 30^\\circ$", "$\\cos 30^\\circ$"], 
-                answer: 0 
-            },
-            { 
-                id: 2025242, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Fluid Mechanics", 
-                text: "What is the value of atmospheric pressure in Pascals (Pa)?", 
-                options: ["$1.013 \\times 10^5 \\, Pa$", "$1.013 \\times 10^6 \\, Pa$", "$1.013 \\times 10^3 \\, Pa$", "$1.013 \\times 10^4 \\, Pa$"], 
-                answer: 0 
-            },
-            { 
-                id: 2025243, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Circular Motion", 
-                text: "When a particle moves along a circle with a constant speed, then force acts towards the centre of the circle is called", 
-                options: ["Centripetal force", "Centrifugal force", "Magnetic force", "Gravitational force"], 
-                answer: 0 
-            },
-            { 
-                id: 2025244, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Circular Motion", 
-                text: "A particle is moving in a circle of radius 40 cm with uniform speed and it completes one rotation in 10 s. What is the magnitude of the particle's acceleration?", 
-                options: ["$0.10 \\, m/s^2$", "$0.16 \\, m/s^2$", "$0.25 \\, m/s^2$", "$0.40 \\, m/s^2$"], 
-                answer: 1 
-            },
-            { 
-                id: 2025245, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Work, Energy & Power", 
-                text: "When applied force is perpendicular to displacement, then work done will be", 
-                options: ["Maximum and positive", "Zero", "Maximum and negative", "Dependent on the magnitudes of force and displacement"], 
-                answer: 1 
-            },
-            { 
-                id: 2025246, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Current Electricity", 
-                text: "If 1 ampere of current flows in a given wire having uniform area of cross section $0.05 \\, cm^2$ along length 50 cm, find specific conductance of the material of given wire if the voltage across two ends of wire is 5 volts.", 
-                options: ["$2 \\times 10^4 \\, S/m$", "$0.5 \\times 10^4 \\, S/m$", "$1 \\times 10^4 \\, S/m$", "$4 \\times 10^4 \\, S/m$"], 
-                answer: 0 
-            },
-            { 
-                id: 2025247, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Current Electricity", 
-                text: "A meter bridge or slide wire bridge is primarily used to measure", 
-                options: ["Current", "Voltage", "Unknown resistance", "Power"], 
-                answer: 2 
-            },
-            { 
-                id: 2025248, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Units & Measurements", 
-                text: "One kilowatt-hour (kWh) is equivalent to", 
-                options: ["$3.6 \\times 10^6 \\, J$", "$3.6 \\times 10^5 \\, J$", "$3600 \\, J$", "$1000 \\, J$"], 
-                answer: 0 
-            },
-            { 
-                id: 2025249, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Magnetism", 
-                text: "Ferromagnetic materials exhibit a net magnetic moment due to the presence of", 
-                options: ["Paired electrons with opposite spins", "An equal number of electrons and protons", "Unpaired electrons", "Only neutrons"], 
-                answer: 2 
-            },
-            { 
-                id: 2025250, 
-                year: 2025, 
-                subject: "Physics", 
-                chapter: "Semiconductors", 
-                text: "Free electrons in a solid are found in the", 
-                options: ["Valence band", "Inner energy levels", "Conduction band", "Forbidden gap"], 
-                answer: 2 
-            }
+          { id: "2025_201", year: 2025, subject: "Physics", chapter: "Optics", text: "The ability of optical instrument to resolve any two near objects and form separate images of those nearby objects is called", options: ["Magnification", "Distinguish power", "Focus", "Resolving power"], answer: 3 },
+    { id: "2025_202", year: 2025, subject: "Physics", chapter: "Optics", text: "The focal length of objective and eyepiece of telescope is 150 cm and 5 cm respectively. Find the distance between objective and eyepiece if the telescope is at normal adjustment.", options: ["155 cm", "750 cm", "145 cm", "30 cm"], answer: 0 },
+    { id: "2025_203", year: 2025, subject: "Physics", chapter: "Modern Physics", text: "The energy required to excite an electron from ground state to any of the excited state is known as", options: ["Ionisation energy", "Binding energy", "Excitation energy", "Kinetic energy"], answer: 2 },
+    { id: "2025_204", year: 2025, subject: "Physics", chapter: "Electrostatics", text: "A circular sheet of diameter 5 cm placed in a uniform electric field of $50 \\, N/C$ with its normal making an angle $30^\\circ$ with the field. Calculate the electric flux through the sheet.", options: ["$0.043 \\, Nm^2/C$", "$0.085 \\, Nm^2/C$", "$0.055 \\, Nm^2/C$", "$0.170 \\, Nm^2/C$"], answer: 1 },
+    { id: "2025_205", year: 2025, subject: "Physics", chapter: "Current Electricity", text: "The average velocity with which the free electrons get drifted towards the positive end of the conductor under the influence of an external electric field is called", options: ["Thermal velocity", "Electron mobility", "Current density", "Drift velocity"], answer: 3 },
+    { id: "2025_206", year: 2025, subject: "Physics", chapter: "Mechanics", text: "Find the torque of a force $\\vec{F} = 2\\hat{i} + 3\\hat{j}$ about origin when it acted upon a particle at a point $(1, 1, 0)$.", options: ["$5\\hat{k} \\, Nm$", "$-\\hat{k} \\, Nm$", "$\\hat{k} \\, Nm$", "$-5\\hat{k} \\, Nm$"], answer: 2 },
+    { id: "2025_207", year: 2025, subject: "Physics", chapter: "Properties of Matter", text: "Hooke's law states that within the elastic limit of a body", options: ["Stress is proportional to strain", "Force is proportional to displacement", "Pressure is proportional to volume", "Energy is proportional to temperature"], answer: 0 },
+    { id: "2025_208", year: 2025, subject: "Physics", chapter: "Properties of Matter", text: "Shear modulus is defined as the ratio of", options: ["Tensile stress to tensile strain", "Compressive stress to compressive strain", "Shear stress to shear strain", "Volume stress to volume strain"], answer: 2 },
+    { id: "2025_209", year: 2025, subject: "Physics", chapter: "Properties of Matter", text: "A stress of $5 \\, kg \\, wt/cm^2$ is applied to a wire. Find the percentage increase in its length if Young's modulus is $2 \\times 10^{11} \\, Pa$.", options: ["$2.45 \\times 10^{-4}$", "$2.45 \\times 10^{-6}$", "$2.45 \\times 10^{-2}$", "$2.45$"], answer: 0 },
+    { id: "2025_210", year: 2025, subject: "Physics", chapter: "Fluid Mechanics", text: "The angle between the tangent at the solid surface and the tangent at the liquid surface at the contact is called", options: ["Angle of refraction", "Angle of repose", "Angle of incidence", "Angle of contact"], answer: 3 },
+    { id: "2025_211", year: 2025, subject: "Physics", chapter: "Units & Measurements", text: "Find the dimensional formula of work.", options: ["$[M L^2 T^{-2}]$", "$[M^2 L^2 T^{-3}]$", "$[M L T^{-1}]$", "$[M L T^{-2}]$"], answer: 0 },
+    { id: "2025_212", year: 2025, subject: "Physics", chapter: "Units & Measurements", text: "What does the Least Count (LC) of a measuring instrument represent?", options: ["The maximum measurement it can take", "The smallest measurement it can accurately take", "The average value of multiple readings", "The error margin in all readings"], answer: 1 },
+    { id: "2025_213", year: 2025, subject: "Physics", chapter: "Vectors", text: "Two vectors have magnitudes of 10 units and 20 units and the angle between them is $120^\\circ$. What is the dot product of these two vectors?", options: ["200 units", "100 units", "-100 units", "-200 units"], answer: 2 },
+    { id: "2025_214", year: 2025, subject: "Physics", chapter: "Vectors", text: "Resolve in horizontal ($F_x$) and vertical components ($F_y$) of a force $F = 20 \\, N$ which is making an angle $60^\\circ$ with the horizontal.", options: ["$F_x = 10\\sqrt{3} \\, N, F_y = 10 \\, N$", "$F_x = 10 \\, N, F_y = 20 \\, N$", "$F_x = 20 \\, N, F_y = 10 \\, N$", "$F_x = 10 \\, N, F_y = 10\\sqrt{3} \\, N$"], answer: 3 },
+    { id: "2025_215", year: 2025, subject: "Physics", chapter: "Mechanics", text: "The impulse of a force acting on a body is equal to", options: ["The force multiplied by the mass of the body", "The rate of change of momentum of the body", "The change in kinetic energy of a body", "The change in linear momentum of the body"], answer: 3 },
+    { id: "2025_216", year: 2025, subject: "Physics", chapter: "Thermodynamics", text: "If the specific heat of silver is $0.235 \\, kJ/kg.K$. Find the quantity of heat energy required to raise the temperature of 100 g of silver by 50 K.", options: ["$1175 \\, J$", "$50 \\, J$", "$23.5 \\, J$", "$11.75 \\, J$"], answer: 0 },
+    { id: "2025_217", year: 2025, subject: "Physics", chapter: "Waves & Oscillations", text: "When a wave propagates through medium and the particles of a medium vibrate in a direction perpendicular to the travel of the wave, then the waves are called", options: ["Longitudinal waves", "Transverse waves", "Stationary waves", "Surface waves"], answer: 1 },
+    { id: "2025_218", year: 2025, subject: "Physics", chapter: "Thermodynamics", text: "Thermally insulated handles are used on hot utensils during cooking to avoid getting burns due to", options: ["Evaporation", "Conduction", "Convection", "Radiation"], answer: 1 },
+    { id: "2025_219", year: 2025, subject: "Physics", chapter: "Electrostatics", text: "Gauss's law provides a method to calculate", options: ["Electric potential due to a charge distribution", "Electric current through a closed surface", "Magnetic field due to a current-carrying wire", "Electric field from a charge distribution"], answer: 3 },
+    { id: "2025_220", year: 2025, subject: "Physics", chapter: "Waves & Oscillations", text: "Tuning of Radio Station is an example of", options: ["Damped oscillation", "Free vibration", "Resonant vibration", "None of the above"], answer: 2 },
+    { id: "2025_221", year: 2025, subject: "Physics", chapter: "Semiconductors", text: "When the positive terminal of a battery or DC power supply is connected to the n-side and the negative terminal is connected to the p-side of a semiconductor junction, this biasing is known as", options: ["Forward biasing", "Reverse biasing", "Neutral biasing", "Equilibrium"], answer: 1 },
+    { id: "2025_222", year: 2025, subject: "Physics", chapter: "Semiconductors", text: "For normal working of transistor, the emitter-base junction is typically", options: ["Forward biased", "Reverse biased", "Not biased", "Open-circuited"], answer: 0 },
+    { id: "2025_223", year: 2025, subject: "Physics", chapter: "Semiconductors", text: "A solar cell is a junction device, which is used to convert", options: ["Light energy into electrical energy", "Thermal energy into electrical energy", "Chemical energy into electrical energy", "Mechanical energy into electrical energy"], answer: 0 },
+    { id: "2025_224", year: 2025, subject: "Physics", chapter: "Atomic Physics", text: "The ionization potential required for ionization of hydrogen atom is", options: ["$3.4 \\, eV$", "$27.2 \\, eV$", "$10.2 \\, eV$", "$13.6 \\, eV$"], answer: 3 },
+    { id: "2025_225", year: 2025, subject: "Physics", chapter: "Optics", text: "Light wave propagates in optical fiber due to the phenomenon of", options: ["Refraction", "Diffraction", "Interference", "Total Internal Reflection (TIR)"], answer: 3 },
+    { id: "2025_226", year: 2025, subject: "Physics", chapter: "Fluid Mechanics", text: "The rise or depression of liquid in a capillary tube is called", options: ["Viscosity", "Surface tension", "Osmosis", "Capillarity"], answer: 3 },
+    { id: "2025_227", year: 2025, subject: "Physics", chapter: "Fluid Mechanics", text: "Bernoulli's theorem is based on the principle of", options: ["Conservation of energy", "Conservation of momentum", "Conservation of charge", "Conservation of mass"], answer: 0 },
+    { id: "2025_228", year: 2025, subject: "Physics", chapter: "Fluid Mechanics", text: "The Reynolds number (Re) is defined as the ratio of", options: ["Viscous forces to inertia forces", "Pressure forces to viscous forces", "Inertia forces to viscous forces", "Buoyant forces to gravitational forces"], answer: 2 },
+    { id: "2025_229", year: 2025, subject: "Physics", chapter: "Thermodynamics", text: "Heat energy always flows from", options: ["Cooler areas to warmer areas", "Region of lower temperature to higher temperature", "Hotter or warmer substances to cooler substances", "Substances with less energy to substances with more energy"], answer: 2 },
+    { id: "2025_230", year: 2025, subject: "Physics", chapter: "Thermodynamics", text: "In Kelvin scale, the freezing point of water is", options: ["$273.15 \\, K$", "$373.15 \\, K$", "$212 \\, K$", "$0 \\, K$"], answer: 0 },
+    { id: "2025_231", year: 2025, subject: "Physics", chapter: "Mechanics", text: "The relationship between coefficients of static friction ($\\mu_s$) and kinetic friction ($\\mu_k$) is given by", options: ["$\\mu_k > \\mu_s$", "$\\mu_k = \\mu_s$", "$\\mu_k < \\mu_s$", "There is no relationship between $\\mu_k$ and $\\mu_s$"], answer: 2 },
+    { id: "2025_232", year: 2025, subject: "Physics", chapter: "Modern Physics", text: "Convert 24.5 GeV to Joules. (Given $1 \\, eV = 1.6 \\times 10^{-19} \\, J$)", options: ["$39.2 \\times 10^{-11} \\, J$", "$39.2 \\times 10^{-10} \\, J$", "$39.2 \\times 10^{-9} \\, J$", "$39.2 \\times 10^{-8} \\, J$"], answer: 1 },
+    { id: "2025_233", year: 2025, subject: "Physics", chapter: "Rotational Motion", text: "The product of a force and its perpendicular distance from the axis of rotation is known as", options: ["Work", "Energy", "Power", "Torque"], answer: 3 },
+    { id: "2025_234", year: 2025, subject: "Physics", chapter: "Rotational Motion", text: "The moment of inertia of a particle about an axis of rotation is defined as the product of its", options: ["Mass and its distance from the axis of rotation", "Mass and the square of its distance from the axis of rotation", "Velocity and its distance from the axis of rotation", "Velocity and the square of its distance from the axis of rotation"], answer: 1 },
+    { id: "2025_235", year: 2025, subject: "Physics", chapter: "Rotational Motion", text: "A uniform ring of mass 200g and radius 20 cm is rotated about its diameter. What is the moment of inertia of the ring about this axis?", options: ["$4 \\times 10^{-3} \\, kgm^2$", "$2 \\times 10^{-3} \\, kgm^2$", "$8 \\times 10^{-3} \\, kgm^2$", "$4 \\times 10^{-2} \\, kgm^2$"], answer: 0 },
+    { id: "2025_236", year: 2025, subject: "Physics", chapter: "Waves", text: "An ultrasonic position sensor sends 40 kHz and detect the reflected signal from obstacle after 40ms. Find the distance of obstacle from sensor. (velocity of sound is $340 \\, m/s$)", options: ["$6.8 \\, m$", "$3.4 \\, m$", "$13.6 \\, m$", "$0.68 \\, m$"], answer: 0 },
+    { id: "2025_237", year: 2025, subject: "Physics", chapter: "Waves", text: "The range of frequencies that are audible to human ears is", options: ["Below 20 Hz", "Above 20,000 Hz", "20 Hz to 20,000 Hz", "20,000 Hz to 40,000 Hz"], answer: 2 },
+    { id: "2025_238", year: 2025, subject: "Physics", chapter: "Magnetism", text: "A point charge of $2.5 \\, C$ is moving perpendicular to magnetic field of $10 \\, amp/meter$ with a velocity $20 \\, m/s$. Find the Lorentz force acting on the charge.", options: ["$500 \\, N$", "$250 \\, N$", "$1000 \\, N$", "$25 \\, N$"], answer: 0 },
+    { id: "2025_239", year: 2025, subject: "Physics", chapter: "Optics", text: "Mathematically, power of a lens is defined as", options: ["Square of its focal length", "Product of its focal length and the speed of light", "Sum of its focal length and its diameter", "Reciprocal of focal length"], answer: 3 },
+    { id: "2025_240", year: 2025, subject: "Physics", chapter: "Optics", text: "Find refractive index of glass with respect to water. Given $_a\\mu_g = 3/2$ and $_a\\mu_w = 4/3$.", options: ["$9/8$", "$8/9$", "$1/2$", "$2$"], answer: 0 },
+    { id: "2025_241", year: 2025, subject: "Physics", chapter: "Mechanics", text: "A skier of 60 kg rests on an inclined surface of the mountain. The inclination angle $\\theta$ is $30^\\circ$ with the horizontal and the skier just begins to slide. What is the coefficient of static friction between the skier and the surface of the mountain?", options: ["$\\tan 30^\\circ$", "$\\tan 60^\\circ$", "$\\sin 30^\\circ$", "$\\cos 30^\\circ$"], answer: 0 },
+    { id: "2025_242", year: 2025, subject: "Physics", chapter: "Fluid Mechanics", text: "What is the value of atmospheric pressure in Pascals (Pa)?", options: ["$1.013 \\times 10^5 \\, Pa$", "$1.013 \\times 10^6 \\, Pa$", "$1.013 \\times 10^3 \\, Pa$", "$1.013 \\times 10^4 \\, Pa$"], answer: 0 },
+    { id: "2025_243", year: 2025, subject: "Physics", chapter: "Circular Motion", text: "When a particle moves along a circle with a constant speed, then force acts towards the centre of the circle is called", options: ["Centripetal force", "Centrifugal force", "Magnetic force", "Gravitational force"], answer: 0 },
+    { id: "2025_244", year: 2025, subject: "Physics", chapter: "Circular Motion", text: "A particle is moving in a circle of radius 40 cm with uniform speed and it completes one rotation in 10 s. What is the magnitude of the particle's acceleration?", options: ["$0.10 \\, m/s^2$", "$0.16 \\, m/s^2$", "$0.25 \\, m/s^2$", "$0.40 \\, m/s^2$"], answer: 1 },
+    { id: "2025_245", year: 2025, subject: "Physics", chapter: "Work, Energy & Power", text: "When applied force is perpendicular to displacement, then work done will be", options: ["Maximum and positive", "Zero", "Maximum and negative", "Dependent on the magnitudes of force and displacement"], answer: 1 },
+    { id: "2025_246", year: 2025, subject: "Physics", chapter: "Current Electricity", text: "If 1 ampere of current flows in a given wire having uniform area of cross section $0.05 \\, cm^2$ along length 50 cm, find specific conductance of the material of given wire if the voltage across two ends of wire is 5 volts.", options: ["$2 \\times 10^4 \\, S/m$", "$0.5 \\times 10^4 \\, S/m$", "$1 \\times 10^4 \\, S/m$", "$4 \\times 10^4 \\, S/m$"], answer: 0 },
+    { id: "2025_247", year: 2025, subject: "Physics", chapter: "Current Electricity", text: "A meter bridge or slide wire bridge is primarily used to measure", options: ["Current", "Voltage", "Unknown resistance", "Power"], answer: 2 },
+    { id: "2025_248", year: 2025, subject: "Physics", chapter: "Units & Measurements", text: "One kilowatt-hour (kWh) is equivalent to", options: ["$3.6 \\times 10^6 \\, J$", "$3.6 \\times 10^5 \\, J$", "$3600 \\, J$", "$1000 \\, J$"], answer: 0 },
+    { id: "2025_249", year: 2025, subject: "Physics", chapter: "Magnetism", text: "Ferromagnetic materials exhibit a net magnetic moment due to the presence of", options: ["Paired electrons with opposite spins", "An equal number of electrons and protons", "Unpaired electrons", "Only neutrons"], answer: 2 },
+    { id: "2025_250", year: 2025, subject: "Physics", chapter: "Semiconductors", text: "Free electrons in a solid are found in the", options: ["Valence band", "Inner energy levels", "Conduction band", "Forbidden gap"], answer: 2 },
+       
+
+    { id: "2025_301", year: 2025, subject: "Chemistry", chapter: "General Chemistry", text: "Glass is described as an excellent insulator against", options: ["Pressure and friction", "Magnetic field and gravity", "Sound and vibration", "Heat, electricity and electromagnetic radiation"], answer: 3 },
+    { id: "2025_302", year: 2025, subject: "Chemistry", chapter: "Fuels", text: "Which of the following is the main constituent of fuel?", options: ["Oxygen", "Nitrogen", "Carbon", "None of the above"], answer: 2 },
+    { id: "2025_303", year: 2025, subject: "Chemistry", chapter: "Fuels", text: "Cetane (n-Hexadecane) is assigned a cetane number of", options: ["100", "50", "10", "78"], answer: 0 },
+    { id: "2025_304", year: 2025, subject: "Chemistry", chapter: "Lubricants", text: "A substance introduced between two moving or sliding surfaces to reduce friction or frictional resistance is known as", options: ["Coolant", "Lubricant", "Catalyst", "Solvent"], answer: 1 },
+    { id: "2025_305", year: 2025, subject: "Chemistry", chapter: "Lubricants", text: "Semi-solid lubricants are obtained by combining lubricating oil with", options: ["Thickening agents", "Cooling agents", "Cleaning agents", "Oxidation inhibitors"], answer: 0 },
+    { id: "2025_306", year: 2025, subject: "Chemistry", chapter: "Water Treatment", text: "Temporary hardness in water is caused by the presence of dissolved", options: ["Chlorides and sulfates of magnesium", "Carbonates of calcium", "Hydroxides of calcium", "Bicarbonates of magnesium, calcium and other metals"], answer: 3 },
+    { id: "2025_307", year: 2025, subject: "Chemistry", chapter: "Organic Chemistry", text: "Which of the following are commonly used fatty acids in soap?", options: ["Acetic acid and valine", "Hydrochloric acid and H2SO4", "Benzoic acid and alanine", "Palmitic acid, oleic acid and stearic acid"], answer: 3 },
+    { id: "2025_308", year: 2025, subject: "Chemistry", chapter: "Water Treatment", text: "Which of the following is listed as a reason for boiler corrosion?", options: ["High steam velocities", "Improper boiler design", "Dissolved oxygen", "Presence of oil"], answer: 2 },
+    { id: "2025_309", year: 2025, subject: "Chemistry", chapter: "Water Treatment", text: "The EDTA method is used to determine the", options: ["Presence of dissolved CO2 in H2O", "Amount of dissolved oxygen in H2O", "pH of water sample", "Hardness of water"], answer: 3 },
+    { id: "2025_310", year: 2025, subject: "Chemistry", chapter: "Water Treatment", text: "Alkalinity of water is defined as the measure of", options: ["Hardness causing ions", "The acid neutralising capacity of H2O", "Total dissolved solids", "Concentration of metal ions"], answer: 1 },
+    { id: "2025_311", year: 2025, subject: "Chemistry", chapter: "Atomic Structure", text: "As move away from the nucleus, the energy of the orbits", options: ["Decreases", "Remains constant", "Goes on increasing", "Fluctuates randomly"], answer: 2 },
+    { id: "2025_312", year: 2025, subject: "Chemistry", chapter: "Atomic Structure", text: "Which series of hydrogen spectrum appears in visible region?", options: ["Balmer series", "Lyman series", "Paschen series", "Brackette series"], answer: 0 },
+    { id: "2025_313", year: 2025, subject: "Chemistry", chapter: "Atomic Structure", text: "Heisenberg won the Noble Prize in 1932 for the", options: ["Theory of relativity", "Quantum mechanics", "Discovery of the electron", "Development of atomic model"], answer: 1 },
+    { id: "2025_314", year: 2025, subject: "Chemistry", chapter: "Atomic Structure", text: "What is the total electron capacity of a p-orbital?", options: ["2 electrons", "4 electrons", "1 electron", "6 electrons"], answer: 3 },
+    { id: "2025_315", year: 2025, subject: "Chemistry", chapter: "Atomic Structure", text: "The Azimuthal Quantum Number (l) is used to describe the", options: ["Sub-energy level", "Main energy level", "Spin of the electron", "Orientation of the orbit in space"], answer: 0 },
+    { id: "2025_316", year: 2025, subject: "Chemistry", chapter: "Metallurgy", text: "Naturally occurring chemical substances in which metals or their compounds occur either in native state or combined state are called", options: ["Minerals", "Alloys", "Gangue", "Ores"], answer: 0 },
+    { id: "2025_317", year: 2025, subject: "Chemistry", chapter: "Metallurgy", text: "Unwanted impurities such as sand, stone, earthy particles, limestone and mica present in an ore are collectively called", options: ["Slag", "Gangue or matrix", "Mineral", "Flux"], answer: 1 },
+    { id: "2025_318", year: 2025, subject: "Chemistry", chapter: "Metallurgy", text: "The process of extracting metals from their ores and then refining them for use is called", options: ["Smelting", "Roasting", "Calcination", "Metallurgy"], answer: 3 },
+    { id: "2025_319", year: 2025, subject: "Chemistry", chapter: "Metallurgy", text: "Physical concentration methods for ores include", options: ["Gravity separation, magnetic separation and froth flotation", "Calcination and roasting", "Leaching and electrolysis", "Smelting and reduction"], answer: 0 },
+    { id: "2025_320", year: 2025, subject: "Chemistry", chapter: "Metallurgy", text: "Which of the following ores can be concentrated using the froth flotation method?", options: ["Haematite (Fe2O3)", "Zinc blende (ZnS)", "Bauxite (Al2O3.2H2O)", "Tinstone (SnO2)"], answer: 1 },
+    { id: "2025_321", year: 2025, subject: "Chemistry", chapter: "Electrochemistry", text: "The value of 1 Faraday is approximately equal to", options: ["96.5 coulombs", "965 coulombs", "9650 coulombs", "96500 coulombs"], answer: 3 },
+    { id: "2025_322", year: 2025, subject: "Chemistry", chapter: "Electrochemistry", text: "The electrolyte used in electrolytic refining is a solution of", options: ["A strong acid", "Non-electrolytes", "Salt of the metal to be refined", "Pure water"], answer: 2 },
+    { id: "2025_323", year: 2025, subject: "Chemistry", chapter: "Electrochemistry", text: "The graphite rod in a dry cell is surrounded by paste of", options: ["ZnCl2 and NH4Cl", "KOH", "CuSO4", "Manganese dioxide (MnO2), ground carbon and water"], answer: 3 },
+    { id: "2025_324", year: 2025, subject: "Chemistry", chapter: "Electrochemistry", text: "Secondary cells are also known as", options: ["Storage cells or accumulators", "Voltaic cells", "Electric cells", "Primary cells"], answer: 0 },
+    { id: "2025_325", year: 2025, subject: "Chemistry", chapter: "Electrochemistry", text: "The process of coating a layer of zinc on iron by hot dipping is called", options: ["Electroplating", "Tinning", "Galvanizing", "Anodizing"], answer: 2 },
+    { id: "2025_326", year: 2025, subject: "Chemistry", chapter: "Water Treatment", text: "Which indicators are used in the alkalinity estimation for the quantitative determination of hard water?", options: ["Litmus and methyl red", "EBT and EDTA", "Phenolphthalein and methyl orange", "Bromothymol and phenolphthalein"], answer: 2 },
+    { id: "2025_327", year: 2025, subject: "Chemistry", chapter: "Water Treatment", text: "Which of the following is listed as an external treatment method for water softening?", options: ["Soda lime processes", "Colloidal treatment", "Phosphate treatment", "None of the above"], answer: 0 },
+    { id: "2025_328", year: 2025, subject: "Chemistry", chapter: "Water Treatment", text: "The zeolite or permutit process is a method for", options: ["Disinfecting water", "Softening of water", "Increasing the hardness of water", "Removing dissolved gases from water"], answer: 1 },
+    { id: "2025_329", year: 2025, subject: "Chemistry", chapter: "Water Treatment", text: "Excessive levels of fluoride in drinking water can be lead to", options: ["Improved bone density", "Lower risk of cancers", "Dental and skeletal fluorosis", "Cognitive abilities"], answer: 2 },
+    { id: "2025_330", year: 2025, subject: "Chemistry", chapter: "Environmental Chemistry", text: "In 2010, which international body explicitly recognised the human right to water and sanitation?", options: ["Bureau of Indian Standard (BIS)", "World Health Organisation (WHO)", "Indian Council of Medical Research (ICMR)", "UN General Assembly"], answer: 3 },
+    { id: "2025_331", year: 2025, subject: "Chemistry", chapter: "General Chemistry", text: "The density of water is maximum at", options: ["0 K", "277 K", "250 K", "300 K"], answer: 1 },
+    { id: "2025_332", year: 2025, subject: "Chemistry", chapter: "Chemical Bonding", text: "In NH3, one 2s and three 2p orbitals of Nitrogen undergo sp³ hybridisation to form how many sp3 hybrid orbitals?", options: ["Four", "Two", "Five", "Three"], answer: 0 },
+    { id: "2025_333", year: 2025, subject: "Chemistry", chapter: "Atomic Structure", text: "The spectral lines of different frequencies are evidence that", options: ["Distance between different orbits is equal", "The distance between two different orbits is not equal", "Electrons always remain in their ground state", "Electrons can jump with higher to lower energy orbitals"], answer: 3 },
+    { id: "2025_334", year: 2025, subject: "Chemistry", chapter: "Atomic Structure", text: "In hydrogen atom if an electron jumps from the n = 7 energy level to the n = 6 energy level, which series does this spectral line belong to?", options: ["Lyman series", "Balmer series", "Humphreys series", "Paschen series"], answer: 2 },
+    { id: "2025_335", year: 2025, subject: "Chemistry", chapter: "Organic Chemistry", text: "Soap is described as a potassium or sodium salt of", options: ["Simple carboxylic acids", "Mineral acids", "Higher fatty acids", "Amino acids"], answer: 2 },
+    { id: "2025_336", year: 2025, subject: "Chemistry", chapter: "Metallurgy", text: "In the extraction of copper, iron impurities (FeO) are basic, which acidic flux is used to remove them?", options: ["SiO2", "MgO", "CaO", "Fe2O3"], answer: 0 },
+    { id: "2025_337", year: 2025, subject: "Chemistry", chapter: "Metallurgy", text: "The method used for the reduction of metal oxide depends on", options: ["Physical state of the ore", "The nature and chemical reactivity of the metal", "The location where the ore is found", "The amount of impurities present"], answer: 1 },
+    { id: "2025_338", year: 2025, subject: "Chemistry", chapter: "Metallurgy", text: "In the reduction of ferric oxide (Fe2O3) using CO in a furnace, the products formed are", options: ["Iron and CO", "Iron (II) oxide and CO2", "Iron and CO2", "Iron carbide and CO"], answer: 2 },
+    { id: "2025_339", year: 2025, subject: "Chemistry", chapter: "Metallurgy", text: "Which of the following metals is commonly refined using the liquation method?", options: ["Tin", "Iron", "Aluminium", "Magnesium"], answer: 0 },
+    { id: "2025_340", year: 2025, subject: "Chemistry", chapter: "Polymers", text: "Asbestos and powdered mica are examples of which type of filler?", options: ["Organic filler", "Inorganic filler", "Elastomeric filler", "Polymer filler"], answer: 1 },
+    { id: "2025_341", year: 2025, subject: "Chemistry", chapter: "Chemical Bonding", text: "According to the Lewis Octet Rule, atoms of all elements tend to acquire an electronic configuration similar to that of", options: ["Halogens", "Inert gases", "Alkali metals", "Transition metals"], answer: 1 },
+    { id: "2025_342", year: 2025, subject: "Chemistry", chapter: "Chemical Bonding", text: "The chemical bond formed as a result of the transfer of one or more electrons from electropositive to electronegative atoms is called as", options: ["Covalent bond", "Metallic bond", "Hydrogen bond", "Electrovalent bond"], answer: 3 },
+    { id: "2025_343", year: 2025, subject: "Chemistry", chapter: "Chemical Bonding", text: "The symbols introduced by Lewis to represent valence electrons are known as", options: ["Bohr Models", "Electron-dot symbols", "Electronic configuration", "None of the above"], answer: 1 },
+    { id: "2025_344", year: 2025, subject: "Chemistry", chapter: "Chemical Bonding", text: "When a covalent bond is formed by overlapping of half-filled atomic orbitals along the same axis, it is called", options: ["Pi bond", "Triple bond", "Sigma bond", "Double bond"], answer: 2 },
+    { id: "2025_345", year: 2025, subject: "Chemistry", chapter: "Chemical Bonding", text: "Ice has relatively high freezing and boiling points due to its", options: ["Hydrogen bonds", "Metallic bonds", "Strong covalent bonds", "Weak Van der Waal's forces"], answer: 0 },
+    { id: "2025_346", year: 2025, subject: "Chemistry", chapter: "Chemical Bonding", text: "The easy sliding of one layer of graphite over another is facilitated by", options: ["Strong covalent bonds", "Weak Van der Waal's forces", "Metallic bonding", "Ionic interactions"], answer: 1 },
+    { id: "2025_347", year: 2025, subject: "Chemistry", chapter: "Lubricants", text: "To maintain the viscosity of oil in all seasons of the year, hydrocarbon lubricants are often blended with", options: ["Solid particles like graphite", "Water soluble substances", "Volatile solvents", "Selected long chain polymers"], answer: 3 },
+    { id: "2025_348", year: 2025, subject: "Chemistry", chapter: "Lubricants", text: "The unit of viscosity is", options: ["Joule", "Poise", "Newton", "None of the above"], answer: 1 },
+    { id: "2025_349", year: 2025, subject: "Chemistry", chapter: "Fuels", text: "In crude oil ____ are usually the acids that cause corrosion problems.", options: ["Amino acids", "Mineral acid", "Fatty acids", "Naphthenic acid"], answer: 3 },
+    { id: "2025_350", year: 2025, subject: "Chemistry", chapter: "Electrochemistry", text: "Mathematically, Faraday's first law of Electrolysis is expressed as", options: ["Q = Wt", "W = Q/Z", "W a Q", "Z = Wt"], answer: 2 }
         ];
 
         // ================= APP LOGIC =================
         const yearsList = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
-        const subjectsList = ["Physics", "Chemistry", "Math"];
         
-        let activeYears = [];
-        let activeSubjects = [];
-        let activeChapters = [];
+        // Single Source of Truth for Filters
+        let currentFilters = { year: "All", subject: "All", chapter: "All" };
+        let isCombineMode = false;
 
         window.onload = () => {
             const grid = document.getElementById('year-grid');
@@ -712,87 +330,97 @@
                     </div>
                 `;
             });
+            populateYearDropdown();
         };
+
+        function populateYearDropdown() {
+            const ddYear = document.getElementById('dd-year');
+            yearsList.forEach(y => {
+                ddYear.innerHTML += `<option value="${y}">${y}</option>`;
+            });
+        }
+
+        function updateChapterDropdown() {
+            const ddChapter = document.getElementById('dd-chapter');
+            ddChapter.innerHTML = `<option value="All">All Chapters</option>`;
+            
+            let availableChapters = [];
+            questionBank.forEach(q => {
+                const matchY = currentFilters.year === "All" || q.year.toString() === currentFilters.year;
+                const matchS = currentFilters.subject === "All" || q.subject === currentFilters.subject;
+                if (matchY && matchS && !availableChapters.includes(q.chapter)) {
+                    availableChapters.push(q.chapter);
+                }
+            });
+
+            availableChapters.sort().forEach(c => {
+                // If the previously selected chapter is still available, keep it selected
+                const selected = currentFilters.chapter === c ? 'selected' : '';
+                ddChapter.innerHTML += `<option value="${c}" ${selected}>${c}</option>`;
+            });
+
+            // If current chapter is not in the new list, reset to All
+            if(currentFilters.chapter !== "All" && !availableChapters.includes(currentFilters.chapter)) {
+                currentFilters.chapter = "All";
+                ddChapter.value = "All";
+            }
+        }
 
         function goHome() {
             document.getElementById('test-view').style.display = 'none';
             document.getElementById('home-view').style.display = 'block';
-            document.getElementById('filter-panel').style.display = 'none';
         }
 
+        // When a specific year card is clicked
         function openYearTest(year) {
             document.getElementById('home-view').style.display = 'none';
             document.getElementById('test-view').style.display = 'block';
-            document.getElementById('test-title').innerText = `${year} Full Paper`;
-            document.getElementById('filter-panel').style.display = 'none';
+            document.getElementById('test-title').innerText = `${year} Paper`;
+            isCombineMode = false;
 
-            activeYears = [year];
-            activeSubjects = [...subjectsList]; 
-            activeChapters = []; 
+            // Set UI Dropdowns
+            document.getElementById('dd-year').value = year.toString();
+            document.getElementById('dd-year').disabled = true; // Lock Year in normal mode
+            document.getElementById('dd-subject').value = "All";
             
-            renderFilters();
+            // Set State
+            currentFilters = { year: year.toString(), subject: "All", chapter: "All" };
+            
+            updateChapterDropdown();
             renderQuestions();
         }
 
+        // When Combine Research Lab is clicked
         function openCombineFilter() {
             document.getElementById('home-view').style.display = 'none';
             document.getElementById('test-view').style.display = 'block';
-            document.getElementById('test-title').innerText = "Combine Research Lab 🧪";
+            document.getElementById('test-title').innerText = "Combine Lab 🧪";
+            isCombineMode = true;
+
+            // Unlock and reset Dropdowns
+            document.getElementById('dd-year').disabled = false;
+            document.getElementById('dd-year').value = "All";
+            document.getElementById('dd-subject').value = "All";
             
-            activeYears = [...yearsList];
-            activeSubjects = [...subjectsList];
-            activeChapters = [];
+            currentFilters = { year: "All", subject: "All", chapter: "All" };
             
-            document.getElementById('filter-panel').style.display = 'block';
-            renderFilters();
+            updateChapterDropdown();
             renderQuestions();
         }
 
-        function toggleFilterPanel() {
-            const panel = document.getElementById('filter-panel');
-            panel.style.display = panel.style.display === 'none' || panel.style.display === '' ? 'block' : 'none';
-        }
-
-        // ================= FILTERS =================
-        function toggleFilterArray(array, value) {
-            const index = array.indexOf(value);
-            if (index > -1) array.splice(index, 1);
-            else array.push(value);
-            renderFilters();
-            renderQuestions();
-        }
-
-        function renderFilters() {
-            const fYears = document.getElementById('f-years');
-            fYears.innerHTML = '';
-            yearsList.forEach(y => {
-                const isActive = activeYears.includes(y) ? 'active' : '';
-                fYears.innerHTML += `<div class="chip ${isActive}" onclick="toggleFilterArray(activeYears, ${y})">${y}</div>`;
-            });
-
-            const fSubj = document.getElementById('f-subjects');
-            fSubj.innerHTML = '';
-            subjectsList.forEach(s => {
-                const isActive = activeSubjects.includes(s) ? 'active' : '';
-                fSubj.innerHTML += `<div class="chip ${isActive}" onclick="toggleFilterArray(activeSubjects, '${s}')">${s}</div>`;
-            });
-
-            let availableChapters = [];
-            questionBank.forEach(q => {
-                if (activeYears.includes(q.year) && activeSubjects.includes(q.subject)) {
-                    if (!availableChapters.includes(q.chapter)) availableChapters.push(q.chapter);
-                }
-            });
-
-            activeChapters = activeChapters.filter(c => availableChapters.includes(c));
-
-            const fChap = document.getElementById('f-chapters');
-            fChap.innerHTML = availableChapters.length === 0 ? '<span style="font-size:12px; color:gray;">No chapters available</span>' : '';
+        // Triggered instantly when ANY dropdown changes
+        function applyFilters() {
+            currentFilters.year = document.getElementById('dd-year').value;
+            currentFilters.subject = document.getElementById('dd-subject').value;
+            currentFilters.chapter = document.getElementById('dd-chapter').value;
             
-            availableChapters.forEach(c => {
-                const isActive = activeChapters.includes(c) ? 'active' : '';
-                fChap.innerHTML += `<div class="chip ${isActive}" onclick="toggleFilterArray(activeChapters, '${c}')">${c}</div>`;
-            });
+            // Only update chapter dropdown if Year or Subject changed (to prevent infinite loop)
+            updateChapterDropdown(); 
+            
+            // Re-read chapter value in case it was reset by updateChapterDropdown
+            currentFilters.chapter = document.getElementById('dd-chapter').value;
+            
+            renderQuestions();
         }
 
         function updateOptionStyle(radioInput) {
@@ -813,30 +441,35 @@
             document.getElementById('bottom-bar').classList.remove('show');
 
             let filteredData = questionBank.filter(q => {
-                return activeYears.includes(q.year) && activeSubjects.includes(q.subject) && (activeChapters.length === 0 || activeChapters.includes(q.chapter));
+                const matchY = currentFilters.year === "All" || q.year.toString() === currentFilters.year;
+                const matchS = currentFilters.subject === "All" || q.subject === currentFilters.subject;
+                const matchC = currentFilters.chapter === "All" || q.chapter === currentFilters.chapter;
+                return matchY && matchS && matchC;
             });
 
             if (filteredData.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding: 60px; color:var(--gray-dark); font-weight:bold; font-size:18px;">No questions match your filter. 😢</div>`;
+                container.innerHTML = `<div style="text-align:center; padding: 60px; color:var(--gray-dark); font-weight:600;">No questions found for this filter. 🔍</div>`;
                 return;
             }
 
-            // SORTING LOGIC: Descending Year -> Ascending Subject
+            // SORTING LOGIC: Year DESC -> Subject ASC -> Question No (Extracted from string ID)
             filteredData.sort((a, b) => {
-                if (b.year !== a.year) return b.year - a.year; // Year DESC
-                if (a.subject !== b.subject) return a.subject.localeCompare(b.subject); // Subject ASC
-                return a.id - b.id;
+                if (b.year !== a.year) return b.year - a.year; 
+                if (a.subject !== b.subject) return a.subject.localeCompare(b.subject); 
+                let qNumA = parseInt(a.id.split('_')[1]);
+                let qNumB = parseInt(b.id.split('_')[1]);
+                return qNumA - qNumB;
             });
 
             let currentYear = null;
             let currentSubject = null;
 
             filteredData.forEach((q, index) => {
-                // UI: Insert Year Header if Year Changes
-                if (q.year !== currentYear) {
+                // UI: Insert Year Header if Year Changes (Useful in Combine Mode)
+                if (q.year !== currentYear && isCombineMode) {
                     currentYear = q.year;
                     container.innerHTML += `<div class="year-header">Year: ${currentYear}</div>`;
-                    currentSubject = null; // Reset Subject for new year
+                    currentSubject = null;
                 }
 
                 // UI: Insert Subject Badge if Subject Changes
@@ -854,9 +487,9 @@
                 `).join('');
 
                 container.innerHTML += `
-                    <div class="q-card fade-in" style="animation-delay: ${index * 0.05}s" data-id="${q.id}" data-ans="${q.answer}">
+                    <div class="q-card fade-in" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s" data-id="${q.id}" data-ans="${q.answer}">
                         <div class="q-meta">
-                            <span>#ID-${q.id}</span>
+                            <span>ID: ${q.id}</span>
                             <span>${q.chapter}</span>
                         </div>
                         <div class="q-text">Q. ${q.text}</div>
@@ -874,7 +507,6 @@
         // ================= SCROLL TRIGGER FOR SUBMIT BUTTON =================
         const observer = new IntersectionObserver((entries) => {
             const bottomBar = document.getElementById('bottom-bar');
-            // If the anchor at the bottom of the page enters viewport, show button
             if (entries[0].isIntersecting && document.querySelectorAll('.q-card').length > 0) {
                 bottomBar.classList.add('show');
             } else {
@@ -882,13 +514,11 @@
             }
         }, { threshold: 0.1 });
 
-        // Observe the hidden anchor div
         setTimeout(() => observer.observe(document.getElementById('scroll-anchor')), 1000);
 
         // ================= SUBMIT TEST =================
         function submitTest() {
             document.getElementById('bottom-bar').classList.remove('show');
-            document.getElementById('filter-panel').style.display = 'none';
 
             let score = 0;
             const cards = document.querySelectorAll('.q-card');
@@ -912,6 +542,7 @@
             });
 
             document.querySelectorAll('.opt-label input').forEach(inp => inp.disabled = true);
+            document.querySelectorAll('.filter-select').forEach(dd => dd.disabled = true);
             
             const container = document.getElementById('quiz-container');
             const resultHtml = `
@@ -919,11 +550,21 @@
                     <h2 style="margin-top:0; color:var(--black); font-weight:800;">Report Card 📋</h2>
                     <div class="score-circle">${score}/${cards.length}</div>
                     <p style="color:var(--gray-dark); font-weight:600;">Review your answers below.</p>
-                    <button class="btn-submit" style="margin: 20px auto 0 auto;" onclick="renderQuestions(); window.scrollTo(0,0);">Re-Attempt Assessment</button>
+                    <button class="btn-submit" style="margin: 20px auto 0 auto;" onclick="resetTest()">Re-Attempt Filter</button>
                 </div>
             `;
             container.insertAdjacentHTML('afterbegin', resultHtml);
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetTest() {
+            document.querySelectorAll('.filter-select').forEach(dd => {
+                // Keep year disabled if not in combine mode
+                if(dd.id === 'dd-year' && !isCombineMode) return;
+                dd.disabled = false;
+            });
+            renderQuestions();
+            window.scrollTo(0,0);
         }
     </script>
 </body>
