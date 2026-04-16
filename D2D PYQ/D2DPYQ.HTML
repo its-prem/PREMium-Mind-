@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>D2D PYQ Master Portal</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] }
+        };
+    </script>
+
+    <style>
+        :root {
+            --black: #09090b; --black-muted: #27272a;
+            --gray-dark: #52525b; --gray-light: #e4e4e7;
+            --white: #ffffff; --primary: #2563eb;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --glass-blur: blur(20px);
+            --smooth: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { box-sizing: border-box; }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); background-attachment: fixed; color: var(--black); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        .fade-in { animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Loading Screen */
+        #loading-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--glass-bg); backdrop-filter: blur(5px); z-index: 3000; justify-content: center; align-items: center; flex-direction: column; }
+        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); border-left-color: var(--black); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px;}
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ================= HOME DASHBOARD ================= */
+        #home-view { padding: 40px 20px 100px 20px; max-width: 1000px; margin: 0 auto; }
+        .hero-section { text-align: center; margin-bottom: 50px; }
+        .hero-section h1 { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
+        .funny-tag { font-size: 15px; color: var(--gray-dark); font-weight: 600; background: var(--white); display: inline-block; padding: 10px 25px; border-radius: 30px; border: 1px solid var(--gray-light); box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .section-title { font-size: 18px; font-weight: 800; text-transform: uppercase; color: var(--black-muted); margin: 40px 0 20px 0; display: inline-block; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+
+        .combine-card { background: var(--black); color: var(--white); padding: 30px; border-radius: 20px; cursor: pointer; text-align: left; box-shadow: 0 10px 20px rgba(0,0,0,0.15); transition: transform var(--smooth); grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; }
+        .combine-card:hover { transform: translateY(-4px); box-shadow: 0 15px 30px rgba(0,0,0,0.25); }
+        .combine-card h2 { margin: 0 0 8px 0; font-size: 26px; font-weight: 800; }
+        .combine-card p { margin: 0; color: #a1a1aa; font-size: 14px; font-weight: 500; }
+        .combine-icon { background: var(--white); color: var(--black); padding: 12px 20px; border-radius: 30px; font-weight: 800; font-size: 13px; }
+
+        .year-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); padding: 30px 20px; border-radius: 20px; text-align: center; cursor: pointer; transition: all var(--smooth); }
+        .year-card:hover { transform: translateY(-4px); background: var(--white); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .year-card h3 { margin: 0; font-size: 32px; font-weight: 800; color: var(--black); }
+        .year-card p { margin: 8px 0 0 0; font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; }
+
+        /* ================= TEST & FILTER VIEW ================= */
+        #test-view { display: none; padding-bottom: 120px; }
+        .top-nav { position: sticky; top: 0; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); z-index: 1000; padding: 15px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .back-btn { background: var(--white); border: 1px solid var(--gray-light); padding: 8px 16px; border-radius: 12px; cursor: pointer; font-weight: 700; transition: all 0.2s; display: flex; align-items: center; gap: 8px; font-size: 14px;}
+        .back-btn:hover { background: var(--black); color: var(--white); }
+
+        /* Custom Multi-Select Dropdown UI */
+        .filter-bar { background: var(--white); padding: 15px 24px; border-bottom: 1px solid var(--gray-light); display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .dd-container { position: relative; flex: 1; min-width: 200px; max-width: 250px; }
+        .dd-header { padding: 12px 16px; border-radius: 12px; border: 2px solid var(--gray-light); background: #f8fafc; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--black-muted); user-select: none; transition: 0.2s; }
+        .dd-header:hover { border-color: var(--black); background: var(--white); color: var(--black); }
+        .dd-header span { font-size: 10px; color: var(--gray-dark); }
+        .dd-list { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: var(--white); border: 1px solid var(--gray-light); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 2000; max-height: 300px; overflow-y: auto; display: none; flex-direction: column; padding: 10px; }
+        .dd-list.show { display: flex; }
+        
+        .dd-actions { display: flex; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid var(--gray-light); margin-bottom: 10px; }
+        .dd-btn { background: none; border: none; color: var(--primary); font-size: 12px; font-weight: 700; cursor: pointer; }
+        .dd-btn:hover { text-decoration: underline; }
+        
+        .cb-label { display: flex; align-items: center; gap: 10px; padding: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 8px; transition: 0.2s; color: var(--black); }
+        .cb-label:hover { background: #f1f5f9; }
+        .cb-label input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--black); }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 30px 20px; }
+        .year-header { font-size: 22px; font-weight: 800; color: var(--black); margin: 40px 0 15px 0; border-bottom: 2px solid var(--gray-light); padding-bottom: 8px; }
+        .year-header::before { content: '📅'; font-size: 28px; }
+        .subject-badge { display: inline-block; background: var(--black-muted); color: var(--white); padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; margin-bottom: 20px; letter-spacing: 0.5px; }
+
+        /* Question Cards */
+        .q-card { background: var(--white); border-radius: 20px; padding: 30px; margin-bottom: 25px; border: 1px solid var(--glass-border); box-shadow: 0 4px 20px rgba(0,0,0,0.03); transition: transform 0.2s; }
+        .q-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
+        .q-meta { font-size: 11px; font-weight: 700; color: var(--gray-dark); margin-bottom: 15px; display: flex; gap: 8px; flex-wrap: wrap;}
+        .q-meta span { background: #f1f5f9; padding: 4px 10px; border-radius: 8px; }
+        .q-text { font-size: 16px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; }
+        
+        .options-grid { display: flex; flex-direction: column; gap: 12px; }
+        .opt-label { padding: 14px 18px; border-radius: 14px; border: 2px solid var(--gray-light); background: #f8fafc; cursor: pointer; font-size: 15px; font-weight: 500; display: flex; align-items: center; transition: all 0.2s; }
+        .opt-label input { position: absolute; opacity: 0; }
+        .custom-radio { width: 20px; height: 20px; min-width: 20px; border: 2px solid var(--gray-dark); border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; }
+        .opt-label input:checked ~ .custom-radio { border-color: var(--black); }
+        .opt-label input:checked ~ .custom-radio::after { content: ''; width: 10px; height: 10px; background: var(--black); border-radius: 50%; }
+        .opt-label.selected-bg { border-color: var(--black); background: var(--white); }
+
+        .bottom-action-bar { position: fixed; bottom: 30px; right: 30px; z-index: 1000; opacity: 0; transform: translateY(20px); pointer-events: none; transition: all 0.3s; }
+        .bottom-action-bar.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .btn-submit { background: var(--black); color: var(--white); border: none; padding: 16px 32px; border-radius: 50px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; transition: transform 0.2s; }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
+        #scroll-anchor { height: 10px; width: 100%; margin-top: 10px; }
+
+        .correct-opt { border-color: #10b981 !important; background: #ecfdf5 !important; color: #065f46; font-weight: 700; }
+        .correct-opt .custom-radio { border-color: #10b981 !important; background: #10b981 !important; }
+        .correct-opt .custom-radio::after { display: none; }
+        .wrong-opt { border-color: #ef4444 !important; background: #fef2f2 !important; color: #991b1b; text-decoration: line-through; }
+        .wrong-opt .custom-radio { border-color: #ef4444 !important; background: #ef4444 !important; }
+        .wrong-opt .custom-radio::after { display: none; }
+        
+        .result-dashboard { display: none; text-align: center; background: var(--white); padding: 40px 20px; border-radius: 24px; margin-top: 30px; border: 1px solid var(--gray-light); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--white); display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 800; margin: 0 auto 20px auto; border: 8px solid var(--black); }
+
+        @media (max-width: 600px) {
+            .hero-section h1 { font-size: 30px; }
+            .filter-bar { padding: 15px; flex-direction: column; }
+            .dd-container { max-width: 100%; width: 100%; }
+            .bottom-action-bar { bottom: 20px; right: 20px; left: 20px; display: flex; justify-content: center; }
+            .btn-submit { width: 100%; justify-content: center; }
+            .q-card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <div style="font-weight: 800;">Fetching Real-Time Data...</div>
+    </div>
+
+    <div id="home-view" class="fade-in">
+        <div class="hero-section">
+            <h1>D2D PYQ Master 🎓</h1>
+            <p class="funny-tag">Kyunki ratta maarne se achha hai previous year pel do! 🚀</p>
+        </div>
+
+        <div class="combine-card" onclick="openCombineFilter()">
+            <div>
+                <h2>Combine Research Lab 🧪</h2>
+                <p>Select Multiple Years, Subjects, and Chapters!</p>
+            </div>
+            <div class="combine-icon">ENTER →</div>
+        </div>
+
+        <div class="section-title">Year-Wise Papers (2017-2025)</div>
+        <div class="grid-container" id="year-grid"></div>
+    </div>
+
+    <div id="test-view">
+        <nav class="top-nav">
+            <div class="nav-left">
+                <button class="back-btn" onclick="goHome()">← Back</button>
+                <div style="font-weight: 800; font-size: 16px;" id="test-title">Paper Setup</div>
+            </div>
+        </nav>
+
+        <div class="filter-bar" id="filter-bar">
+            
+            <div class="dd-container" id="container-year">
+                <div class="dd-header" id="hdr-year" onclick="toggleDD('list-year')">Years (All) <span>▼</span></div>
+                <div class="dd-list" id="list-year"></div>
+            </div>
+
+            <div class="dd-container" id="container-subject">
+                <div class="dd-header" id="hdr-subject" onclick="toggleDD('list-subject')">Subjects (All) <span>▼</span></div>
+                <div class="dd-list" id="list-subject"></div>
+            </div>
+
+            <div class="dd-container" id="container-chapter">
+                <div class="dd-header" id="hdr-chapter" onclick="toggleDD('list-chapter')">Chapters (All) <span>▼</span></div>
+                <div class="dd-list" id="list-chapter"></div>
+            </div>
+
+        </div>
+
+        <div class="container" id="quiz-container"></div>
+        <div id="scroll-anchor"></div>
+
+        <div class="bottom-action-bar" id="bottom-bar">
+            <button class="btn-submit" onclick="submitTest()">
+                Submit Test
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        let allLoadedData = [];
+        
+        // Setup 2017 to 2025 Data
+        const yearsList = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
+        const subjectsList = ["Physics", "Chemistry", "Math"];
+        let isCombineMode = false;
+
+        window.onload = () => {
+            const grid = document.getElementById('year-grid');
+            yearsList.forEach(y => {
+                grid.innerHTML += `
+                    <div class="year-card" onclick="openYearTest(${y})">
+                        <h3>${y}</h3>
+                        <p>Physics • Chem • Math</p>
+                    </div>
+                `;
+            });
+        };
+
+        window.goHome = () => {
+            document.getElementById('test-view').style.display = 'none';
+            document.getElementById('home-view').style.display = 'block';
+            allLoadedData = []; // Free memory
+        }
+
+        // --- Custom Dropdown Logic ---
+        window.toggleDD = (id) => {
+            document.querySelectorAll('.dd-list').forEach(l => { if(l.id !== id) l.classList.remove('show'); });
+            document.getElementById(id).classList.toggle('show');
+        }
+        
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.dd-container')) {
+                document.querySelectorAll('.dd-list').forEach(l => l.classList.remove('show'));
+            }
+        });
+
+        window.selectAll = (className, checkStatus) => {
+            document.querySelectorAll(`.${className}`).forEach(cb => cb.checked = checkStatus);
+            applyFilters();
+        }
+
+        // --- Data Fetching ---
+        window.openYearTest = async (year) => {
+            document.getElementById('loading-screen').style.display = 'flex';
+            try {
+                const module = await import(`./data/data_${year}.js`);
+                allLoadedData = module[`data${year}`];
+                
+                document.getElementById('home-view').style.display = 'none';
+                document.getElementById('test-view').style.display = 'block';
+                document.getElementById('test-title').innerText = `${year} Paper`;
+                
+                isCombineMode = false;
+                document.getElementById('container-year').style.display = 'none'; // Hide year filter for single year test
+                
+                buildSubjectFilter();
+                applyFilters();
+            } catch (error) {
+                alert(`Data file for ${year} is not uploaded yet! Create data/data_${year}.js`);
+            } finally {
+                document.getElementById('loading-screen').style.display = 'none';
+            }
+        }
+
+        window.openCombineFilter = async () => {
+            document.getElementById('loading-screen').style.display = 'flex';
+            try {
+                // Fetch all years concurrently (Fast)
+                const fetchPromises = yearsList.map(y => import(`./data/data_${y}.js`).catch(e => null));
+                const modules = await Promise.all(fetchPromises);
+                
+                allLoadedData = [];
+                modules.forEach((mod, idx) => {
+                    if(mod) allLoadedData.push(...mod[`data${yearsList[idx]}`]);
+                });
+
+                if(allLoadedData.length === 0) throw new Error("No data files found!");
+
+                document.getElementById('home-view').style.display = 'none';
+                document.getElementById('test-view').style.display = 'block';
+                document.getElementById('test-title').innerText = "Combine Lab 🧪";
+                
+                isCombineMode = true;
+                document.getElementById('container-year').style.display = 'block'; // Show year filter
+                
+                buildYearFilter();
+                buildSubjectFilter();
+                applyFilters();
+            } catch (error) {
+                alert("Failed to load combine data. Ensure files exist in /data folder.");
+            } finally {
+                document.getElementById('loading-screen').style.display = 'none';
+            }
+        }
+
+        // --- Dynamic Filter Builders ---
+        function buildYearFilter() {
+            document.getElementById('list-year').innerHTML = `
+                <div class="dd-actions">
+                    <button class="dd-btn" onclick="selectAll('cb-year', true)">Select All</button>
+                    <button class="dd-btn" onclick="selectAll('cb-year', false)">Clear</button>
+                </div>
+                ${yearsList.map(y => `<label class="cb-label"><input type="checkbox" class="cb-year" value="${y}" checked onchange="applyFilters()"> ${y}</label>`).join('')}
+            `;
+        }
+
+        function buildSubjectFilter() {
+            document.getElementById('list-subject').innerHTML = `
+                <div class="dd-actions">
+                    <button class="dd-btn" onclick="selectAll('cb-subject', true)">Select All</button>
+                    <button class="dd-btn" onclick="selectAll('cb-subject', false)">Clear</button>
+                </div>
+                ${subjectsList.map(s => `<label class="cb-label"><input type="checkbox" class="cb-subject" value="${s}" checked onchange="applyFilters()"> ${s}</label>`).join('')}
+            `;
+        }
+
+        window.applyFilters = () => {
+            // Get Selected Years (If in single year mode, use allLoadedData's year)
+            let selYears = [];
+            if(isCombineMode) {
+                selYears = Array.from(document.querySelectorAll('.cb-year:checked')).map(cb => parseInt(cb.value));
+                document.getElementById('hdr-year').innerHTML = `Years (${selYears.length}) <span>▼</span>`;
+            } else {
+                selYears = [allLoadedData[0]?.year]; // Single year fallback
+            }
+
+            // Get Selected Subjects
+            const selSubj = Array.from(document.querySelectorAll('.cb-subject:checked')).map(cb => cb.value);
+            document.getElementById('hdr-subject').innerHTML = `Subjects (${selSubj.length}) <span>▼</span>`;
+
+            // Update Available Chapters
+            updateChapterCheckboxes(selYears, selSubj);
+        }
+
+        function updateChapterCheckboxes(selYears, selSubj) {
+            const chapList = document.getElementById('list-chapter');
+            const availableChapters = [...new Set(allLoadedData
+                .filter(q => selYears.includes(q.year) && selSubj.includes(q.subject))
+                .map(q => q.chapter))].sort();
+
+            let prevChecked = Array.from(document.querySelectorAll('.cb-chapter:checked')).map(cb => cb.value);
+            let hasExisting = document.querySelectorAll('.cb-chapter').length > 0;
+
+            let html = `
+                <div class="dd-actions">
+                    <button class="dd-btn" onclick="selectAll('cb-chapter', true)">Select All</button>
+                    <button class="dd-btn" onclick="selectAll('cb-chapter', false)">Clear</button>
+                </div>
+            `;
+
+            if (availableChapters.length === 0) {
+                html += `<div style="padding:10px; font-size:13px; color:gray; text-align:center;">No chapters found</div>`;
+            } else {
+                availableChapters.forEach(c => {
+                    // Auto-check new chapters or preserve old checks
+                    let isChecked = (!hasExisting || prevChecked.includes(c)) ? 'checked' : '';
+                    html += `<label class="cb-label"><input type="checkbox" class="cb-chapter" value="${c}" ${isChecked} onchange="renderQuestions()"> ${c}</label>`;
+                });
+            }
+
+            chapList.innerHTML = html;
+            renderQuestions(); // Call render after updating chapters
+        }
+
+        // --- Render UI ---
+        window.updateOptionStyle = (radioInput) => {
+            const name = radioInput.name;
+            document.querySelectorAll(`input[name="${name}"]`).forEach(inp => {
+                inp.parentElement.classList.remove('selected-bg');
+            });
+            radioInput.parentElement.classList.add('selected-bg');
+        }
+
+        window.renderQuestions = () => {
+            const container = document.getElementById('quiz-container');
+            const existingRes = document.querySelector('.result-dashboard');
+            if(existingRes) existingRes.remove();
+            document.getElementById('bottom-bar').classList.remove('show');
+
+            // Read Final Checked Values
+            let selYears = isCombineMode ? Array.from(document.querySelectorAll('.cb-year:checked')).map(cb => parseInt(cb.value)) : [allLoadedData[0]?.year];
+            const selSubj = Array.from(document.querySelectorAll('.cb-subject:checked')).map(cb => cb.value);
+            const selChap = Array.from(document.querySelectorAll('.cb-chapter:checked')).map(cb => cb.value);
+            
+            // Update Chapter Header Text
+            document.getElementById('hdr-chapter').innerHTML = `Chapters (${selChap.length}) <span>▼</span>`;
+
+            let filteredData = allLoadedData.filter(q => 
+                selYears.includes(q.year) && selSubj.includes(q.subject) && selChap.includes(q.chapter)
+            );
+
+            if (filteredData.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding: 60px; color:var(--gray-dark); font-weight:600;">Please select filters to load questions. 🔍</div>`;
+                return;
+            }
+
+            // Fast Sorting
+            filteredData.sort((a, b) => {
+                if (b.year !== a.year) return b.year - a.year; 
+                if (a.subject !== b.subject) return a.subject.localeCompare(b.subject); 
+                let qNumA = parseInt(a.id.split('_')[1]);
+                let qNumB = parseInt(b.id.split('_')[1]);
+                return qNumA - qNumB;
+            });
+
+            // Fast String Building
+            let fullHTML = "";
+            let currentYear = null;
+            let currentSubject = null;
+
+            filteredData.forEach((q) => {
+                if (q.year !== currentYear && isCombineMode) {
+                    currentYear = q.year;
+                    fullHTML += `<div class="year-header">Year: ${currentYear}</div>`;
+                    currentSubject = null;
+                }
+                if (q.subject !== currentSubject) {
+                    currentSubject = q.subject;
+                    fullHTML += `<div class="subject-badge">${currentSubject}</div>`;
+                }
+
+                let optionsHtml = q.options.map((opt, i) => `
+                    <label class="opt-label" id="lbl-q${q.id}-o${i}">
+                        <input type="radio" name="q${q.id}" value="${i}" onchange="updateOptionStyle(this)">
+                        <div class="custom-radio"></div>
+                        <span>${['A', 'B', 'C', 'D'][i]}) ${opt}</span>
+                    </label>
+                `).join('');
+
+                fullHTML += `
+                    <div class="q-card" data-id="${q.id}" data-ans="${q.answer}">
+                        <div class="q-meta"><span>ID: ${q.id}</span><span>${q.chapter}</span></div>
+                        <div class="q-text">Q. ${q.text}</div>
+                        <div class="options-grid">${optionsHtml}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = fullHTML;
+            if(window.MathJax) MathJax.typesetPromise([container]).catch(err => console.log(err));
+        }
+
+        // --- Submit Logic ---
+        const observer = new IntersectionObserver((entries) => {
+            const bottomBar = document.getElementById('bottom-bar');
+            if (entries[0].isIntersecting && document.querySelectorAll('.q-card').length > 0) {
+                bottomBar.classList.add('show');
+            } else {
+                bottomBar.classList.remove('show');
+            }
+        }, { threshold: 0.1 });
+        setTimeout(() => observer.observe(document.getElementById('scroll-anchor')), 1000);
+
+        window.submitTest = () => {
+            document.getElementById('bottom-bar').classList.remove('show');
+            let score = 0;
+            const cards = document.querySelectorAll('.q-card');
+
+            cards.forEach(card => {
+                const qId = card.dataset.id;
+                const correctAns = parseInt(card.dataset.ans);
+                const selected = document.querySelector(`input[name="q${qId}"]:checked`);
+                const correctLabel = document.getElementById(`lbl-q${qId}-o${correctAns}`);
+                
+                if(correctLabel) correctLabel.classList.add('correct-opt');
+
+                if (selected) {
+                    const selectedVal = parseInt(selected.value);
+                    if (selectedVal === correctAns) score++;
+                    else {
+                        const wrongLabel = document.getElementById(`lbl-q${qId}-o${selectedVal}`);
+                        if(wrongLabel) wrongLabel.classList.add('wrong-opt');
+                    }
+                }
+            });
+
+            document.querySelectorAll('.opt-label input').forEach(inp => inp.disabled = true);
+            
+            const container = document.getElementById('quiz-container');
+            container.insertAdjacentHTML('afterbegin', `
+                <div class="result-dashboard fade-in" style="display:block;">
+                    <h2 style="margin-top:0; color:var(--black); font-weight:800;">Report Card 📋</h2>
+                    <div class="score-circle">${score}/${cards.length}</div>
+                    <p style="color:var(--gray-dark); font-weight:600;">Review your answers below.</p>
+                </div>
+            `);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
