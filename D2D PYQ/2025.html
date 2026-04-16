@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2025 PYQ D2D - Glass Monochrome Test</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            /* Monochrome Palette */
+            --black: #09090b;
+            --black-muted: #27272a;
+            --gray-dark: #52525b;
+            --gray-light: #e4e4e7;
+            --white: #ffffff;
+            
+            /* Glassmorphism Variables */
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --glass-blur: blur(24px);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+            
+            /* Animation timing */
+            --smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 100%);
+            background-attachment: fixed;
+            color: var(--black);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* --- Layout & Glass Header --- */
+        .top-nav {
+            position: sticky;
+            top: 0;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--black);
+            letter-spacing: -0.5px;
+        }
+
+        .brand p { margin: 2px 0 0 0; font-size: 11px; font-weight: 700; color: var(--gray-dark); text-transform: uppercase; letter-spacing: 1.5px; }
+
+        .timer-badge {
+            background: var(--black);
+            color: var(--white);
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* --- Scrollable Filter Chips --- */
+        .filter-wrapper {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -ms-overflow-style: none;  
+            scrollbar-width: none;  
+        }
+        .filter-wrapper::-webkit-scrollbar { display: none; }
+
+        .filter-label { font-size: 11px; font-weight: 800; color: var(--gray-dark); text-transform: uppercase; margin-right: 4px; letter-spacing: 1px;}
+
+        .chip {
+            background: rgba(255,255,255,0.7);
+            border: 1px solid var(--glass-border);
+            color: var(--gray-dark);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--smooth);
+            user-select: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .chip:hover { transform: translateY(-2px); background: var(--white); color: var(--black); }
+
+        .chip.active {
+            background: var(--black);
+            color: var(--white);
+            border-color: var(--black);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- Container & Animations --- */
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chapter-heading {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--black-muted);
+            margin: 40px 0 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeUp 0.5s ease forwards;
+        }
+        .chapter-heading::before {
+            content: '';
+            width: 30px;
+            height: 2px;
+            background: var(--black);
+            display: inline-block;
+        }
+
+        /* --- Glass Cards --- */
+        .q-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            transition: transform var(--smooth), box-shadow var(--smooth);
+            animation: fadeUp 0.6s ease forwards;
+        }
+        
+        .q-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+        }
+
+        .q-text {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--black);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        /* --- Stylish Options --- */
+        .options-grid { display: flex; flex-direction: column; gap: 14px; }
+
+        .opt-label {
+            position: relative;
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 2px solid rgba(255,255,255,0.6);
+            background: rgba(255,255,255,0.4);
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--black-muted);
+            transition: all var(--smooth);
+            display: flex;
+            align-items: center;
+        }
+
+        .opt-label:hover { background: rgba(255,255,255,0.8); border-color: var(--white); color: var(--black); }
+
+        .opt-label input { position: absolute; opacity: 0; cursor: pointer; }
+
+        .custom-radio {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--gray-dark);
+            border-radius: 50%;
+            margin-right: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--smooth);
+        }
+
+        .opt-label input:checked ~ .custom-radio { border-color: var(--black); }
+        
+        .opt-label input:checked ~ .custom-radio::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: var(--black);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn { to { transform: scale(1); } }
+
+        .opt-label.selected-bg {
+            border-color: var(--black);
+            background: var(--white);
+            color: var(--black);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        /* --- Floating Bottom Action Button (Updated) --- */
+        .bottom-action-bar {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            
+            /* Hidden initially */
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Class added via JS on scroll */
+        .bottom-action-bar.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .btn-submit {
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            padding: 16px 36px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all var(--smooth);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-submit:hover { transform: translateY(-4px); box-shadow: 0 15px 40px rgba(0,0,0,0.4); }
+        .btn-submit:active { transform: translateY(1px); }
+
+        /* --- Result States --- */
+        .result-icon { width: 24px; height: 24px; margin-right: 16px; display: none; }
+        
+        .correct-opt {
+            border-color: var(--black) !important;
+            background: var(--white) !important;
+            color: var(--black);
+        }
+        .correct-opt .custom-radio { display: none; }
+        .correct-opt .result-icon.icon-check { display: block; fill: var(--black); }
+
+        .wrong-opt {
+            border-color: var(--gray-dark) !important;
+            background: transparent !important;
+            color: var(--gray-dark);
+            opacity: 0.7;
+            text-decoration: line-through;
+        }
+        .wrong-opt .custom-radio { display: none; }
+        .wrong-opt .result-icon.icon-cross { display: block; fill: var(--gray-dark); }
+
+        .result-dashboard {
+            display: none;
+            text-align: center;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            padding: 50px 20px;
+            border-radius: 30px;
+            margin-top: 20px;
+            box-shadow: var(--glass-shadow);
+            animation: fadeUp 0.6s ease;
+        }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: var(--white);
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 800;
+            margin: 0 auto 24px auto;
+            border: 8px solid var(--black);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--gray-dark); font-weight: 600; }
+
+        @media (max-width: 600px) {
+            .q-card { padding: 24px 20px; border-radius: 20px; }
+            .opt-label { padding: 14px 16px; font-size: 14px; }
+            .top-nav { padding: 14px 20px; }
+            
+            /* Adjust floating button for mobile */
+            .bottom-action-bar { bottom: 20px; right: 20px; left: 20px; display: flex; justify-content: center; }
+            .btn-submit { width: 100%; max-width: 300px; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="brand">
+            <h1>Set C • Math</h1>
+            <p>2025 PYQ D2D</p>
+        </div>
+        <div class="timer-badge" id="timer">50:00</div>
+    </nav>
+
+    <div class="filter-wrapper" id="chip-container">
+        <span class="filter-label">Filter</span>
+        <div class="chip active" onclick="setFilter('All', this)">All Chapters</div>
+    </div>
+
+    <div class="container" id="quiz-container">
+        </div>
+
+    <div class="bottom-action-bar" id="bottom-bar">
+        <button class="btn-submit" onclick="submitTest()">
+            Submit Assessment
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </button>
+    </div>
+
+    <svg style="display:none;">
+        <symbol id="icon-check" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </symbol>
+        <symbol id="icon-cross" viewBox="0 0 24 24">
+            <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/>
+        </symbol>
+    </svg>
+
+    <script>
+        // Exact 50 Questions Data (Truncated for readability, full array kept intact)
+        const questionsData = [
+            { id: 101, chapter: "Linear Inequalities", text: "Number of solutions of x > 2 in integers is", options: ["Infinite", "0", "1", "2"], answer: 0 },
+            { id: 102, chapter: "Linear Inequalities", text: "The solution set of 2 < x ≤ 5 is", options: ["(2, 5)", "[2, 5]", "(2, 5]", "[2, 5)"], answer: 2 },
+            { id: 103, chapter: "Linear Inequalities", text: "Which of the following is not a linear inequality in one variable?", options: ["x + 3 < 5", "x² + 1 < 4", "-2x - 4", "x - 5 > 10"], answer: 2 },
+            { id: 104, chapter: "Sequences & Series", text: "Find the 10th term of the Arithmetic Progression 5, 8, 11, 14, ...", options: ["32", "35", "38", "41"], answer: 0 },
+            { id: 105, chapter: "Sequences & Series", text: "What is the sum of first 20 terms of the Arithmetic Progression 3, 7, 11, 15, ...?", options: ["760", "880", "840", "820"], answer: 3 },
+            { id: 106, chapter: "Relations & Functions", text: "Which of the following is not a function?", options: ["f(x) = x²", "f(x) = ± √x", "f(x) = 1/x", "None of these"], answer: 1 },
+            { id: 107, chapter: "Trigonometry", text: "The value of sin 90° is", options: ["0", "√3/2", "-1", "1"], answer: 3 },
+            { id: 108, chapter: "Trigonometry", text: "The principal value of sin⁻¹(√3/2) is", options: ["π/2", "3π/2", "5π/2", "π/3"], answer: 3 },
+            { id: 109, chapter: "Trigonometry", text: "Which of the following is not periodic?", options: ["sin x", "tan x", "cos x", "|x|"], answer: 3 },
+            { id: 110, chapter: "Trigonometry", text: "sin (180° + θ) =", options: ["sin θ", "- cos θ", "cos θ", "- sin θ"], answer: 3 },
+            { id: 111, chapter: "Sets", text: "If A = {1, 2, 3} and B = {2, 3, 4}, then A U B =", options: ["{1, 2, 3}", "{1, 4}", "{2, 3, 4}", "{1, 2, 3, 4}"], answer: 3 },
+            { id: 112, chapter: "Sets", text: "If A = {x : x is a prime number less than 10}, then A =", options: ["{2, 3, 5, 7}", "{1, 2, 3, 5}", "{2, 4, 6, 8}", "{3, 5, 9}"], answer: 0 },
+            { id: 113, chapter: "Sets", text: "The number of subsets of a set with 4 elements is", options: ["4", "8", "16", "32"], answer: 2 },
+            { id: 114, chapter: "Sets", text: "The empty set is a subset of", options: ["No set", "Some sets", "Every set", "Infinite sets only"], answer: 2 },
+            { id: 115, chapter: "Sets", text: "Universal set means", options: ["A set containing everything under discussion", "Empty set", "A set with one element", "None of the above"], answer: 0 },
+            { id: 116, chapter: "Complex Numbers", text: "The product of a complex number with its conjugate is always", options: ["A complex number", "Purely imaginary", "Real and non-negative", "0"], answer: 2 },
+            { id: 117, chapter: "Complex Numbers", text: "The equation x² + 4 = 0 has", options: ["Two real roots", "Two complex roots", "One real root", "No solution"], answer: 1 },
+            { id: 118, chapter: "Complex Numbers", text: "√-9 =", options: ["3", "-3", "3i", "-3i"], answer: 2 },
+            { id: 119, chapter: "Complex Numbers", text: "If z = a + bi, then Re(z) is", options: ["a", "b", "i", "0"], answer: 0 },
+            { id: 120, chapter: "Complex Numbers", text: "The value of (1-i)² is", options: ["0", "2i", "3i", "-2i"], answer: 3 },
+            { id: 121, chapter: "Limits & Derivatives", text: "Find lim(x→2) (3x² - x + 1).", options: ["10", "11", "12", "13"], answer: 1 },
+            { id: 122, chapter: "Limits & Derivatives", text: "If f(x) = x², then f'(x) using first principle is", options: ["x", "2x", "x²", "1"], answer: 1 },
+            { id: 123, chapter: "Limits & Derivatives", text: "The derivative of √x is", options: ["1/(2√x)", "1/√x", "√x", "2√x"], answer: 0 },
+            { id: 124, chapter: "Limits & Derivatives", text: "lim(x→1) (x²-1)/(x-1) is", options: ["1", "2", "Does not exist", "0"], answer: 1 },
+            { id: 125, chapter: "Limits & Derivatives", text: "If f(x) = x² + 3x, then f'(2) is", options: ["5", "6", "8", "7"], answer: 3 },
+            { id: 126, chapter: "Trigonometry", text: "The period of tan x is", options: ["π", "2π", "π/2", "1"], answer: 0 },
+            { id: 127, chapter: "Trigonometry", text: "If sin x = 4/5, then cos x =", options: ["3/5", "3/4", "2/5", "1"], answer: 0 },
+            { id: 128, chapter: "Complex Numbers", text: "The value of i² is", options: ["1", "0", "-1", "i"], answer: 2 },
+            { id: 129, chapter: "Complex Numbers", text: "The conjugate of 3 + 2i is", options: ["3+2i", "-3+2i", "3-2i", "-3-2i"], answer: 2 },
+            { id: 130, chapter: "Complex Numbers", text: "The modulus of 1 + i is", options: ["√2", "1", "2", "0"], answer: 0 },
+            { id: 131, chapter: "Relations & Functions", text: "The Cartesian product A x B, where A = {1, 2}, B = {3, 4} has how many elements?", options: ["2", "3", "4", "6"], answer: 2 },
+            { id: 132, chapter: "Relations & Functions", text: "If A= {a, b}, then the number of relations from A to A is", options: ["4", "2", "8", "16"], answer: 3 },
+            { id: 133, chapter: "Relations & Functions", text: "A function is a relation in which", options: ["One input has many outputs", "Each input has exactly one output", "Each output has one input", "Inputs and outputs are equal"], answer: 1 },
+            { id: 134, chapter: "Relations & Functions", text: "The set of all first elements of ordered pairs in a relation is called", options: ["Range", "Codomain", "Domain", "Output"], answer: 2 },
+            { id: 135, chapter: "Relations & Functions", text: "If a function f: R→R is defined by f(x) = 2x+1, then f(3) =", options: ["5", "6", "7", "8"], answer: 2 },
+            { id: 136, chapter: "Complex Numbers", text: "The discriminant of x² + 2x + 5 = 0 is", options: ["4", "2", "-4", "-16"], answer: 3 },
+            { id: 137, chapter: "Complex Numbers", text: "Roots of a quadratic equation are imaginary, when", options: ["D > 0", "D = 0", "D < 0", "None of these"], answer: 2 },
+            { id: 138, chapter: "Linear Inequalities", text: "The solution of Inequality 2x - 3 < 7 is", options: ["x < 2", "x > 5", "x < 5", "x > 2"], answer: 2 },
+            { id: 139, chapter: "Linear Inequalities", text: "The solution set of x² - 4 < 0 is", options: ["x < -2 or x > 2", "-2 < x < 2", "x < -2", "x > 2"], answer: 1 },
+            { id: 140, chapter: "Linear Inequalities", text: "If a < b and c < 0, then", options: ["ac < bc", "ac > bc", "ac = bc", "No relation"], answer: 1 },
+            { id: 141, chapter: "Sets", text: "A = {1, 2, 3}, B = {3, 4, 5}, then A - B is", options: ["{1, 2}", "{4, 5}", "{3}", "{1, 2, 3, 4, 5}"], answer: 0 },
+            { id: 142, chapter: "Sets", text: "The number of elements in the power set of {a, b} is", options: ["2", "16", "8", "4"], answer: 3 },
+            { id: 143, chapter: "Sets", text: "Which of the following is a finite set?", options: ["The set of all stars in the sky", "The set of natural numbers", "The set of months in a year", "The set of integers"], answer: 2 },
+            { id: 144, chapter: "Sets", text: "If A = {x : x ∈ N, x ≤ 5}, then A =", options: ["{0, 1, 2, 3, 4, 5}", "{1, 2, 3, 4}", "{2, 3, 4, 5}", "{1, 2, 3, 4, 5}"], answer: 3 },
+            { id: 145, chapter: "Relations & Functions", text: "A relation R from A = {1, 2, 3} to B = {4, 5} is a subset of", options: ["A", "B", "A x B", "B x A"], answer: 2 },
+            { id: 146, chapter: "Sequences & Series", text: "What is the common ratio of the Geometric Progression 81, 27, 9, 3,...?", options: ["3", "1/3", "-3", "-1/3"], answer: 1 },
+            { id: 147, chapter: "Sequences & Series", text: "If the 5th term of an Arithmetic Progression is 20 and the 10th term is 35, what is the common difference?", options: ["2", "5", "4", "3"], answer: 3 },
+            { id: 148, chapter: "Sequences & Series", text: "What is the sum of the first 5 terms of the Geometric Progression 3, 6, 12, ....?", options: ["90", "93", "96", "99"], answer: 1 },
+            { id: 149, chapter: "Sequences & Series", text: "In an Arithmetic Progression, if the sum of first n terms is S_n = 5n² + 3n, what is the 7th term?", options: ["78", "63", "90", "68"], answer: 3 },
+            { id: 150, chapter: "Sequences & Series", text: "The sum of an infinite Geometric Progression with first term 4 and common ratio 1/2 is", options: ["6", "8", "10", "12"], answer: 1 }
+        ];
+
+        let activeFilter = 'All';
+        const chapters = [...new Set(questionsData.map(q => q.chapter))];
+
+        function initChips() {
+            const container = document.getElementById('chip-container');
+            chapters.forEach(ch => {
+                const div = document.createElement('div');
+                div.className = 'chip';
+                div.textContent = ch;
+                div.onclick = function() { setFilter(ch, this); };
+                container.appendChild(div);
+            });
+        }
+
+        function setFilter(chapter, element) {
+            activeFilter = chapter;
+            document.querySelectorAll('.chip').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            renderQuestions();
+            // Scroll to top of questions when filter is applied
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateOptionStyle(radioInput) {
+            const name = radioInput.name;
+            document.querySelectorAll(`input[name="${name}"]`).forEach(inp => {
+                inp.parentElement.classList.remove('selected-bg');
+            });
+            radioInput.parentElement.classList.add('selected-bg');
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            const filteredData = activeFilter === 'All' ? questionsData : questionsData.filter(q => q.chapter === activeFilter);
+            
+            if (filteredData.length === 0) {
+                container.innerHTML = `<div class="empty-state">No questions found.</div>`;
+                return;
+            }
+
+            let currentChapter = '';
+
+            filteredData.forEach(q => {
+                if (q.chapter !== currentChapter) {
+                    currentChapter = q.chapter;
+                    container.innerHTML += `<div class="chapter-heading">${currentChapter}</div>`;
+                }
+
+                let optionsHtml = q.options.map((opt, i) => `
+                    <label class="opt-label" id="lbl-q${q.id}-o${i}">
+                        <input type="radio" name="q${q.id}" value="${i}" onchange="updateOptionStyle(this)">
+                        
+                        <svg class="result-icon icon-check"><use href="#icon-check"></use></svg>
+                        <svg class="result-icon icon-cross"><use href="#icon-cross"></use></svg>
+                        
+                        <div class="custom-radio"></div>
+                        <span>${['A', 'B', 'C', 'D'][i]}) ${opt}</span>
+                    </label>
+                `).join('');
+
+                container.innerHTML += `
+                    <div class="q-card" data-id="${q.id}" data-ans="${q.answer}">
+                        <div class="q-text">Q${q.id}. ${q.text}</div>
+                        <div class="options-grid">${optionsHtml}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Timer
+        let timeLeft = 50 * 60;
+        const timerElement = document.getElementById('timer');
+        const timerInterval = setInterval(() => {
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            timerElement.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timeLeft <= 0) { clearInterval(timerInterval); submitTest(); }
+            timeLeft--;
+        }, 1000);
+
+        // --- Handle Scroll for the Floating Submit Button ---
+        window.addEventListener('scroll', () => {
+            const bottomBar = document.getElementById('bottom-bar');
+            // Show button after user scrolls 200 pixels down
+            if (window.scrollY > 200) {
+                bottomBar.classList.add('show');
+            } else {
+                bottomBar.classList.remove('show');
+            }
+        });
+
+        function submitTest() {
+            clearInterval(timerInterval);
+            let score = 0;
+            const cards = document.querySelectorAll('.q-card');
+
+            cards.forEach(card => {
+                const qId = card.dataset.id;
+                const correctAns = parseInt(card.dataset.ans);
+                const selected = document.querySelector(`input[name="q${qId}"]:checked`);
+
+                const correctLabel = document.getElementById(`lbl-q${qId}-o${correctAns}`);
+                correctLabel.classList.add('correct-opt');
+
+                if (selected) {
+                    const selectedVal = parseInt(selected.value);
+                    if (selectedVal === correctAns) {
+                        score++;
+                    } else {
+                        const wrongLabel = document.getElementById(`lbl-q${qId}-o${selectedVal}`);
+                        wrongLabel.classList.add('wrong-opt');
+                    }
+                }
+            });
+
+            // Disable interactions
+            document.querySelectorAll('.opt-label input').forEach(inp => inp.disabled = true);
+            document.querySelectorAll('.chip').forEach(c => c.style.pointerEvents = 'none');
+            
+            // Hide the floating bottom button
+            document.getElementById('bottom-bar').style.display = 'none';
+            
+            // Show result dashboard at the top
+            const container = document.getElementById('quiz-container');
+            const resultHtml = `
+                <div class="result-dashboard" style="display:block;">
+                    <h2 style="margin-top:0; color:var(--black); font-weight:800;">Assessment Summary</h2>
+                    <div class="score-circle">${score}/${cards.length}</div>
+                    <p style="color:var(--gray-dark); font-weight:500;">Review your answers below. Correct answers are indicated by a tick mark, and incorrect ones are crossed out.</p>
+                    <button class="btn-submit" style="margin:20px auto 0 auto; width:auto; padding:16px 36px; justify-content:center;" onclick="location.reload()">Practice Again</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('afterbegin', resultHtml);
+
+            // Scroll to the result
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.onload = () => {
+            initChips();
+            renderQuestions();
+        };
+    </script>
+</body>
+</html>
