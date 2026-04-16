@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2025 PYQ D2D - Glass Monochrome Test</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    <title>D2D PYQ Master Portal</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] }
+        };
+    </script>
 
+    <style>
         :root {
-            /* Monochrome Palette */
-            --black: #09090b;
-            --black-muted: #27272a;
-            --gray-dark: #52525b;
-            --gray-light: #e4e4e7;
+            --black: #09090b; --black-muted: #27272a;
+            --gray-dark: #52525b; --gray-light: #e4e4e7;
             --white: #ffffff;
-            
-            /* Glassmorphism Variables */
-            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-bg: rgba(255, 255, 255, 0.6);
             --glass-border: rgba(255, 255, 255, 0.8);
             --glass-blur: blur(24px);
-            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
-            
-            /* Animation timing */
             --smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -29,425 +30,769 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 100%);
             background-attachment: fixed;
-            color: var(--black);
-            margin: 0;
-            padding: 0;
-            padding-bottom: 80px;
+            color: var(--black); margin: 0; padding: 0;
             -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
         }
 
-        /* --- Layout & Glass Header --- */
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ================= HOME DASHBOARD ================= */
+        #home-view { padding: 40px 20px 100px 20px; max-width: 1000px; margin: 0 auto; }
+        .hero-section { text-align: center; margin-bottom: 50px; }
+        .hero-section h1 { font-size: 38px; font-weight: 800; letter-spacing: -1px; margin-bottom: 10px; }
+        .hero-section p.funny-tag { font-size: 16px; color: var(--gray-dark); font-weight: 600; background: var(--glass-bg); display: inline-block; padding: 10px 20px; border-radius: 30px; border: 1px solid var(--glass-border); }
+
+        .section-title { font-size: 18px; font-weight: 800; text-transform: uppercase; color: var(--black-muted); margin: 40px 0 20px 0; border-bottom: 2px solid var(--black); display: inline-block; padding-bottom: 5px; }
+
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+
+        .combine-card {
+            background: var(--black); color: var(--white); padding: 35px; border-radius: 20px; cursor: pointer; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform var(--smooth); grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center;
+        }
+        .combine-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
+        .combine-card h2 { margin: 0 0 10px 0; font-size: 28px; font-weight: 800; }
+        .combine-card p { margin: 0; color: #a1a1aa; font-size: 15px; font-weight: 500; }
+        .combine-icon { background: var(--white); color: var(--black); padding: 15px 25px; border-radius: 50px; font-weight: 800; font-size: 14px; letter-spacing: 1px; }
+
+        .year-card {
+            background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); padding: 30px 20px; border-radius: 20px; text-align: center; cursor: pointer; transition: all var(--smooth);
+        }
+        .year-card:hover { transform: translateY(-5px); background: var(--white); box-shadow: 0 12px 30px rgba(0,0,0,0.08); border-color: var(--white); }
+        .year-card h3 { margin: 0; font-size: 32px; font-weight: 800; color: var(--black); }
+        .year-card p { margin: 5px 0 0 0; font-size: 12px; font-weight: 700; color: var(--gray-dark); text-transform: uppercase; }
+
+        /* ================= TEST & FILTER VIEW ================= */
+        #test-view { display: none; padding-bottom: 120px; }
+
         .top-nav {
-            position: sticky;
-            top: 0;
-            background: var(--glass-bg);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid var(--glass-border);
-            z-index: 1000;
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            position: sticky; top: 0; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); z-index: 1000; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;
         }
+        .nav-left { display: flex; align-items: center; gap: 15px; }
+        .back-btn { background: var(--white); border: 1px solid var(--gray-light); padding: 8px 15px; border-radius: 10px; cursor: pointer; font-weight: 700; transition: all 0.2s; }
+        .back-btn:hover { background: var(--black); color: var(--white); }
 
-        .brand h1 {
-            margin: 0;
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--black);
-            letter-spacing: -0.5px;
+        /* Premium Filter UI */
+        .filter-panel {
+            background: var(--white); border-bottom: 1px solid var(--gray-light); padding: 30px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
-
-        .brand p { margin: 2px 0 0 0; font-size: 11px; font-weight: 700; color: var(--gray-dark); text-transform: uppercase; letter-spacing: 1.5px; }
-
-        .timer-badge {
-            background: var(--black);
-            color: var(--white);
-            padding: 8px 18px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        .filter-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-width: 1000px; margin: 0 auto;
         }
-
-        /* --- Scrollable Filter Chips --- */
-        .filter-wrapper {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--glass-border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            overflow-x: auto;
-            white-space: nowrap;
-            -ms-overflow-style: none;  
-            scrollbar-width: none;  
-        }
-        .filter-wrapper::-webkit-scrollbar { display: none; }
-
-        .filter-label { font-size: 11px; font-weight: 800; color: var(--gray-dark); text-transform: uppercase; margin-right: 4px; letter-spacing: 1px;}
-
+        .filter-group h4 { margin: 0 0 15px 0; font-size: 14px; text-transform: uppercase; color: var(--gray-dark); letter-spacing: 1px; }
+        .chip-container { display: flex; flex-wrap: wrap; gap: 10px; }
+        
         .chip {
-            background: rgba(255,255,255,0.7);
-            border: 1px solid var(--glass-border);
-            color: var(--gray-dark);
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all var(--smooth);
-            user-select: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            background: var(--bg-body); border: 1px solid var(--gray-light); color: var(--gray-dark); padding: 8px 18px; border-radius: 50px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .chip:hover { background: var(--gray-light); color: var(--black); }
+        .chip.active { background: var(--black); color: var(--white); border-color: var(--black); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .toggle-filter-btn { background: transparent; border: 2px solid var(--black); font-weight: 800; padding: 8px 18px; border-radius: 20px; cursor: pointer; transition: all 0.2s;}
+        .toggle-filter-btn:hover { background: var(--black); color: var(--white); }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 24px; }
+
+        /* Year & Subject Headers */
+        .year-header {
+            font-size: 24px; font-weight: 800; color: var(--black); margin: 50px 0 20px 0; display: flex; align-items: center; gap: 15px; border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;
+        }
+        .year-header::before { content: '📅'; font-size: 28px; }
+        .subject-badge {
+            display: inline-block; background: var(--black-muted); color: var(--white); padding: 6px 15px; border-radius: 8px; font-size: 14px; font-weight: 700; margin-bottom: 20px; letter-spacing: 1px; text-transform: uppercase;
         }
 
-        .chip:hover { transform: translateY(-2px); background: var(--white); color: var(--black); }
-
-        .chip.active {
-            background: var(--black);
-            color: var(--white);
-            border-color: var(--black);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        /* --- Container & Animations --- */
-        .container {
-            max-width: 760px;
-            margin: 0 auto;
-            padding: 24px;
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .chapter-heading {
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--black-muted);
-            margin: 40px 0 20px 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: fadeUp 0.5s ease forwards;
-        }
-        .chapter-heading::before {
-            content: '';
-            width: 30px;
-            height: 2px;
-            background: var(--black);
-            display: inline-block;
-        }
-
-        /* --- Glass Cards --- */
-        .q-card {
-            background: var(--glass-bg);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border-radius: 24px;
-            padding: 30px;
-            margin-bottom: 24px;
-            box-shadow: var(--glass-shadow);
-            border: 1px solid var(--glass-border);
-            transition: transform var(--smooth), box-shadow var(--smooth);
-            animation: fadeUp 0.6s ease forwards;
-        }
+        /* Question Cards */
+        .q-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-radius: 24px; padding: 35px; margin-bottom: 24px; border: 1px solid var(--glass-border); box-shadow: 0 8px 32px rgba(0,0,0,0.03); transition: transform 0.2s; }
+        .q-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.06); }
+        .q-meta { font-size: 12px; font-weight: 800; color: var(--gray-dark); text-transform: uppercase; margin-bottom: 20px; display: flex; gap: 10px; }
+        .q-meta span { background: var(--white); padding: 5px 12px; border-radius: 12px; border: 1px solid var(--gray-light); }
+        .q-text { font-size: 18px; font-weight: 600; margin-bottom: 25px; line-height: 1.6; color: var(--black); }
         
-        .q-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.06);
-        }
-
-        .q-text {
-            font-size: 17px;
-            font-weight: 600;
-            color: var(--black);
-            margin-bottom: 24px;
-            line-height: 1.6;
-        }
-
-        /* --- Stylish Options --- */
         .options-grid { display: flex; flex-direction: column; gap: 14px; }
-
-        .opt-label {
-            position: relative;
-            padding: 16px 20px;
-            border-radius: 16px;
-            border: 2px solid rgba(255,255,255,0.6);
-            background: rgba(255,255,255,0.4);
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--black-muted);
-            transition: all var(--smooth);
-            display: flex;
-            align-items: center;
-        }
-
-        .opt-label:hover { background: rgba(255,255,255,0.8); border-color: var(--white); color: var(--black); }
-
-        .opt-label input { position: absolute; opacity: 0; cursor: pointer; }
-
-        .custom-radio {
-            width: 22px;
-            height: 22px;
-            border: 2px solid var(--gray-dark);
-            border-radius: 50%;
-            margin-right: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all var(--smooth);
-        }
-
+        .opt-label { padding: 16px 20px; border-radius: 16px; border: 2px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.5); cursor: pointer; font-size: 16px; font-weight: 500; display: flex; align-items: center; transition: all var(--smooth); }
+        .opt-label input { position: absolute; opacity: 0; }
+        .custom-radio { width: 22px; height: 22px; min-width: 22px; border: 2px solid var(--gray-dark); border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; }
         .opt-label input:checked ~ .custom-radio { border-color: var(--black); }
-        
-        .opt-label input:checked ~ .custom-radio::after {
-            content: '';
-            width: 12px;
-            height: 12px;
-            background: var(--black);
-            border-radius: 50%;
-            transform: scale(0);
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
+        .opt-label input:checked ~ .custom-radio::after { content: ''; width: 12px; height: 12px; background: var(--black); border-radius: 50%; }
+        .opt-label.selected-bg { border-color: var(--black); background: var(--white); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
 
-        @keyframes popIn { to { transform: scale(1); } }
-
-        .opt-label.selected-bg {
-            border-color: var(--black);
-            background: var(--white);
-            color: var(--black);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-
-        /* --- Floating Bottom Action Button (Updated) --- */
+        /* Floating Submit Button */
         .bottom-action-bar {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 1000;
-            
-            /* Hidden initially */
-            opacity: 0;
-            transform: translateY(20px) scale(0.95);
-            pointer-events: none;
-            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: fixed; bottom: 30px; right: 30px; z-index: 1000;
+            opacity: 0; transform: translateY(20px) scale(0.95); pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        /* Class added via JS on scroll */
-        .bottom-action-bar.show {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            pointer-events: auto;
-        }
-
+        .bottom-action-bar.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
         .btn-submit {
-            background: var(--black);
-            color: var(--white);
-            border: none;
-            padding: 16px 36px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: all var(--smooth);
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            background: var(--black); color: var(--white); border: none; padding: 18px 36px; border-radius: 50px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; transition: transform 0.2s;
         }
-
         .btn-submit:hover { transform: translateY(-4px); box-shadow: 0 15px 40px rgba(0,0,0,0.4); }
-        .btn-submit:active { transform: translateY(1px); }
 
-        /* --- Result States --- */
-        .result-icon { width: 24px; height: 24px; margin-right: 16px; display: none; }
-        
-        .correct-opt {
-            border-color: var(--black) !important;
-            background: var(--white) !important;
-            color: var(--black);
-        }
-        .correct-opt .custom-radio { display: none; }
-        .correct-opt .result-icon.icon-check { display: block; fill: var(--black); }
+        /* End Anchor for Submit Trigger */
+        #scroll-anchor { height: 20px; width: 100%; margin-top: 20px; }
 
-        .wrong-opt {
-            border-color: var(--gray-dark) !important;
-            background: transparent !important;
-            color: var(--gray-dark);
-            opacity: 0.7;
-            text-decoration: line-through;
-        }
-        .wrong-opt .custom-radio { display: none; }
-        .wrong-opt .result-icon.icon-cross { display: block; fill: var(--gray-dark); }
+        /* Results */
+        .correct-opt { border-color: var(--black) !important; background: var(--white) !important; color: var(--black); font-weight: 700; }
+        .wrong-opt { border-color: var(--gray-dark) !important; background: transparent !important; color: var(--gray-dark); opacity: 0.6; text-decoration: line-through; }
+        .result-dashboard { display: none; text-align: center; background: var(--glass-bg); backdrop-filter: var(--glass-blur); padding: 50px; border-radius: 30px; margin-top: 40px; border: 1px solid var(--glass-border); box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
+        .score-circle { width: 140px; height: 140px; border-radius: 50%; background: var(--white); display: flex; align-items: center; justify-content: center; font-size: 38px; font-weight: 800; margin: 0 auto 20px auto; border: 8px solid var(--black); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 
-        .result-dashboard {
-            display: none;
-            text-align: center;
-            background: var(--glass-bg);
-            backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--glass-border);
-            padding: 50px 20px;
-            border-radius: 30px;
-            margin-top: 20px;
-            box-shadow: var(--glass-shadow);
-            animation: fadeUp 0.6s ease;
-        }
-
-        .score-circle {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            background: var(--white);
-            color: var(--black);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            font-weight: 800;
-            margin: 0 auto 24px auto;
-            border: 8px solid var(--black);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .empty-state { text-align: center; padding: 80px 20px; color: var(--gray-dark); font-weight: 600; }
-
-        @media (max-width: 600px) {
-            .q-card { padding: 24px 20px; border-radius: 20px; }
-            .opt-label { padding: 14px 16px; font-size: 14px; }
-            .top-nav { padding: 14px 20px; }
-            
-            /* Adjust floating button for mobile */
-            .bottom-action-bar { bottom: 20px; right: 20px; left: 20px; display: flex; justify-content: center; }
-            .btn-submit { width: 100%; max-width: 300px; justify-content: center; }
+        @media (max-width: 800px) {
+            .filter-grid { grid-template-columns: 1fr; gap: 20px; }
+            .hero-section h1 { font-size: 30px; }
+            .combine-card { flex-direction: column; text-align: center; gap: 15px; }
+            .bottom-action-bar { bottom: 20px; right: 20px; }
+            .btn-submit { padding: 15px 25px; font-size: 14px; }
+            .q-card { padding: 25px; }
         }
     </style>
 </head>
 <body>
 
-    <nav class="top-nav">
-        <div class="brand">
-            <h1>Set C • Math</h1>
-            <p>2025 PYQ D2D</p>
-        </div>
-        <div class="timer-badge" id="timer">50:00</div>
-    </nav>
-
-    <div class="filter-wrapper" id="chip-container">
-        <span class="filter-label">Filter</span>
-        <div class="chip active" onclick="setFilter('All', this)">All Chapters</div>
-    </div>
-
-    <div class="container" id="quiz-container">
+    <div id="home-view" class="fade-in">
+        <div class="hero-section">
+            <h1>Welcome to D2D PYQ! 🎓</h1>
+            <p class="funny-tag">Kyunki ratta maarne se achha hai previous year pel do! 😂🚀</p>
         </div>
 
-    <div class="bottom-action-bar" id="bottom-bar">
-        <button class="btn-submit" onclick="submitTest()">
-            Submit Assessment
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-        </button>
+        <div class="combine-card" onclick="openCombineFilter()">
+            <div>
+                <h2>Combine Research Lab 🧪</h2>
+                <p>Filter & mix questions by Year, Subject, and Chapter!</p>
+            </div>
+            <div class="combine-icon">ENTER LAB →</div>
+        </div>
+
+        <div class="section-title">Year-Wise Papers (2017 - 2025)</div>
+        <div class="grid-container" id="year-grid"></div>
     </div>
 
-    <svg style="display:none;">
-        <symbol id="icon-check" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-        </symbol>
-        <symbol id="icon-cross" viewBox="0 0 24 24">
-            <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/>
-        </symbol>
-    </svg>
+    <div id="test-view">
+        <nav class="top-nav">
+            <div class="nav-left">
+                <button class="back-btn" onclick="goHome()">← Back</button>
+                <div style="font-weight: 800; font-size: 18px;" id="test-title">Paper Setup</div>
+            </div>
+            <button class="toggle-filter-btn" onclick="toggleFilterPanel()" id="filter-btn">⚙️ Filters</button>
+        </nav>
+
+        <div class="filter-panel" id="filter-panel">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <h4>Select Years</h4>
+                    <div class="chip-container" id="f-years"></div>
+                </div>
+                <div class="filter-group">
+                    <h4>Select Subjects</h4>
+                    <div class="chip-container" id="f-subjects"></div>
+                </div>
+                <div class="filter-group">
+                    <h4>Select Chapters</h4>
+                    <div class="chip-container" id="f-chapters"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container" id="quiz-container"></div>
+        
+        <div id="scroll-anchor"></div>
+
+        <div class="bottom-action-bar" id="bottom-bar">
+            <button class="btn-submit" onclick="submitTest()">
+                Submit Test
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </button>
+        </div>
+    </div>
 
     <script>
-        // Exact 50 Questions Data (Truncated for readability, full array kept intact)
-        const questionsData = [
-            { id: 101, chapter: "Linear Inequalities", text: "Number of solutions of x > 2 in integers is", options: ["Infinite", "0", "1", "2"], answer: 0 },
-            { id: 102, chapter: "Linear Inequalities", text: "The solution set of 2 < x ≤ 5 is", options: ["(2, 5)", "[2, 5]", "(2, 5]", "[2, 5)"], answer: 2 },
-            { id: 103, chapter: "Linear Inequalities", text: "Which of the following is not a linear inequality in one variable?", options: ["x + 3 < 5", "x² + 1 < 4", "-2x - 4", "x - 5 > 10"], answer: 2 },
-            { id: 104, chapter: "Sequences & Series", text: "Find the 10th term of the Arithmetic Progression 5, 8, 11, 14, ...", options: ["32", "35", "38", "41"], answer: 0 },
-            { id: 105, chapter: "Sequences & Series", text: "What is the sum of first 20 terms of the Arithmetic Progression 3, 7, 11, 15, ...?", options: ["760", "880", "840", "820"], answer: 3 },
-            { id: 106, chapter: "Relations & Functions", text: "Which of the following is not a function?", options: ["f(x) = x²", "f(x) = ± √x", "f(x) = 1/x", "None of these"], answer: 1 },
-            { id: 107, chapter: "Trigonometry", text: "The value of sin 90° is", options: ["0", "√3/2", "-1", "1"], answer: 3 },
-            { id: 108, chapter: "Trigonometry", text: "The principal value of sin⁻¹(√3/2) is", options: ["π/2", "3π/2", "5π/2", "π/3"], answer: 3 },
-            { id: 109, chapter: "Trigonometry", text: "Which of the following is not periodic?", options: ["sin x", "tan x", "cos x", "|x|"], answer: 3 },
-            { id: 110, chapter: "Trigonometry", text: "sin (180° + θ) =", options: ["sin θ", "- cos θ", "cos θ", "- sin θ"], answer: 3 },
-            { id: 111, chapter: "Sets", text: "If A = {1, 2, 3} and B = {2, 3, 4}, then A U B =", options: ["{1, 2, 3}", "{1, 4}", "{2, 3, 4}", "{1, 2, 3, 4}"], answer: 3 },
-            { id: 112, chapter: "Sets", text: "If A = {x : x is a prime number less than 10}, then A =", options: ["{2, 3, 5, 7}", "{1, 2, 3, 5}", "{2, 4, 6, 8}", "{3, 5, 9}"], answer: 0 },
-            { id: 113, chapter: "Sets", text: "The number of subsets of a set with 4 elements is", options: ["4", "8", "16", "32"], answer: 2 },
-            { id: 114, chapter: "Sets", text: "The empty set is a subset of", options: ["No set", "Some sets", "Every set", "Infinite sets only"], answer: 2 },
-            { id: 115, chapter: "Sets", text: "Universal set means", options: ["A set containing everything under discussion", "Empty set", "A set with one element", "None of the above"], answer: 0 },
-            { id: 116, chapter: "Complex Numbers", text: "The product of a complex number with its conjugate is always", options: ["A complex number", "Purely imaginary", "Real and non-negative", "0"], answer: 2 },
-            { id: 117, chapter: "Complex Numbers", text: "The equation x² + 4 = 0 has", options: ["Two real roots", "Two complex roots", "One real root", "No solution"], answer: 1 },
-            { id: 118, chapter: "Complex Numbers", text: "√-9 =", options: ["3", "-3", "3i", "-3i"], answer: 2 },
-            { id: 119, chapter: "Complex Numbers", text: "If z = a + bi, then Re(z) is", options: ["a", "b", "i", "0"], answer: 0 },
-            { id: 120, chapter: "Complex Numbers", text: "The value of (1-i)² is", options: ["0", "2i", "3i", "-2i"], answer: 3 },
-            { id: 121, chapter: "Limits & Derivatives", text: "Find lim(x→2) (3x² - x + 1).", options: ["10", "11", "12", "13"], answer: 1 },
-            { id: 122, chapter: "Limits & Derivatives", text: "If f(x) = x², then f'(x) using first principle is", options: ["x", "2x", "x²", "1"], answer: 1 },
-            { id: 123, chapter: "Limits & Derivatives", text: "The derivative of √x is", options: ["1/(2√x)", "1/√x", "√x", "2√x"], answer: 0 },
-            { id: 124, chapter: "Limits & Derivatives", text: "lim(x→1) (x²-1)/(x-1) is", options: ["1", "2", "Does not exist", "0"], answer: 1 },
-            { id: 125, chapter: "Limits & Derivatives", text: "If f(x) = x² + 3x, then f'(2) is", options: ["5", "6", "8", "7"], answer: 3 },
-            { id: 126, chapter: "Trigonometry", text: "The period of tan x is", options: ["π", "2π", "π/2", "1"], answer: 0 },
-            { id: 127, chapter: "Trigonometry", text: "If sin x = 4/5, then cos x =", options: ["3/5", "3/4", "2/5", "1"], answer: 0 },
-            { id: 128, chapter: "Complex Numbers", text: "The value of i² is", options: ["1", "0", "-1", "i"], answer: 2 },
-            { id: 129, chapter: "Complex Numbers", text: "The conjugate of 3 + 2i is", options: ["3+2i", "-3+2i", "3-2i", "-3-2i"], answer: 2 },
-            { id: 130, chapter: "Complex Numbers", text: "The modulus of 1 + i is", options: ["√2", "1", "2", "0"], answer: 0 },
-            { id: 131, chapter: "Relations & Functions", text: "The Cartesian product A x B, where A = {1, 2}, B = {3, 4} has how many elements?", options: ["2", "3", "4", "6"], answer: 2 },
-            { id: 132, chapter: "Relations & Functions", text: "If A= {a, b}, then the number of relations from A to A is", options: ["4", "2", "8", "16"], answer: 3 },
-            { id: 133, chapter: "Relations & Functions", text: "A function is a relation in which", options: ["One input has many outputs", "Each input has exactly one output", "Each output has one input", "Inputs and outputs are equal"], answer: 1 },
-            { id: 134, chapter: "Relations & Functions", text: "The set of all first elements of ordered pairs in a relation is called", options: ["Range", "Codomain", "Domain", "Output"], answer: 2 },
-            { id: 135, chapter: "Relations & Functions", text: "If a function f: R→R is defined by f(x) = 2x+1, then f(3) =", options: ["5", "6", "7", "8"], answer: 2 },
-            { id: 136, chapter: "Complex Numbers", text: "The discriminant of x² + 2x + 5 = 0 is", options: ["4", "2", "-4", "-16"], answer: 3 },
-            { id: 137, chapter: "Complex Numbers", text: "Roots of a quadratic equation are imaginary, when", options: ["D > 0", "D = 0", "D < 0", "None of these"], answer: 2 },
-            { id: 138, chapter: "Linear Inequalities", text: "The solution of Inequality 2x - 3 < 7 is", options: ["x < 2", "x > 5", "x < 5", "x > 2"], answer: 2 },
-            { id: 139, chapter: "Linear Inequalities", text: "The solution set of x² - 4 < 0 is", options: ["x < -2 or x > 2", "-2 < x < 2", "x < -2", "x > 2"], answer: 1 },
-            { id: 140, chapter: "Linear Inequalities", text: "If a < b and c < 0, then", options: ["ac < bc", "ac > bc", "ac = bc", "No relation"], answer: 1 },
-            { id: 141, chapter: "Sets", text: "A = {1, 2, 3}, B = {3, 4, 5}, then A - B is", options: ["{1, 2}", "{4, 5}", "{3}", "{1, 2, 3, 4, 5}"], answer: 0 },
-            { id: 142, chapter: "Sets", text: "The number of elements in the power set of {a, b} is", options: ["2", "16", "8", "4"], answer: 3 },
-            { id: 143, chapter: "Sets", text: "Which of the following is a finite set?", options: ["The set of all stars in the sky", "The set of natural numbers", "The set of months in a year", "The set of integers"], answer: 2 },
-            { id: 144, chapter: "Sets", text: "If A = {x : x ∈ N, x ≤ 5}, then A =", options: ["{0, 1, 2, 3, 4, 5}", "{1, 2, 3, 4}", "{2, 3, 4, 5}", "{1, 2, 3, 4, 5}"], answer: 3 },
-            { id: 145, chapter: "Relations & Functions", text: "A relation R from A = {1, 2, 3} to B = {4, 5} is a subset of", options: ["A", "B", "A x B", "B x A"], answer: 2 },
-            { id: 146, chapter: "Sequences & Series", text: "What is the common ratio of the Geometric Progression 81, 27, 9, 3,...?", options: ["3", "1/3", "-3", "-1/3"], answer: 1 },
-            { id: 147, chapter: "Sequences & Series", text: "If the 5th term of an Arithmetic Progression is 20 and the 10th term is 35, what is the common difference?", options: ["2", "5", "4", "3"], answer: 3 },
-            { id: 148, chapter: "Sequences & Series", text: "What is the sum of the first 5 terms of the Geometric Progression 3, 6, 12, ....?", options: ["90", "93", "96", "99"], answer: 1 },
-            { id: 149, chapter: "Sequences & Series", text: "In an Arithmetic Progression, if the sum of first n terms is S_n = 5n² + 3n, what is the 7th term?", options: ["78", "63", "90", "68"], answer: 3 },
-            { id: 150, chapter: "Sequences & Series", text: "The sum of an infinite Geometric Progression with first term 4 and common ratio 1/2 is", options: ["6", "8", "10", "12"], answer: 1 }
+        // ==========================================
+        // 📥 MASTER DATA FORMAT 
+        // ==========================================
+        const questionBank = [
+            
+            // --- 2025 MATH ---
+            { 
+                id: 2025101, year: 2025, subject: "Math", chapter: "Calculus", 
+                text: "Evaluate the integral: $$\\int_{0}^{\\frac{\\pi}{2}} \\sin(x) \\, dx$$", 
+                options: ["$0$", "$1$", "$-1$", "$\\frac{\\pi}{2}$"], 
+                answer: 1 
+            },
+            { 
+                id: 2025102, year: 2025, subject: "Math", chapter: "Algebra", 
+                text: "Find the roots of the quadratic equation $x^2 - 5x + 6 = 0$.", 
+                options: ["$x = 1, 6$", "$x = -2, -3$", "$x = 2, 3$", "$x = 0, 5$"], 
+                answer: 2 
+            },
+            { 
+                id: 2025103, year: 2025, subject: "Math", chapter: "Limits", 
+                text: "Find the limit: $\\lim_{x \\to 0} \\frac{\\sin x}{x}$", 
+                options: ["$\\infty$", "$0$", "$1$", "Does not exist"], 
+                answer: 2 
+            },
+
+            // --- 2024 CHEMISTRY ---
+            { 
+                id: 2024301, year: 2024, subject: "Chemistry", chapter: "Thermodynamics", 
+                text: "The ideal gas law equation is given as:", 
+                options: ["$PV = nRT$", "$P_1 V_1 = P_2 V_2$", "$V \\propto T$", "$E = mc^2$"], 
+                answer: 0 
+            }, // YAHAN COMMA MISSING THA PEHLE
+
+            // --- 2025 PHYSICS ---
+            { 
+                id: 2025201, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Optics", 
+                text: "The ability of optical instrument to resolve any two near objects and form separate images of those nearby objects is called", 
+                options: ["Magnification", "Distinguish power", "Focus", "Resolving power"], 
+                answer: 3 
+            },
+            { 
+                id: 2025202, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Optics", 
+                text: "The focal length of objective and eyepiece of telescope is 150 cm and 5 cm respectively. Find the distance between objective and eyepiece if the telescope is at normal adjustment.", 
+                options: ["155 cm", "750 cm", "145 cm", "30 cm"], 
+                answer: 0 
+            },
+            { 
+                id: 2025203, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Modern Physics", 
+                text: "The energy required to excite an electron from ground state to any of the excited state is known as", 
+                options: ["Ionisation energy", "Binding energy", "Excitation energy", "Kinetic energy"], 
+                answer: 2 
+            },
+            { 
+                id: 2025204, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Electrostatics", 
+                text: "A circular sheet of diameter 5 cm placed in a uniform electric field of $50 \\, N/C$ with its normal making an angle $30^\\circ$ with the field. Calculate the electric flux through the sheet.", 
+                options: ["$0.043 \\, Nm^2/C$", "$0.085 \\, Nm^2/C$", "$0.055 \\, Nm^2/C$", "$0.170 \\, Nm^2/C$"], 
+                answer: 1 
+            },
+            { 
+                id: 2025205, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Current Electricity", 
+                text: "The average velocity with which the free electrons get drifted towards the positive end of the conductor under the influence of an external electric field is called", 
+                options: ["Thermal velocity", "Electron mobility", "Current density", "Drift velocity"], 
+                answer: 3 
+            },
+            { 
+                id: 2025206, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Mechanics", 
+                text: "Find the torque of a force $\\vec{F} = 2\\hat{i} + 3\\hat{j}$ about origin when it acted upon a particle at a point $(1, 1, 0)$.", 
+                options: ["$5\\hat{k} \\, Nm$", "$-\\hat{k} \\, Nm$", "$\\hat{k} \\, Nm$", "$-5\\hat{k} \\, Nm$"], 
+                answer: 2 
+            },
+            { 
+                id: 2025207, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Properties of Matter", 
+                text: "Hooke's law states that within the elastic limit of a body", 
+                options: ["Stress is proportional to strain", "Force is proportional to displacement", "Pressure is proportional to volume", "Energy is proportional to temperature"], 
+                answer: 0 
+            },
+            { 
+                id: 2025208, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Properties of Matter", 
+                text: "Shear modulus is defined as the ratio of", 
+                options: ["Tensile stress to tensile strain", "Compressive stress to compressive strain", "Shear stress to shear strain", "Volume stress to volume strain"], 
+                answer: 2 
+            },
+            { 
+                id: 2025209, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Properties of Matter", 
+                text: "A stress of $5 \\, kg \\, wt/cm^2$ is applied to a wire. Find the percentage increase in its length if Young's modulus is $2 \\times 10^{11} \\, Pa$.", 
+                options: ["$2.45 \\times 10^{-4}$", "$2.45 \\times 10^{-6}$", "$2.45 \\times 10^{-2}$", "$2.45$"], 
+                answer: 0 
+            },
+            { 
+                id: 2025210, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Fluid Mechanics", 
+                text: "The angle between the tangent at the solid surface and the tangent at the liquid surface at the contact is called", 
+                options: ["Angle of refraction", "Angle of repose", "Angle of incidence", "Angle of contact"], 
+                answer: 3 
+            },
+            { 
+                id: 2025211, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Units & Measurements", 
+                text: "Find the dimensional formula of work.", 
+                options: ["$[M L^2 T^{-2}]$", "$[M^2 L^2 T^{-3}]$", "$[M L T^{-1}]$", "$[M L T^{-2}]$"], 
+                answer: 0 
+            },
+            { 
+                id: 2025212, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Units & Measurements", 
+                text: "What does the Least Count (LC) of a measuring instrument represent?", 
+                options: ["The maximum measurement it can take", "The smallest measurement it can accurately take", "The average value of multiple readings", "The error margin in all readings"], 
+                answer: 1 
+            },
+            { 
+                id: 2025213, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Vectors", 
+                text: "Two vectors have magnitudes of 10 units and 20 units and the angle between them is $120^\\circ$. What is the dot product of these two vectors?", 
+                options: ["200 units", "100 units", "-100 units", "-200 units"], 
+                answer: 2 
+            },
+            { 
+                id: 2025214, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Vectors", 
+                text: "Resolve in horizontal ($F_x$) and vertical components ($F_y$) of a force $F = 20 \\, N$ which is making an angle $60^\\circ$ with the horizontal.", 
+                options: ["$F_x = 10\\sqrt{3} \\, N, F_y = 10 \\, N$", "$F_x = 10 \\, N, F_y = 20 \\, N$", "$F_x = 20 \\, N, F_y = 10 \\, N$", "$F_x = 10 \\, N, F_y = 10\\sqrt{3} \\, N$"], 
+                answer: 3 
+            },
+            { 
+                id: 2025215, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Mechanics", 
+                text: "The impulse of a force acting on a body is equal to", 
+                options: ["The force multiplied by the mass of the body", "The rate of change of momentum of the body", "The change in kinetic energy of a body", "The change in linear momentum of the body"], 
+                answer: 3 
+            },
+            { 
+                id: 2025216, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Thermodynamics", 
+                text: "If the specific heat of silver is $0.235 \\, kJ/kg.K$. Find the quantity of heat energy required to raise the temperature of 100 g of silver by 50 K.", 
+                options: ["$1175 \\, J$", "$50 \\, J$", "$23.5 \\, J$", "$11.75 \\, J$"], 
+                answer: 0 
+            },
+            { 
+                id: 2025217, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Waves & Oscillations", 
+                text: "When a wave propagates through medium and the particles of a medium vibrate in a direction perpendicular to the travel of the wave, then the waves are called", 
+                options: ["Longitudinal waves", "Transverse waves", "Stationary waves", "Surface waves"], 
+                answer: 1 
+            },
+            { 
+                id: 2025218, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Thermodynamics", 
+                text: "Thermally insulated handles are used on hot utensils during cooking to avoid getting burns due to", 
+                options: ["Evaporation", "Conduction", "Convection", "Radiation"], 
+                answer: 1 
+            },
+            { 
+                id: 2025219, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Electrostatics", 
+                text: "Gauss's law provides a method to calculate", 
+                options: ["Electric potential due to a charge distribution", "Electric current through a closed surface", "Magnetic field due to a current-carrying wire", "Electric field from a charge distribution"], 
+                answer: 3 
+            },
+            { 
+                id: 2025220, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Waves & Oscillations", 
+                text: "Tuning of Radio Station is an example of", 
+                options: ["Damped oscillation", "Free vibration", "Resonant vibration", "None of the above"], 
+                answer: 2 
+            },
+            { 
+                id: 2025221, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Semiconductors", 
+                text: "When the positive terminal of a battery or DC power supply is connected to the n-side and the negative terminal is connected to the p-side of a semiconductor junction, this biasing is known as", 
+                options: ["Forward biasing", "Reverse biasing", "Neutral biasing", "Equilibrium"], 
+                answer: 1 
+            },
+            { 
+                id: 2025222, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Semiconductors", 
+                text: "For normal working of transistor, the emitter-base junction is typically", 
+                options: ["Forward biased", "Reverse biased", "Not biased", "Open-circuited"], 
+                answer: 0 
+            },
+            { 
+                id: 2025223, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Semiconductors", 
+                text: "A solar cell is a junction device, which is used to convert", 
+                options: ["Light energy into electrical energy", "Thermal energy into electrical energy", "Chemical energy into electrical energy", "Mechanical energy into electrical energy"], 
+                answer: 0 
+            },
+            { 
+                id: 2025224, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Atomic Physics", 
+                text: "The ionization potential required for ionization of hydrogen atom is", 
+                options: ["$3.4 \\, eV$", "$27.2 \\, eV$", "$10.2 \\, eV$", "$13.6 \\, eV$"], 
+                answer: 3 
+            },
+            { 
+                id: 2025225, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Optics", 
+                text: "Light wave propagates in optical fiber due to the phenomenon of", 
+                options: ["Refraction", "Diffraction", "Interference", "Total Internal Reflection (TIR)"], 
+                answer: 3 
+            },
+            { 
+                id: 2025226, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Fluid Mechanics", 
+                text: "The rise or depression of liquid in a capillary tube is called", 
+                options: ["Viscosity", "Surface tension", "Osmosis", "Capillarity"], 
+                answer: 3 
+            },
+            { 
+                id: 2025227, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Fluid Mechanics", 
+                text: "Bernoulli's theorem is based on the principle of", 
+                options: ["Conservation of energy", "Conservation of momentum", "Conservation of charge", "Conservation of mass"], 
+                answer: 0 
+            },
+            { 
+                id: 2025228, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Fluid Mechanics", 
+                text: "The Reynolds number (Re) is defined as the ratio of", 
+                options: ["Viscous forces to inertia forces", "Pressure forces to viscous forces", "Inertia forces to viscous forces", "Buoyant forces to gravitational forces"], 
+                answer: 2 
+            },
+            { 
+                id: 2025229, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Thermodynamics", 
+                text: "Heat energy always flows from", 
+                options: ["Cooler areas to warmer areas", "Region of lower temperature to higher temperature", "Hotter or warmer substances to cooler substances", "Substances with less energy to substances with more energy"], 
+                answer: 2 
+            },
+            { 
+                id: 2025230, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Thermodynamics", 
+                text: "In Kelvin scale, the freezing point of water is", 
+                options: ["$273.15 \\, K$", "$373.15 \\, K$", "$212 \\, K$", "$0 \\, K$"], 
+                answer: 0 
+            },
+            { 
+                id: 2025231, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Mechanics", 
+                text: "The relationship between coefficients of static friction ($\\mu_s$) and kinetic friction ($\\mu_k$) is given by", 
+                options: ["$\\mu_k > \\mu_s$", "$\\mu_k = \\mu_s$", "$\\mu_k < \\mu_s$", "There is no relationship between $\\mu_k$ and $\\mu_s$"], 
+                answer: 2 
+            },
+            { 
+                id: 2025232, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Modern Physics", 
+                text: "Convert 24.5 GeV to Joules. (Given $1 \\, eV = 1.6 \\times 10^{-19} \\, J$)", 
+                options: ["$39.2 \\times 10^{-11} \\, J$", "$39.2 \\times 10^{-10} \\, J$", "$39.2 \\times 10^{-9} \\, J$", "$39.2 \\times 10^{-8} \\, J$"], 
+                answer: 1 
+            },
+            { 
+                id: 2025233, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Rotational Motion", 
+                text: "The product of a force and its perpendicular distance from the axis of rotation is known as", 
+                options: ["Work", "Energy", "Power", "Torque"], 
+                answer: 3 
+            },
+            { 
+                id: 2025234, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Rotational Motion", 
+                text: "The moment of inertia of a particle about an axis of rotation is defined as the product of its", 
+                options: ["Mass and its distance from the axis of rotation", "Mass and the square of its distance from the axis of rotation", "Velocity and its distance from the axis of rotation", "Velocity and the square of its distance from the axis of rotation"], 
+                answer: 1 
+            },
+            { 
+                id: 2025235, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Rotational Motion", 
+                text: "A uniform ring of mass 200g and radius 20 cm is rotated about its diameter. What is the moment of inertia of the ring about this axis?", 
+                options: ["$4 \\times 10^{-3} \\, kgm^2$", "$2 \\times 10^{-3} \\, kgm^2$", "$8 \\times 10^{-3} \\, kgm^2$", "$4 \\times 10^{-2} \\, kgm^2$"], 
+                answer: 0 
+            },
+            { 
+                id: 2025236, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Waves", 
+                text: "An ultrasonic position sensor sends 40 kHz and detect the reflected signal from obstacle after 40ms. Find the distance of obstacle from sensor. (velocity of sound is $340 \\, m/s$)", 
+                options: ["$6.8 \\, m$", "$3.4 \\, m$", "$13.6 \\, m$", "$0.68 \\, m$"], 
+                answer: 0 
+            },
+            { 
+                id: 2025237, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Waves", 
+                text: "The range of frequencies that are audible to human ears is", 
+                options: ["Below 20 Hz", "Above 20,000 Hz", "20 Hz to 20,000 Hz", "20,000 Hz to 40,000 Hz"], 
+                answer: 2 
+            },
+            { 
+                id: 2025238, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Magnetism", 
+                text: "A point charge of $2.5 \\, C$ is moving perpendicular to magnetic field of $10 \\, amp/meter$ with a velocity $20 \\, m/s$. Find the Lorentz force acting on the charge.", 
+                options: ["$500 \\, N$", "$250 \\, N$", "$1000 \\, N$", "$25 \\, N$"], 
+                answer: 0 
+            },
+            { 
+                id: 2025239, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Optics", 
+                text: "Mathematically, power of a lens is defined as", 
+                options: ["Square of its focal length", "Product of its focal length and the speed of light", "Sum of its focal length and its diameter", "Reciprocal of focal length"], 
+                answer: 3 
+            },
+            { 
+                id: 2025240, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Optics", 
+                text: "Find refractive index of glass with respect to water. Given $_a\\mu_g = 3/2$ and $_a\\mu_w = 4/3$.", 
+                options: ["$9/8$", "$8/9$", "$1/2$", "$2$"], 
+                answer: 0 
+            },
+            { 
+                id: 2025241, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Mechanics", 
+                text: "A skier of 60 kg rests on an inclined surface of the mountain. The inclination angle $\\theta$ is $30^\\circ$ with the horizontal and the skier just begins to slide. What is the coefficient of static friction between the skier and the surface of the mountain?", 
+                options: ["$\\tan 30^\\circ$", "$\\tan 60^\\circ$", "$\\sin 30^\\circ$", "$\\cos 30^\\circ$"], 
+                answer: 0 
+            },
+            { 
+                id: 2025242, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Fluid Mechanics", 
+                text: "What is the value of atmospheric pressure in Pascals (Pa)?", 
+                options: ["$1.013 \\times 10^5 \\, Pa$", "$1.013 \\times 10^6 \\, Pa$", "$1.013 \\times 10^3 \\, Pa$", "$1.013 \\times 10^4 \\, Pa$"], 
+                answer: 0 
+            },
+            { 
+                id: 2025243, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Circular Motion", 
+                text: "When a particle moves along a circle with a constant speed, then force acts towards the centre of the circle is called", 
+                options: ["Centripetal force", "Centrifugal force", "Magnetic force", "Gravitational force"], 
+                answer: 0 
+            },
+            { 
+                id: 2025244, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Circular Motion", 
+                text: "A particle is moving in a circle of radius 40 cm with uniform speed and it completes one rotation in 10 s. What is the magnitude of the particle's acceleration?", 
+                options: ["$0.10 \\, m/s^2$", "$0.16 \\, m/s^2$", "$0.25 \\, m/s^2$", "$0.40 \\, m/s^2$"], 
+                answer: 1 
+            },
+            { 
+                id: 2025245, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Work, Energy & Power", 
+                text: "When applied force is perpendicular to displacement, then work done will be", 
+                options: ["Maximum and positive", "Zero", "Maximum and negative", "Dependent on the magnitudes of force and displacement"], 
+                answer: 1 
+            },
+            { 
+                id: 2025246, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Current Electricity", 
+                text: "If 1 ampere of current flows in a given wire having uniform area of cross section $0.05 \\, cm^2$ along length 50 cm, find specific conductance of the material of given wire if the voltage across two ends of wire is 5 volts.", 
+                options: ["$2 \\times 10^4 \\, S/m$", "$0.5 \\times 10^4 \\, S/m$", "$1 \\times 10^4 \\, S/m$", "$4 \\times 10^4 \\, S/m$"], 
+                answer: 0 
+            },
+            { 
+                id: 2025247, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Current Electricity", 
+                text: "A meter bridge or slide wire bridge is primarily used to measure", 
+                options: ["Current", "Voltage", "Unknown resistance", "Power"], 
+                answer: 2 
+            },
+            { 
+                id: 2025248, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Units & Measurements", 
+                text: "One kilowatt-hour (kWh) is equivalent to", 
+                options: ["$3.6 \\times 10^6 \\, J$", "$3.6 \\times 10^5 \\, J$", "$3600 \\, J$", "$1000 \\, J$"], 
+                answer: 0 
+            },
+            { 
+                id: 2025249, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Magnetism", 
+                text: "Ferromagnetic materials exhibit a net magnetic moment due to the presence of", 
+                options: ["Paired electrons with opposite spins", "An equal number of electrons and protons", "Unpaired electrons", "Only neutrons"], 
+                answer: 2 
+            },
+            { 
+                id: 2025250, 
+                year: 2025, 
+                subject: "Physics", 
+                chapter: "Semiconductors", 
+                text: "Free electrons in a solid are found in the", 
+                options: ["Valence band", "Inner energy levels", "Conduction band", "Forbidden gap"], 
+                answer: 2 
+            }
         ];
 
-        let activeFilter = 'All';
-        const chapters = [...new Set(questionsData.map(q => q.chapter))];
+        // ================= APP LOGIC =================
+        const yearsList = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
+        const subjectsList = ["Physics", "Chemistry", "Math"];
+        
+        let activeYears = [];
+        let activeSubjects = [];
+        let activeChapters = [];
 
-        function initChips() {
-            const container = document.getElementById('chip-container');
-            chapters.forEach(ch => {
-                const div = document.createElement('div');
-                div.className = 'chip';
-                div.textContent = ch;
-                div.onclick = function() { setFilter(ch, this); };
-                container.appendChild(div);
+        window.onload = () => {
+            const grid = document.getElementById('year-grid');
+            yearsList.forEach(y => {
+                grid.innerHTML += `
+                    <div class="year-card" onclick="openYearTest(${y})">
+                        <h3>${y}</h3>
+                        <p>Physics • Chem • Math</p>
+                    </div>
+                `;
             });
+        };
+
+        function goHome() {
+            document.getElementById('test-view').style.display = 'none';
+            document.getElementById('home-view').style.display = 'block';
+            document.getElementById('filter-panel').style.display = 'none';
         }
 
-        function setFilter(chapter, element) {
-            activeFilter = chapter;
-            document.querySelectorAll('.chip').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
+        function openYearTest(year) {
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('test-view').style.display = 'block';
+            document.getElementById('test-title').innerText = `${year} Full Paper`;
+            document.getElementById('filter-panel').style.display = 'none';
+
+            activeYears = [year];
+            activeSubjects = [...subjectsList]; 
+            activeChapters = []; 
+            
+            renderFilters();
             renderQuestions();
-            // Scroll to top of questions when filter is applied
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openCombineFilter() {
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('test-view').style.display = 'block';
+            document.getElementById('test-title').innerText = "Combine Research Lab 🧪";
+            
+            activeYears = [...yearsList];
+            activeSubjects = [...subjectsList];
+            activeChapters = [];
+            
+            document.getElementById('filter-panel').style.display = 'block';
+            renderFilters();
+            renderQuestions();
+        }
+
+        function toggleFilterPanel() {
+            const panel = document.getElementById('filter-panel');
+            panel.style.display = panel.style.display === 'none' || panel.style.display === '' ? 'block' : 'none';
+        }
+
+        // ================= FILTERS =================
+        function toggleFilterArray(array, value) {
+            const index = array.indexOf(value);
+            if (index > -1) array.splice(index, 1);
+            else array.push(value);
+            renderFilters();
+            renderQuestions();
+        }
+
+        function renderFilters() {
+            const fYears = document.getElementById('f-years');
+            fYears.innerHTML = '';
+            yearsList.forEach(y => {
+                const isActive = activeYears.includes(y) ? 'active' : '';
+                fYears.innerHTML += `<div class="chip ${isActive}" onclick="toggleFilterArray(activeYears, ${y})">${y}</div>`;
+            });
+
+            const fSubj = document.getElementById('f-subjects');
+            fSubj.innerHTML = '';
+            subjectsList.forEach(s => {
+                const isActive = activeSubjects.includes(s) ? 'active' : '';
+                fSubj.innerHTML += `<div class="chip ${isActive}" onclick="toggleFilterArray(activeSubjects, '${s}')">${s}</div>`;
+            });
+
+            let availableChapters = [];
+            questionBank.forEach(q => {
+                if (activeYears.includes(q.year) && activeSubjects.includes(q.subject)) {
+                    if (!availableChapters.includes(q.chapter)) availableChapters.push(q.chapter);
+                }
+            });
+
+            activeChapters = activeChapters.filter(c => availableChapters.includes(c));
+
+            const fChap = document.getElementById('f-chapters');
+            fChap.innerHTML = availableChapters.length === 0 ? '<span style="font-size:12px; color:gray;">No chapters available</span>' : '';
+            
+            availableChapters.forEach(c => {
+                const isActive = activeChapters.includes(c) ? 'active' : '';
+                fChap.innerHTML += `<div class="chip ${isActive}" onclick="toggleFilterArray(activeChapters, '${c}')">${c}</div>`;
+            });
         }
 
         function updateOptionStyle(radioInput) {
@@ -458,70 +803,93 @@
             radioInput.parentElement.classList.add('selected-bg');
         }
 
+        // ================= RENDERING & SORTING =================
         function renderQuestions() {
             const container = document.getElementById('quiz-container');
             container.innerHTML = '';
-
-            const filteredData = activeFilter === 'All' ? questionsData : questionsData.filter(q => q.chapter === activeFilter);
             
+            const existingRes = document.querySelector('.result-dashboard');
+            if(existingRes) existingRes.remove();
+            document.getElementById('bottom-bar').classList.remove('show');
+
+            let filteredData = questionBank.filter(q => {
+                return activeYears.includes(q.year) && activeSubjects.includes(q.subject) && (activeChapters.length === 0 || activeChapters.includes(q.chapter));
+            });
+
             if (filteredData.length === 0) {
-                container.innerHTML = `<div class="empty-state">No questions found.</div>`;
+                container.innerHTML = `<div style="text-align:center; padding: 60px; color:var(--gray-dark); font-weight:bold; font-size:18px;">No questions match your filter. 😢</div>`;
                 return;
             }
 
-            let currentChapter = '';
+            // SORTING LOGIC: Descending Year -> Ascending Subject
+            filteredData.sort((a, b) => {
+                if (b.year !== a.year) return b.year - a.year; // Year DESC
+                if (a.subject !== b.subject) return a.subject.localeCompare(b.subject); // Subject ASC
+                return a.id - b.id;
+            });
 
-            filteredData.forEach(q => {
-                if (q.chapter !== currentChapter) {
-                    currentChapter = q.chapter;
-                    container.innerHTML += `<div class="chapter-heading">${currentChapter}</div>`;
+            let currentYear = null;
+            let currentSubject = null;
+
+            filteredData.forEach((q, index) => {
+                // UI: Insert Year Header if Year Changes
+                if (q.year !== currentYear) {
+                    currentYear = q.year;
+                    container.innerHTML += `<div class="year-header">Year: ${currentYear}</div>`;
+                    currentSubject = null; // Reset Subject for new year
+                }
+
+                // UI: Insert Subject Badge if Subject Changes
+                if (q.subject !== currentSubject) {
+                    currentSubject = q.subject;
+                    container.innerHTML += `<div class="subject-badge">${currentSubject}</div>`;
                 }
 
                 let optionsHtml = q.options.map((opt, i) => `
                     <label class="opt-label" id="lbl-q${q.id}-o${i}">
                         <input type="radio" name="q${q.id}" value="${i}" onchange="updateOptionStyle(this)">
-                        
-                        <svg class="result-icon icon-check"><use href="#icon-check"></use></svg>
-                        <svg class="result-icon icon-cross"><use href="#icon-cross"></use></svg>
-                        
                         <div class="custom-radio"></div>
                         <span>${['A', 'B', 'C', 'D'][i]}) ${opt}</span>
                     </label>
                 `).join('');
 
                 container.innerHTML += `
-                    <div class="q-card" data-id="${q.id}" data-ans="${q.answer}">
-                        <div class="q-text">Q${q.id}. ${q.text}</div>
+                    <div class="q-card fade-in" style="animation-delay: ${index * 0.05}s" data-id="${q.id}" data-ans="${q.answer}">
+                        <div class="q-meta">
+                            <span>#ID-${q.id}</span>
+                            <span>${q.chapter}</span>
+                        </div>
+                        <div class="q-text">Q. ${q.text}</div>
                         <div class="options-grid">${optionsHtml}</div>
                     </div>
                 `;
             });
+
+            // Re-render MathJax
+            if(window.MathJax) {
+                MathJax.typesetPromise([container]).catch((err) => console.log(err.message));
+            }
         }
 
-        // Timer
-        let timeLeft = 50 * 60;
-        const timerElement = document.getElementById('timer');
-        const timerInterval = setInterval(() => {
-            const m = Math.floor(timeLeft / 60);
-            const s = timeLeft % 60;
-            timerElement.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
-            if (timeLeft <= 0) { clearInterval(timerInterval); submitTest(); }
-            timeLeft--;
-        }, 1000);
-
-        // --- Handle Scroll for the Floating Submit Button ---
-        window.addEventListener('scroll', () => {
+        // ================= SCROLL TRIGGER FOR SUBMIT BUTTON =================
+        const observer = new IntersectionObserver((entries) => {
             const bottomBar = document.getElementById('bottom-bar');
-            // Show button after user scrolls 200 pixels down
-            if (window.scrollY > 200) {
+            // If the anchor at the bottom of the page enters viewport, show button
+            if (entries[0].isIntersecting && document.querySelectorAll('.q-card').length > 0) {
                 bottomBar.classList.add('show');
             } else {
                 bottomBar.classList.remove('show');
             }
-        });
+        }, { threshold: 0.1 });
 
+        // Observe the hidden anchor div
+        setTimeout(() => observer.observe(document.getElementById('scroll-anchor')), 1000);
+
+        // ================= SUBMIT TEST =================
         function submitTest() {
-            clearInterval(timerInterval);
+            document.getElementById('bottom-bar').classList.remove('show');
+            document.getElementById('filter-panel').style.display = 'none';
+
             let score = 0;
             const cards = document.querySelectorAll('.q-card');
 
@@ -535,42 +903,28 @@
 
                 if (selected) {
                     const selectedVal = parseInt(selected.value);
-                    if (selectedVal === correctAns) {
-                        score++;
-                    } else {
+                    if (selectedVal === correctAns) score++;
+                    else {
                         const wrongLabel = document.getElementById(`lbl-q${qId}-o${selectedVal}`);
                         wrongLabel.classList.add('wrong-opt');
                     }
                 }
             });
 
-            // Disable interactions
             document.querySelectorAll('.opt-label input').forEach(inp => inp.disabled = true);
-            document.querySelectorAll('.chip').forEach(c => c.style.pointerEvents = 'none');
             
-            // Hide the floating bottom button
-            document.getElementById('bottom-bar').style.display = 'none';
-            
-            // Show result dashboard at the top
             const container = document.getElementById('quiz-container');
             const resultHtml = `
-                <div class="result-dashboard" style="display:block;">
-                    <h2 style="margin-top:0; color:var(--black); font-weight:800;">Assessment Summary</h2>
+                <div class="result-dashboard fade-in" style="display:block;">
+                    <h2 style="margin-top:0; color:var(--black); font-weight:800;">Report Card 📋</h2>
                     <div class="score-circle">${score}/${cards.length}</div>
-                    <p style="color:var(--gray-dark); font-weight:500;">Review your answers below. Correct answers are indicated by a tick mark, and incorrect ones are crossed out.</p>
-                    <button class="btn-submit" style="margin:20px auto 0 auto; width:auto; padding:16px 36px; justify-content:center;" onclick="location.reload()">Practice Again</button>
+                    <p style="color:var(--gray-dark); font-weight:600;">Review your answers below.</p>
+                    <button class="btn-submit" style="margin: 20px auto 0 auto;" onclick="renderQuestions(); window.scrollTo(0,0);">Re-Attempt Assessment</button>
                 </div>
             `;
             container.insertAdjacentHTML('afterbegin', resultHtml);
-
-            // Scroll to the result
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        window.onload = () => {
-            initChips();
-            renderQuestions();
-        };
     </script>
 </body>
 </html>
