@@ -17,16 +17,16 @@
     /* Security: Print Block */
     @media print { html, body { display: none !important; } }
 
-    /* Body ko pura block kar diya taaki background bilkul na hile */
+    /* Body global block */
     body {
       margin: 0; padding: 0; font-family: 'Poppins', sans-serif;
       background: #e5e7eb; user-select: none; -webkit-user-select: none;
       transition: filter 0.3s ease;
       overflow: hidden; 
-      touch-action: none; /* Native gestures global block */
+      touch-action: none; 
     }
     
-    /* 🛡️ 100% STATIC HEADER (Rock Solid & Modern) 🛡️ */
+    /* 🛡️ STATIC HEADER 🛡️ */
     .header {
       background: #111827; color: #fff; padding: 0 15px; 
       display: flex; align-items: center; justify-content: space-between;
@@ -49,7 +49,7 @@
       letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px;
     }
 
-    /* 🟢 DOWNLOAD BUTTON STYLES 🟢 */
+    /* 🟢 DOWNLOAD BUTTON 🟢 */
     .header-actions {
       display: flex;
       align-items: center;
@@ -58,23 +58,14 @@
 
     .download-btn {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 50px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
+      color: #fff; border: none; padding: 8px 16px; border-radius: 50px;
+      font-weight: 600; font-size: 0.85rem; cursor: pointer;
       box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
-      transition: all 0.3s ease;
-      align-items: center;
-      gap: 6px;
-      display: flex; /* 🔥 Isko show karne ke liye block kiya 🔥 */
+      transition: all 0.3s ease; align-items: center; gap: 6px; display: flex; 
     }
     .download-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
     .download-btn:active { transform: translateY(0); }
 
-    /* Agar download off ho toh thoda gray/lock type feel dene ke liye class */
     .download-btn.locked {
       background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -86,7 +77,7 @@
       border: 1px solid rgba(255,255,255,0.1);
     }
 
-    /* 🛡️ STATIC WATERMARK (Never Moves) 🛡️ */
+    /* 🛡️ STATIC WATERMARK 🛡️ */
     .watermark-overlay {
       position: absolute; top: 65px; left: 0; width: 100%; height: calc(100vh - 65px);
       display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr);
@@ -113,11 +104,10 @@
     .scroll-area {
       position: absolute; top: 65px; left: 0;
       width: 100vw; height: calc(100vh - 65px);
-      overflow: auto; /* Allows native scrolling */
+      overflow: auto; 
       -webkit-overflow-scrolling: touch;
-      touch-action: pan-x pan-y; /* Allow scroll but block pinch-zoom natively */
-      z-index: 10;
-      pointer-events: auto;
+      touch-action: pan-x pan-y; 
+      z-index: 10; pointer-events: auto;
     }
 
     .pdf-viewer-container {
@@ -129,11 +119,8 @@
 
     .page-wrapper { 
       position: relative; width: 100%; display: flex; justify-content: center; 
-      max-width: 900px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-      border-radius: 8px;
-      background: #fff;
-      overflow: hidden;
+      max-width: 900px; box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      border-radius: 8px; background: #fff; overflow: hidden;
     }
 
     canvas {
@@ -147,13 +134,11 @@
     @media (max-width: 600px) {
        .wm-item { font-size: 10px; color: rgba(0,0,0,0.06); }
        .watermark-overlay { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(5, 1fr); }
-       
        .header { padding: 0 12px; height: 60px; }
        .scroll-area { top: 60px; height: calc(100vh - 60px); }
        .watermark-overlay { top: 60px; height: calc(100vh - 60px); }
-       
-       .brand-title { display: none; } /* Hide title on very small screens to save space */
-       .back-btn span { display: none; } /* Hide "Back" text, show only icon */
+       .brand-title { display: none; } 
+       .back-btn span { display: none; } 
        .back-btn { padding: 8px 12px; }
        .download-btn { padding: 8px 14px; font-size: 0.8rem; }
     }
@@ -197,19 +182,14 @@
      // 1. GLOBAL NATIVE ZOOM BLOCKER
      // =========================================================
      document.addEventListener('touchmove', function(e) {
-         if (e.touches && e.touches.length > 1) {
-             e.preventDefault();
-         }
+         if (e.touches && e.touches.length > 1) { e.preventDefault(); }
      }, { passive: false });
 
      // =========================================================
      // 2. CUSTOM PINCH-TO-ZOOM FOR PDF ONLY
      // =========================================================
      const scrollArea = document.getElementById('scrollArea');
-     
-     let currentScale = 1;
-     let initialDistance = 0;
-     let initialScale = 1;
+     let currentScale = 1, initialDistance = 0, initialScale = 1;
 
      scrollArea.addEventListener('touchstart', (e) => {
          if (e.touches.length === 2) {
@@ -228,10 +208,8 @@
                  e.touches[0].clientX - e.touches[1].clientX,
                  e.touches[0].clientY - e.touches[1].clientY
              );
-             
              currentScale = initialScale * (currentDistance / initialDistance);
              currentScale = Math.max(1, Math.min(currentScale, 3.5));
-             
              document.documentElement.style.setProperty('--pdf-scale', currentScale);
          }
      }, {passive: false});
@@ -254,9 +232,7 @@
              if (data.status === 'success' && data.phone && data.phone.trim() !== "") {
                  userPhone = data.phone;
              }
-         } catch (error) {
-             console.error("Failed to fetch phone number");
-         }
+         } catch (error) { console.error("Failed to fetch phone number"); }
 
          const wmContent = `${userEmail}<br>+91 ${userPhone}`;
          document.querySelectorAll('.wm-item').forEach(el => el.innerHTML = wmContent);
@@ -279,58 +255,52 @@
      });
 
      // =========================================================
-     // 5. PDF INITIALIZATION & BRANDED DOWNLOAD LOGIC (UPDATED)
+     // 5. PDF SECURE FETCHING LOGIC (UPDATED WITH TOKEN)
      // =========================================================
      const urlParams = new URLSearchParams(window.location.search);
-     let pdfUrl = urlParams.get('pdf');
+     let rawPdfUrl = urlParams.get('pdf');
      let allowDownload = urlParams.get('download') === 'true' || urlParams.get('download') === '1'; 
      let customTitle = urlParams.get('title');
 
-     if (pdfUrl) {
+     // 🛑 SECRET KEY - Ye wahi key honi chahiye jo Hostinger PHP file mein hai 🛑
+     const SECRET_KEY = "PREM_MIND_SECURE_2026";
+     
+     // Secure URL banaya (Token attach karke)
+     let securePdfUrl = rawPdfUrl ? `${rawPdfUrl}&token=${SECRET_KEY}` : null;
+
+     if (securePdfUrl) {
          const downloadBtn = document.getElementById('downloadBtn');
          
-         // Agar access nahi hai, toh lock wala look de do
          if(!allowDownload) {
              downloadBtn.classList.add('locked');
              document.getElementById('dl-text').innerText = "Locked";
          }
          
          downloadBtn.addEventListener('click', async () => {
-             // 🔥 AGAR ALLOW NAHI HAI TOH MESSAGE DIKHAO AUR ROK DO 🔥
              if(!allowDownload) {
                  alert("⚠️ Download available day of exam at 6:00 AM only."); 
-                 return; // Yahan se code aage nahi jayega
+                 return; 
              }
-            //  one day before exam
 
              const originalHtml = downloadBtn.innerHTML;
              downloadBtn.innerHTML = "⏳ Wait...";
              downloadBtn.disabled = true;
 
              try {
-                 const response = await fetch(pdfUrl);
+                 // Secure URL se Blob fetch karna
+                 const response = await fetch(securePdfUrl);
+                 if(!response.ok) throw new Error("Unauthorized Download");
+                 
                  const blob = await response.blob();
                  const blobUrl = window.URL.createObjectURL(blob);
                  
                  let baseName = "Premium_Notes"; 
-
                  if (customTitle) {
                      baseName = decodeURIComponent(customTitle).replace(/[^a-zA-Z0-9 ]/g, "_");
                  } else {
-                     let extractedName = "";
-                     if (pdfUrl.includes('proxy_pdf.php?file=')) {
-                         let realPath = decodeURIComponent(pdfUrl.split('file=')[1]);
-                         extractedName = realPath.substring(realPath.lastIndexOf('/') + 1).split('?')[0];
-                     } else {
-                         extractedName = pdfUrl.substring(pdfUrl.lastIndexOf('/') + 1).split('?')[0];
-                     }
-
-                     if (extractedName.toLowerCase().endsWith('.pdf')) {
-                         extractedName = extractedName.substring(0, extractedName.length - 4);
-                     }
-                     
+                     let extractedName = rawPdfUrl.substring(rawPdfUrl.lastIndexOf('/') + 1).split('?')[0];
                      if (extractedName && !extractedName.includes('.php')) {
-                         baseName = extractedName;
+                         baseName = extractedName.replace(".pdf", "");
                      }
                  }
                  
@@ -339,17 +309,15 @@
                  const a = document.createElement('a');
                  a.href = blobUrl;
                  a.download = finalFileName;
-                 
                  document.body.appendChild(a);
                  a.click();
                  document.body.removeChild(a);
                  
                  window.URL.revokeObjectURL(blobUrl);
-                 
                  downloadBtn.innerHTML = "✅ Done";
              } catch (error) {
-                 window.open(pdfUrl, '_blank');
-                 downloadBtn.innerHTML = "✅ Opened";
+                 alert("Download Failed: Connection secure layer active.");
+                 downloadBtn.innerHTML = "❌ Failed";
              }
              
              setTimeout(() => {
@@ -359,63 +327,61 @@
          });
      }
 
-  // =========================================================
-// RENDER HD PDF WITH BLOB PROTECTION
-// =========================================================
-if (pdfUrl) {
-    const loadingState = document.getElementById('loadingState');
-    const container = document.getElementById('pdfContainer');
-    
-    // PDF URL mein temporary token add karein
-    const secureUrl = `${pdfUrl}&token=PREM_SECURE_ACCESS_KEY`;
+     // =========================================================
+     // 6. RENDER HD PDF VIA BLOB (SECURE PREVIEW)
+     // =========================================================
+     if(securePdfUrl) {
+         const container = document.getElementById('pdfContainer');
+         const loadingState = document.getElementById('loadingState');
 
-    // 1. PDF ko pehle binary format mein fetch karein
-    fetch(secureUrl)
-        .then(response => {
-            if (!response.ok) throw new Error('Not Authorized');
-            return response.blob();
-        })
-        .then(blob => {
-            // 2. Binary data se ek temporary Blob URL banayein
-            const blobDataUrl = URL.createObjectURL(blob);
-            
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+         // Blob fetch karke network tab se original file chhupana
+         fetch(securePdfUrl)
+         .then(response => {
+             if (!response.ok) throw new Error('Unauthorized Access or Invalid Token');
+             return response.blob();
+         })
+         .then(blob => {
+             const blobUrl = URL.createObjectURL(blob);
+             
+             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-            pdfjsLib.getDocument(blobDataUrl).promise.then(async (pdfDoc) => {
-                for (let num = 1; num <= pdfDoc.numPages; num++) {
-                    const page = await pdfDoc.getPage(num);
-                    const scale = 2.0; 
-                    const viewport = page.getViewport({ scale });
-                    
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'page-wrapper';
-                    
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d', { alpha: false }); 
-                    const dpr = window.devicePixelRatio || 1;
+             pdfjsLib.getDocument(blobUrl).promise.then(async (pdfDoc) => {
+                 for (let num = 1; num <= pdfDoc.numPages; num++) {
+                     const page = await pdfDoc.getPage(num);
+                     const scale = 2.0; 
+                     const viewport = page.getViewport({ scale });
+                     
+                     const wrapper = document.createElement('div');
+                     wrapper.className = 'page-wrapper';
+                     
+                     const canvas = document.createElement('canvas');
+                     const ctx = canvas.getContext('2d', { alpha: false }); 
+                     const dpr = window.devicePixelRatio || 1;
 
-                    canvas.width = Math.floor(viewport.width * dpr);
-                    canvas.height = Math.floor(viewport.height * dpr);
+                     canvas.width = Math.floor(viewport.width * dpr);
+                     canvas.height = Math.floor(viewport.height * dpr);
 
-                    const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null;
-                    wrapper.appendChild(canvas);
-                    container.appendChild(wrapper);
+                     const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null;
+                     wrapper.appendChild(canvas);
+                     container.appendChild(wrapper);
 
-                    await page.render({ canvasContext: ctx, transform: transform, viewport: viewport }).promise;
-                }
-                loadingState.style.display = 'none';
-                
-                // 3. Kaam hone ke baad temporary URL ko delete kar dein (Security)
-                URL.revokeObjectURL(blobDataUrl);
-            });
-        })
-        .catch(err => {
-            loadingState.innerHTML = "Access Denied: Please open via Store.";
-            console.error(err);
-        });
-} else {
-    document.getElementById('loadingState').innerHTML = "No PDF URL Provided.";
-}
+                     await page.render({ canvasContext: ctx, transform: transform, viewport: viewport }).promise;
+                 }
+                 
+                 loadingState.style.display = 'none';
+                 // Security: Render hote hi URL memory se delete kar do
+                 setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+             }).catch(err => {
+                 loadingState.innerHTML = "<p style='color:#ef4444; font-weight:bold;'>Error rendering document.</p>";
+             });
+         })
+         .catch(err => {
+             loadingState.innerHTML = "<p style='color:#ef4444; font-weight:bold;'>Access Denied. Secure Connection Failed.</p>";
+             console.error(err);
+         });
+     } else {
+         document.getElementById('loadingState').innerHTML = "No PDF URL Provided.";
+     }
   </script>
 </body>
 </html>
