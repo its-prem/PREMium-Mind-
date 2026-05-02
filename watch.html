@@ -359,42 +359,63 @@
          });
      }
 
-     // =========================================================
-     // 6. RENDER HD PDF
-     // =========================================================
-     if(pdfUrl) {
-         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-         const container = document.getElementById('pdfContainer');
+  // =========================================================
+// RENDER HD PDF WITH BLOB PROTECTION
+// =========================================================
+if (pdfUrl) {
+    const loadingState = document.getElementById('loadingState');
+    const container = document.getElementById('pdfContainer');
+    
+    // PDF URL mein temporary token add karein
+    const secureUrl = `${pdfUrl}&token=PREM_SECURE_ACCESS_KEY`;
 
-         pdfjsLib.getDocument({url: pdfUrl}).promise.then(async (pdfDoc) => {
-             for (let num = 1; num <= pdfDoc.numPages; num++) {
-                 const page = await pdfDoc.getPage(num);
-                 const scale = 2.0; 
-                 const viewport = page.getViewport({ scale });
-                 
-                 const wrapper = document.createElement('div');
-                 wrapper.className = 'page-wrapper';
-                 
-                 const canvas = document.createElement('canvas');
-                 const ctx = canvas.getContext('2d', { alpha: false }); 
-                 const dpr = window.devicePixelRatio || 1;
+    // 1. PDF ko pehle binary format mein fetch karein
+    fetch(secureUrl)
+        .then(response => {
+            if (!response.ok) throw new Error('Not Authorized');
+            return response.blob();
+        })
+        .then(blob => {
+            // 2. Binary data se ek temporary Blob URL banayein
+            const blobDataUrl = URL.createObjectURL(blob);
+            
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-                 canvas.width = Math.floor(viewport.width * dpr);
-                 canvas.height = Math.floor(viewport.height * dpr);
+            pdfjsLib.getDocument(blobDataUrl).promise.then(async (pdfDoc) => {
+                for (let num = 1; num <= pdfDoc.numPages; num++) {
+                    const page = await pdfDoc.getPage(num);
+                    const scale = 2.0; 
+                    const viewport = page.getViewport({ scale });
+                    
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'page-wrapper';
+                    
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d', { alpha: false }); 
+                    const dpr = window.devicePixelRatio || 1;
 
-                 const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null;
-                 wrapper.appendChild(canvas);
-                 container.appendChild(wrapper);
+                    canvas.width = Math.floor(viewport.width * dpr);
+                    canvas.height = Math.floor(viewport.height * dpr);
 
-                 await page.render({ canvasContext: ctx, transform: transform, viewport: viewport }).promise;
-             }
-             document.getElementById('loadingState').style.display = 'none';
-         }).catch(err => {
-             document.getElementById('loadingState').innerHTML = "Failed to load Document. Check if link is valid.";
-         });
-     } else {
-         document.getElementById('loadingState').innerHTML = "No PDF URL Provided.";
-     }
+                    const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null;
+                    wrapper.appendChild(canvas);
+                    container.appendChild(wrapper);
+
+                    await page.render({ canvasContext: ctx, transform: transform, viewport: viewport }).promise;
+                }
+                loadingState.style.display = 'none';
+                
+                // 3. Kaam hone ke baad temporary URL ko delete kar dein (Security)
+                URL.revokeObjectURL(blobDataUrl);
+            });
+        })
+        .catch(err => {
+            loadingState.innerHTML = "Access Denied: Please open via Store.";
+            console.error(err);
+        });
+} else {
+    document.getElementById('loadingState').innerHTML = "No PDF URL Provided.";
+}
   </script>
 </body>
 </html>
