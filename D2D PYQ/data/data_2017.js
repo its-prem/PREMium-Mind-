@@ -1,4 +1,4 @@
-export const data2017_maths = [
+export const data2017 = [
   { "id": "2017_1", "year": 2017, "subject": "Math", "chapter": "Complex Numbers", "text": "If $(1+ni)^{2}$ is purely imaginary, then $n=$", "options": ["$0$", "$1$", "$-1$", "Both B and C"], "answer": 4 },
   { "id": "2017_2", "year": 2017, "subject": "Math", "chapter": "Complex Numbers", "text": "The conjugate of $\\frac{2+3i}{1+2i}$ is", "options": ["$\\frac{8-i}{5}$", "$\\frac{8+i}{5}$", "$\\frac{i-8}{5}$", "None of these"], "answer": 2 },
   { "id": "2017_3", "year": 2017, "subject": "Math", "chapter": "Complex Numbers", "text": "The amplitude of the complex number $\\frac{(1+i)(1+2i)}{1+3i}$ is", "options": ["$\\sin^{-1}(\\frac{3}{4})$", "$\\tan^{-1}(\\frac{1}{3})$", "$\\tan^{-1}(\\frac{3}{4})$", "None of these"], "answer": 3 },
