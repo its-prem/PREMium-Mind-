@@ -489,4 +489,615 @@ const observer = new IntersectionObserver(entries=>{
 document.querySelectorAll('.wish-card').forEach(c=>observer.observe(c));
 </script>
 </body>
+</html><!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ek Kahani</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Lora:ital,wght@0,400;0,500;1,400&family=Martel:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1209;
+  --paper: #f7f0e3;
+  --paper2: #ede4d0;
+  --sepia: #8b6914;
+  --sepia-l: #c9a84c;
+  --sepia-d: #5c440d;
+  --rose: #9e4a5a;
+  --rose-l: #d4768a;
+  --text: #2d1f0a;
+  --text-m: #5a3d1a;
+  --text-l: #8a6840;
+  --fade: rgba(247,240,227,0);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink);
+  color: var(--text);
+  font-family: 'Lora', serif;
+  overflow-x: hidden;
+}
+
+/* ── STICKY PHOTO BG ── */
+.photo-sticky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: url('/mnt/user-data/uploads/1778608644096_image.png');
+  background-size: cover;
+  background-position: center 15%;
+  filter: grayscale(100%) brightness(0.45) contrast(1.1);
+}
+
+/* dark overlay for readability */
+.photo-sticky::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(10,7,3,0.35) 0%,
+    rgba(10,7,3,0.5) 40%,
+    rgba(10,7,3,0.7) 100%
+  );
+}
+
+/* grain texture */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+/* ── SCROLL CONTAINER ── */
+.scroll-layer {
+  position: relative;
+  z-index: 10;
+}
+
+/* ── HERO / OPENING SCREEN ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1.5rem 5rem;
+}
+
+.hero-eyebrow {
+  font-size: 0.58rem;
+  letter-spacing: 0.6em;
+  text-transform: uppercase;
+  color: var(--sepia-l);
+  opacity: 0;
+  animation: riseIn 1s 0.3s forwards;
+  margin-bottom: 1.8rem;
+}
+
+.hero-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: rgba(201,168,76,0.55);
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  font-family: 'Martel', serif;
+  font-weight: 300;
+  opacity: 0;
+  animation: riseIn 1s 0.6s forwards;
+  margin-bottom: 2.4rem;
+}
+.hero-date span { display:inline-block; width:30px; height:1px; background:rgba(201,168,76,0.4); }
+
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3rem, 15vw, 5.5rem);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--paper);
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  text-shadow: 0 2px 40px rgba(0,0,0,0.8), 0 0 80px rgba(201,168,76,0.08);
+  opacity: 0;
+  animation: riseIn 1.2s 0.9s cubic-bezier(.16,1,.3,1) forwards;
+  margin-bottom: 1rem;
+}
+
+.hero-sub {
+  font-size: 0.7rem;
+  letter-spacing: 0.45em;
+  color: rgba(247,240,227,0.3);
+  text-transform: uppercase;
+  font-family: 'Martel', serif;
+  font-weight: 300;
+  opacity: 0;
+  animation: riseIn 1s 1.5s forwards;
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 2.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0;
+  animation: riseIn 1s 2.2s forwards;
+  color: rgba(201,168,76,0.35);
+  font-size: 0.5rem;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  font-family: 'Martel', serif;
+}
+.sh-line {
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, rgba(201,168,76,0.5), transparent);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+@keyframes riseIn {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── STORY SECTIONS ── */
+.story {
+  min-height: 100vh;
+  padding: 5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.story-inner {
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1.4rem;
+  opacity: 0;
+  transform: translateY(45px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+.story-inner.vis { opacity:1; transform:translateY(0); }
+
+/* chapter label */
+.chapter-label {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.cl-line { flex:1; height:1px; background: linear-gradient(to right, transparent, rgba(201,168,76,0.3)); }
+.cl-text {
+  font-size: 0.52rem;
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  color: var(--sepia-l);
+  font-family: 'Martel', serif;
+  font-weight: 300;
+  white-space: nowrap;
+}
+.cl-dot {
+  width:5px; height:5px;
+  background: var(--sepia-l);
+  border-radius: 50%;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+/* story card */
+.story-card {
+  background: rgba(10,7,3,0.72);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 4px;
+  padding: 2.5rem 2rem;
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* corner accents */
+.story-card::before,
+.story-card::after {
+  content: '';
+  position: absolute;
+  width: 16px; height: 16px;
+  border-color: rgba(201,168,76,0.3);
+  border-style: solid;
+}
+.story-card::before { top:8px; left:8px; border-width:1px 0 0 1px; }
+.story-card::after  { bottom:8px; right:8px; border-width:0 1px 1px 0; }
+
+/* chapter number watermark */
+.card-num {
+  position: absolute;
+  top: -0.5rem;
+  right: 1.5rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 6rem;
+  font-weight: 500;
+  color: rgba(201,168,76,0.04);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* icon */
+.card-icon {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.card-body {
+  font-family: 'Lora', serif;
+  font-size: clamp(0.9rem, 3.5vw, 1.05rem);
+  font-weight: 400;
+  line-height: 2;
+  color: rgba(247,240,227,0.82);
+  position: relative;
+}
+
+/* inline highlight spans */
+.hl {
+  color: var(--sepia-l);
+  font-style: italic;
+}
+.hl-rose {
+  color: var(--rose-l);
+  font-style: italic;
+}
+
+/* quote opener */
+.q-open {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.5rem;
+  color: rgba(201,168,76,0.18);
+  line-height: 0;
+  vertical-align: -1.4rem;
+  margin-right: 0.15rem;
+}
+
+/* divider between paragraphs */
+.p-div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.2rem 0;
+}
+.p-div .pd { width:20px; height:1px; background:rgba(201,168,76,0.2); }
+.p-div .pdot { width:3px; height:3px; background:rgba(201,168,76,0.25); border-radius:50%; }
+
+/* feeling tag */
+.feeling-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(201,168,76,0.07);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 2px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--sepia-l);
+  font-family: 'Martel', serif;
+  margin-bottom: 1.2rem;
+}
+
+/* ── TIMELINE DOT between sections ── */
+.timeline-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.timeline-dot.vis { opacity:1; }
+.td-line { width:1px; height:60px; background:linear-gradient(to bottom, transparent, rgba(201,168,76,0.25), transparent); }
+.td-dot {
+  width:8px; height:8px;
+  border:1px solid rgba(201,168,76,0.5);
+  border-radius:50%;
+  background:rgba(201,168,76,0.1);
+}
+
+/* ── CLOSING ── */
+.closing {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 1.5rem;
+}
+
+.closing-inner {
+  opacity: 0;
+  transform: translateY(35px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+.closing-inner.vis { opacity:1; transform:translateY(0); }
+
+.closing-quote {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.3rem, 6vw, 2rem);
+  font-style: italic;
+  color: rgba(247,240,227,0.6);
+  max-width: 420px;
+  line-height: 1.7;
+  margin: 0 auto 2rem;
+}
+
+.closing-rule {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  justify-content: center;
+  margin: 2rem auto;
+}
+.cr-line { width:50px; height:1px; background:rgba(201,168,76,0.3); }
+.cr-glyph {
+  font-size: 0.9rem;
+  color: rgba(201,168,76,0.4);
+  font-family: 'Playfair Display', serif;
+}
+
+.closing-sig {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.75rem;
+  font-style: italic;
+  color: rgba(247,240,227,0.2);
+  letter-spacing: 0.3em;
+}
+</style>
+</head>
+<body>
+
+<div class="photo-sticky"></div>
+<div class="grain"></div>
+
+<div class="scroll-layer">
+
+  <!-- HERO -->
+  <section class="hero" style="position:relative;">
+    <p class="hero-eyebrow">✦ &nbsp; ek kahani &nbsp; ✦</p>
+
+    <div class="hero-date">
+      <span></span>
+      kuch baatein, kuch yaadein
+      <span></span>
+    </div>
+
+    <h1 class="hero-title">Shuru Se<br>Abhi Tak</h1>
+
+    <p class="hero-sub">jo hua, jo feel hua, jo reh gaya</p>
+
+    <div class="scroll-hint">
+      <div class="sh-line"></div>
+      <span>padho</span>
+    </div>
+  </section>
+
+  <!-- ─────────────────── CHAPTER 1 ─────────────────── -->
+  <div class="timeline-dot" id="td0" style="display:flex;">
+    <div class="td-line"></div><div class="td-dot"></div><div class="td-line"></div>
+  </div>
+
+  <section class="story">
+    <div class="story-inner" id="s1">
+      <div class="chapter-label">
+        <div class="cl-dot"></div>
+        <div class="cl-text">Pehli Baat</div>
+        <div class="cl-line"></div>
+      </div>
+      <div class="story-card">
+        <div class="card-num">01</div>
+        <span class="card-icon">💬</span>
+        <div class="feeling-tag">✦ &nbsp; Shuruaat &nbsp; ✦</div>
+        <div class="card-body">
+          <span class="q-open">"</span>Yahi woh waqt tha —
+          <span class="hl">jab usne pehli baar message kiya.</span>
+          Dheere dheere contact hua, jaan pehchaan hui,
+          aur phir achhi khaasi baatein hone lagi.
+          <div class="p-div"><div class="pd"></div><div class="pdot"></div><div class="pd"></div></div>
+          Bilkul ek dost ki tarah. Kabhi kabhi to aisa bhi hota tha ki
+          <span class="hl">raat ke 1–2 baje tak baatein chalti rehti thi</span> —
+          aur waqt ka koi hisaab hi nahi rehta tha.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────── CHAPTER 2 ─────────────────── -->
+  <div class="timeline-dot" id="td1" style="display:flex;">
+    <div class="td-line"></div><div class="td-dot"></div><div class="td-line"></div>
+  </div>
+
+  <section class="story">
+    <div class="story-inner" id="s2">
+      <div class="chapter-label">
+        <div class="cl-dot"></div>
+        <div class="cl-text">Aadat Ho Gayi</div>
+        <div class="cl-line"></div>
+      </div>
+      <div class="story-card">
+        <div class="card-num">02</div>
+        <span class="card-icon">🌙</span>
+        <div class="feeling-tag">✦ &nbsp; Ek Dard &nbsp; ✦</div>
+        <div class="card-body">
+          Phir ek din usne kaha —
+          <span class="hl-rose">"usse padhna hai, shayad kal se baat nahi ho payegi."</span>
+          <div class="p-div"><div class="pd"></div><div class="pdot"></div><div class="pd"></div></div>
+          Us waqt kuch alag sa feel hua tha. Thoda bura, thoda ajeeb.
+          Shayad mujhe <span class="hl">uski aadat si ho gayi thi</span> — aur ye
+          change achha nahi laga.
+          <div class="p-div"><div class="pd"></div><div class="pdot"></div><div class="pd"></div></div>
+          Mujhe jab bhi koi sudden change hota hai life mein,
+          bahut bura lagta hai. Shayad us waqt bhi wahi ho raha tha —
+          <span class="hl-rose">bas mai samajh nahi paa raha tha.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────── CHAPTER 3 ─────────────────── -->
+  <div class="timeline-dot" id="td2" style="display:flex;">
+    <div class="td-line"></div><div class="td-dot"></div><div class="td-line"></div>
+  </div>
+
+  <section class="story">
+    <div class="story-inner" id="s3">
+      <div class="chapter-label">
+        <div class="cl-dot"></div>
+        <div class="cl-text">Maine Koshish Ki</div>
+        <div class="cl-line"></div>
+      </div>
+      <div class="story-card">
+        <div class="card-num">03</div>
+        <span class="card-icon">🤍</span>
+        <div class="feeling-tag">✦ &nbsp; Khamoshi &nbsp; ✦</div>
+        <div class="card-body">
+          Maine try kiya tha —
+          <span class="hl">rokne ka, samjhane ka…</span>
+          par dheere dheere usne baat karna kam kar diya.
+          <div class="p-div"><div class="pd"></div><div class="pdot"></div><div class="pd"></div></div>
+          Maine stories bhi dali thi — taaki
+          <span class="hl-rose">hamaari memories dekh kar shayad usse farq samjh aaye</span>
+          ki mujhe bhi kuch feel ho raha hai.
+          <div class="p-div"><div class="pd"></div><div class="pdot"></div><div class="pd"></div></div>
+          Lekin usne kuch react nahi kiya.
+          <span class="hl">Bas dekh kar chhod diya.</span>
+          Phir maine bhi jaane diya.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────── CHAPTER 4 ─────────────────── -->
+  <div class="timeline-dot" id="td3" style="display:flex;">
+    <div class="td-line"></div><div class="td-dot"></div><div class="td-line"></div>
+  </div>
+
+  <section class="story">
+    <div class="story-inner" id="s4">
+      <div class="chapter-label">
+        <div class="cl-dot"></div>
+        <div class="cl-text">Door Hota Gaya</div>
+        <div class="cl-line"></div>
+      </div>
+      <div class="story-card">
+        <div class="card-num">04</div>
+        <span class="card-icon">📵</span>
+        <div class="feeling-tag">✦ &nbsp; Faasla &nbsp; ✦</div>
+        <div class="card-body">
+          Kabhi kabhi wo message kar diya karti thi —
+          aur main bhi bas <span class="hl">utni der hi baat karta tha.</span>
+          Calls bahut kam ho gayi thi.
+          <div class="p-div"><div class="pd"></div><div class="pdot"></div><div class="pd"></div></div>
+          Aur jab bhi call par hoti thi, apne doston mein itni kho jaati thi
+          ki <span class="hl-rose">shayad bhool hi jaati thi ki main bhi call mein hu.</span>
+          <div class="p-div"><div class="pd"></div><div class="pdot"></div><div class="pd"></div></div>
+          Late replies. Blue tick off.
+          Maine ek baar bola bhi tha —
+          <span class="hl">"agar aisa karna hai to mat karo."</span>
+          Par wahi cheez
+          <span class="hl-rose">itni baar repeat hui ki count bhi nahi kiya ja sakta.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────── CHAPTER 5 ─────────────────── -->
+  <div class="timeline-dot" id="td4" style="display:flex;">
+    <div class="td-line"></div><div class="td-dot"></div><div class="td-line"></div>
+  </div>
+
+  <section class="story">
+    <div class="story-inner" id="s5">
+      <div class="chapter-label">
+        <div class="cl-dot"></div>
+        <div class="cl-text">Aakhir Mein</div>
+        <div class="cl-line"></div>
+      </div>
+      <div class="story-card">
+        <div class="card-num">05</div>
+        <span class="card-icon">🕊️</span>
+        <div class="feeling-tag">✦ &nbsp; Ant &nbsp; ✦</div>
+        <div class="card-body">
+          Maine har baar chances diye.
+          <span class="hl">Baar baar.</span>
+          <div class="p-div"><div class="pd"></div><div class="pdot"></div><div class="pd"></div></div>
+          Lekin har baar thoda aur distance banta gaya.
+          Kabhi gussa, kabhi block-unblock…
+          <div class="p-div"><div class="pd"></div><div class="pdot"></div><div class="pd"></div></div>
+          Aur dheere dheere
+          <span class="hl-rose">sab pehle jaisa reh hi nahi gaya.</span>
+          <div class="p-div"><div class="pd"></div><div class="pdot"></div><div class="pd"></div></div>
+          Shayad kuch cheezein hoti hi aisi hain —
+          <span class="hl">jo shuru khud hoti hain, aur khatam bhi khud.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CLOSING ── -->
+  <section class="closing">
+    <div class="closing-inner" id="cl">
+      <div class="closing-rule">
+        <div class="cr-line"></div>
+        <div class="cr-glyph">✦</div>
+        <div class="cr-line"></div>
+      </div>
+
+      <p class="closing-quote">
+        "Kuch waqt sirf ek yaad banta hai —<br>
+        na regret, na complaint.<br>
+        Bas ek chapter jo tha, aur ab nahi hai."
+      </p>
+
+      <div class="closing-rule">
+        <div class="cr-line"></div>
+        <div class="cr-glyph">✦</div>
+        <div class="cr-line"></div>
+      </div>
+
+      <p class="closing-sig">— Prem</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('vis');
+  });
+}, { threshold: 0.12 });
+
+['s1','s2','s3','s4','s5',
+ 'td0','td1','td2','td3','td4','cl']
+.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) io.observe(el);
+});
+</script>
+</body>
 </html>
