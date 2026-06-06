@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Job Application - Part-Time Remote Opportunity</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==========================================
+           CORE STYLES & VARIABLES (MILKY FORMAL THEME)
+           ========================================== */
+        :root {
+            --bg-milky: #fbfcfa;         /* Premium Milky/Off-white background */
+            --surface-white: #ffffff;    /* Pure White for Content Cards */
+            --text-primary: #1e293b;     /* Deep Slate for high formal readability */
+            --text-secondary: #475569;   /* Muted Slate for descriptions */
+            --brand-primary: #2563eb;    /* Professional Corporate Blue */
+            --brand-light: #eff6ff;      /* Soft Blue Tint */
+            --accent-female: #be123c;    /* Deep Elegant Rose for Female Candidate Note */
+            --accent-female-bg: #fff1f2; /* Ultra-soft Rose Tint */
+            --border-color: #e2e8f0;     /* Subtle elegant dividers */
+            
+            /* Mobile-optimized system properties */
+            --radius-main: 14px;
+            --radius-button: 100px;
+            --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* Removes blue flash on mobile tap */
+        }
+
+        html, body {
+            background-color: var(--bg-milky);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-primary);
+            line-height: 1.6;
+            letter-spacing: -0.01em;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Smooth Scrollbar for Mobile/Web viewports */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-milky);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        /* ==========================================
+           MOBILE-FIRST LAYOUT STRUCTURE
+           ========================================== */
+        .app-container {
+            width: 100%;
+            max-width: 540px; /* Perfect reading width for mobile & tablet viewports */
+            margin: 0 auto;
+            padding: 24px 16px 120px 16px; /* High bottom padding to clear the fixed button */
+        }
+
+        /* ==========================================
+           HERO HEADER SECTION
+           ========================================== */
+        .header-card {
+            background-color: var(--surface-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-main);
+            padding: 28px 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        }
+
+        .company-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--brand-light);
+            color: var(--brand-primary);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .main-title {
+            font-size: 1.65rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.25;
+            margin-bottom: 10px;
+        }
+
+        .sub-roles {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--brand-primary);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .sub-roles span::after {
+            content: "•";
+            margin-left: 8px;
+            color: #cbd5e1;
+        }
+
+        .sub-roles span:last-child::after {
+            content: "";
+        }
+
+        .hero-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* ==========================================
+           FORMAL ELIGIBILITY ALERT (CRITICAL CRITERIA)
+           ========================================== */
+        .gender-restriction-banner {
+            background-color: var(--accent-female-bg);
+            border: 1px solid #fecdd3;
+            border-left: 4px solid var(--accent-female);
+            border-radius: var(--radius-main);
+            padding: 16px 18px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .gender-icon {
+            color: var(--accent-female);
+            font-size: 1.3rem;
+            margin-top: 2px;
+        }
+
+        .gender-text-heading {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--accent-female);
+            margin-bottom: 2px;
+        }
+
+        .gender-text-body {
+            font-size: 0.85rem;
+            color: #9f1239;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        /* ==========================================
+           CONTENT BLOCKS / CARD COMPONENTS
+           ========================================== */
+        .content-card {
+            background-color: var(--surface-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-main);
+            padding: 24px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.01);
+        }
+
+        .section-heading {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-heading i {
+            color: var(--brand-primary);
+            font-size: 1.1rem;
+        }
+
+        /* Formal Professional Lists */
+        .formal-list {
+            list-style: none;
+        }
+
+        .formal-list li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 14px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .formal-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .formal-list li::before {
+            content: "\f00c"; /* Check icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            left: 2px;
+            top: 2px;
+            color: #10b981; /* Formal soft green */
+            font-size: 0.85rem;
+        }
+
+        /* Highlight Sub-bullet points if any */
+        .formal-list li strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Grid Framework for Quick Information Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .metric-box {
+            background-color: var(--bg-milky);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px 8px;
+            text-align: center;
+            transition: transform var(--transition-smooth);
+        }
+
+        .metric-box:hover, .metric-box:active {
+            border-color: var(--brand-primary);
+        }
+
+        .metric-icon {
+            font-size: 1.25rem;
+            color: var(--brand-primary);
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-secondary);
+            letter-spacing: 0.02em;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        /* Standardized Text Blocks */
+        .info-paragraph {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .info-paragraph:last-child {
+            margin-bottom: 0;
+        }
+
+        .emphasized-box {
+            background-color: #f8fafc;
+            border-left: 3px solid #cbd5e1;
+            padding: 12px 14px;
+            border-radius: 0 var(--radius-main) var(--radius-main) 0;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* ==========================================
+           TERMS AGREEMENT BOX
+           ========================================== */
+        .agreement-card {
+            background-color: var(--surface-white);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-main);
+            padding: 24px 20px;
+            margin-top: 10px;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .agreement-card.checked-active {
+            border-color: var(--brand-primary);
+            background-color: #fbfcfe;
+        }
+
+        /* Professional Mobile Checkbox Architecture */
+        .interactive-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .native-checkbox {
+            display: none; /* Hide standard system layout */
+        }
+
+        .custom-ui-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            background-color: var(--surface-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: all 0.2s var(--transition-smooth);
+        }
+
+        .custom-ui-checkbox::after {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: var(--surface-white);
+            font-size: 0.75rem;
+            opacity: 0;
+            transform: scale(0.6);
+            transition: all 0.2s var(--transition-smooth);
+        }
+
+        /* Logic for Checked Box State */
+        .native-checkbox:checked + .custom-ui-checkbox {
+            background-color: var(--brand-primary);
+            border-color: var(--brand-primary);
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+        }
+
+        .native-checkbox:checked + .custom-ui-checkbox::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .agreement-text-label {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.45;
+        }
+
+        /* ==========================================
+           FIXED BOTTOM ACTIONS BAR (PHONE ACTION POINT)
+           ========================================== */
+        .action-bar-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border-color);
+            padding: 16px;
+            z-index: 999;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.03);
+        }
+
+        .action-bar-inner {
+            max-width: 508px; /* Perfectly aligns with container inner elements */
+            margin: 0 auto;
+        }
+
+        .btn-primary-action {
+            width: 100%;
+            height: 54px;
+            border: none;
+            border-radius: var(--radius-button);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--surface-white);
+            background: #cbd5e1; /* Disabled state default grey */
+            cursor: not-allowed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s var(--transition-smooth);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Button Active State Styling */
+        .btn-primary-action.ready {
+            background: linear-gradient(135deg, var(--brand-primary), #1d4ed8);
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary-action.ready:active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-arrow-icon {
+            font-size: 0.9rem;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-primary-action.ready:hover .btn-arrow-icon {
+            transform: translateX(4px);
+        }
+
+        /* Screen Protection Hint Text below main terms */
+        .protection-hint {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <header class="header-card">
+            <div class="company-badge">
+                <i class="fa-solid fa-circle-check"></i> Verified Opportunity
+            </div>
+            <h1 class="main-title">Part-Time Remote Work Opportunity</h1>
+            <div class="sub-roles">
+                <span>Customer Support Executive</span>
+                <span>Telecaller</span>
+                <span>Content & Assistant Roles</span>
+            </div>
+            <p class="hero-description">We are offering flexible remote workflow options specifically structuralized for students and aspirants looking to learn and manage careers parallelly.</p>
+        </header>
+
+        <div class="gender-restriction-banner">
+            <div class="gender-icon">
+                <i class="fa-solid fa-venus"></i>
+            </div>
+            <div class="gender-text-wrapper">
+                <div class="gender-text-heading">Mandatory Eligibility Profile</div>
+                <div class="gender-text-body">This profile is exclusively open for <strong>Female Candidates Only</strong>. Candidates matching this criterion are invited to complete verification.</div>
+            </div>
+        </div>
+
+        <section class="content-card">
+            <h2 class="section-heading">
+                <i class="fa-solid fa-user-gear"></i> Infrastructure & Requirements
+            </h2>
+            <ul class="formal-list">
+                <li>Possession of a personal functional <strong>Laptop</strong> is mandatory for daily tasks.</li>
+                <li>Basic operating proficiency in <strong>MS Excel, Social Media Platforms</strong>, and exploratory AI interfaces.</li>
+                <li>Standard <strong>Communication Skills</strong> over professional virtual channels.</li>
+                <li>A constructive commitment towards adaptive operational tasks and guidance workflow.</li>
+            </ul>
+        </section>
+
+        <section class="content-card">
+            <h2 class="section-heading">
+                <i class="fa-solid fa-briefcase"></i> Job Responsibilities & Roles
+            </h2>
+            <ul class="formal-list">
+                <li><strong>Customer Support Executive:</strong> Assisting query resolutions and handling initial chat channels professionally.</li>
+                <li><strong>Telecaller:</strong> Assisting remote operational calling tasks and direct data-set communications when authorized.</li>
+                <li><strong>Social Media & Content Handling:</strong> Structured managing of active platforms and data optimization.</li>
+                <li><strong>Data Processing:</strong> Organizing clean entries and tracking systemic sheets inside Excel templates.</li>
+                <li><strong>AI Integration:</strong> Utilizing standard AI prompt mechanisms for enhanced operational execution.</li>
+            </ul>
+            <div class="emphasized-box">
+                Note: Work assignments are situational. Whenever designated data-flows or project tasks are ready, resources will be systematically informed over remote interfaces.
+            </div>
+        </section>
+
+        <section class="content-card">
+            <h2 class="section-heading">
+                <i class="fa-solid fa-sliders"></i> Employment Terms
+            </h2>
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <i class="fa-regular fa-clock metric-icon"></i>
+                    <div class="metric-label">Hours</div>
+                    <div class="metric-value">3–4 Hrs / Day</div>
+                </div>
+                <div class="metric-box">
+                    <i class="fa-solid fa-house-laptop metric-icon"></i>
+                    <div class="metric-label">Location</div>
+                    <div class="metric-value">100% Remote</div>
+                </div>
+                <div class="metric-box">
+                    <i class="fa-solid fa-wallet metric-icon"></i>
+                    <div class="metric-label">Stipend</div>
+                    <div class="metric-value">₹2k – ₹3k / Skill-based</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-card">
+            <h2 class="section-heading">
+                <i class="fa-solid fa-graduation-cap"></i> Selection Process
+            </h2>
+            <p class="info-paragraph">
+                The initiation path spans an observation framework of <strong>2 to 3 days</strong>. This period monitors standard functional execution, attention toward instructions, and overall working compatibility.
+            </p>
+            <p class="info-paragraph">
+                <strong>Freshers are eligible to apply.</strong> Candidates displaying structured intent toward real-world learning and adaptiveness hold full preference. Direct training scaffolding and task support blueprints will be systematic.
+            </p>
+        </section>
+
+        <section class="content-card">
+            <h2 class="section-heading">
+                <i class="fa-solid fa-shield-halved"></i> Privacy & Data Governance
+            </h2>
+            <p class="info-paragraph">
+                Candidate identity credentials, documentation records, and data sharing are completely governed via isolated systems ensuring security and strict privacy protocols.
+            </p>
+        </section>
+
+        <div id="termsContainer" class="agreement-card">
+            <label class="interactive-label" for="termsCheckbox">
+                <input type="checkbox" id="termsCheckbox" class="native-checkbox">
+                <div class="custom-ui-checkbox"></div>
+                <span class="agreement-text-label">
+                    I confirm that I am a female candidate, and I completely agree with the operational terms, criteria, and observation framework detailed above.
+                </span>
+            </label>
+        </div>
+
+    </div>
+
+    <div class="action-bar-container">
+        <div class="action-bar-inner">
+            <button id="formSubmitBtn" class="btn-primary-action" onclick="handleNavigation(event)" disabled>
+                <span>Proceed to Application Form</span>
+                <i class="fa-solid fa-arrow-right btn-arrow-icon"></i>
+            </button>
+            <div class="protection-hint">
+                <i class="fa-solid fa-lock"></i> Secure Connection • Form redirects safely
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkbox = document.getElementById('termsCheckbox');
+            const submitBtn = document.getElementById('formSubmitBtn');
+            const termsContainer = document.getElementById('termsContainer');
+
+            // Listening to Interactive State Changes on Mobile Tap
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    submitBtn.classList.add('ready');
+                    submitBtn.removeAttribute('disabled');
+                    termsContainer.classList.add('checked-active');
+                } else {
+                    submitBtn.classList.remove('ready');
+                    submitBtn.setAttribute('disabled', 'true');
+                    termsContainer.classList.remove('checked-active');
+                }
+            });
+        });
+
+        // Safe Redirection Routing Framework
+        function handleNavigation(event) {
+            const button = event.currentTarget;
+            
+            // Validation check to prevent unauthorized forced click triggers
+            if (!button.classList.contains('ready')) return;
+
+            // =============================================================
+            // CRITICAL: APNA REAL GOOGLE FORM LINK NICHE VALE QUOTES MEIN DALEN
+            // =============================================================
+            const destinationGoogleForm = "YOUR_GOOGLE_FORM_LINK_HERE";
+
+            if (destinationGoogleForm !== "YOUR_GOOGLE_FORM_LINK_HERE") {
+                window.location.href = destinationGoogleForm;
+            } else {
+                alert("Security Verification Successful! Form redirection is working properly. (Developer Node: Code ke andar 'YOUR_GOOGLE_FORM_LINK_HERE' ko apne Google form link se replace karein.)");
+            }
+        }
+    </script>
+</body>
+</html>
