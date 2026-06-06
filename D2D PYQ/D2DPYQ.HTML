@@ -7,7 +7,6 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
         window.MathJax = {
@@ -193,6 +192,22 @@
     <script type="module">
         let allLoadedData = [];
         
+        // Cache object to store fetched year data
+        const cache = {};
+
+        // Helper function for fast loading with cache
+        async function loadYear(y) {
+            if (cache[y]) return cache[y];
+            try {
+                const module = await import(`./data/data_${y}.js`);
+                cache[y] = module[`data${y}`];
+                return cache[y];
+            } catch (e) {
+                console.warn(`Data for ${y} is missing or failed to load.`);
+                return []; 
+            }
+        }
+        
         // Setup 2017 to 2025 Data
         const yearsList = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
         const subjectsList = ["Physics", "Chemistry", "Math"];
@@ -237,8 +252,11 @@
         window.openYearTest = async (year) => {
             document.getElementById('loading-screen').style.display = 'flex';
             try {
-                const module = await import(`./data/data_${year}.js`);
-                allLoadedData = module[`data${year}`];
+                // Using cached version here too for consistency and speed
+                const data = await loadYear(year);
+                if (!data || data.length === 0) throw new Error("No data");
+                
+                allLoadedData = data;
                 
                 document.getElementById('home-view').style.display = 'none';
                 document.getElementById('test-view').style.display = 'block';
@@ -259,14 +277,9 @@
         window.openCombineFilter = async () => {
             document.getElementById('loading-screen').style.display = 'flex';
             try {
-                // Fetch all years concurrently (Fast)
-                const fetchPromises = yearsList.map(y => import(`./data/data_${y}.js`).catch(e => null));
-                const modules = await Promise.all(fetchPromises);
-                
-                allLoadedData = [];
-                modules.forEach((mod, idx) => {
-                    if(mod) allLoadedData.push(...mod[`data${yearsList[idx]}`]);
-                });
+                // Using the requested cached parallel loading
+                const modules = await Promise.all(yearsList.map(loadYear));
+                allLoadedData = modules.flat();
 
                 if(allLoadedData.length === 0) throw new Error("No data files found!");
 
@@ -388,12 +401,15 @@
                 return;
             }
 
+            // Slice limit for performance (load top 100 max to prevent mobile browser crash)
+            filteredData = filteredData.slice(0, 100);
+
             // Fast Sorting
             filteredData.sort((a, b) => {
                 if (b.year !== a.year) return b.year - a.year; 
                 if (a.subject !== b.subject) return a.subject.localeCompare(b.subject); 
-                let qNumA = parseInt(a.id.split('_')[1]);
-                let qNumB = parseInt(b.id.split('_')[1]);
+                let qNumA = parseInt(a.id.split('_')[1] || 0);
+                let qNumB = parseInt(b.id.split('_')[1] || 0);
                 return qNumA - qNumB;
             });
 
@@ -430,8 +446,22 @@
                 `;
             });
 
-            container.innerHTML = fullHTML;
-            if(window.MathJax) MathJax.typesetPromise([container]).catch(err => console.log(err));
+            // DOM Freeze Fix & Conditional MathJax
+            requestAnimationFrame(() => {
+                container.innerHTML = fullHTML;
+                
+                // Add conditional check to only run MathJax when needed
+                if (
+                    window.MathJax &&
+                    (fullHTML.includes('$') ||
+                     fullHTML.includes('\\(') ||
+                     fullHTML.includes('\\['))
+                ) {
+                    requestAnimationFrame(() => {
+                        MathJax.typesetPromise([container]).catch(console.error);
+                    });
+                }
+            });
         }
 
         // --- Submit Logic ---
