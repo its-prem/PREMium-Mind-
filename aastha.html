@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -12,7 +12,7 @@
   --rose: #E8A0B0;
   --cream: #FFF8F0;
   --dark: #08060A;
-}
+} -->
 
 * { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior: smooth; }
@@ -652,7 +652,6 @@ function drawP(){
   requestAnimationFrame(drawP);
 }
 drawP();
-
 /* ── CONFETTI ── */
 const CC=['#C9A84C','#F0D080','#E8A0B0','#fff','#FF6B9D','#c084fc'];
 for(let i=0;i<40;i++){
@@ -668,7 +667,6 @@ for(let i=0;i<40;i++){
     'border-radius:'+(Math.random()>.5?'50%':'2px')+';';
   document.body.appendChild(c);
 }
-
 /* ── SCROLL REVEAL ── */
 const io = new IntersectionObserver(entries=>{
   entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('vis'); });
