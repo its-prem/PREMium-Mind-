@@ -10,7 +10,8 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
         window.MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] }
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            startup: { typeset: false } // Auto-typeset band kiya for faster manual control
         };
     </script>
 
@@ -27,7 +28,7 @@
 
         * { box-sizing: border-box; }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); background-attachment: fixed; color: var(--black); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); background-attachment: fixed; color: var(--black); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
         .fade-in { animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -76,27 +77,46 @@
         
         .cb-label { display: flex; align-items: center; gap: 10px; padding: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 8px; transition: 0.2s; color: var(--black); }
         .cb-label:hover { background: #f1f5f9; }
-        .cb-label input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--black); }
+        .cb-label input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--black); flex-shrink: 0; }
 
-        .container { max-width: 800px; margin: 0 auto; padding: 30px 20px; }
+        .container { max-width: 800px; margin: 0 auto; padding: 30px 20px; width: 100%; }
         .year-header { font-size: 22px; font-weight: 800; color: var(--black); margin: 40px 0 15px 0; border-bottom: 2px solid var(--gray-light); padding-bottom: 8px; }
-        .year-header::before { content: '📅'; font-size: 28px; }
+        .year-header::before { content: '📅'; font-size: 28px; margin-right: 8px; }
         .subject-badge { display: inline-block; background: var(--black-muted); color: var(--white); padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; margin-bottom: 20px; letter-spacing: 0.5px; }
 
-        /* Question Cards */
-        .q-card { background: var(--white); border-radius: 20px; padding: 30px; margin-bottom: 25px; border: 1px solid var(--glass-border); box-shadow: 0 4px 20px rgba(0,0,0,0.03); transition: transform 0.2s; }
+        /* Question Cards - PERFORMANCE & OVERFLOW FIXES */
+        .q-card { 
+            background: var(--white); border-radius: 20px; padding: 30px; margin-bottom: 25px; 
+            border: 1px solid var(--glass-border); box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
+            transition: transform 0.2s; width: 100%;
+            /* Speed rendering for long lists */
+            content-visibility: auto; contain-intrinsic-size: 300px;
+            /* Force break long unbreakable text */
+            word-wrap: break-word; overflow-wrap: break-word;
+        }
         .q-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
         .q-meta { font-size: 11px; font-weight: 700; color: var(--gray-dark); margin-bottom: 15px; display: flex; gap: 8px; flex-wrap: wrap;}
         .q-meta span { background: #f1f5f9; padding: 4px 10px; border-radius: 8px; }
-        .q-text { font-size: 16px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; }
         
-        .options-grid { display: flex; flex-direction: column; gap: 12px; }
-        .opt-label { padding: 14px 18px; border-radius: 14px; border: 2px solid var(--gray-light); background: #f8fafc; cursor: pointer; font-size: 15px; font-weight: 500; display: flex; align-items: center; transition: all 0.2s; }
+        /* Allow horizontal scroll for crazy long equations */
+        .q-text { font-size: 16px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; overflow-x: auto; padding-bottom: 5px; }
+        
+        .options-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        
+        /* Layout fix for mobile multiline options */
+        .opt-label { 
+            padding: 14px 18px; border-radius: 14px; border: 2px solid var(--gray-light); background: #f8fafc; 
+            cursor: pointer; font-size: 15px; font-weight: 500; display: flex; align-items: flex-start; /* flex-start prevents radio from centering weirdly on multiline */
+            transition: all 0.2s; width: 100%; 
+        }
         .opt-label input { position: absolute; opacity: 0; }
-        .custom-radio { width: 20px; height: 20px; min-width: 20px; border: 2px solid var(--gray-dark); border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; }
+        .custom-radio { width: 20px; height: 20px; min-width: 20px; border: 2px solid var(--gray-dark); border-radius: 50%; margin-right: 15px; margin-top: 2px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .opt-label input:checked ~ .custom-radio { border-color: var(--black); }
         .opt-label input:checked ~ .custom-radio::after { content: ''; width: 10px; height: 10px; background: var(--black); border-radius: 50%; }
         .opt-label.selected-bg { border-color: var(--black); background: var(--white); }
+        
+        /* Make sure text wraps correctly inside the label */
+        .opt-label span { flex: 1; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.4; overflow-x: auto; }
 
         .bottom-action-bar { position: fixed; bottom: 30px; right: 30px; z-index: 1000; opacity: 0; transform: translateY(20px); pointer-events: none; transition: all 0.3s; }
         .bottom-action-bar.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
@@ -121,6 +141,7 @@
             .bottom-action-bar { bottom: 20px; right: 20px; left: 20px; display: flex; justify-content: center; }
             .btn-submit { width: 100%; justify-content: center; }
             .q-card { padding: 20px; }
+            .opt-label { padding: 12px 14px; }
         }
     </style>
 </head>
@@ -215,14 +236,16 @@
 
         window.onload = () => {
             const grid = document.getElementById('year-grid');
+            let htmlBuffer = '';
             yearsList.forEach(y => {
-                grid.innerHTML += `
+                htmlBuffer += `
                     <div class="year-card" onclick="openYearTest(${y})">
                         <h3>${y}</h3>
                         <p>Physics • Chem • Math</p>
                     </div>
                 `;
             });
+            grid.innerHTML = htmlBuffer; // Faster DOM injection
         };
 
         window.goHome = () => {
@@ -252,7 +275,6 @@
         window.openYearTest = async (year) => {
             document.getElementById('loading-screen').style.display = 'flex';
             try {
-                // Using cached version here too for consistency and speed
                 const data = await loadYear(year);
                 if (!data || data.length === 0) throw new Error("No data");
                 
@@ -263,7 +285,7 @@
                 document.getElementById('test-title').innerText = `${year} Paper`;
                 
                 isCombineMode = false;
-                document.getElementById('container-year').style.display = 'none'; // Hide year filter for single year test
+                document.getElementById('container-year').style.display = 'none'; 
                 
                 buildSubjectFilter();
                 applyFilters();
@@ -277,7 +299,6 @@
         window.openCombineFilter = async () => {
             document.getElementById('loading-screen').style.display = 'flex';
             try {
-                // Using the requested cached parallel loading
                 const modules = await Promise.all(yearsList.map(loadYear));
                 allLoadedData = modules.flat();
 
@@ -288,7 +309,7 @@
                 document.getElementById('test-title').innerText = "Combine Lab 🧪";
                 
                 isCombineMode = true;
-                document.getElementById('container-year').style.display = 'block'; // Show year filter
+                document.getElementById('container-year').style.display = 'block'; 
                 
                 buildYearFilter();
                 buildSubjectFilter();
@@ -322,20 +343,17 @@
         }
 
         window.applyFilters = () => {
-            // Get Selected Years (If in single year mode, use allLoadedData's year)
             let selYears = [];
             if(isCombineMode) {
                 selYears = Array.from(document.querySelectorAll('.cb-year:checked')).map(cb => parseInt(cb.value));
                 document.getElementById('hdr-year').innerHTML = `Years (${selYears.length}) <span>▼</span>`;
             } else {
-                selYears = [allLoadedData[0]?.year]; // Single year fallback
+                selYears = [allLoadedData[0]?.year]; 
             }
 
-            // Get Selected Subjects
             const selSubj = Array.from(document.querySelectorAll('.cb-subject:checked')).map(cb => cb.value);
             document.getElementById('hdr-subject').innerHTML = `Subjects (${selSubj.length}) <span>▼</span>`;
 
-            // Update Available Chapters
             updateChapterCheckboxes(selYears, selSubj);
         }
 
@@ -359,24 +377,26 @@
                 html += `<div style="padding:10px; font-size:13px; color:gray; text-align:center;">No chapters found</div>`;
             } else {
                 availableChapters.forEach(c => {
-                    // Auto-check new chapters or preserve old checks
                     let isChecked = (!hasExisting || prevChecked.includes(c)) ? 'checked' : '';
                     html += `<label class="cb-label"><input type="checkbox" class="cb-chapter" value="${c}" ${isChecked} onchange="renderQuestions()"> ${c}</label>`;
                 });
             }
 
             chapList.innerHTML = html;
-            renderQuestions(); // Call render after updating chapters
+            renderQuestions(); 
         }
 
         // --- Render UI ---
-        window.updateOptionStyle = (radioInput) => {
-            const name = radioInput.name;
-            document.querySelectorAll(`input[name="${name}"]`).forEach(inp => {
-                inp.parentElement.classList.remove('selected-bg');
-            });
-            radioInput.parentElement.classList.add('selected-bg');
-        }
+        // Event delegation logic to handle clicks efficiently without 400 inline onclicks
+        document.addEventListener('change', function(e) {
+            if(e.target && e.target.matches('.opt-label input[type="radio"]')) {
+                const name = e.target.name;
+                document.querySelectorAll(`input[name="${name}"]`).forEach(inp => {
+                    inp.parentElement.classList.remove('selected-bg');
+                });
+                e.target.parentElement.classList.add('selected-bg');
+            }
+        });
 
         window.renderQuestions = () => {
             const container = document.getElementById('quiz-container');
@@ -384,12 +404,10 @@
             if(existingRes) existingRes.remove();
             document.getElementById('bottom-bar').classList.remove('show');
 
-            // Read Final Checked Values
             let selYears = isCombineMode ? Array.from(document.querySelectorAll('.cb-year:checked')).map(cb => parseInt(cb.value)) : [allLoadedData[0]?.year];
             const selSubj = Array.from(document.querySelectorAll('.cb-subject:checked')).map(cb => cb.value);
             const selChap = Array.from(document.querySelectorAll('.cb-chapter:checked')).map(cb => cb.value);
             
-            // Update Chapter Header Text
             document.getElementById('hdr-chapter').innerHTML = `Chapters (${selChap.length}) <span>▼</span>`;
 
             let filteredData = allLoadedData.filter(q => 
@@ -401,19 +419,17 @@
                 return;
             }
 
-            // Slice limit for performance (load top 100 max to prevent mobile browser crash)
-            filteredData = filteredData.slice(0, 100);
+            // Cap at 150 to keep browsers highly responsive
+            filteredData = filteredData.slice(0, 150);
 
-            // Fast Sorting
             filteredData.sort((a, b) => {
                 if (b.year !== a.year) return b.year - a.year; 
                 if (a.subject !== b.subject) return a.subject.localeCompare(b.subject); 
-                let qNumA = parseInt(a.id.split('_')[1] || 0);
-                let qNumB = parseInt(b.id.split('_')[1] || 0);
+                let qNumA = parseInt((a.id || "").split('_')[1] || 0);
+                let qNumB = parseInt((b.id || "").split('_')[1] || 0);
                 return qNumA - qNumB;
             });
 
-            // Fast String Building
             let fullHTML = "";
             let currentYear = null;
             let currentSubject = null;
@@ -431,7 +447,7 @@
 
                 let optionsHtml = q.options.map((opt, i) => `
                     <label class="opt-label" id="lbl-q${q.id}-o${i}">
-                        <input type="radio" name="q${q.id}" value="${i}" onchange="updateOptionStyle(this)">
+                        <input type="radio" name="q${q.id}" value="${i}">
                         <div class="custom-radio"></div>
                         <span>${['A', 'B', 'C', 'D'][i]}) ${opt}</span>
                     </label>
@@ -446,17 +462,11 @@
                 `;
             });
 
-            // DOM Freeze Fix & Conditional MathJax
             requestAnimationFrame(() => {
                 container.innerHTML = fullHTML;
                 
-                // Add conditional check to only run MathJax when needed
-                if (
-                    window.MathJax &&
-                    (fullHTML.includes('$') ||
-                     fullHTML.includes('\\(') ||
-                     fullHTML.includes('\\['))
-                ) {
+                // Smart MathJax execution
+                if (window.MathJax && (fullHTML.includes('$') || fullHTML.includes('\\(') || fullHTML.includes('\\['))) {
                     requestAnimationFrame(() => {
                         MathJax.typesetPromise([container]).catch(console.error);
                     });
