@@ -3,23 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Button Sound</title>
+    <title>Modern Spline Landing Page</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.5/build/spline-viewer.js"></script>
+
+    <style>
+        /* --- Base Styles --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #0d0e15;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* --- Navbar (Glassmorphism) --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(13, 14, 21, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links li a {
+            text-decoration: none;
+            color: #a0a5bc;
+            font-weight: 400;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links li a:hover {
+            color: #ffffff;
+        }
+
+        .nav-btn {
+            background: #ffffff;
+            color: #0d0e15;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 10%;
+            position: relative;
+        }
+
+        .hero-content {
+            flex: 1;
+            z-index: 10;
+            padding-right: 50px;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .hero-content h1 span {
+            color: #4facfe;
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            color: #a0a5bc;
+            margin-bottom: 40px;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px 35px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            padding: 15px 35px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* --- Spline 3D Container --- */
+        .spline-container {
+            flex: 1;
+            height: 80vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        spline-viewer {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Hide the Spline Logo (Optional, works on some versions) */
+        spline-viewer::part(logo) {
+            display: none !important;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 991px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding-top: 120px;
+            }
+            .hero-content {
+                padding-right: 0;
+                margin-bottom: 50px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .hero-content h1 {
+                font-size: 3rem;
+            }
+            .nav-links {
+                display: none; /* Can add a hamburger menu later */
+            }
+            .spline-container {
+                width: 100%;
+                height: 50vh;
+            }
+        }
+    </style>
 </head>
 <body>
 
-    <button onclick="playSound()">Press Me</button>
+    <nav>
+        <div class="logo">Brand.</div>
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Features</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+        <button class="nav-btn">Get Started</button>
+    </nav>
 
-    <!-- Audio file -->
-    <audio id="mySound">
-        <source src="sound.mp3" type="audio/mpeg">
-    </audio>
+    <section class="hero">
+        
+        <div class="hero-content">
+            <h1>Experience the<br><span>Next Dimension</span></h1>
+            <p>Bring your ideas to life with stunning interactive 3D elements. Fast, responsive, and completely seamless integration for modern web experiences.</p>
+            
+            <div class="cta-buttons">
+                <button class="btn-primary">Explore Now</button>
+                <button class="btn-secondary">View Demo</button>
+            </div>
+        </div>
 
-    <script>
-        function playSound() {
-            let audio = document.getElementById("mySound");
-            audio.play();
-        }
-    </script>
+        <div class="spline-container">
+            <spline-viewer loading-anim-type="spinner-small-dark" url="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode"></spline-viewer>
+        </div>
+
+    </section>
 
 </body>
 </html>

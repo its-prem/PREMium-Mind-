@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>PREMium Mind - All in One Demo</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="small-logo.png">
+    
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Outfit:wght@400;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. CSS VARIABLES (PREMIUM LIGHT THEME)
+           ========================================================================== */
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --accent: #06b6d4;
+            --accent-pink: #ec4899;
+            
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --gray-soft: #f1f5f9;
+            --gray-light: #e2e8f0;
+            --gray-dark: #64748b;
+            
+            --text-dark: #0f172a;
+            --text-muted: #475569;
+            --text-light: #94a3b8;
+            
+            /* Fonts */
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+            --font-numbers: 'Space Grotesk', sans-serif;
+            --font-script: 'Caveat', cursive;
+
+            /* Neobrutalism 3D Shadows */
+            --shadow-3d-sm: 3px 3px 0px #0f172a;
+            --shadow-3d-md: 5px 5px 0px #0f172a;
+            --shadow-3d-hover: 8px 8px 0px #0f172a;
+            
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-blur: blur(12px);
+            
+            --smooth: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html { scroll-behavior: smooth; }
+
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            color: var(--text-dark); 
+            overflow-x: hidden; 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::selection { background: var(--primary); color: white; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; }
+
+        .fade-up { opacity: 0; transform: translateY(40px); transition: all 0.8s ease-out; }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+        /* ==========================================================================
+           2. SHARED BUTTON STYLES (2D to 3D)
+           ========================================================================== */
+        .btn-3d {
+            background: var(--primary); color: white !important;
+            padding: 12px 28px; border-radius: 8px;
+            border: 2px solid var(--text-dark); box-shadow: var(--shadow-3d-sm);
+            font-family: var(--font-heading); font-weight: 700 !important; font-size: 15px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.2s ease; cursor: pointer; text-decoration: none; justify-content: center;
+        }
+        .btn-3d:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-3d-hover); background: var(--primary-dark); }
+        .btn-3d:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px var(--text-dark); }
+
+        .btn-outline-3d {
+            background: var(--bg-card); color: var(--text-dark) !important;
+            padding: 12px 28px; border-radius: 8px;
+            border: 2px solid var(--text-dark); box-shadow: var(--shadow-3d-sm);
+            font-family: var(--font-heading); font-weight: 700 !important; font-size: 15px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.2s ease; cursor: pointer; text-decoration: none; justify-content: center;
+        }
+        .btn-outline-3d:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-3d-hover); background: var(--gray-soft); }
+        .btn-outline-3d:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px var(--text-dark); }
+
+        /* ==========================================================================
+           3. NAVBAR
+           ========================================================================== */
+        .navbar {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border-bottom: 2px solid var(--text-dark);
+            z-index: 1000; padding: 15px 0; transition: var(--smooth);
+        }
+        .navbar.scrolled { padding: 10px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+
+        .nav-container { display: flex; justify-content: space-between; align-items: center; }
+
+        .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; transition: var(--bounce); }
+        .nav-logo img { height: 35px; width: auto; }
+        .nav-logo:hover { transform: scale(1.05) rotate(-2deg); }
+
+        .nav-links { display: flex; gap: 30px; list-style: none; align-items: center; }
+        .nav-links li a {
+            text-decoration: none; color: var(--text-dark); font-weight: 700; font-size: 15px; position: relative; transition: var(--smooth);
+        }
+        .nav-links li a::before {
+            content: ''; position: absolute; bottom: -4px; left: 0; width: 0%; height: 3px; background: var(--accent-pink); transition: var(--smooth); border-radius: 2px;
+        }
+        .nav-links li a:hover::before, .nav-links li a.active::before { width: 100%; }
+
+        .mobile-menu-btn { display: none; font-size: 32px; cursor: pointer; color: var(--text-dark); }
+
+        /* ==========================================================================
+           4. MOBILE SIDEBAR
+           ========================================================================== */
+        .sidebar {
+            position: fixed; top: 0; right: -100%; width: 300px; height: 100vh;
+            background: white; border-left: 2px solid var(--text-dark); z-index: 2000;
+            padding: 30px; transition: var(--smooth); box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; overflow-y: auto;
+        }
+        .sidebar.active { right: 0; }
+        .close-btn { align-self: flex-end; font-size: 35px; cursor: pointer; margin-bottom: 30px; transition: 0.2s; }
+        .close-btn:hover { color: var(--primary); transform: rotate(90deg); }
+        
+        .sidebar ul { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+        .sidebar ul li a { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; transition: var(--smooth); }
+        .sidebar ul li a:hover { background: var(--gray-soft); color: var(--primary); padding-left: 15px; }
+        .sidebar ul li a ion-icon { color: var(--primary); font-size: 20px; }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1500; opacity: 0; pointer-events: none; transition: var(--smooth); }
+        .overlay.active { opacity: 1; pointer-events: auto; }
+
+        /* ==========================================================================
+           5. HERO SECTION (WITH CANVAS)
+           ========================================================================== */
+        .hero {
+            position: relative; padding: 160px 0 100px; min-height: 90vh;
+            display: flex; align-items: center; overflow: hidden; background: var(--bg-body);
+        }
+        #sparkles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.6; pointer-events: none; }
+        
+        .hero-content { position: relative; z-index: 10; text-align: center; max-width: 900px; margin: 0 auto; }
+        .hero-script { font-family: var(--font-script); font-size: 32px; color: var(--accent-pink); transform: rotate(-5deg); display: inline-block; margin-bottom: 10px; }
+        .hero h1 { font-family: var(--font-heading); font-size: 4.5rem; font-weight: 900; line-height: 1.1; color: var(--text-dark); margin-bottom: 25px; letter-spacing: -1px; }
+        .hero h1 span { color: var(--primary); position: relative; display: inline-block; }
+        .hero h1 span::after { content: ''; position: absolute; bottom: 8px; left: 0; width: 100%; height: 12px; background: rgba(6, 182, 212, 0.3); z-index: -1; transform: skewX(-15deg); }
+        .hero p { font-size: 1.15rem; color: var(--text-muted); font-weight: 500; max-width: 700px; margin: 0 auto 40px; line-height: 1.6; }
+        
+        .hero-actions { display: flex; gap: 20px; justify-content: center; align-items: center; }
+
+        /* ==========================================================================
+           6. STORE SECTION
+           ========================================================================== */
+        .courses-section { padding: 100px 0; background: var(--bg-card); border-top: 2px solid var(--text-dark); }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-header h2 { font-family: var(--font-heading); font-size: 3rem; font-weight: 900; color: var(--text-dark); }
+        .section-header p { font-size: 1.1rem; color: var(--text-muted); font-weight: 500; margin-top: 10px; }
+
+        .card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; }
+        .course-card {
+            background: var(--bg-card); border: 2px solid var(--text-dark); border-radius: 16px; padding: 20px;
+            box-shadow: var(--shadow-3d-md); transition: all 0.3s ease; display: flex; flex-direction: column; position: relative;
+        }
+        .course-card:hover { transform: translateY(-10px); box-shadow: 12px 12px 0px var(--text-dark); }
+        .course-card img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; border: 2px solid var(--text-dark); margin-bottom: 20px; }
+        
+        .new-badge {
+            position: absolute; top: 10px; right: 10px; background: var(--accent-pink); color: white;
+            font-family: var(--font-numbers); font-weight: 700; padding: 5px 15px; border-radius: 50px; border: 2px solid var(--text-dark); transform: rotate(5deg);
+        }
+
+        .course-card h3 { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; line-height: 1.3; }
+        .course-card p { font-size: 0.95rem; color: var(--text-muted); font-weight: 500; line-height: 1.6; margin-bottom: 20px; flex: 1; }
+        
+        .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-top: 15px; border-top: 2px dashed var(--gray-light); }
+        .price { font-family: var(--font-numbers); font-size: 1.8rem; font-weight: 700; color: var(--text-dark); display: flex; align-items: baseline; gap: 8px; }
+        .price span { font-size: 1rem; color: var(--text-light); text-decoration: line-through; }
+
+        /* ==========================================================================
+           7. DETAILS & OFFERS SECTION
+           ========================================================================== */
+        .details-section { padding: 100px 0; background: var(--gray-soft); border-top: 2px solid var(--text-dark); }
+        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        
+        .details-text h2 { font-family: var(--font-heading); font-size: 3rem; font-weight: 900; margin-bottom: 20px; line-height: 1.1; color: var(--text-dark); }
+        .details-text h2 span { color: var(--accent-pink); }
+        .details-text p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px; line-height: 1.7; font-weight: 500; }
+        .details-list { list-style: none; margin-bottom: 30px; }
+        .details-list li { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-weight: 700; font-size: 1.1rem; color: var(--text-dark); }
+        .details-list li ion-icon { background: var(--primary); color: white; padding: 5px; border-radius: 50%; border: 2px solid var(--text-dark); font-size: 20px; }
+
+        .details-form-box {
+            background: var(--bg-card); border: 2px solid var(--text-dark); border-radius: 20px;
+            padding: 40px; box-shadow: var(--shadow-3d-md);
+        }
+        .details-form-box h3 { font-family: var(--font-heading); font-size: 24px; font-weight: 800; margin-bottom: 25px; text-align: center; }
+        
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 14px; }
+        .input-group select, .input-group input {
+            width: 100%; padding: 12px 15px; border: 2px solid var(--text-dark); border-radius: 8px;
+            font-family: var(--font-body); font-size: 15px; font-weight: 500; outline: none; background: var(--bg-body); transition: var(--smooth);
+        }
+        .input-group select:focus, .input-group input:focus { box-shadow: 3px 3px 0 var(--primary); border-color: var(--primary); }
+
+        /* ==========================================================================
+           8. FOOTER
+           ========================================================================== */
+        .footer { background: var(--bg-card); padding: 80px 0 30px; border-top: 2px solid var(--text-dark); }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 50px; margin-bottom: 60px; }
+        
+        .footer-logo img { height: 45px; margin-bottom: 20px; }
+        .footer-about { color: var(--text-muted); font-weight: 500; line-height: 1.7; margin-bottom: 25px; max-width: 300px; }
+        
+        .social-icons { display: flex; gap: 15px; }
+        .social-icons a {
+            width: 45px; height: 45px; display: flex; justify-content: center; align-items: center;
+            background: white; border: 2px solid var(--text-dark); border-radius: 50%;
+            color: var(--text-dark); font-size: 20px; box-shadow: 2px 2px 0 var(--text-dark); transition: all 0.2s;
+        }
+        .social-icons a:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--primary); background: var(--primary); color: white; }
+
+        .footer-col h3 { font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; margin-bottom: 25px; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 15px; }
+        .footer-col ul li a { color: var(--text-muted); text-decoration: none; font-weight: 600; transition: var(--smooth); }
+        .footer-col ul li a:hover { color: var(--primary); padding-left: 5px; }
+
+        .footer-form { background: var(--gray-soft); padding: 25px; border-radius: 12px; border: 2px solid var(--text-dark); box-shadow: var(--shadow-3d-sm); }
+        .footer-form input, .footer-form textarea { width: 100%; padding: 12px 15px; margin-bottom: 15px; border: 2px solid var(--text-dark); border-radius: 6px; font-family: var(--font-body); font-weight: 500; outline: none; }
+        .footer-form input:focus, .footer-form textarea:focus { border-color: var(--primary); box-shadow: 3px 3px 0 var(--primary); }
+        
+        .footer-bottom { text-align: center; padding-top: 30px; border-top: 2px dashed #cbd5e1; font-weight: 600; color: var(--text-muted); }
+
+        /* ==========================================================================
+           9. RESPONSIVE QUERIES
+           ========================================================================== */
+        @media (max-width: 1024px) {
+            .hero h1 { font-size: 3.5rem; }
+            .details-grid { grid-template-columns: 1fr; gap: 50px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links, .navbar .btn-3d { display: none; }
+            .mobile-menu-btn { display: block; }
+            
+            .hero { padding: 130px 0 80px; }
+            .hero-script { font-size: 26px; }
+            .hero h1 { font-size: 2.8rem; }
+            .hero p { font-size: 1rem; }
+            .hero-actions { flex-direction: column; width: 100%; padding: 0 20px; }
+            .btn-3d, .btn-outline-3d { width: 100%; justify-content: center; padding: 15px; }
+            
+            .section-header h2 { font-size: 2.2rem; }
+            
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .footer-logo img, .footer-about { margin: 0 auto 20px; }
+            .social-icons { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="#home" class="nav-logo">
+                <img src="PM-LOGO-TEXT.png" alt="PREMium Mind" onerror="this.src='https://ui-avatars.com/api/?name=PM&background=4f46e5&color=fff&rounded=true&bold=true'">
+            </a>
+            
+            <ul class="nav-links">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#store">Store</a></li>
+                <li><a href="#offers">Special Offers</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+
+            <a href="login.html" class="btn-3d" id="desktop-login">
+                <ion-icon name="person"></ion-icon> Login
+            </a>
+
+            <div class="mobile-menu-btn" id="menu-btn">
+                <ion-icon name="grid"></ion-icon>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MOBILE SIDEBAR -->
+    <div class="overlay" id="overlay"></div>
+    <div class="sidebar" id="sidebar">
+        <ion-icon name="close" class="close-btn" id="close-btn"></ion-icon>
+        <ul>
+            <li><a href="#home"><ion-icon name="home-outline"></ion-icon> Home</a></li>
+            <li><a href="#store"><ion-icon name="storefront-outline"></ion-icon> PREMium Store</a></li>
+            <li><a href="#offers"><ion-icon name="gift-outline"></ion-icon> Special Deals</a></li>
+            <li><a href="#contact"><ion-icon name="call-outline"></ion-icon> Contact Us</a></li>
+        </ul>
+        <a href="login.html" class="btn-3d"><ion-icon name="log-in"></ion-icon> Login / Sign Up</a>
+    </div>
+
+    <!-- SECTION 1: HERO -->
+    <section class="hero" id="home">
+        <!-- Canvas for Sparkles Effect -->
+        <canvas id="sparkles-canvas"></canvas>
+
+        <div class="container hero-content fade-up">
+            <span class="hero-script">Your Ultimate Learning Partner</span>
+            <h1>Transform Your Future with <span>PREMium Mind</span></h1>
+            <p>Access premium study materials, expert-crafted notes, and career-building resources designed for ambitious students to ace their exams and interviews.</p>
+            
+            <div class="hero-actions">
+                <a href="#store" class="btn-3d">
+                    <ion-icon name="rocket"></ion-icon> Explore Products
+                </a>
+                <a href="#offers" class="btn-outline-3d">
+                    <ion-icon name="gift"></ion-icon> View Deals
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: PREMium STORE -->
+    <section class="courses-section" id="store">
+        <div class="container">
+            <div class="section-header fade-up">
+                <h2>PREMium Store</h2>
+                <p>Top-rated programs and PYQs designed by industry experts.</p>
+            </div>
+
+            <div class="card-container">
+                <!-- Card 1 -->
+                <div class="course-card fade-up">
+                    <span class="new-badge" style="background: var(--text-dark);">Diploma</span>
+                    <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Diploma">
+                    <h2>Diploma VVI Questions</h2>
+                    <p>Complete important question banks and notes tailored specifically for your syllabus to score 90%+.</p>
+                    <div class="price-row">
+                        <div class="price">₹499 <span>₹999</span></div>
+                    </div>
+                    <a href="lecture.html" class="btn-3d" style="width: 100%;"><ion-icon name="cart"></ion-icon> Buy Now</a>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="course-card fade-up" style="transition-delay: 0.1s;">
+                    <span class="new-badge">Bestseller</span>
+                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Web Dev">
+                    <h2>Full Stack MERN Bootcamp</h2>
+                    <p>Master MongoDB, Express, React, and Node.js. Build real-world projects from scratch.</p>
+                    <div class="price-row">
+                        <div class="price">₹2999 <span>₹5999</span></div>
+                    </div>
+                    <a href="lecture.html" class="btn-3d" style="width: 100%;"><ion-icon name="cart"></ion-icon> Enroll Now</a>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="course-card fade-up" style="transition-delay: 0.2s;">
+                    <span class="new-badge" style="background: var(--accent);">Trending</span>
+                    <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Data Science">
+                    <h2>Python & Data Science</h2>
+                    <p>Learn Python, Pandas, Machine Learning algorithms, and data visualization techniques.</p>
+                    <div class="price-row">
+                        <div class="price">₹3499 <span>₹6999</span></div>
+                    </div>
+                    <a href="lecture.html" class="btn-3d" style="width: 100%;"><ion-icon name="cart"></ion-icon> Enroll Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: EVENT/DEALS DETAILS -->
+    <section class="details-section" id="offers">
+        <div class="container details-grid">
+            
+            <div class="details-text fade-up">
+                <h2>Register for <span>Exclusive Deals</span></h2>
+                <p>Register your upcoming special events with us. Whether it’s your birthday or an anniversary, unlock the most luxurious learning combo deals.</p>
+                <ul class="details-list">
+                    <li><ion-icon name="gift-outline"></ion-icon> Receive exclusive VIP discounts</li>
+                    <li><ion-icon name="heart-outline"></ion-icon> Personalized course bundles</li>
+                    <li><ion-icon name="sparkles-outline"></ion-icon> Priority doubt solving access</li>
+                </ul>
+            </div>
+
+            <div class="details-form-box fade-up" style="transition-delay: 0.2s;">
+                <h3>Submit Event Details</h3>
+                <form action="ourdeals.html" method="GET">
+                    <div class="input-group">
+                        <label>Select Your Event</label>
+                        <select name="event_name" required>
+                            <option value="" disabled selected>-- Choose an Event --</option>
+                            <option value="birthday">My Birthday</option>
+                            <option value="anniversary">My Anniversary</option>
+                            <option value="mother_birthday">Mother's Birthday</option>
+                            <option value="daughter_birthday">Daughter's Birthday</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Event Date</label>
+                        <input type="date" name="date" required />
+                    </div>
+                    <button type="submit" class="btn-3d" style="width: 100%;">View My Deals <ion-icon name="arrow-forward"></ion-icon></button>
+                </form>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECTION 4: FOOTER -->
+    <footer class="footer" id="contact">
+        <div class="container footer-grid">
+            
+            <div class="footer-col">
+                <a href="#home" class="footer-logo">
+                    <img src="small-logo.png" alt="PREMium Mind" onerror="this.src='https://ui-avatars.com/api/?name=PM&background=4f46e5&color=fff&rounded=true&bold=true'">
+                </a>
+                <p class="footer-about">Empowering students and freshers with job-ready skills through practical learning and expert-led courses.</p>
+                <div class="social-icons">
+                    <a href="#"><ion-icon name="logo-whatsapp"></ion-icon></a>
+                    <a href="#"><ion-icon name="logo-youtube"></ion-icon></a>
+                    <a href="#"><ion-icon name="logo-instagram"></ion-icon></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#store">PREMium Store</a></li>
+                    <li><a href="lecture.html">My Courses</a></li>
+                    <li><a href="#offers">Special Offers</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="termcondition.html">Terms & Conditions</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <form class="footer-form" onsubmit="event.preventDefault(); alert('Message sent!');">
+                    <h3 style="margin-bottom: 15px;">Contact Support</h3>
+                    <input type="text" placeholder="Full Name" required>
+                    <input type="tel" placeholder="Phone Number" required>
+                    <textarea rows="3" placeholder="Describe your issue..." required></textarea>
+                    <button type="submit" class="btn-3d" style="width: 100%; font-size: 14px;">Send Message</button>
+                </form>
+            </div>
+
+        </div>
+        
+        <div class="footer-bottom container">
+            <p>&copy; 2025 PREMium Mind. Designed for Ambitious Learners.</p>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Mobile Sidebar Logic
+            const menuBtn = document.getElementById('menu-btn');
+            const closeBtn = document.getElementById('close-btn');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+
+            function toggleSidebar() {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            }
+
+            menuBtn.addEventListener('click', toggleSidebar);
+            closeBtn.addEventListener('click', toggleSidebar);
+            overlay.addEventListener('click', toggleSidebar);
+            
+            document.querySelectorAll('.sidebar ul li a').forEach(link => {
+                link.addEventListener('click', toggleSidebar);
+            });
+
+            // Sticky Navbar
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) navbar.classList.add('scrolled');
+                else navbar.classList.remove('scrolled');
+            });
+
+            // Active Link Highlighting
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-links li a');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (scrollY >= (sectionTop - sectionHeight / 3)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            // Scroll Reveal Animations
+            const fadeElements = document.querySelectorAll('.fade-up');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.15 });
+            
+            fadeElements.forEach(el => observer.observe(el));
+
+            // Custom Canvas Particle Sparkles Effect
+            const canvas = document.getElementById('sparkles-canvas');
+            const ctx = canvas.getContext('2d');
+            let particlesArray = [];
+            let w, h;
+
+            function initCanvas() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = document.getElementById('home').offsetHeight;
+                particlesArray = [];
+                const numParticles = w > 768 ? 150 : 60; // Mobile optimization
+                
+                for(let i=0; i < numParticles; i++) {
+                    let size = Math.random() * 2 + 1;
+                    let x = Math.random() * w;
+                    let y = Math.random() * h;
+                    let speedY = (Math.random() * 0.5) - 0.25;
+                    let opacity = Math.random() * 0.5 + 0.1;
+                    particlesArray.push({x, y, size, speedY, opacity});
+                }
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, w, h);
+                ctx.fillStyle = '#4f46e5'; 
+                
+                particlesArray.forEach(p => {
+                    ctx.globalAlpha = p.opacity;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    p.y += p.speedY;
+                    p.x += Math.sin(p.y * 0.01) * 0.5; // Floating effect
+                    
+                    if (p.y > h) p.y = 0;
+                    if (p.y < 0) p.y = h;
+                });
+                
+                requestAnimationFrame(animateParticles);
+            }
+
+            initCanvas();
+            animateParticles();
+
+            window.addEventListener('resize', () => {
+                clearTimeout(window.resizeTimer);
+                window.resizeTimer = setTimeout(initCanvas, 200);
+            });
+        });
+    </script>
+</body>
+</html>
