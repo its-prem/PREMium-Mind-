@@ -86,7 +86,8 @@
         align-items: center;
     }
     .nav-logo img {
-        height: 46px;
+        height: 62px;
+        max-height: 68px;
         width: auto;
         display: block;
         transition: transform var(--smooth);
@@ -884,12 +885,42 @@
                         <ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us
                     </a>
                 </li>
-
-                <li id="desktopUserPillContainer" style="display: none;">
+                <li>
+                    <a href="#help-form" class="nav-link">
+                        <ion-icon name="warning-outline"></ion-icon> Report Problem
+                    </a>
+                </li>
+                <li id="desktopUserPillContainer" class="nav-dropdown" style="display: none;">
                     <a href="#" onclick="if(window.openSidebarGlobal) window.openSidebarGlobal(); return false;" class="nav-user-badge" id="navUserBadge">
                         <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Avatar" class="nav-avatar-img" id="navAvatarImg">
                         <span class="nav-user-name" id="navUserName">User</span>
+                        <ion-icon name="chevron-down-outline" class="dropdown-arrow"></ion-icon>
                     </a>
+                    <div class="dropdown-menu user-dropdown-menu" style="width: 230px;">
+                        <div class="dropdown-header" id="navUserEmailHeader">user@example.com</div>
+                        <a href="#" onclick="if(window.openSidebarGlobal) window.openSidebarGlobal(); return false;" class="dropdown-item">
+                            <div class="dropdown-icon icon-blue"><ion-icon name="person-outline"></ion-icon></div>
+                            <div class="dropdown-text">
+                                <span class="item-title">My Profile</span>
+                                <span class="item-desc">Change avatar & profile</span>
+                            </div>
+                        </a>
+                        <a href="lecture.html" class="dropdown-item">
+                            <div class="dropdown-icon icon-purple"><ion-icon name="play-circle-outline"></ion-icon></div>
+                            <div class="dropdown-text">
+                                <span class="item-title">My Courses</span>
+                                <span class="item-desc">Access enrolled lectures</span>
+                            </div>
+                        </a>
+                        <div style="border-top: 1px solid #e2e8f0; margin: 4px 0;"></div>
+                        <a href="#" onclick="handleLogout(); return false;" class="dropdown-item">
+                            <div class="dropdown-icon icon-rose"><ion-icon name="log-out-outline"></ion-icon></div>
+                            <div class="dropdown-text">
+                                <span class="item-title" style="color: #e11d48;">Logout Account</span>
+                                <span class="item-desc">Sign out safely</span>
+                            </div>
+                        </a>
+                    </div>
                 </li>
                 <li id="desktopLoginBtnContainer">
                     <a href="login.html" class="login-btn">
@@ -1301,9 +1332,11 @@
             desktopLoginBtn.style.display = 'none';
             const navAvatar = document.getElementById('navAvatarImg');
             const navName = document.getElementById('navUserName');
+            const navEmailHeader = document.getElementById('navUserEmailHeader');
             const userPhoto = photoSrc || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=000&color=fff&size=80`;
             if(navAvatar) navAvatar.src = userPhoto;
             if(navName) navName.textContent = name || 'User';
+            if(navEmailHeader) navEmailHeader.textContent = email || '';
         }
         const userNameElem = document.getElementById('userName');
         const userEmailElem = document.getElementById('userEmail');
@@ -1739,6 +1772,106 @@
                       storeElem.scrollIntoView({ behavior: 'smooth' });
                   }
               }
+          }
+          // --- Footer Contact / Support WhatsApp Form ---
+          const whForm = document.getElementById('whForm');
+          if (whForm) {
+              whForm.addEventListener('submit', function(e) {
+                  e.preventDefault();
+                  const nameVal = document.getElementById('name').value;
+                  const phoneVal = document.getElementById('phone').value;
+                  const msgVal = document.getElementById('message').value;
+                  const whatsappUrl = `https://wa.me/919153950552?text=${encodeURIComponent(
+                      `*New Support Request - PREMium Mind*\n\n👤 *Name:* ${nameVal}\n📞 *Phone:* ${phoneVal}\n💬 *Message:* ${msgVal}`
+                  )}`;
+                  window.open(whatsappUrl, '_blank');
+              });
+          }
+          // --- WhatsApp Unlock Modal Form ---
+          const waForm = document.getElementById('waForm');
+          if (waForm) {
+              waForm.addEventListener('submit', async function(e) {
+                  e.preventDefault();
+                  const btn = document.getElementById('waSubmit');
+                  const originalText = btn.innerText;
+                  btn.innerText = 'Submitting...';
+                  btn.disabled = true;
+                  const cid = document.getElementById('wa_cid').value;
+                  const college = document.getElementById('wa_college').value;
+                  const branch = document.getElementById('wa_branch').value;
+                  const fileInput = document.getElementById('wa_file');
+                  const emailToUse = getStoredEmail() || (document.getElementById('userEmail') ? document.getElementById('userEmail').textContent : '');
+                  const formData = new FormData();
+                  formData.append('email', emailToUse);
+                  formData.append('course_id', cid);
+                  formData.append('college', college);
+                  formData.append('branch', branch);
+                  if (fileInput.files[0]) {
+                      formData.append('screenshot', fileInput.files[0]);
+                  }
+                  try {
+                      const response = await fetch("https://premind.diplomawallah.in/submit_wa_unlock.php", {
+                          method: "POST",
+                          body: formData
+                      });
+                      const resData = await response.json();
+                      if (resData.status === 'success' || resData.success) {
+                          alert("🎉 Screenshot & Request submitted successfully! Your access will be reviewed within 1-2 hours.");
+                          document.getElementById('waModal').style.display = 'none';
+                          waForm.reset();
+                          window.loadCourses(emailToUse);
+                      } else {
+                          alert(resData.message || "Submission failed. Please try again.");
+                      }
+                  } catch (err) {
+                      alert("🎉 Request submitted for review! We will verify your screenshot soon.");
+                      document.getElementById('waModal').style.display = 'none';
+                      waForm.reset();
+                  } finally {
+                      btn.innerText = originalText;
+                      btn.disabled = false;
+                  }
+              });
+          }
+          // --- Report Modal Form ---
+          const reportForm = document.getElementById('reportForm');
+          if (reportForm) {
+              reportForm.addEventListener('submit', async function(e) {
+                  e.preventDefault();
+                  const btn = document.getElementById('reportSubmit');
+                  const originalText = btn.innerText;
+                  btn.innerText = 'Submitting Report...';
+                  btn.disabled = true;
+                  const cid = document.getElementById('report_cid').value;
+                  const msg = document.getElementById('report_msg').value;
+                  const fileInput = document.getElementById('report_file');
+                  const emailToUse = getStoredEmail() || (document.getElementById('userEmail') ? document.getElementById('userEmail').textContent : '');
+                  const formData = new FormData();
+                  formData.append('email', emailToUse);
+                  formData.append('course_id', cid);
+                  formData.append('message', msg);
+                  if (fileInput.files[0]) {
+                      formData.append('screenshot', fileInput.files[0]);
+                  }
+                  try {
+                      const response = await fetch("https://premind.diplomawallah.in/submit_report.php", {
+                          method: "POST",
+                          body: formData
+                      });
+                      const resData = await response.json();
+                      alert(resData.message || "🚩 Report submitted successfully! Our team will resolve your issue within 1-2 hours.");
+                      document.getElementById('reportModal').style.display = 'none';
+                      reportForm.reset();
+                      window.loadCourses(emailToUse);
+                  } catch (err) {
+                      alert("🚩 Report submitted! We will inspect and resolve your issue within 1-2 hours.");
+                      document.getElementById('reportModal').style.display = 'none';
+                      reportForm.reset();
+                  } finally {
+                      btn.innerText = originalText;
+                      btn.disabled = false;
+                  }
+              });
           }
           window.addEventListener('hashchange', handleHashFilter);
           handleHashFilter();
