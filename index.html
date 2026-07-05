@@ -2,1750 +2,1505 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PREMium Mind - Your Learning Partner</title>
-  
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="small-logo.png">
   
-  <!-- Google Fonts -->
+  <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bree+Serif&family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Kalam:wght@300;400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
-  <!-- Ionicons -->
-  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-  <!-- Cashfree Payment SDK -->
-  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
   <style>
-    /* ==========================================================================
-       1. CSS VARIABLES & BASE STYLES
-       ========================================================================== */
-    :root {
-        --black: #09090b; 
-        --black-muted: #27272a;
-        --gray-dark: #475569; 
-        --gray-light: #e2e8f0;
-        --gray-soft: #f8fafc;
-        --white: #ffffff; 
-        --primary: #2563eb;
-        --primary-hover: #1d4ed8;
-        --primary-light: #eff6ff;
-        
-        --success: #10b981;
-        --warning: #f59e0b;
-        --danger: #ef4444;
-        --glass-bg: rgba(255, 255, 255, 0.85);
-        --glass-blur: blur(16px);
-        
-        --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 10px 25px -3px rgba(0, 0, 0, 0.08);
-        --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        
-        --smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    @media screen and (max-width: 600px) {
+      .card-container {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+      }
+      .course-card {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+      }
+      .navbar {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+      }
+      .footer-container {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+      }
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { 
-        font-family: 'Plus Jakarta Sans', 'Poppins', sans-serif; 
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); 
-        color: var(--black); 
-        -webkit-font-smoothing: antialiased; 
-        overflow-x: hidden; 
+
+    html {
+      scroll-behavior: smooth;
     }
-    .fade-in { animation: fadeIn 0.8s var(--smooth) forwards; }
-    @keyframes fadeIn { 
-        from { opacity: 0; transform: translateY(20px); } 
-        to { opacity: 1; transform: translateY(0); } 
-    }
-    /* ==========================================================================
-       2. ENHANCED NAVBAR & DROPDOWN MENU
-       ========================================================================== */
-    .navbar {
-        position: fixed;
-        top: 0; left: 0; width: 100%;
-        background: var(--glass-bg);
-        backdrop-filter: var(--glass-blur);
-        -webkit-backdrop-filter: var(--glass-blur);
-        border-bottom: 1px solid rgba(226, 232, 240, 0.7);
-        z-index: 1000;
-        padding: 14px 0;
-        transition: var(--smooth);
-    }
-    .navbar.scrolled {
-        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
-        padding: 10px 0;
-        background: rgba(255, 255, 255, 0.96);
-    }
-    .nav-container {
-        max-width: 1240px;
-        margin: 0 auto;
-        padding: 0 24px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .nav-logo img {
-        height: 46px;
-        width: auto;
-        display: block;
-        transition: transform var(--smooth);
-    }
-    .nav-logo:hover img { transform: scale(1.04); }
-    .nav-menu {
-        display: flex;
-        gap: 10px;
-        list-style: none;
-        align-items: center;
-    }
-    .nav-link {
-        text-decoration: none;
-        color: #475569;
-        font-weight: 700;
-        font-size: 14.5px;
-        padding: 9px 18px;
-        border-radius: 50px;
-        transition: var(--smooth);
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        position: relative;
-    }
-    .nav-link ion-icon {
-        font-size: 18px;
-        color: #64748b;
-        transition: var(--smooth);
-    }
-    .nav-link:hover, .nav-link.active {
-        color: var(--primary);
-        background: rgba(37, 99, 235, 0.08);
-    }
-    .nav-link:hover ion-icon, .nav-link.active ion-icon {
-        color: var(--primary);
-        transform: translateY(-1px);
-    }
-    /* --- PREMium Store Dropdown --- */
-    .nav-dropdown {
-        position: relative;
-    }
-    .dropdown-arrow {
-        font-size: 14px !important;
-        margin-left: 2px;
-        transition: transform var(--smooth) !important;
-    }
-    .nav-dropdown:hover .dropdown-arrow,
-    .nav-dropdown.active .dropdown-arrow {
-        transform: rotate(180deg);
-    }
-    .dropdown-menu {
-        position: absolute;
-        top: calc(100% + 12px);
-        left: 50%;
-        transform: translateX(-50%) translateY(12px) scale(0.95);
-        width: 290px;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(226, 232, 240, 0.8);
-        border-radius: 20px;
-        padding: 12px;
-        box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.15);
-        opacity: 0;
-        pointer-events: none;
-        transition: var(--smooth);
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        z-index: 1100;
-    }
-    .dropdown-menu::before {
-        content: '';
-        position: absolute;
-        top: -6px; left: 50%;
-        transform: translateX(-50%) rotate(45deg);
-        width: 12px; height: 12px;
-        background: #ffffff;
-        border-left: 1px solid rgba(226, 232, 240, 0.8);
-        border-top: 1px solid rgba(226, 232, 240, 0.8);
-    }
-    .nav-dropdown:hover .dropdown-menu,
-    .nav-dropdown:focus-within .dropdown-menu {
-        opacity: 1;
-        pointer-events: auto;
-        transform: translateX(-50%) translateY(0) scale(1);
-    }
-    .dropdown-header {
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        color: #94a3b8;
-        padding: 8px 12px 4px;
-    }
-    .dropdown-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 10px 12px;
-        border-radius: 14px;
-        text-decoration: none;
-        transition: var(--smooth);
-        position: relative;
-    }
-    .dropdown-item:hover {
-        background: #f1f5f9;
-        transform: translateX(4px);
-    }
-    .dropdown-icon {
-        width: 38px;
-        height: 38px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 19px;
-        flex-shrink: 0;
-        transition: var(--smooth);
-    }
-    .icon-blue { background: #eff6ff; color: #2563eb; }
-    .icon-purple { background: #faf5ff; color: #9333ea; }
-    .icon-green { background: #ecfdf5; color: #10b981; }
-    .icon-amber { background: #fffbeb; color: #f59e0b; }
-    .icon-rose { background: #fff1f2; color: #f43f5e; }
-    .dropdown-item:hover .dropdown-icon { transform: scale(1.08); }
-    .dropdown-text { display: flex; flex-direction: column; flex: 1; }
-    .item-title { font-size: 14px; font-weight: 700; color: var(--black); line-height: 1.2; }
-    .item-desc { font-size: 11.5px; color: #64748b; font-weight: 500; margin-top: 2px; }
-    .dropdown-badge {
-        background: #f43f5e; color: var(--white); font-size: 10px;
-        font-weight: 800; padding: 3px 8px; border-radius: 50px; text-transform: uppercase;
-    }
-    .login-btn {
-        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        color: var(--white) !important;
-        padding: 10px 22px;
-        border-radius: 50px;
-        font-weight: 800 !important;
-        font-size: 13.5px;
-        letter-spacing: 0.3px;
-        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
-        transition: var(--smooth);
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.25);
-    }
-    .login-btn ion-icon { color: var(--white) !important; font-size: 18px; }
-    .login-btn:hover {
-        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
-        transform: translateY(-2px);
-    }
-    /* Desktop User Profile Badge */
-    .nav-user-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        background: var(--white);
-        border: 1px solid var(--gray-light);
-        padding: 5px 16px 5px 6px;
-        border-radius: 50px;
-        box-shadow: var(--shadow-sm);
-        cursor: pointer;
-        transition: var(--smooth);
-        text-decoration: none;
-    }
-    .nav-user-badge:hover {
-        border-color: var(--primary);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.2);
-    }
-    .nav-avatar-img {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid var(--primary);
-    }
-    .nav-user-name {
-        font-size: 13.5px;
-        font-weight: 700;
-        color: var(--black);
-        max-width: 110px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .mobile-menu-btn {
-        display: none;
-        background: var(--white);
-        border: 1px solid var(--gray-light);
-        width: 44px; height: 44px;
-        border-radius: 14px;
-        cursor: pointer;
-        align-items: center;
-        justify-content: center;
-        box-shadow: var(--shadow-sm);
-        transition: var(--smooth);
-    }
-    .mobile-menu-btn ion-icon { font-size: 26px; color: var(--black); }
-    .mobile-menu-btn:hover { background: var(--gray-soft); border-color: var(--primary); transform: scale(1.05); }
-    /* ==========================================================================
-       3. ANIMATED MOBILE SIDEBAR MENU & USER PROFILE
-       ========================================================================== */
-    .overlay {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(15, 23, 42, 0.6);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        z-index: 1500;
-        opacity: 0;
-        pointer-events: none;
-        transition: var(--smooth);
-    }
-    .overlay.active { opacity: 1; pointer-events: auto; }
-    .sidebar {
-        position: fixed;
-        top: 0; right: -100%;
-        width: 320px; max-width: 88vw;
-        height: 100vh;
-        background: var(--white);
-        box-shadow: -15px 0 40px rgba(0, 0, 0, 0.15);
-        z-index: 2000;
-        transition: right 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        display: flex;
-        flex-direction: column;
-        padding: 24px;
-        overflow-y: auto;
-    }
-    .sidebar.active { right: 0; }
-    .sidebar-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 14px;
-        border-bottom: 1px solid var(--gray-light);
-    }
-    .sidebar-logo { height: 40px; width: auto; }
-    .close-sidebar {
-        background: var(--gray-soft);
-        border: 1px solid var(--gray-light);
-        width: 38px; height: 38px;
-        border-radius: 12px;
-        font-size: 22px;
-        color: var(--gray-dark);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: var(--smooth);
-    }
-    .close-sidebar:hover { background: #fee2e2; color: var(--danger); border-color: #fca5a5; transform: rotate(90deg); }
-    /* Concise & Elegant User Profile Card */
-    .user-profile-compact {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 12px 14px;
-        border: 1px solid #cbd5e1;
-        margin-bottom: 16px;
-        background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-        border-radius: 16px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-        position: relative;
-    }
-    .profile-photo-container {
-        position: relative;
-        width: 50px;
-        height: 50px;
-        flex-shrink: 0;
-    }
-    .profile-photo {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2.5px solid var(--primary);
-        cursor: pointer;
-        transition: var(--smooth);
-        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
-    }
-    .profile-photo:hover { transform: scale(1.05); }
-    .change-photo-btn {
-        position: absolute;
-        bottom: -2px; right: -2px;
-        background: var(--black);
-        color: #fff;
-        border: 1.5px solid #fff;
-        border-radius: 50%;
-        width: 22px; height: 22px;
-        cursor: pointer;
-        font-size: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-    .profile-info {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        overflow: hidden;
-        flex: 1;
-    }
-    .user-name {
-        font-size: 14.5px;
-        font-weight: 800;
-        color: var(--black);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-height: 1.2;
-    }
-    .user-email-chip {
-        font-size: 11.5px;
-        color: var(--gray-dark);
-        font-weight: 600;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin-top: 3px;
-        background: #e2e8f0;
-        padding: 2px 8px;
-        border-radius: 6px;
-        max-width: fit-content;
-    }
-    
-    .sidebar-footer {
-        margin-top: auto;
-        padding-top: 16px;
-        border-top: 1px solid var(--gray-light);
-        width: 100%;
-    }
-    .logout-btn-sidebar {
-        width: 100%;
-        padding: 12px 16px;
-        background: #fff1f2;
-        color: #e11d48;
-        border: 1.5px solid #fecdd3;
-        border-radius: 12px;
-        font-weight: 800;
-        font-size: 14px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        transition: var(--smooth);
-    }
-    .logout-btn-sidebar ion-icon { font-size: 18px; }
-    .logout-btn-sidebar:hover {
-        background: #ffe4e6;
-        border-color: #fda4af;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(225, 29, 72, 0.15);
-    }
-    .login-prompt {
-        text-align: center; padding: 18px 14px;
-        background: var(--gray-soft); border-radius: 16px;
-        border: 1px solid var(--gray-light); margin-bottom: 20px;
-    }
-    .login-prompt h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 6px; }
-    .login-prompt p { font-size: 0.85rem; color: var(--gray-dark); margin-bottom: 12px; }
-    .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-    .sidebar-item { opacity: 0; transform: translateX(30px); transition: opacity 0.4s ease, transform 0.4s ease; }
-    .sidebar.active .sidebar-item { opacity: 1; transform: translateX(0); transition-delay: var(--delay, 0s); }
-    .sidebar-link {
-        text-decoration: none; color: var(--black); font-size: 15px; font-weight: 700;
-        display: flex; align-items: center; gap: 12px; padding: 11px 14px;
-        border-radius: 12px; transition: var(--smooth);
-    }
-    .sidebar-link ion-icon { font-size: 20px; color: var(--primary); }
-    .sidebar-link:hover, .sidebar-link.active { background: var(--primary-light); color: var(--primary); padding-left: 18px; }
-    /* Mobile Submenu Accordion */
-    .sidebar-dropdown-toggle {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 11px 14px; border-radius: 12px; font-size: 15px; font-weight: 700;
-        color: var(--black); cursor: pointer; transition: var(--smooth);
-    }
-    .sidebar-dropdown-toggle:hover { background: var(--gray-soft); color: var(--primary); }
-    .sidebar-link-content { display: flex; align-items: center; gap: 12px; }
-    .sidebar-link-content ion-icon { font-size: 20px; color: var(--primary); }
-    .mobile-dropdown-arrow { font-size: 18px; color: #94a3b8; transition: transform 0.3s ease; }
-    .sidebar-dropdown.open .mobile-dropdown-arrow { transform: rotate(180deg); color: var(--primary); }
-    .sidebar-submenu {
-        max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        display: flex; flex-direction: column; gap: 4px; padding-left: 16px; margin-top: 4px;
-    }
-    .sidebar-dropdown.open .sidebar-submenu { max-height: 320px; }
-    .sidebar-sublink {
-        text-decoration: none; color: #475569; font-size: 13.5px; font-weight: 600;
-        padding: 9px 12px; border-radius: 10px; display: flex; align-items: center;
-        gap: 10px; transition: var(--smooth);
-    }
-    .sidebar-sublink ion-icon { font-size: 17px; color: var(--primary); }
-    .sidebar-sublink:hover { background: #f1f5f9; color: var(--primary); padding-left: 16px; }
-    /* ==========================================================================
-       4. ANIMATED HERO SECTION
-       ========================================================================== */
+
+    /* Hero Section */
     .hero-section {
-        padding: 160px 20px 90px;
-        max-width: 900px;
-        margin: 0 auto;
-        text-align: center;
+      background: linear-gradient(135deg, #000000 0%, #434343 100%);
+      color: white;
+      padding: 80px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
     }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
     .hero-badge {
-        font-size: 13px; color: var(--primary); font-weight: 700;
-        background: #eff6ff; display: inline-flex; align-items: center; gap: 6px;
-        padding: 8px 20px; border-radius: 50px; border: 1px solid #bfdbfe; margin-bottom: 24px;
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 8px 20px;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
-    .animated-hero-title {
-        font-size: 48px; line-height: 1.35; margin-bottom: 24px;
-        display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 14px;
-        cursor: pointer;
+
+    .hero-section h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      line-height: 1.2;
     }
-    .animated-word {
-        display: inline-block; opacity: 0; transform: translateY(35px) scale(0.85); filter: blur(8px);
-        animation: wordPopIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; transition: transform 0.3s ease;
+
+    .hero-section p {
+      font-size: 1.3rem;
+      margin-bottom: 35px;
+      opacity: 0.95;
+      line-height: 1.6;
     }
-    .animated-word:hover { transform: translateY(-4px) scale(1.06) !important; }
-    .animated-word.word-1 { animation-delay: 0.15s; }
-    .animated-word.word-2 { animation-delay: 0.45s; }
-    .animated-word.word-3 { animation-delay: 0.75s; }
-    .animated-word.word-4 { animation-delay: 1.05s; }
-    .animated-word.word-5 { animation-delay: 1.40s; }
-    .animated-word.word-6 { animation-delay: 1.65s; }
-    .animated-word.word-7 { animation-delay: 1.95s; }
-    @keyframes wordPopIn { to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
-    .font-kalam {
-        font-family: 'Kalam', cursive; color: var(--primary); font-weight: 700;
-        background: rgba(37, 99, 235, 0.08); padding: 2px 16px; border-radius: 14px;
-        border: 2px dashed rgba(37, 99, 235, 0.35); transform: rotate(-3deg);
+
+    .cta-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
     }
-    .font-serif { font-family: 'Crimson Pro', 'EB Garamond', serif; font-style: italic; font-weight: 600; color: #334155; font-size: 44px; }
-    .accent-fails { font-family: 'EB Garamond', serif; font-weight: 800; color: #dc2626; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .font-archivo { font-family: 'Archivo Black', sans-serif; letter-spacing: -1px; font-size: 50px; }
-    .brand-gradient { background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .works-badge {
-        color: var(--white); background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        padding: 4px 22px; border-radius: 16px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
-        animation: wordPopIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 1.95s forwards, pulseWorks 2.5s infinite 2.6s ease-in-out;
+
+    .cta-btn {
+      padding: 15px 35px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
     }
-    @keyframes pulseWorks { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
-    .hero-break { flex-basis: 100%; height: 0; }
-    .hero-section p { font-size: 18px; color: var(--gray-dark); margin-bottom: 35px; font-weight: 500; line-height: 1.7; }
-    .cta-group { display: flex; gap: 16px; justify-content: center; }
-    .btn-primary {
-        background: var(--primary); color: var(--white); padding: 16px 36px; border-radius: 50px;
-        text-decoration: none; font-weight: 700; font-size: 16px; transition: var(--smooth);
-        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25); display: inline-flex; align-items: center; gap: 8px;
+
+    .cta-primary {
+      background: white;
+      color: #000;
     }
-    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-4px); box-shadow: 0 12px 25px rgba(37, 99, 235, 0.35); }
-    .btn-secondary {
-        background: var(--white); color: var(--black); padding: 16px 36px; border-radius: 50px;
-        text-decoration: none; font-weight: 700; font-size: 16px; border: 1px solid var(--gray-light);
-        transition: var(--smooth); box-shadow: var(--shadow-sm);
+
+    .cta-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
     }
-    .btn-secondary:hover { background: var(--gray-soft); border-color: var(--black); transform: translateY(-4px); }
-    /* ==========================================================================
-       5. PREMIUM STORE GRID & HORIZONTAL CATEGORY SCROLL
-       ========================================================================== */
-    .store-section { max-width: 1240px; margin: 0 auto; padding: 40px 20px 100px; scroll-margin-top: 90px; }
-    .section-header { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 25px; }
-    .section-title { font-size: 34px; font-weight: 800; letter-spacing: -1px; color: var(--black); }
-    .section-subtitle { color: var(--gray-dark); font-weight: 500; margin-top: 6px; }
-    /* Horizontal Scrollable Category Filter Tabs */
-    .store-categories-wrapper {
-        width: 100%; overflow-x: auto; overflow-y: hidden; padding: 8px 4px 14px 4px;
-        margin-top: 20px; margin-bottom: 5px; scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: rgba(37, 99, 235, 0.4) transparent;
+
+    .cta-secondary {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
     }
-    .store-categories-wrapper::-webkit-scrollbar { height: 6px; }
-    .store-categories-wrapper::-webkit-scrollbar-track { background: rgba(226, 232, 240, 0.6); border-radius: 10px; }
-    .store-categories-wrapper::-webkit-scrollbar-thumb { background: rgba(37, 99, 235, 0.35); border-radius: 10px; }
-    .store-categories-wrapper::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-    .store-categories-tabs { display: flex; gap: 12px; flex-wrap: nowrap; width: max-content; }
-    .category-tab {
-        white-space: nowrap; flex-shrink: 0; background: var(--white); border: 1px solid var(--gray-light);
-        color: var(--gray-dark); padding: 11px 24px; border-radius: 50px; font-weight: 700; font-size: 14px;
-        cursor: pointer; transition: var(--smooth); display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm);
+
+    .cta-secondary:hover {
+      background: white;
+      color: #000;
     }
-    .category-tab ion-icon { font-size: 16px; color: #94a3b8; }
-    .category-tab:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
-    .category-tab.active { background: var(--primary); color: var(--white); border-color: var(--primary); box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3); }
-    .category-tab.active ion-icon { color: var(--white); }
-    .courses-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
-        gap: 24px;
-        margin-top: 10px;
+
+    /* Stats Section */
+    .stats-section {
+      background: #f9f9f9;
+      padding: 60px 20px;
     }
+
+    .stats-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 35px 25px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #000;
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      color: #666;
+      font-weight: 500;
+    }
+
+    /* Features Section */
+    .features-section {
+      padding: 80px 20px;
+      background: white;
+    }
+
+    .features-header {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 60px;
+    }
+
+    .features-header h2 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #000000 0%, #434343 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .features-header p {
+      font-size: 1.2rem;
+      color: #666;
+    }
+
+    .features-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 35px;
+    }
+
+    .feature-card {
+      padding: 35px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+      border: 2px solid #f0f0f0;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      border-color: #000;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-icon {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .feature-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .feature-card p {
+      color: #666;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    /* User Profile in Sidebar */
+    .user-profile {
+      text-align: center;
+      padding: 20px 15px;
+      border-bottom: 2px solid rgba(0,0,0,0.08);
+      margin: 0 15px 20px 15px;
+      background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .profile-photo-container {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 15px;
+    }
+
+    .profile-photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #000;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    .profile-photo:hover {
+      transform: scale(1.08);
+      border-color: #333;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    }
+
+    .change-photo-btn {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      background: linear-gradient(135deg, #000 0%, #333 100%);
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+
+    .change-photo-btn:hover {
+      background: linear-gradient(135deg, #333 0%, #000 100%);
+      transform: scale(1.15) rotate(15deg);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .user-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #000;
+      margin-bottom: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    .user-email {
+      font-size: 0.85rem;
+      color: #666;
+      word-break: break-all;
+      background: rgba(0,0,0,0.03);
+      padding: 5px 10px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .logout-btn-sidebar {
+      width: 90%;
+      margin: 15px auto 10px;
+      padding: 11px;
+      background: linear-gradient(135deg, #000 0%, #333 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      letter-spacing: 0.5px;
+    }
+
+    .logout-btn-sidebar:hover {
+      background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255,68,68,0.4);
+    }
+
+    .logout-btn-sidebar:active {
+      transform: translateY(0);
+    }
+
+    .login-prompt {
+      text-align: center;
+      padding: 25px 20px;
+      background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+      margin: 0 15px 20px 15px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .login-prompt h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #000 0%, #333 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 800;
+    }
+
+    .login-prompt p {
+      margin: 10px 0;
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .login-btn {
+      background: linear-gradient(135deg, #000 0%, #333 100%);
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 15px;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      letter-spacing: 0.5px;
+    }
+
+    .login-btn:hover {
+      background: linear-gradient(135deg, #333 0%, #000 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    #photo-input {
+      display: none;
+    }
+
+    .protected-route {
+      position: relative;
+    }
+
+    .protected-route.locked::after {
+      content: '🔒';
+      margin-left: 5px;
+    }
+
+    /* Course Enrollment Badge */
+    .enrolled-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    .enroll-btn {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 10px;
+      transition: all 0.3s;
+    }
+
+    .enroll-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .buy-course-btn {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 10px;
+      transition: all 0.3s;
+    }
+
+    .buy-course-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+    }
+
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
     .course-card {
-        background: var(--white);
-        border-radius: 20px;
-        padding: 16px;
-        border: 1px solid var(--gray-light);
-        box-shadow: var(--shadow-sm);
-        transition: var(--smooth);
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        height: 100%;
+      position: relative;
+      width: 280px;
+      border-radius: 12px;
+      padding: 15px;
+      background: #fff;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
     }
-    .course-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: #cbd5e1; }
-    
-    .card-img-wrapper {
-        width: 100%;
-        height: 220px;
-        border-radius: 14px;
-        overflow: hidden;
-        margin-bottom: 12px;
-        position: relative;
-        flex-shrink: 0;
+
+    .course-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
-    .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-    .course-card:hover .card-img-wrapper img { transform: scale(1.06); }
-    .card-report-slot {
-        min-height: 28px;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        margin-bottom: 6px;
+
+    .course-card img {
+      width: 100%;
+      border-radius: 8px;
     }
-    .course-badge {
-        position: absolute; top: 12px; right: 12px; background: var(--warning); color: var(--white);
-        padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 800; text-transform: uppercase; z-index: 5;
+
+    .course-card h2 {
+      font-size: 18px;
+      margin: 10px 0;
     }
-    /* Angled Ribbon Corner Badge */
-    .new-badge {
-        position: absolute; top: 14px; right: -32px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: #fff; font-size: 10.5px; font-weight: 800; padding: 5px 35px; transform: rotate(45deg);
-        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.35); letter-spacing: 0.5px; text-transform: uppercase; z-index: 10;
+
+    .price {
+      font-size: 18px;
+      font-weight: bold;
     }
-    /* Mini Timer Offer Box */
-    .mini-timer {
-        font-size: 12px; font-weight: 700; color: #dc2626; margin: 4px 0 12px 0; text-align: center;
-        background: #fef2f2; border: 1.5px dashed #fca5a5; padding: 6px 12px; border-radius: 10px;
-        display: flex; align-items: center; justify-content: center; gap: 6px;
+
+    .price span {
+      color: #888;
+      text-decoration: line-through;
+      font-size: 14px;
+      margin-left: 6px;
     }
-    .mini-timer span { background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 6px; font-weight: 800; }
-    /* Disabled Closed Button */
+
     .disabled-btn {
-        width: 100%; padding: 12px; background: #f59e0b; border: none; border-radius: 12px;
-        color: #fff; font-size: 15px; font-weight: 700; cursor: not-allowed; text-align: center;
-        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+      width: 100%;
+      padding: 10px;
+      background: #ff9800;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
     }
-    .course-card h3 {
-        font-size: 16px;
-        font-weight: 800;
-        color: var(--black);
-        line-height: 1.35;
-        min-height: 44px;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        margin-bottom: 8px;
+
+    .new-badge {
+      position: absolute;
+      top: 12px;
+      right: -35px;
+      background: red;
+      color: #fff;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 6px 40px;
+      transform: rotate(45deg);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
     }
-    .card-desc-container {
-        min-height: 44px;
-        margin-bottom: 10px;
+
+    .course-section h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #000000 0%, #434343 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 40px 0 30px 0;
+      padding: 0 20px;
+      letter-spacing: 1px;
+      position: relative;
     }
-    .card-desc {
-        font-size: 12.5px;
-        color: var(--gray-dark);
-        line-height: 1.5;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+
+    .course-section h1::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, #000000, #666666);
+      border-radius: 2px;
     }
-    .card-desc.desc-sub { font-size: 11.5px; color: #64748b; margin-top: 2px; }
-    .course-meta {
-        margin-top: auto;
-        padding-top: 12px;
-        padding-bottom: 14px;
-        border-top: 1px dashed var(--gray-light);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+
+    .mini-timer {
+      font-size: 12px;
+      font-weight: 700;
+      color: #d32f2f;
+      margin: 4px 0;
+      text-align: center;
     }
-    .price { font-size: 22px; font-weight: 800; color: var(--black); }
-    .old-price { font-size: 13px; color: var(--gray-dark); text-decoration: line-through; font-weight: 600; margin-left: 5px; }
-    .rating { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: var(--black-muted); }
-    .rating ion-icon { color: var(--warning); font-size: 15px; }
-    .card-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 4px; }
-    /* Action Buttons */
+
+    .mini-timer span {
+      background: #fdecea;
+      color: #b71c1c;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    @media screen and (max-width: 768px) {
+      .hero-section h1 {
+        font-size: 2.2rem;
+      }
+      .hero-section p {
+        font-size: 1.1rem;
+      }
+      .cta-buttons {
+        flex-direction: column;
+      }
+      .cta-btn {
+        width: 100%;
+      }
+    }
+
+    /* --- 💥 NEW WHATSAPP MODAL & BUTTON STYLES 💥 --- */
     .wa-unlock-btn {
         width: 100%; background: #f0fdf4; color: #15803d; border: 1.5px dashed #22c55e;
-        padding: 12px; border-radius: 12px; font-weight: 700; font-size: 0.9rem;
-        cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: var(--smooth);
+        padding: 10px; border-radius: 8px; font-weight: 700; font-size: 0.85rem;
+        cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
+        transition: 0.3s; margin-bottom: 10px;
     }
     .wa-unlock-btn:hover { background: #dcfce7; transform: translateY(-2px); }
-    .buy-course-btn {
-        width: 100%; background: var(--black); color: var(--white); border: none;
-        padding: 13px; border-radius: 12px; font-weight: 700; font-size: 14px;
-        cursor: pointer; transition: var(--smooth); display: flex; align-items: center; justify-content: center; gap: 8px;
+
+    .btn-reviewing {
+        width: 100%; background: #94a3b8 !important; color: white !important; 
+        border: none !important; padding: 12px; border-radius: 8px; cursor: not-allowed !important;
+        font-weight: bold; margin-bottom: 10px;
     }
-    .buy-course-btn:hover { background: var(--primary); box-shadow: 0 8px 20px rgba(37,99,235,0.3); transform: translateY(-2px); }
-    .btn-reviewing { width: 100%; background: #94a3b8 !important; color: white !important; border: none !important; padding: 12px; border-radius: 12px; font-weight: bold; cursor: not-allowed; text-align: center; }
-    .report-btn {
-        background: #fff1f2 !important; color: #e11d48 !important;
-        border: 1.5px dashed #f43f5e !important; padding: 5px 12px !important; border-radius: 8px !important;
-        font-weight: 700 !important; font-size: 0.75rem !important; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+
+    /* --- 🚩 REPORT BUTTON & SOLVING STATES 🚩 --- */
+    .course-card .report-btn {
+        width: max-content !important; 
+        align-self: flex-end !important; 
+        margin: 0 0 10px auto !important; 
+        background: #fff1f2 !important; 
+        color: #e11d48 !important; 
+        border: 1.5px dashed #f43f5e !important;
+        padding: 6px 14px !important; 
+        border-radius: 8px !important; 
+        font-weight: 700 !important; 
+        font-size: 0.75rem !important;
+        cursor: pointer !important; 
+        display: inline-flex !important; 
+        align-items: center !important; 
+        justify-content: center !important; 
+        gap: 4px !important;
+        transition: 0.3s !important;
     }
-    .report-btn:hover { background: #ffe4e6 !important; transform: translateY(-2px); }
-    .btn-solving { background: #fef08a !important; color: #854d0e !important; border: 1.5px dashed #eab308 !important; padding: 5px 12px !important; border-radius: 8px !important; font-weight: bold; font-size: 0.75rem; margin-bottom: 8px; }
-    .empty-category-state {
-        grid-column: 1 / -1; background: var(--white); border: 2px dashed var(--gray-light);
-        border-radius: 24px; padding: 60px 20px; text-align: center; display: flex;
-        flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    .course-card .report-btn:hover { 
+        background: #ffe4e6 !important; 
+        transform: translateY(-2px) !important; 
     }
-    .empty-icon-box { width: 70px; height: 70px; border-radius: 20px; background: #eff6ff; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 32px; }
-    .empty-category-state h3 { font-size: 22px; font-weight: 800; }
-    .empty-category-state p { color: var(--gray-dark); font-size: 15px; max-width: 450px; }
-    .empty-action-btn { background: var(--black); color: var(--white); border: none; padding: 12px 28px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: var(--smooth); }
-    .empty-action-btn:hover { background: var(--primary); transform: translateY(-2px); }
-    /* ==========================================================================
-       6. MODALS SYSTEM
-       ========================================================================== */
+    
+    .course-card .btn-solving {
+        width: max-content !important; 
+        align-self: flex-end !important; 
+        margin: 0 0 10px auto !important; 
+        background: #fef08a !important; 
+        color: #854d0e !important;
+        border: 1.5px dashed #eab308 !important; 
+        padding: 6px 14px !important; 
+        border-radius: 8px !important; 
+        cursor: not-allowed !important; 
+        font-weight: bold !important; 
+        font-size: 0.75rem !important; 
+        display: inline-flex !important;
+    }
+
+    /* MODAL BASE */
     .wa-modal {
-        display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75);
-        z-index: 10001; align-items: center; justify-content: center; padding: 20px;
-        backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); 
+        z-index: 10001; align-items:center; justify-content:center; padding:15px;
+        backdrop-filter: blur(5px);
     }
-    .wa-content {
-        background: white; width: 100%; max-width: 440px; padding: 32px;
-        border-radius: 24px; position: relative; max-height: 90vh; overflow-y: auto;
-        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    .wa-content { background:white; width:100%; max-width:400px; padding:30px; border-radius:20px; position:relative; max-height: 90vh; overflow-y: auto;}
+    .wa-input { width:100%; padding:12px; margin-bottom:15px; border:1.5px solid #eee; border-radius:10px; outline:none; font-family: 'Poppins'; box-sizing: border-box; }
+    .wa-submit-btn { width:100%; padding:14px; background:#000; color:#fff; border:none; border-radius:12px; font-weight:700; cursor:pointer; }
+
+    /* ================================================================
+       📱 IMPROVED RESPONSIVE RULES (added)
+       ================================================================ */
+    * { box-sizing: border-box; }
+
+    img { max-width: 100%; height: auto; }
+
+    .card-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      justify-content: center;
     }
-    .wa-input {
-        width: 100%; padding: 12px 16px; margin-top: 6px; margin-bottom: 16px;
-        border: 1px solid #cbd5e1; border-radius: 12px; outline: none; font-family: inherit; font-size: 14px;
+
+    .course-card {
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
     }
-    .wa-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
-    .wa-submit-btn {
-        width: 100%; padding: 14px; background: var(--black); color: #fff;
-        border: none; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: var(--smooth);
+
+    @media screen and (max-width: 1024px) {
+      .features-grid { gap: 25px; }
+      .stats-container { gap: 20px; }
     }
-    .wa-submit-btn:hover { background: var(--primary); transform: translateY(-2px); }
-    /* ==========================================================================
-       7. ULTRA-PREMIUM MODERN FOOTER
-       ========================================================================== */
-    .footer-wrapper { background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); border-top: 1px solid var(--gray-light); padding-top: 60px; position: relative; }
-    .footer-cta-banner { max-width: 1240px; margin: 0 auto 60px; padding: 0 20px; }
-    .cta-card {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 24px;
-        padding: 45px; color: var(--white); display: flex; justify-content: space-between;
-        align-items: center; box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.25); position: relative; overflow: hidden;
+
+    @media screen and (max-width: 768px) {
+      .stats-container {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 15px;
+      }
+      .stat-card { padding: 22px 15px; }
+      .stat-number { font-size: 2rem; }
+      .stat-icon { font-size: 2.2rem; margin-bottom: 8px; }
+
+      .features-section { padding: 50px 15px; }
+      .features-header h2 { font-size: 2rem; }
+      .features-header p { font-size: 1rem; }
+      .features-grid { grid-template-columns: 1fr; gap: 20px; }
+      .feature-card { padding: 25px; }
+
+      .course-section h1 { font-size: 1.7rem; margin: 25px 0 20px 0; }
+
+      .card-container {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        padding: 12px;
+      }
+      .course-card { padding: 10px; max-width: 100%; }
+      .course-card h2 { font-size: 15px; margin: 6px 0; }
+      .course-card p { font-size: 12px; }
+      .price { font-size: 15px; }
+
+      .wa-content { padding: 20px; border-radius: 14px; }
+
+      .footer-container {
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-part.text-part {
+        flex-direction: column;
+      }
     }
-    .cta-content h2 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
-    .cta-content p { color: #94a3b8; font-size: 15px; }
-    .cta-card-btn {
-        background: var(--primary); color: var(--white); padding: 14px 32px; border-radius: 50px;
-        text-decoration: none; font-weight: 700; font-size: 15px; white-space: nowrap; transition: var(--smooth);
-        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); display: inline-flex; align-items: center; gap: 8px;
+
+    @media screen and (max-width: 480px) {
+      .hero-section { padding: 55px 15px; }
+      .hero-section h1 { font-size: 1.7rem; }
+      .hero-section p { font-size: 0.95rem; }
+      .hero-badge { font-size: 0.75rem; padding: 6px 14px; }
+
+      .card-container {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 8px;
+      }
+      .course-card { padding: 8px; border-radius: 10px; }
+      .course-card h2 { font-size: 13px; }
+      .course-card p { font-size: 11px; line-height: 1.3; }
+      .price { font-size: 13px; }
+      .disabled-btn, .enroll-btn, .buy-course-btn, .wa-unlock-btn { font-size: 12px; padding: 8px; }
+      .new-badge { font-size: 10px; padding: 4px 30px; right: -30px; top: 8px; }
+
+      .course-section h1 { font-size: 1.3rem; }
+
+      .wa-content { padding: 15px; }
+      .wa-input { padding: 10px; font-size: 13px; }
     }
-    .cta-card-btn:hover { background: #3b82f6; transform: translateY(-3px); }
-    .footer-container {
-        max-width: 1240px; margin: 0 auto; padding: 0 20px 60px; display: grid;
-        grid-template-columns: 1.4fr 0.8fr 1fr 1.3fr; gap: 45px;
-    }
-    .footer-brand { display: flex; flex-direction: column; }
-    .footer-logo-img { height: 52px; width: auto; object-fit: contain; margin-bottom: 18px; }
-    .footer-desc { color: var(--gray-dark); font-size: 14px; line-height: 1.7; margin-bottom: 22px; }
-    .contact-info-list { list-style: none; margin-bottom: 24px; display: flex; flex-direction: column; gap: 10px; }
-    .contact-info-list li { display: flex; align-items: center; gap: 10px; color: var(--black-muted); font-size: 14px; font-weight: 600; }
-    .contact-info-list li ion-icon { color: var(--primary); font-size: 18px; }
-    .social-heading { font-size: 13px; font-weight: 800; text-transform: uppercase; color: #64748b; margin-bottom: 12px; }
-    .footer-social { display: flex; gap: 12px; }
-    .footer-social a {
-        width: 40px; height: 40px; border-radius: 12px; background: var(--white);
-        border: 1px solid var(--gray-light); color: var(--black-muted); display: flex;
-        align-items: center; justify-content: center; font-size: 20px; transition: var(--smooth);
-    }
-    .footer-social a:hover { background: var(--primary); color: var(--white); border-color: var(--primary); transform: translateY(-4px); }
-    .footer-col-title { font-size: 17px; font-weight: 800; color: var(--black); margin-bottom: 22px; position: relative; padding-bottom: 10px; }
-    .footer-col-title::after { content: ''; position: absolute; left: 0; bottom: 0; width: 32px; height: 3px; background: var(--primary); border-radius: 4px; }
-    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 13px; }
-    .footer-col ul li a { color: var(--gray-dark); text-decoration: none; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; transition: var(--smooth); }
-    .footer-col ul li a:hover { color: var(--primary); transform: translateX(4px); }
-    .footer-form-card { background: var(--white); padding: 28px 24px; border-radius: 20px; border: 1px solid var(--gray-light); box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05); }
-    .form-card-title { font-size: 18px; font-weight: 800; color: var(--black); display: flex; align-items: center; gap: 8px; }
-    .form-card-title ion-icon { color: var(--primary); font-size: 22px; }
-    .form-card-desc { font-size: 13px; color: var(--gray-dark); margin-top: 4px; }
-    .footer-form { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
-    .input-group { position: relative; }
-    .input-group ion-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 18px; }
-    .input-group.textarea-group ion-icon { top: 18px; transform: none; }
-    .footer-form input, .footer-form textarea {
-        width: 100%; padding: 12px 14px 12px 42px; border-radius: 12px; border: 1px solid #cbd5e1;
-        background: var(--gray-soft); font-family: inherit; font-size: 13px; font-weight: 600; outline: none; transition: var(--smooth);
-    }
-    .footer-form input:focus, .footer-form textarea:focus { background: var(--white); border-color: var(--primary); box-shadow: 0 0 0 4px rgba(37,99,235,0.12); }
-    .footer-form button {
-        width: 100%; background: var(--black); color: var(--white); border: none; padding: 13px;
-        border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: var(--smooth); display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .footer-form button:hover { background: var(--primary); transform: translateY(-2px); }
-    .footer-bottom { background: var(--white); border-top: 1px solid var(--gray-light); padding: 24px 20px; }
-    .footer-bottom-container { max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-    .copyright-text { color: var(--gray-dark); font-size: 13px; font-weight: 600; }
-    .bottom-legal-links { display: flex; gap: 20px; list-style: none; }
-    .bottom-legal-links li a { color: var(--gray-dark); text-decoration: none; font-size: 13px; font-weight: 600; }
-    .trust-badge { display: flex; align-items: center; gap: 6px; background: #f1f5f9; padding: 6px 14px; border-radius: 50px; font-size: 12px; font-weight: 700; color: #475569; }
-    .trust-badge ion-icon { color: var(--success); font-size: 16px; }
-    @media (max-width: 1024px) {
-        .footer-container { grid-template-columns: 1fr 1fr; gap: 40px; }
-        .cta-card { flex-direction: column; text-align: center; gap: 24px; }
-    }
-    @media (max-width: 768px) {
-        .nav-menu { display: none; }
-        .mobile-menu-btn { display: flex; }
-        .hero-section { padding: 130px 20px 60px; }
-        .animated-hero-title { font-size: 34px; }
-        .font-serif { font-size: 32px; }
-        .font-archivo { font-size: 36px; }
-        .footer-container { grid-template-columns: 1fr; gap: 35px; }
-        .footer-bottom-container { flex-direction: column; text-align: center; }
+
+    @media screen and (max-width: 360px) {
+      .card-container { grid-template-columns: 1fr; }
     }
   </style>
+
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 </head>
 <body>
-    <!-- ENHANCED PROFESSIONAL NAVBAR -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo">
-                <img src="PM-LOGO-TEXT.png" alt="PREMium Mind" onerror="this.onerror=null; this.src='small-logo.png';">
-            </a>
-            
-            <ul class="nav-menu">
-                <li>
-                    <a href="index.html" class="nav-link active">
-                        <ion-icon name="home-outline"></ion-icon> Home
-                    </a>
-                </li>
-                
-                <!-- PREMium Store Dropdown -->
-                <li class="nav-dropdown">
-                    <a href="#store" class="nav-link dropdown-toggle" id="store-dropdown-btn">
-                        <ion-icon name="bag-handle-outline"></ion-icon> PREMium Store
-                        <ion-icon name="chevron-down-outline" class="dropdown-arrow"></ion-icon>
-                    </a>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-header">Explore Categories</div>
-                        <a href="#notes" class="dropdown-item">
-                            <div class="dropdown-icon icon-blue"><ion-icon name="document-text-outline"></ion-icon></div>
-                            <div class="dropdown-text">
-                                <span class="item-title">Notes</span>
-                                <span class="item-desc">Handwritten & exam notes</span>
-                            </div>
-                        </a>
-                        <a href="#ebooks" class="dropdown-item">
-                            <div class="dropdown-icon icon-purple"><ion-icon name="book-outline"></ion-icon></div>
-                            <div class="dropdown-text">
-                                <span class="item-title">E-Books</span>
-                                <span class="item-desc">Complete syllabus guides</span>
-                            </div>
-                        </a>
-                        <a href="#resume" class="dropdown-item">
-                            <div class="dropdown-icon icon-green"><ion-icon name="briefcase-outline"></ion-icon></div>
-                            <div class="dropdown-text">
-                                <span class="item-title">Resume</span>
-                                <span class="item-desc">ATS-ready professional formats</span>
-                            </div>
-                        </a>
-                        <a href="#report-writing" class="dropdown-item">
-                            <div class="dropdown-icon icon-amber"><ion-icon name="bar-chart-outline"></ion-icon></div>
-                            <div class="dropdown-text">
-                                <span class="item-title">Report Writing</span>
-                                <span class="item-desc">Industrial & academic reports</span>
-                            </div>
-                        </a>
-                        <a href="#projects" class="dropdown-item">
-                            <div class="dropdown-icon icon-rose"><ion-icon name="code-slash-outline"></ion-icon></div>
-                            <div class="dropdown-text">
-                                <span class="item-title">Project</span>
-                                <span class="item-desc">Major & minor project code</span>
-                            </div>
-                            <span class="dropdown-badge">Hot</span>
-                        </a>
-                    </div>
-                </li>
-                <li>
-                    <a href="lecture.html" class="nav-link protected-route" id="coursesLinkNav">
-                        <ion-icon name="play-circle-outline"></ion-icon> My Courses
-                    </a>
-                </li>
-                <li>
-                    <a href="#contact" class="nav-link">
-                        <ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us
-                    </a>
-                </li>
 
-                <li id="desktopUserPillContainer" style="display: none;">
-                    <a href="#" onclick="if(window.openSidebarGlobal) window.openSidebarGlobal(); return false;" class="nav-user-badge" id="navUserBadge">
-                        <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Avatar" class="nav-avatar-img" id="navAvatarImg">
-                        <span class="nav-user-name" id="navUserName">User</span>
-                    </a>
-                </li>
-                <li id="desktopLoginBtnContainer">
-                    <a href="login.html" class="login-btn">
-                        <ion-icon name="person-circle-outline"></ion-icon> Login / Sign Up
-                    </a>
-                </li>
-            </ul>
-            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle Menu">
-                <ion-icon name="menu-outline"></ion-icon>
-            </button>
+<nav class="navbar">
+  <div class="logo-container">
+    <img src="PM-LOGO-TEXT.png" alt="PM Logo" class="logo-image" />
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="index.html">PREMium Store</a></li>
+    <li><a href="lecture.html" class="protected-route" id="coursesLinkNav">My Courses</a></li>
+    <li><a href="#help-form">Contact us</a></li>
+    <li><a href="#help-form">Report Problem</a></li>
+  </ul>
+  <div class="menu-btn" id="menu-btn">☰</div>
+</nav>
+
+<div class="sidebar" id="sidebar">
+  <button class="close-sidebar-btn" onclick="document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active');">×</button>
+
+  <div class="user-profile" id="userProfile" style="display: none;">
+    <div class="profile-photo-container">
+      <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" 
+           alt="Profile" class="profile-photo" id="profilePhoto" onclick="document.getElementById('photo-input').click()">
+      <button class="change-photo-btn" onclick="document.getElementById('photo-input').click()">📷</button>
+    </div>
+    <input type="file" id="photo-input" accept="image/*">
+    <div class="user-name" id="userName">User Name</div>
+    <div class="user-email" id="userEmail">user@example.com</div>
+    <button class="logout-btn-sidebar" onclick="handleLogout()">Logout</button>
+  </div>
+
+  <div class="login-prompt" id="loginPrompt">
+    <h3>Welcome to PREMium Mind</h3>
+    <p>Access your courses and profile.</p>
+    <button class="login-btn" onclick="window.location.href='login.html'">Login / Sign Up</button>
+  </div>
+
+  <ul>
+    <li><a href="index.html"><span class="icon">🏠</span> Home</a></li>
+    <li><a href="courses.html" class="protected-route" id="coursesLink"><span class="icon">📚</span> PREMium Courses</a></li>
+    <li><a href="lecture.html" class="protected-route" id="courseAccessLink"><span class="icon">🎓</span> My Course</a></li>
+    <li><a href="#help-form"><span class="icon">📞</span> Contact</a></li>
+    <li><a href="#help-form"><span class="icon">❓</span> Help</a></li>
+    <li><a href="termcondition.html"><span class="icon">⚙️</span> Terms & Privacy</a></li>
+  </ul>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<section class="hero-section">
+  <div class="hero-content">
+    <span class="hero-badge">🎓 Your Learning Partner</span>
+    <h1>Transform Your Future with PREMium Mind</h1>
+    <p>Access premium study materials, expert-crafted notes, and career-building resources designed for ambitious students and professionals.</p>
+    <div class="cta-buttons">
+      <a href="#products" class="cta-btn cta-primary">Explore Products</a>
+      <a href="privacy.html" class="cta-btn cta-secondary">Privacy & Policy</a>
+    </div>
+  </div>
+</section>
+
+<section class="course-section" id="products">
+  <h1>EXPLORE OUR PREMium Mind STORE</h1>
+  <div class="card-container" id="dynamic-products-container">
+      <p style="text-align: center; width: 100%;">Loading Premium Store...</p>
+  </div>
+</section>
+
+<div id="waModal" class="wa-modal">
+  <div class="wa-content">
+    <span onclick="document.getElementById('waModal').style.display='none'" style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
+    <h3 style="margin-bottom:8px; font-size:1.4rem;">Unlock for Free 🎁</h3>
+    <p style="font-size:13px; color:#666; margin-bottom:20px;">Share only in your college batchmates’ WhatsApp group and upload the screenshot.
+Screenshots from other groups or personal chats will be rejected.</p>
+    <form id="waForm">
+      <input type="hidden" id="wa_cid">
+      <label style="font-size:12px; font-weight:600;">College Name*</label>
+      <input type="text" id="wa_college" class="wa-input" placeholder="e.g. Govt Polytechnic" required>
+      <label style="font-size:12px; font-weight:600;">Branch*</label>
+      <input type="text" id="wa_branch" class="wa-input" placeholder="e.g. Mechanical" required>
+      <div style="background:#e8f5e9; padding:15px; border-radius:12px; text-align:center; margin-bottom:20px; border: 1px dashed #22c55e;">
+        <p style="font-size:11px; color:#15803d; margin-bottom:8px; font-weight:600;">STEP 1: Share Link to WhatsApp Group</p>
+        <a href="https://wa.me/?text=%F0%9F%8E%93%20DIPLOMA%20WALLAH%20%E2%80%93%20Biggest%20Platform%20for%20Diploma%20Students%0A%0A%F0%9F%93%9A%20Yahan%20aapko%20milega%3A%0A%E2%80%A2%20Latest%20information%20without%20any%20delay%0A%E2%80%A2%20Proper%20guidance%20throughout%20your%20diploma%20journey%0A%E2%80%A2%20Complete%20notes%20for%20subjects%0A%E2%80%A2%20PYQ%20%28Previous%20Year%20Questions%29%0A%E2%80%A2%20Exam%20important%20questions%0A%E2%80%A2%20Helpful%20resources%20for%20better%20preparation%0A%0A%F0%9F%92%A1%20Agar%20aap%20diploma%20kar%20rahe%20hain%2C%20to%20ye%20group%20aapki%20study%20aur%20preparation%20me%20bahut%20help%20karega.%0A%0A%F0%9F%9A%80%20Abhi%20join%20karein%20aur%20hamari%20family%20ka%20hissa%20banei%21%0A%0A%F0%9F%94%97%20Group%20Link%3A%0Ahttps%3A%2F%2Fchat.whatsapp.com%2FKpGfetOB0oiHvlgfKhPOUd%3Fmode%3Dhq1tcla" target="_blank" style="text-decoration:none; background:#22c55e; color:white; padding:8px 15px; border-radius:8px; font-weight:700; font-size:13px; display:inline-block;">📱 Click to Share</a>
+      </div>
+      <label style="font-size:12px; font-weight:600;">STEP 2: Upload Share Screenshot*</label>
+      <input type="file" id="wa_file" accept="image/*" required style="margin-bottom:20px; font-size:12px; width: 100%;">
+      <button type="submit" id="waSubmit" class="wa-submit-btn">Submit for Review →</button>
+    </form>
+  </div>
+</div>
+
+<div id="reportModal" class="wa-modal">
+  <div class="wa-content">
+    <span onclick="document.getElementById('reportModal').style.display='none'" style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
+    <h3 style="margin-bottom:8px; font-size:1.4rem; color: #be123c;">Report an Issue 🚩</h3>
+    <p style="font-size:13px; color:#666; margin-bottom:20px;">Describe your problem below. If it's a payment issue, please attach a screenshot.</p>
+    <form id="reportForm">
+      <input type="hidden" id="report_cid">
+      <label style="font-size:12px; font-weight:600;">Your Message*</label>
+      <textarea id="report_msg" class="wa-input" rows="3" placeholder="Explain your issue here..." required></textarea>
+      
+      <label style="font-size:12px; font-weight:600;">Upload Payment Screenshot (Optional for Payment Issues)</label>
+      <input type="file" id="report_file" accept="image/*" style="margin-bottom:15px; font-size:12px; width: 100%;">
+      
+      <div style="margin-bottom: 15px; display: flex; gap: 8px; align-items: start; background: #fef2f2; padding: 10px; border-radius: 8px; border: 1px dashed #fda4af;">
+          <input type="checkbox" id="report_agree" required style="margin-top: 2px;">
+          <label for="report_agree" style="font-size: 11px; color: #be123c; font-weight: 600; cursor: pointer;">I understand that my problem will be reviewed and resolved within 1-2 hours.</label>
+      </div>
+      
+      <button type="submit" id="reportSubmit" class="wa-submit-btn" style="background: #be123c;">Submit Report</button>
+    </form>
+  </div>
+</div>
+
+<div id="tncModal" class="wa-modal">
+  <div class="wa-content">
+    <span onclick="closeTncModal()" style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
+    <h3 style="margin-bottom:8px; font-size:1.4rem;">Terms & Conditions 📜</h3>
+    <p style="font-size:13px; color:#666; margin-bottom:15px;">Please read terms and watch the video before payment.</p>
+    
+    <div style="background: #eef2ff; padding: 12px; border-radius: 10px; border: 1px dashed #3b82f6; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+        <button type="button" id="watchVideoBtn" style="background: #1d4ed8; color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; transition: 0.3s; width: max-content;">
+            ▶️ Play Video
+        </button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="checkbox" id="video_agree" style="width: 16px; height: 16px; cursor: not-allowed;" disabled>
+            <label for="video_agree" id="video_agree_label" style="font-size: 11px; font-weight: 700; color: #9ca3af; cursor: not-allowed; line-height: 1.2;">Must play video</label>
         </div>
-    </nav>
-    <!-- ANIMATED SIDE-DRAWER OVERLAY & SIDEBAR -->
-    <div class="overlay" id="sidebar-overlay"></div>
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <img src="PM-LOGO-TEXT.png" alt="PREMium Mind" class="sidebar-logo" onerror="this.onerror=null; this.src='small-logo.png';">
-            <button class="close-sidebar" id="close-sidebar-btn" aria-label="Close Sidebar">
-                <ion-icon name="close-outline"></ion-icon>
-            </button>
+    </div>
+
+    <div id="videoContainer" style="display: none; background: #000; padding: 5px; border-radius: 12px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+        <div style="position: relative; width: 100%; max-width: 180px; margin: 0 auto; aspect-ratio: 9/16; border-radius: 8px; overflow: hidden;">
+            <iframe id="tutorialVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
-        <div class="user-profile-compact" id="userProfile" style="display: none;">
-            <div class="profile-photo-container">
-                <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" 
-                     alt="Profile" class="profile-photo" id="profilePhoto" title="Click to change photo" onclick="document.getElementById('photo-input').click()">
-                <button class="change-photo-btn" onclick="document.getElementById('photo-input').click()" title="Change photo">📷</button>
-            </div>
-            <input type="file" id="photo-input" accept="image/*" style="display:none;">
-            <div class="profile-info">
-                <div class="user-name" id="userName">User Name</div>
-                <div class="user-email-chip" id="userEmail">user@example.com</div>
-            </div>
-        </div>
-        <div class="login-prompt" id="loginPrompt">
-            <h3>Welcome to PREMium Mind</h3>
-            <p>Access your courses and profile.</p>
-            <button class="sidebar-login-btn" onclick="window.location.href='login.html'">
-                <ion-icon name="log-in-outline"></ion-icon> Login / Sign Up
-            </button>
-        </div>
-        
-        <ul class="sidebar-menu">
-            <li class="sidebar-item" style="--delay: 0.1s">
-                <a href="index.html" class="sidebar-link active">
-                    <ion-icon name="home-outline"></ion-icon> Home
-                </a>
-            </li>
-            
-            <!-- Mobile Store Dropdown Accordion -->
-            <li class="sidebar-item sidebar-dropdown" style="--delay: 0.2s">
-                <div class="sidebar-dropdown-toggle" id="mobile-store-toggle">
-                    <span class="sidebar-link-content">
-                        <ion-icon name="bag-handle-outline"></ion-icon> PREMium Store
-                    </span>
-                    <ion-icon name="chevron-down-outline" class="mobile-dropdown-arrow"></ion-icon>
-                </div>
-                <div class="sidebar-submenu" id="mobile-store-submenu">
-                    <a href="#notes" class="sidebar-sublink"><ion-icon name="document-text-outline"></ion-icon> Notes</a>
-                    <a href="#ebooks" class="sidebar-sublink"><ion-icon name="book-outline"></ion-icon> E-Books</a>
-                    <a href="#resume" class="sidebar-sublink"><ion-icon name="briefcase-outline"></ion-icon> Resume</a>
-                    <a href="#report-writing" class="sidebar-sublink"><ion-icon name="bar-chart-outline"></ion-icon> Report Writing</a>
-                    <a href="#projects" class="sidebar-sublink"><ion-icon name="code-slash-outline"></ion-icon> Project <span class="sub-badge">Hot</span></a>
-                </div>
-            </li>
-            <li class="sidebar-item" style="--delay: 0.3s">
-                <a href="lecture.html" class="sidebar-link protected-route" id="coursesLink">
-                    <ion-icon name="play-circle-outline"></ion-icon> My Courses
-                </a>
-            </li>
-            <li class="sidebar-item" style="--delay: 0.4s">
-                <a href="#contact" class="sidebar-link">
-                    <ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us
-                </a>
-            </li>
-            <li class="sidebar-item" style="--delay: 0.5s">
-                <a href="termcondition.html" class="sidebar-link">
-                    <ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy
-                </a>
-            </li>
+    </div>
+    
+    <div style="background:#f9fafb; padding:15px; border-radius:8px; font-size:11px; color:#444; margin-bottom:15px; border:1px solid #eee; line-height: 1.6; height: 120px; overflow-y: auto;">
+        <strong>1. Non-Refundable:</strong> All sales are final. No refunds will be provided once the course access is granted.<br>
+        <strong>2. No Sharing:</strong> Sharing your account details with others is strictly prohibited and will lead to an instant permanent ban without refund.<br>
+        <strong>3. Personal Use:</strong> The study material is for your personal use only. Distribution or piracy will invite legal actions.<br>
+        <strong>4. Download Policy:</strong> You can download the content only one day before the exam at 6:00 PM when the download button unlocks.<br>
+        <strong>5. Payment Instruction:</strong> After successful payment, please wait for 10 seconds on the same page. Then check your profile for access to the purchased content.<br>
+        <strong>6. Important Notice:</strong> This content is based on analysis and predictions; exact exam questions are not guaranteed.<br>
+        <strong>7. Agreement:</strong> By proceeding, you agree to PREMium Mind's standard terms of service.
+    </div>
+    
+    <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+        <input type="checkbox" id="tnc_agree" style="width: 16px; height: 16px;">
+        <label for="tnc_agree" style="font-size: 13px; font-weight: 700; color: #111; cursor: pointer;">I agree to the Terms & Conditions</label>
+    </div>
+    
+    <button type="button" id="tncProceedBtn" class="wa-submit-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Accept & Proceed to Payment</button>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-part logo-part">
+      <img src="small-logo.png" alt="Premium Learnings Logo" class="logo" />
+    </div>
+
+    <div class="footer-part text-part">
+      <div class="footer-column">
+        <h3>About Us</h3>
+        <p>At <strong>PREMium Mind</strong>, we are committed to empowering students and freshers with job-ready skills through practical learning and expert-led courses.</p>
+      </div>
+
+      <div class="footer-column">
+        <h3>Why Choose Us?</h3>
+        <p>With personalized mentorship, project-based learning, and lifetime support, we ensure your career doesn't just start — it accelerates.</p>
+      </div>
+
+      <div class="contact-info">
+        <h3>Contact Us on WhatsApp</h3>
+        <p><strong>Contact course counsellor</strong></p>
+        <ul style="list-style: none;">
+          <li>📞 +91 9153950552</li>
         </ul>
-        <!-- Bottom Logout Action -->
-        <div class="sidebar-footer" id="sidebarFooter" style="display: none;">
-            <button class="logout-btn-sidebar" id="sidebarLogoutBtn" onclick="handleLogout()">
-                <ion-icon name="log-out-outline"></ion-icon> Logout Account
-            </button>
-        </div>
+      </div>
     </div>
-    <!-- HERO SECTION -->
-    <section class="hero-section fade-in">
-        <div class="hero-badge">
-            <ion-icon name="rocket"></ion-icon> Your Ultimate Learning Partner
-        </div>
-        <h1 class="animated-hero-title" id="hero-title" title="Click to replay animation">
-            <span class="animated-word word-1 font-kalam">Boss,</span> 
-            <span class="animated-word word-2 font-serif">When</span> 
-            <span class="animated-word word-3 font-serif">Everything</span> 
-            <span class="animated-word word-4 font-serif accent-fails">Fails...</span> 
-            <br class="hero-break">
-            <span class="animated-word word-5 font-archivo brand-gradient">PREMium</span> 
-            <span class="animated-word word-6 font-archivo brand-gradient">Mind</span> 
-            <span class="animated-word word-7 font-archivo works-badge">Works.</span>
-        </h1>
-        <p>Access premium study materials, expert-crafted notes, and career-building resources designed specifically for ambitious students and professionals.</p>
-        
-        <div class="cta-group">
-            <a href="#store" class="btn-primary">
-                Explore Products <ion-icon name="arrow-forward"></ion-icon>
-            </a>
-            <a href="termcondition.html" class="btn-secondary">
-                Terms & Privacy
-            </a>
-        </div>
-    </section>
-    <!-- COURSES STORE SECTION -->
-    <section class="store-section" id="store">
-        <!-- Sub-section Anchor Targets -->
-        <div id="notes"></div>
-        <div id="ebooks"></div>
-        <div id="resume"></div>
-        <div id="report-writing"></div>
-        <div id="projects"></div>
-        <div class="section-header fade-in">
-            <h2 class="section-title">Explore PREMium Store</h2>
-            <p class="section-subtitle">Upgrade your skills with our top-rated professional resources.</p>
-            
-            <!-- Horizontal Scrollable Category Filter Tabs -->
-            <div class="store-categories-wrapper">
-                <div class="store-categories-tabs" id="category-tabs">
-                    <button class="category-tab active" data-category="all">
-                        <ion-icon name="grid-outline"></ion-icon> All Items
-                    </button>
-                    <button class="category-tab" data-category="notes">
-                        <ion-icon name="document-text-outline"></ion-icon> Notes
-                    </button>
-                    <button class="category-tab" data-category="ebooks">
-                        <ion-icon name="book-outline"></ion-icon> E-Books
-                    </button>
-                    <button class="category-tab" data-category="resume">
-                        <ion-icon name="briefcase-outline"></ion-icon> Resume
-                    </button>
-                    <button class="category-tab" data-category="report-writing">
-                        <ion-icon name="bar-chart-outline"></ion-icon> Report Writing
-                    </button>
-                    <button class="category-tab" data-category="projects">
-                        <ion-icon name="code-slash-outline"></ion-icon> Project
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="courses-grid" id="store-courses-grid">
-            <p style="text-align: center; width: 100%; grid-column: 1 / -1; padding: 40px 0;">Loading PREMium Store...</p>
-        </div>
-    </section>
-    <!-- MODALS SYSTEM -->
-    <!-- WHATSAPP UNLOCK MODAL -->
-    <div id="waModal" class="wa-modal">
-      <div class="wa-content">
-        <span onclick="document.getElementById('waModal').style.display='none'" style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
-        <h3 style="margin-bottom:8px; font-size:1.4rem;">Unlock for Free 🎁</h3>
-        <p style="font-size:13px; color:#666; margin-bottom:20px;">Share only in your college batchmates’ WhatsApp group and upload the screenshot. Screenshots from other groups or personal chats will be rejected.</p>
-        <form id="waForm">
-          <input type="hidden" id="wa_cid">
-          <label style="font-size:12px; font-weight:600;">College Name*</label>
-          <input type="text" id="wa_college" class="wa-input" placeholder="e.g. Govt Polytechnic" required>
-          <label style="font-size:12px; font-weight:600;">Branch*</label>
-          <input type="text" id="wa_branch" class="wa-input" placeholder="e.g. Mechanical" required>
-          <div style="background:#e8f5e9; padding:15px; border-radius:12px; text-align:center; margin-bottom:20px; border: 1px dashed #22c55e;">
-            <p style="font-size:11px; color:#15803d; margin-bottom:8px; font-weight:600;">STEP 1: Share Link to WhatsApp Group</p>
-            <a href="https://wa.me/?text=%F0%9F%8E%93%20DIPLOMA%20WALLAH%20%E2%80%93%20Biggest%20Platform%20for%20Diploma%20Students%0A%0A%F0%9F%93%9A%20Yahan%20aapko%20milega%3A%0A%E2%80%A2%20Latest%20information%20without%20any%20delay%0A%E2%80%A2%20Proper%20guidance%20throughout%20your%20diploma%20journey%0A%E2%80%A2%20Complete%20notes%20for%20subjects%0A%E2%80%A2%20PYQ%20%28Previous%20Year%20Questions%29%0A%E2%80%A2%20Exam%20important%20questions%0A%E2%80%A2%20Helpful%20resources%20for%20better%20preparation%0A%0A%F0%9F%92%A1%20Agar%20aap%20diploma%20kar%20rahe%20hain%2C%20to%20ye%20group%20aapki%20study%20aur%20preparation%20me%20bahut%20help%20karega.%0A%0A%F0%9F%9A%80%20Abhi%20join%20karein%20aur%20hamari%20family%20ka%20hissa%20banei%21%0A%0A%F0%9F%94%97%20Group%20Link%3A%0Ahttps%3A%2F%2Fchat.whatsapp.com%2FKpGfetOB0oiHvlgfKhPOUd%3Fmode%3Dhq1tcla" target="_blank" style="text-decoration:none; background:#22c55e; color:white; padding:8px 15px; border-radius:8px; font-weight:700; font-size:13px; display:inline-block;">📱 Click to Share</a>
-          </div>
-          <label style="font-size:12px; font-weight:600;">STEP 2: Upload Share Screenshot*</label>
-          <input type="file" id="wa_file" accept="image/*" required style="margin-bottom:20px; font-size:12px; width: 100%;">
-          <button type="submit" id="waSubmit" class="wa-submit-btn">Submit for Review →</button>
+
+    <div class="footer-part form-part" id="help-form">
+      <div class="footer-form">
+        <form id="whForm">
+          <label>Full Name:
+            <input type="text" id="name" required placeholder="Enter Full Name"/>
+          </label>
+          <label>Phone Number:
+            <input type="tel" id="phone" pattern="[0-9]{10}" required placeholder="Enter Phone Number" />
+          </label>
+          <label>Report Problem:
+            <textarea id="message" rows="4" placeholder="Your message..." required></textarea>
+          </label>
+          <button type="submit">Submit</button>
         </form>
       </div>
     </div>
-    <!-- REPORT MODAL -->
-    <div id="reportModal" class="wa-modal">
-      <div class="wa-content">
-        <span onclick="document.getElementById('reportModal').style.display='none'" style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
-        <h3 style="margin-bottom:8px; font-size:1.4rem; color: #be123c;">Report an Issue 🚩</h3>
-        <p style="font-size:13px; color:#666; margin-bottom:20px;">Describe your problem below. If it's a payment issue, please attach a screenshot.</p>
-        <form id="reportForm">
-          <input type="hidden" id="report_cid">
-          <label style="font-size:12px; font-weight:600;">Your Message*</label>
-          <textarea id="report_msg" class="wa-input" rows="3" placeholder="Explain your issue here..." required></textarea>
-          
-          <label style="font-size:12px; font-weight:600;">Upload Payment Screenshot (Optional for Payment Issues)</label>
-          <input type="file" id="report_file" accept="image/*" style="margin-bottom:15px; font-size:12px; width: 100%;">
-          
-          <div style="margin-bottom: 15px; display: flex; gap: 8px; align-items: start; background: #fef2f2; padding: 10px; border-radius: 8px; border: 1px dashed #fda4af;">
-              <input type="checkbox" id="report_agree" required style="margin-top: 2px;">
-              <label for="report_agree" style="font-size: 11px; color: #be123c; font-weight: 600; cursor: pointer;">I understand that my problem will be reviewed and resolved within 1-2 hours.</label>
-          </div>
-          
-          <button type="submit" id="reportSubmit" class="wa-submit-btn" style="background: #be123c;">Submit Report</button>
-        </form>
-      </div>
-    </div>
-    <!-- TERMS & CONDITIONS MODAL -->
-    <div id="tncModal" class="wa-modal">
-      <div class="wa-content">
-        <span onclick="closeTncModal()" style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
-        <h3 style="margin-bottom:8px; font-size:1.4rem;">Terms & Conditions 📜</h3>
-        <p style="font-size:13px; color:#666; margin-bottom:15px;">Please read terms and watch the video before payment.</p>
-        
-        <div style="background: #eef2ff; padding: 12px; border-radius: 10px; border: 1px dashed #3b82f6; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-            <button type="button" id="watchVideoBtn" style="background: #1d4ed8; color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; transition: 0.3s; width: max-content;">
-                ▶️ Play Video
-            </button>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <input type="checkbox" id="video_agree" style="width: 16px; height: 16px; cursor: not-allowed;" disabled>
-                <label for="video_agree" id="video_agree_label" style="font-size: 11px; font-weight: 700; color: #9ca3af; cursor: not-allowed; line-height: 1.2;">Must play video</label>
-            </div>
-        </div>
-        <div id="videoContainer" style="display: none; background: #000; padding: 5px; border-radius: 12px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-            <div style="position: relative; width: 100%; max-width: 180px; margin: 0 auto; aspect-ratio: 9/16; border-radius: 8px; overflow: hidden;">
-                <iframe id="tutorialVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-        </div>
-        
-        <div style="background:#f9fafb; padding:15px; border-radius:8px; font-size:11px; color:#444; margin-bottom:15px; border:1px solid #eee; line-height: 1.6; height: 120px; overflow-y: auto;">
-            <strong>1. Non-Refundable:</strong> All sales are final. No refunds will be provided once the course access is granted.<br>
-            <strong>2. No Sharing:</strong> Sharing your account details with others is strictly prohibited and will lead to an instant permanent ban without refund.<br>
-            <strong>3. Personal Use:</strong> The study material is for your personal use only. Distribution or piracy will invite legal actions.<br>
-            <strong>4. Download Policy:</strong> You can download the content only one day before the exam at 6:00 PM when the download button unlocks.<br>
-            <strong>5. Payment Instruction:</strong> After successful payment, please wait for 10 seconds on the same page. Then check your profile for access to the purchased content.<br>
-            <strong>6. Important Notice:</strong> This content is based on analysis and predictions; exact exam questions are not guaranteed.<br>
-            <strong>7. Agreement:</strong> By proceeding, you agree to PREMium Mind's standard terms of service.
-        </div>
-        
-        <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
-            <input type="checkbox" id="tnc_agree" style="width: 16px; height: 16px;">
-            <label for="tnc_agree" style="font-size: 13px; font-weight: 700; color: #111; cursor: pointer;">I agree to the Terms & Conditions</label>
-        </div>
-        
-        <button type="button" id="tncProceedBtn" class="wa-submit-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Accept & Proceed to Payment</button>
-      </div>
-    </div>
-    <!-- ULTRA-PREMIUM MODERN FOOTER -->
-    <footer class="footer-wrapper" id="contact">
-        <!-- Top Call to Action Banner -->
-        <div class="footer-cta-banner fade-in">
-            <div class="cta-card">
-                <div class="cta-content">
-                    <h2>Ready to Elevate Your Skills?</h2>
-                    <p>Join thousands of ambitious learners accelerating their tech and engineering careers today.</p>
-                </div>
-                <a href="#store" class="cta-card-btn">
-                    Browse All Courses <ion-icon name="arrow-forward-outline"></ion-icon>
-                </a>
-            </div>
-        </div>
-        <!-- Main Footer Links & Form -->
-        <div class="footer-container">
-            <!-- Column 1: Brand Info & Social -->
-            <div class="footer-brand">
-                <a href="index.html" class="brand-logo-link">
-                    <img src="PM-LOGO-TEXT.png" alt="PREMium Mind" class="footer-logo-img" onerror="this.onerror=null; this.src='small-logo.png';">
-                </a>
-                <p class="footer-desc">Empowering students, freshers, and professionals with industry-ready skills, curated notes, and practical learning resources.</p>
-                
-                <ul class="contact-info-list">
-                    <li><ion-icon name="mail-outline"></ion-icon> support@premiummind.in</li>
-                    <li><ion-icon name="call-outline"></ion-icon> +91 9153950552</li>
-                    <li><ion-icon name="location-outline"></ion-icon> New Delhi, India</li>
-                </ul>
-                <span class="social-heading">Connect With Us</span>
-                <div class="footer-social">
-                    <a href="#" aria-label="WhatsApp"><ion-icon name="logo-whatsapp"></ion-icon></a>
-                    <a href="#" aria-label="YouTube"><ion-icon name="logo-youtube"></ion-icon></a>
-                    <a href="#" aria-label="Instagram"><ion-icon name="logo-instagram"></ion-icon></a>
-                    <a href="#" aria-label="LinkedIn"><ion-icon name="logo-linkedin"></ion-icon></a>
-                </div>
-            </div>
-            <!-- Column 2: Quick Links -->
-            <div class="footer-col">
-                <h3 class="footer-col-title">Navigation</h3>
-                <ul>
-                    <li><a href="index.html"><ion-icon name="chevron-forward-outline"></ion-icon> Home</a></li>
-                    <li><a href="#store"><ion-icon name="chevron-forward-outline"></ion-icon> PREMium Store</a></li>
-                    <li><a href="lecture.html"><ion-icon name="chevron-forward-outline"></ion-icon> My Courses</a></li>
-                    <li><a href="login.html"><ion-icon name="chevron-forward-outline"></ion-icon> Student Portal</a></li>
-                </ul>
-            </div>
-            <!-- Column 3: Resource & Legal -->
-            <div class="footer-col">
-                <h3 class="footer-col-title">Resources</h3>
-                <ul>
-                    <li><a href="termcondition.html"><ion-icon name="chevron-forward-outline"></ion-icon> Terms & Conditions</a></li>
-                    <li><a href="termcondition.html#privacy"><ion-icon name="chevron-forward-outline"></ion-icon> Privacy Policy</a></li>
-                    <li><a href="termcondition.html#refund"><ion-icon name="chevron-forward-outline"></ion-icon> Refund Policy</a></li>
-                    <li><a href="#contact"><ion-icon name="chevron-forward-outline"></ion-icon> Help & Support</a></li>
-                </ul>
-            </div>
-            <!-- Column 4: Contact Form Card -->
-            <div class="footer-form-card" id="help-form">
-                <div class="form-card-header">
-                    <h3 class="form-card-title">
-                        <ion-icon name="paper-plane-outline"></ion-icon> Contact Support
-                    </h3>
-                    <p class="form-card-desc">Have questions or facing an issue? Message us directly.</p>
-                </div>
-                <form class="footer-form" id="whForm">
-                    <div class="input-group">
-                        <input type="text" id="name" placeholder="Full Name" required>
-                        <ion-icon name="person-outline"></ion-icon>
-                    </div>
-                    <div class="input-group">
-                        <input type="tel" id="phone" pattern="[0-9]{10}" placeholder="Phone Number" required>
-                        <ion-icon name="call-outline"></ion-icon>
-                    </div>
-                    <div class="input-group textarea-group">
-                        <textarea id="message" rows="3" placeholder="Describe your issue..." required></textarea>
-                        <ion-icon name="chatbox-outline"></ion-icon>
-                    </div>
-                    <button type="submit">
-                        Send Message <ion-icon name="send-outline"></ion-icon>
-                    </button>
-                </form>
-            </div>
-        </div>
-        
-        <!-- Bottom Copyright & Security Bar -->
-        <div class="footer-bottom">
-            <div class="footer-bottom-container">
-                <p class="copyright-text">
-                    &copy; 2025 PREMium Mind. All rights reserved. Built for Excellence.
-                </p>
-                <div class="trust-badge">
-                    <ion-icon name="shield-checkmark-outline"></ion-icon> 256-Bit SSL Encryption Secured
-                </div>
-                <ul class="bottom-legal-links">
-                    <li><a href="termcondition.html">Privacy</a></li>
-                    <li><a href="termcondition.html">Terms</a></li>
-                    <li><a href="termcondition.html">Cookies</a></li>
-                </ul>
-            </div>
-        </div>
-    </footer>
-    <!-- SESSION UTILITIES -->
-    <script>
-      function setCookie(name, value, days = 30) {
-        const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-        document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Strict; Secure`;
-      }
-      function getCookie(name) {
-        const match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + '=([^;]*)'));
-        return match ? decodeURIComponent(match[1]) : null;
-      }
-      function deleteCookie(name) {
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict; Secure`;
-      }
-      function getStoredEmail() {
-        const val = localStorage.getItem('customUserEmail') || getCookie('customUserEmail');
-        if (val) {
-          localStorage.setItem('customUserEmail', val);
-          setCookie('customUserEmail', val);
-        }
-        return val;
-      }
-      function getStoredName() {
-        const val = localStorage.getItem('customUserName') || getCookie('customUserName');
-        if (val) {
-          localStorage.setItem('customUserName', val);
-          setCookie('customUserName', val);
-        }
-        return val;
-      }
-      function clearStoredSession() {
-        localStorage.removeItem('customUserEmail');
-        localStorage.removeItem('customUserName');
-        localStorage.removeItem('customUserPhone');
-        deleteCookie('customUserEmail');
-        deleteCookie('customUserName');
-        deleteCookie('customUserPhone');
-      }
-    </script>
-    <!-- FIREBASE MODULE -->
-    <script type="module">
-      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-      import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-      import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
-      const firebaseConfig = {
-        apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
-        authDomain: "premium-mind-fcb16.firebaseapp.com",
-        databaseURL: "https://premium-mind-fcb16-default-rtdb.firebaseio.com",
-        projectId: "premium-mind-fcb16",
-        storageBucket: "premium-mind-fcb16.firebasestorage.app",
-        messagingSenderId: "864874199521",
-        appId: "1:864874199521:web:5deb96a956dc404a077aa0"
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2025 PREMium Mind | <a href="termcondition.html">Privacy Policy</a></p>
+  </div>
+</footer>
+
+<script>
+  // ================================================================
+  // 🍪 UPGRADED SECURE COOKIE UTILITIES
+  // ================================================================
+  function setCookie(name, value, days = 30) {
+    const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+    // Added SameSite=Strict and Secure for maximum frontend protection
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Strict; Secure`;
+  }
+
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + '=([^;]*)'));
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+
+  function deleteCookie(name) {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict; Secure`;
+  }
+
+  // Session helpers: read from localStorage first, fall back to cookie,
+  // and keep both storages in sync so the session survives even if
+  // localStorage is cleared/blocked (private browsing, etc).
+  function getStoredEmail() {
+    const val = localStorage.getItem('customUserEmail') || getCookie('customUserEmail');
+    if (val) {
+      localStorage.setItem('customUserEmail', val);
+      setCookie('customUserEmail', val);
+    }
+    return val;
+  }
+
+  function getStoredName() {
+    const val = localStorage.getItem('customUserName') || getCookie('customUserName');
+    if (val) {
+      localStorage.setItem('customUserName', val);
+      setCookie('customUserName', val);
+    }
+    return val;
+  }
+
+  function getStoredPhone() {
+    const val = localStorage.getItem('customUserPhone') || getCookie('customUserPhone');
+    if (val) {
+      localStorage.setItem('customUserPhone', val);
+      setCookie('customUserPhone', val);
+    }
+    return val;
+  }
+
+  function clearStoredSession() {
+    localStorage.removeItem('customUserEmail');
+    localStorage.removeItem('customUserName');
+    localStorage.removeItem('customUserPhone');
+    deleteCookie('customUserEmail');
+    deleteCookie('customUserName');
+    deleteCookie('customUserPhone');
+  }
+</script>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+  import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
+    authDomain: "premium-mind-fcb16.firebaseapp.com",
+    databaseURL: "https://premium-mind-fcb16-default-rtdb.firebaseio.com",
+    projectId: "premium-mind-fcb16",
+    storageBucket: "premium-mind-fcb16.firebasestorage.app",
+    messagingSenderId: "864874199521",
+    appId: "1:864874199521:web:5deb96a956dc404a077aa0"
+  };
+
+  const app      = initializeApp(firebaseConfig);
+  const auth     = getAuth(app);
+  const storage  = getStorage(app);
+  const database = getDatabase(app);
+
+  function updateUI(name, email, photoSrc) {
+    const userProfile    = document.getElementById('userProfile');
+    const loginPrompt    = document.getElementById('loginPrompt');
+    const coursesLink    = document.getElementById('coursesLink');
+    const coursesLinkNav = document.getElementById('coursesLinkNav');
+
+    userProfile.style.display = 'block';
+    loginPrompt.style.display = 'none';
+
+    document.getElementById('userName').textContent  = name  || 'User';
+    document.getElementById('userEmail').textContent = email || '';
+
+    document.getElementById('profilePhoto').src = photoSrc ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=000&color=fff&size=80`;
+
+    if (coursesLink)    { coursesLink.classList.remove('locked');    coursesLink.onclick    = null; }
+    if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
+    
+    if(typeof window.loadCourses === 'function') {
+        window.loadCourses(email);
+    }
+  }
+
+  function showLoggedOut() {
+    const userProfile    = document.getElementById('userProfile');
+    const loginPrompt    = document.getElementById('loginPrompt');
+    const coursesLink    = document.getElementById('coursesLink');
+    const coursesLinkNav = document.getElementById('coursesLinkNav');
+
+    userProfile.style.display = 'none';
+    loginPrompt.style.display = 'block';
+
+    const handleLock = (e) => {
+        e.preventDefault();
+        alert('Please login to access PREMium Courses!');
+        window.location.href = 'login.html';
       };
-      const app     = initializeApp(firebaseConfig);
-      const auth    = getAuth(app);
-      const storage = getStorage(app);
-      function updateUI(name, email, photoSrc) {
-        const userProfile    = document.getElementById('userProfile');
-        const loginPrompt    = document.getElementById('loginPrompt');
-        const coursesLink    = document.getElementById('coursesLink');
-        const coursesLinkNav = document.getElementById('coursesLinkNav');
-        const desktopUserPill = document.getElementById('desktopUserPillContainer');
-        const desktopLoginBtn = document.getElementById('desktopLoginBtnContainer');
-        const sidebarFooter  = document.getElementById('sidebarFooter');
-        if(userProfile) userProfile.style.display = 'flex';
-        if(loginPrompt) loginPrompt.style.display = 'none';
-        if(sidebarFooter) sidebarFooter.style.display = 'block';
-        if(desktopUserPill && desktopLoginBtn) {
-            desktopUserPill.style.display = 'inline-flex';
-            desktopLoginBtn.style.display = 'none';
-            const navAvatar = document.getElementById('navAvatarImg');
-            const navName = document.getElementById('navUserName');
-            const userPhoto = photoSrc || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=000&color=fff&size=80`;
-            if(navAvatar) navAvatar.src = userPhoto;
-            if(navName) navName.textContent = name || 'User';
-        }
-        const userNameElem = document.getElementById('userName');
-        const userEmailElem = document.getElementById('userEmail');
-        if(userNameElem) userNameElem.textContent  = name  || 'User';
-        if(userEmailElem) userEmailElem.textContent = email || '';
-        const profilePhoto = document.getElementById('profilePhoto');
-        if(profilePhoto) {
-            profilePhoto.src = photoSrc || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=000&color=fff&size=80`;
-        }
-        if (coursesLink)    { coursesLink.classList.remove('locked');    coursesLink.onclick    = null; }
-        if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
-        
-        if(typeof window.loadCourses === 'function') {
-            window.loadCourses(email);
-        }
-      }
-      function showLoggedOut() {
-        const userProfile    = document.getElementById('userProfile');
-        const loginPrompt    = document.getElementById('loginPrompt');
-        const coursesLink    = document.getElementById('coursesLink');
-        const coursesLinkNav = document.getElementById('coursesLinkNav');
-        const desktopUserPill = document.getElementById('desktopUserPillContainer');
-        const desktopLoginBtn = document.getElementById('desktopLoginBtnContainer');
-        const sidebarFooter  = document.getElementById('sidebarFooter');
-        if(userProfile) userProfile.style.display = 'none';
-        if(loginPrompt) loginPrompt.style.display = 'block';
-        if(sidebarFooter) sidebarFooter.style.display = 'none';
-        if(desktopUserPill && desktopLoginBtn) {
-            desktopUserPill.style.display = 'none';
-            desktopLoginBtn.style.display = 'block';
-        }
-        const handleLock = (e) => {
-            e.preventDefault();
-            alert('Please login to access PREMium Courses!');
-            window.location.href = 'login.html';
-        };
-        if (coursesLink) { coursesLink.classList.add('locked'); coursesLink.onclick = handleLock; }
-        if (coursesLinkNav) { coursesLinkNav.classList.add('locked'); coursesLinkNav.onclick = handleLock; }
-        
-        if(typeof window.loadCourses === 'function') {
-            window.loadCourses('');
-        }
-      }
-      const customEmail = window.getStoredEmail ? window.getStoredEmail() : localStorage.getItem('customUserEmail');
-      const customName  = window.getStoredName  ? window.getStoredName()  : localStorage.getItem('customUserName');
-      if (customEmail) {
-        updateUI(customName, customEmail, null);
+
+    if (coursesLink) { coursesLink.classList.add('locked'); coursesLink.onclick = handleLock; }
+    if (coursesLinkNav) { coursesLinkNav.classList.add('locked'); coursesLinkNav.onclick = handleLock; }
+    
+    if(typeof window.loadCourses === 'function') {
+        window.loadCourses('');
+    }
+  }
+
+  // Cookie-aware session check (falls back to cookie if localStorage is empty)
+  const customEmail = window.getStoredEmail ? window.getStoredEmail() : localStorage.getItem('customUserEmail');
+  const customName  = window.getStoredName  ? window.getStoredName()  : localStorage.getItem('customUserName');
+
+  if (customEmail) {
+    updateUI(customName, customEmail, null);
+  } else {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || getCookie('profilePhoto_' + user.uid) || user.photoURL;
+        updateUI(user.displayName, user.email, photoURL);
       } else {
-        onAuthStateChanged(auth, (user) => {
-          if (user) {
-            const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || getCookie('profilePhoto_' + user.uid) || user.photoURL;
-            updateUI(user.displayName, user.email, photoURL);
-          } else {
-            showLoggedOut();
-          }
+        showLoggedOut();
+      }
+    });
+  }
+
+  document.getElementById('photo-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+      const photoStorageRef = storageRef(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
+      await uploadBytes(photoStorageRef, file);
+      const photoURL = await getDownloadURL(photoStorageRef);
+      localStorage.setItem('profilePhoto_' + user.uid, photoURL);
+      setCookie('profilePhoto_' + user.uid, photoURL);
+      document.getElementById('profilePhoto').src = photoURL;
+      alert('Profile photo updated successfully!');
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      alert('Error uploading photo. Please try again.');
+    }
+  });
+
+  window.handleLogout = async () => {
+    clearStoredSession();
+    try { await signOut(auth); } catch (error) {}
+    alert('Logged out successfully!');
+    window.location.reload();
+  };
+</script>
+
+<script>
+// -------------------------------------------------------------
+// PAYMENT SDK & ENROLLMENT LOGIC (FRONTEND)
+// -------------------------------------------------------------
+
+const cashfree = Cashfree({
+    mode: "production", 
+});
+
+// 🔥 VIDEO PLAY LOGIC 🔥
+document.getElementById('watchVideoBtn').onclick = function() {
+    const videoContainer = document.getElementById('videoContainer');
+    const videoIframe = document.getElementById('tutorialVideo');
+    const videoAgree = document.getElementById('video_agree');
+    const videoLabel = document.getElementById('video_agree_label');
+
+    // Video show karo & Autoplay chalu karo
+    videoContainer.style.display = 'block';
+    videoIframe.src = "https://www.youtube.com/embed/-6-W7LiGpoM?rel=0&autoplay=1";
+
+    // Checkbox unlock karo & Auto tick karo
+    videoAgree.disabled = false;
+    videoAgree.checked = true;
+    videoAgree.style.cursor = 'pointer';
+    
+    videoLabel.style.color = '#1d4ed8';
+    videoLabel.style.cursor = 'pointer';
+    videoLabel.innerText = 'Watched';
+    
+    // Button styling change
+    this.innerHTML = '🔽 Playing...';
+    this.style.background = '#64748b';
+    this.disabled = true; 
+}
+
+// Close Modal Func (To stop background audio)
+window.closeTncModal = function() {
+    document.getElementById('tncModal').style.display = 'none';
+    document.getElementById('tutorialVideo').src = ''; // Video Stop
+}
+
+let currentPurchaseInfo = {};
+
+window.initiatePurchase = function(cid, price, showTnc) {
+    if(!getStoredEmail() && document.getElementById('userProfile').style.display === 'none') {
+        alert("Please Login / Sign Up first to buy this course.");
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    if (showTnc === '1' || showTnc === 1) {
+        currentPurchaseInfo = { cid, price };
+        
+        // Modal khulte hi sab kuch purani (lock) state me daalo
+        document.getElementById('tnc_agree').checked = false; 
+        
+        const videoAgree = document.getElementById('video_agree');
+        const videoLabel = document.getElementById('video_agree_label');
+        const watchBtn = document.getElementById('watchVideoBtn');
+        
+        videoAgree.checked = false;
+        videoAgree.disabled = true;
+        videoAgree.style.cursor = 'not-allowed';
+        
+        videoLabel.style.color = '#9ca3af';
+        videoLabel.style.cursor = 'not-allowed';
+        videoLabel.innerText = 'Must play video';
+        
+        document.getElementById('videoContainer').style.display = 'none';
+        document.getElementById('tutorialVideo').src = '';
+        
+        watchBtn.innerHTML = '▶️ Play Video';
+        watchBtn.style.background = '#1d4ed8';
+        watchBtn.disabled = false;
+
+        document.getElementById('tncModal').style.display = 'flex';
+    } else {
+        window.enrollCourse(cid, price);
+    }
+}
+
+// 🔥 Proceed Button Logic 🔥
+document.getElementById('tncProceedBtn').onclick = function() {
+    if (!document.getElementById('video_agree').checked) {
+        alert("Please click 'Play Video' button and confirm you have watched the tutorial.");
+        return;
+    }
+    if (!document.getElementById('tnc_agree').checked) {
+        alert("Please check the box to agree to the Terms & Conditions.");
+        return;
+    }
+    
+    document.getElementById('tncModal').style.display = 'none';
+    document.getElementById('tutorialVideo').src = ''; // Background play band karna zaruri hai
+    window.enrollCourse(currentPurchaseInfo.cid, currentPurchaseInfo.price);
+}
+
+
+window.enrollCourse = async function(courseId, price) {
+    // 🔥 FIX: CASHFREE LOCALHOST BLOCKER ALERT 🔥
+    if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+        alert("⚠️ WARNING: Cashfree Payments strictly block localhost/127.0.0.1 for security reasons.\n\nTo test payments, please deploy/upload this HTML file to your live server (Netlify or Hostinger).");
+        return;
+    }
+
+    const emailToUse = getStoredEmail() || document.getElementById('userEmail').textContent;
+
+    if (!emailToUse || document.getElementById('userProfile').style.display === 'none') {
+        alert("Please Login / Sign Up first to buy this course.");
+        window.location.href = 'login.html';
+        return;
+    }
+
+    try {
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = "Processing...";
+        btn.disabled = true;
+
+        const response = await fetch("https://premind.diplomawallah.in/create_order.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: emailToUse, course_id: courseId, price: price })
         });
-      }
-      const photoInput = document.getElementById('photo-input');
-      if (photoInput) {
-        photoInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const user = auth.currentUser;
-            if (!user) return;
-            try {
-              const photoStorageRef = storageRef(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
-              await uploadBytes(photoStorageRef, file);
-              const photoURL = await getDownloadURL(photoStorageRef);
-              localStorage.setItem('profilePhoto_' + user.uid, photoURL);
-              setCookie('profilePhoto_' + user.uid, photoURL);
-              document.getElementById('profilePhoto').src = photoURL;
-              alert('Profile photo updated successfully!');
-            } catch (error) {
-              console.error('Error uploading photo:', error);
-              alert('Error uploading photo. Please try again.');
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+
+        if (data.payment_session_id) {
+            let checkoutOptions = {
+                paymentSessionId: data.payment_session_id,
+                redirectTarget: "_modal", 
+            };
+            
+            cashfree.checkout(checkoutOptions).then((result) => {
+                if(result.error){
+                    alert("Payment Failed: " + result.error.message);
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+                if(result.paymentDetails){
+                    btn.innerText = "Verifying...";
+                    fetch(`https://premind.diplomawallah.in/verify_payment.php?order_id=${data.order_id}&course_id=${courseId}&email=${emailToUse}`)
+                    .then(res => res.json())
+                    .then(verifyData => {
+                        if(verifyData.status === 'success') {
+                            alert("🎉 Payment Successful! Course is now added to your account.");
+                            window.loadCourses(emailToUse);
+                        } else {
+                            alert("Payment verification failed.");
+                            btn.innerText = originalText;
+                            btn.disabled = false;
+                        }
+                    })
+                    .catch(err => {
+                        window.loadCourses(emailToUse);
+                    });
+                }
+            });
+        } else {
+            alert("Error initializing payment.");
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+
+    } catch (error) {
+        alert("Connection issue. Please try again.");
+    }
+}
+
+window.loadCourses = async function(userEmail = '') {
+    try {
+        const container = document.getElementById('dynamic-products-container');
+        container.innerHTML = '<p style="text-align:center; width:100%;">Loading Premium Store...</p>';
+
+        const apiUrl = userEmail ? `https://premind.diplomawallah.in/api.php?email=${encodeURIComponent(userEmail)}` : 'https://premind.diplomawallah.in/api.php'; 
+        
+        const response = await fetch(apiUrl);
+        const allCourses = await response.json();
+
+        // 🚫 Filter out soft-deleted courses (is_deleted = 1). Only is_deleted = 0 (or missing) shows.
+        const courses = Array.isArray(allCourses) ? allCourses.filter(c => {
+            const deletedVal = c.is_deleted;
+            const isDeleted = deletedVal == 1 || deletedVal === '1' || deletedVal === true;
+            return !isDeleted;
+        }) : [];
+
+        container.innerHTML = ''; 
+
+        if(courses.length === 0) {
+            container.innerHTML = '<p style="text-align:center; width:100%;">No courses available right now.</p>';
+            return;
+        }
+
+        courses.forEach(course => {
+            let badgeHTML = course.badge ? `<span class="new-badge">${course.badge}</span>` : '';
+            let desc1HTML = course.desc1 ? `<p>${course.desc1}</p>` : '';
+            let desc2HTML = course.desc2 ? `<p>${course.desc2}</p>` : '';
+            let oldPriceHTML = course.old_price ? `<span>₹${course.old_price}</span>` : '';
+            let btnHTML = '';
+
+            let reportBtnHTML = '';
+            if (course.show_report_btn == 1 || course.show_report_btn == "1") {
+                if (course.report_status === 'pending') {
+                    reportBtnHTML = `<button class="btn-solving" disabled>Solving... ⏳</button>`;
+                } else {
+                    reportBtnHTML = `<button class="report-btn" onclick="openReportModal(${course.id})">🚩 Report</button>`;
+                }
             }
-          });
+
+            if (course.is_enrolled == 1) {
+                btnHTML = `<button style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.location.href='lecture.html?id=${course.id}'">Access Now 🎓</button>`;
+            } else if (course.req_status === 'pending') {
+                btnHTML = `<button class="btn-reviewing" disabled>Reviewing... ⏳</button>`;
+            } else {
+                
+                if(course.btn_type === 'disabled_look') {
+                    btnHTML = `<button class="disabled-btn">${course.btn_text}</button>`;
+                } else if (course.btn_type === 'preview_buy') {
+                    btnHTML = `
+                        <button style="background: transparent; color: #111; border: 2px solid #111; padding: 5px; border-radius: 8px; font-weight: bold; margin-bottom: 10px; cursor: pointer; width: 100%;" onclick="window.open('${course.demo_link}', '_blank')">Preview (Demo)</button>
+                        <button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase(${course.id}, ${course.price}, '${course.show_tnc || 0}')">${course.btn_text}</button>
+                    `;
+                } else if (course.btn_type === 'disabled') {
+                    btnHTML = `<button class="disabled-btn" disabled>${course.btn_text}</button>`;
+                } else {
+                    btnHTML = `<button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase(${course.id}, ${course.price}, '${course.show_tnc || 0}')">${course.btn_text}</button>`;
+                }
+
+                let courseName = course.title.toLowerCase();
+                if ((courseName.includes('professional') || courseName.includes('skill')) && !courseName.includes('important questions')) {
+                    if (course.btn_type === 'preview_buy') {
+                        btnHTML = `
+                            <div style="display: flex; gap: 8px; margin-bottom: 10px; width: 100%;">
+                                <button style="flex: 1; background: transparent; color: #111; border: 1.5px solid #111; padding: 6px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;" onclick="window.open('${course.demo_link}', '_blank')">Preview</button>
+                                
+                                <button class="wa-unlock-btn" style="flex: 1; margin-bottom: 0; padding: 6px; border-radius: 6px; font-size: 13px;" onclick="openWaModal(${course.id})">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:14px !important; height:14px !important; margin-bottom:0 !important; display:inline-block; border-radius:0 !important;"> WA Unlock
+                                </button>
+                            </div>
+                            <button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase(${course.id}, ${course.price}, '${course.show_tnc || 0}')">${course.btn_text}</button>
+                        `;
+                    } else {
+                        let waBtn = `
+                            <button class="wa-unlock-btn" onclick="openWaModal(${course.id})">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:18px !important; height:18px !important; margin-bottom:0 !important; display:inline-block; border-radius:0 !important;"> Unlock via WhatsApp
+                            </button>
+                        `;
+                        btnHTML = waBtn + btnHTML;
+                    }
+                }
+            }
+
+            btnHTML = reportBtnHTML + btnHTML;
+
+            const cardHTML = `
+                <div class="course-card">
+                  <img src="${course.image}" alt="${course.title}" onerror="this.src='small-logo.png'"/>
+                  ${badgeHTML}
+                  <h2>${course.title}</h2>
+                  ${desc1HTML}
+                  ${desc2HTML}
+                  <p class="price">₹${course.price}${oldPriceHTML}</p>
+                  ${btnHTML}
+                </div>
+            `;
+            container.innerHTML += cardHTML;
+        });
+    } catch (error) {
+        document.getElementById('dynamic-products-container').innerHTML = '<p style="text-align:center; width:100%; color:red;">Database Connection Error.</p>';
+    }
+}
+</script>
+
+<script>
+  // 💥 WHATSAPP MODAL LOGIC 💥
+  function openWaModal(cid) {
+      if(!getStoredEmail()) {
+          alert("Please login first to unlock via WhatsApp!"); 
+          window.location.href = 'login.html'; 
+          return;
       }
-      window.handleLogout = async () => {
-        clearStoredSession();
-        try { await signOut(auth); } catch (error) {}
-        alert('Logged out successfully!');
-        window.location.reload();
-      };
-    </script>
-    <!-- PAYMENT & STORE LOGIC SCRIPT -->
-    <script>
-      const cashfree = Cashfree({ mode: "production" });
-      // Video Play Handler
-      const watchBtn = document.getElementById('watchVideoBtn');
-      if(watchBtn) {
-          watchBtn.onclick = function() {
-              const videoContainer = document.getElementById('videoContainer');
-              const videoIframe = document.getElementById('tutorialVideo');
-              const videoAgree = document.getElementById('video_agree');
-              const videoLabel = document.getElementById('video_agree_label');
-              videoContainer.style.display = 'block';
-              videoIframe.src = "https://www.youtube.com/embed/-6-W7LiGpoM?rel=0&autoplay=1";
-              videoAgree.disabled = false;
-              videoAgree.checked = true;
-              videoAgree.style.cursor = 'pointer';
-              
-              videoLabel.style.color = '#1d4ed8';
-              videoLabel.style.cursor = 'pointer';
-              videoLabel.innerText = 'Watched';
-              
-              this.innerHTML = '🔽 Playing...';
-              this.style.background = '#64748b';
-              this.disabled = true; 
-          };
-      }
-      window.closeTncModal = function() {
-          document.getElementById('tncModal').style.display = 'none';
-          document.getElementById('tutorialVideo').src = '';
-      };
-      let currentPurchaseInfo = {};
-      window.initiatePurchase = function(cid, price, showTnc) {
-          if(!getStoredEmail() && document.getElementById('userProfile').style.display === 'none') {
-              alert("Please Login / Sign Up first to buy this course.");
-              window.location.href = 'login.html';
-              return;
+      document.getElementById('wa_cid').value = cid;
+      document.getElementById('waModal').style.display = 'flex';
+  }
+
+  document.getElementById('waForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('waSubmit');
+      btn.innerText = "Processing..."; btn.disabled = true;
+
+      const fd = new FormData();
+      fd.append('email', getStoredEmail());
+      fd.append('phone', getStoredPhone() || '0000000000');
+      fd.append('course_id', document.getElementById('wa_cid').value);
+      fd.append('college', document.getElementById('wa_college').value);
+      fd.append('branch', document.getElementById('wa_branch').value);
+      fd.append('screenshot', document.getElementById('wa_file').files[0]);
+
+      try {
+          const res = await fetch('https://premind.diplomawallah.in/submit_review.php', { method: 'POST', body: fd });
+          const data = await res.json();
+          if(data.status === 'success') {
+              alert("✅ Submitted Successfully! Please wait 2-4 hours for review.");
+              window.location.reload();
+          } else { 
+              alert("Error: " + data.message); 
           }
-          
-          if (showTnc === '1' || showTnc === 1) {
-              currentPurchaseInfo = { cid, price };
-              document.getElementById('tnc_agree').checked = false; 
-              
-              const videoAgree = document.getElementById('video_agree');
-              const videoLabel = document.getElementById('video_agree_label');
-              const watchBtn = document.getElementById('watchVideoBtn');
-              
-              videoAgree.checked = false;
-              videoAgree.disabled = true;
-              videoAgree.style.cursor = 'not-allowed';
-              
-              videoLabel.style.color = '#9ca3af';
-              videoLabel.style.cursor = 'not-allowed';
-              videoLabel.innerText = 'Must play video';
-              
-              document.getElementById('videoContainer').style.display = 'none';
-              document.getElementById('tutorialVideo').src = '';
-              
-              watchBtn.innerHTML = '▶️ Play Video';
-              watchBtn.style.background = '#1d4ed8';
-              watchBtn.disabled = false;
-              document.getElementById('tncModal').style.display = 'flex';
+      } catch (error) { 
+          alert("Server Error. Please try again later."); 
+      }
+      btn.innerText = "Submit for Review →"; btn.disabled = false;
+  };
+
+  // 🚩 REPORT ISSUE MODAL LOGIC 🚩
+  window.openReportModal = function(cid) {
+      if(!getStoredEmail()) {
+          alert("Please login first to report an issue!");
+          window.location.href = 'login.html';
+          return;
+      }
+      document.getElementById('report_cid').value = cid;
+      document.getElementById('reportModal').style.display = 'flex';
+  }
+
+  document.getElementById('reportForm').onsubmit = async (e) => {
+      e.preventDefault();
+      if (!document.getElementById('report_agree').checked) {
+          alert("Please acknowledge the resolution time by checking the box.");
+          return;
+      }
+      const btn = document.getElementById('reportSubmit');
+      btn.innerText = "Submitting..."; btn.disabled = true;
+
+      const fd = new FormData();
+      fd.append('email', getStoredEmail());
+      fd.append('course_id', document.getElementById('report_cid').value);
+      fd.append('message', document.getElementById('report_msg').value);
+      
+      if (document.getElementById('report_file').files[0]) {
+          fd.append('screenshot', document.getElementById('report_file').files[0]);
+      }
+
+      try {
+          const res = await fetch('https://premind.diplomawallah.in/submit_report.php', { method: 'POST', body: fd });
+          const data = await res.json();
+          if(data.status === 'success') {
+              alert("✅ Report Submitted! We will look into it within 1-2 hours.");
+              window.location.reload();
           } else {
-              window.enrollCourse(cid, price);
+              alert("Error: " + data.message);
           }
-      };
-      const tncProceedBtn = document.getElementById('tncProceedBtn');
-      if (tncProceedBtn) {
-          tncProceedBtn.onclick = function() {
-              if (!document.getElementById('video_agree').checked) {
-                  alert("Please click 'Play Video' button and confirm you have watched the tutorial.");
-                  return;
-              }
-              if (!document.getElementById('tnc_agree').checked) {
-                  alert("Please check the box to agree to the Terms & Conditions.");
-                  return;
-              }
-              document.getElementById('tncModal').style.display = 'none';
-              document.getElementById('tutorialVideo').src = '';
-              window.enrollCourse(currentPurchaseInfo.cid, currentPurchaseInfo.price);
-          };
+      } catch (error) {
+          alert("Server Error. Please check backend API.");
       }
-      window.enrollCourse = async function(courseId, price) {
-          if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
-              alert("⚠️ WARNING: Cashfree Payments strictly block localhost/127.0.0.1 for security reasons.\n\nTo test payments, please deploy/upload this HTML file to your live server (Netlify or Hostinger).");
-              return;
-          }
-          const emailToUse = getStoredEmail() || document.getElementById('userEmail').textContent;
-          if (!emailToUse || document.getElementById('userProfile').style.display === 'none') {
-              alert("Please Login / Sign Up first to buy this course.");
-              window.location.href = 'login.html';
-              return;
-          }
-          try {
-              const response = await fetch("https://premind.diplomawallah.in/create_order.php", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ email: emailToUse, course_id: courseId, price: price })
-              });
-              
-              if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-              const data = await response.json();
-              if (data.payment_session_id) {
-                  let checkoutOptions = {
-                      paymentSessionId: data.payment_session_id,
-                      redirectTarget: "_modal", 
-                  };
-                  
-                  cashfree.checkout(checkoutOptions).then((result) => {
-                      if(result.error){
-                          alert("Payment Failed: " + result.error.message);
-                      }
-                      if(result.paymentDetails){
-                          fetch(`https://premind.diplomawallah.in/verify_payment.php?order_id=${data.order_id}&course_id=${courseId}&email=${emailToUse}`)
-                          .then(res => res.json())
-                          .then(verifyData => {
-                              if(verifyData.status === 'success') {
-                                  alert("🎉 Payment Successful! Course is now added to your account.");
-                                  window.loadCourses(emailToUse);
-                              } else {
-                                  alert("Payment verification failed.");
-                              }
-                          })
-                          .catch(() => window.loadCourses(emailToUse));
-                      }
-                  });
-              } else {
-                  alert("Error initializing payment.");
-              }
-          } catch (error) {
-              alert("Connection issue. Please try again.");
-          }
-      };
-      let globalLoadedCourses = [];
-      let currentActiveCategory = 'all';
-      window.openWaModal = function(cid) {
-          document.getElementById('wa_cid').value = cid;
-          document.getElementById('waModal').style.display = 'flex';
-      };
-      window.openReportModal = function(cid) {
-          document.getElementById('report_cid').value = cid;
-          document.getElementById('reportModal').style.display = 'flex';
-      };
-      window.loadCourses = async function(userEmail = '') {
-          try {
-              const container = document.getElementById('store-courses-grid');
-              if(!container) return;
-              container.innerHTML = '<p style="text-align:center; width:100%; grid-column: 1 / -1; padding: 40px 0;">Loading PREMium Store...</p>';
-              const apiUrl = userEmail ? `https://premind.diplomawallah.in/api.php?email=${encodeURIComponent(userEmail)}` : 'https://premind.diplomawallah.in/api.php'; 
-              
-              const response = await fetch(apiUrl);
-              const allCourses = await response.json();
-              globalLoadedCourses = Array.isArray(allCourses) ? allCourses.filter(c => {
-                  const deletedVal = c.is_deleted;
-                  return !(deletedVal == 1 || deletedVal === '1' || deletedVal === true);
-              }) : [];
-              renderStoreGrid();
-          } catch(err) {
-              console.error(err);
-              renderStoreGrid();
-          }
-      };
-      function renderStoreGrid() {
-          const container = document.getElementById('store-courses-grid');
-          if(!container) return;
-          container.innerHTML = '';
-          // Filter by category
-          const filtered = globalLoadedCourses.filter(course => {
-              const cat = (course.category || 'projects').toLowerCase();
-              return currentActiveCategory === 'all' || cat === currentActiveCategory;
-          });
-          if(filtered.length === 0) {
-              const categoryTitles = {
-                  'notes': 'Notes & PYQs',
-                  'ebooks': 'E-Books & Syllabus Guides',
-                  'resume': 'ATS Resume Templates',
-                  'report-writing': 'Report Writing Resources',
-                  'projects': 'Projects & Source Code'
-              };
-              const title = categoryTitles[currentActiveCategory] || 'Resources';
-              container.innerHTML = `
-                  <div class="empty-category-state">
-                      <div class="empty-icon-box">
-                          <ion-icon name="cloud-upload-outline"></ion-icon>
-                      </div>
-                      <h3>${title} Coming Soon!</h3>
-                      <p>We are currently compiling high-quality ${title.toLowerCase()} for you. Stay tuned!</p>
-                      <button class="empty-action-btn" onclick="window.filterCategoryGlobal('all')">
-                          <ion-icon name="arrow-back-outline"></ion-icon> View All Products
-                      </button>
-                  </div>
-              `;
-              return;
-          }
-          filtered.forEach((course, index) => {
-              // Badge Ribbon / Badge
-              let badgeHTML = '';
-              if (course.badge) {
-                  badgeHTML = `<span class="new-badge">${course.badge}</span>`;
-              } else if (course.is_new == 1 || course.new_badge) {
-                  badgeHTML = `<span class="new-badge">${course.new_badge || 'NEW'}</span>`;
-              }
-              let oldPriceHTML = course.old_price ? `<span class="old-price">₹${course.old_price}</span>` : '';
-              
-              // Descriptions
-              let descHTML = '';
-              if (course.desc1) descHTML += `<p class="card-desc">${course.desc1}</p>`;
-              if (course.desc2) descHTML += `<p class="card-desc desc-sub">${course.desc2}</p>`;
-              if (!course.desc1 && !course.desc2 && course.desc) descHTML += `<p class="card-desc">${course.desc}</p>`;
-              // Mini Timer Box
-              let timerHTML = '';
-              if (course.timer || course.timer_text || course.show_timer == 1 || course.show_timer == "1") {
-                  const timerVal = course.timer || course.timer_text || '02h 15m';
-                  timerHTML = `<div class="mini-timer">⏰ Limited Offer: <span>${timerVal}</span></div>`;
-              }
-              // Report Problem / Solving Button
-              let reportBtnHTML = '';
-              if (course.show_report_btn == 1 || course.show_report_btn == "1") {
-                  if (course.report_status === 'pending') {
-                      reportBtnHTML = `<button class="btn-solving" disabled>Solving... ⏳</button>`;
-                  } else {
-                      reportBtnHTML = `<button class="report-btn" onclick="openReportModal(${course.id})">🚩 Report</button>`;
-                  }
-              }
-              // Main CTA Button
-              let btnHTML = '';
-              if (course.is_enrolled == 1 || course.is_enrolled == "1") {
-                  btnHTML = `<button class="buy-course-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" onclick="window.location.href='lecture.html?id=${course.id}'">Access Now 🎓</button>`;
-              } else if (course.req_status === 'pending') {
-                  btnHTML = `<button class="btn-reviewing" disabled>Under Review ⏳</button>`;
-              } else if (course.is_free == 1 || course.price == 0) {
-                  btnHTML = `<button class="wa-unlock-btn" onclick="openWaModal('${course.id}')">🎁 Unlock Free via WhatsApp</button>`;
-              } else if (course.is_disabled == 1 || course.disabled == 1 || course.is_disabled == "1") {
-                  btnHTML = `<button class="disabled-btn" disabled>Sold Out / Closed</button>`;
-              } else {
-                  btnHTML = `<button class="buy-course-btn" onclick="initiatePurchase('${course.id}', ${course.price}, ${course.show_tnc || 0})">Enroll Now ₹${course.price}</button>`;
-              }
-              const cat = (course.category || 'projects').toLowerCase();
-              const cardHTML = `
-                  <div class="course-card fade-in" data-category="${cat}" style="animation-delay: ${0.06 * (index + 1)}s;">
-                      <div class="card-img-wrapper">
-                          ${badgeHTML}
-                          <img src="${course.image || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'}" alt="${course.title}">
-                      </div>
-                      <div class="card-report-slot">
-                          ${reportBtnHTML}
-                      </div>
-                      <h3>${course.title}</h3>
-                      <div class="card-desc-container">
-                          ${descHTML}
-                      </div>
-                      ${timerHTML}
-                      <div class="course-meta">
-                          <div class="price-box">
-                              <span class="price">₹${course.price}</span>
-                              ${oldPriceHTML}
-                          </div>
-                          <div class="rating"><ion-icon name="star"></ion-icon> 4.9</div>
-                      </div>
-                      <div class="card-actions">
-                          ${btnHTML}
-                      </div>
-                  </div>
-              `;
-              container.insertAdjacentHTML('beforeend', cardHTML);
-          });
-      }
-      window.filterCategoryGlobal = function(categoryName) {
-          currentActiveCategory = categoryName.toLowerCase();
-          const categoryTabs = document.querySelectorAll('.category-tab');
-          categoryTabs.forEach(tab => {
-              if (tab.getAttribute('data-category') === currentActiveCategory) {
-                  tab.classList.add('active');
-                  tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-              } else {
-                  tab.classList.remove('active');
-              }
-          });
-          renderStoreGrid();
-      };
-      document.addEventListener('DOMContentLoaded', () => {
-          // --- Mobile Sidebar Toggle Logic ---
-          const menuBtn = document.getElementById('mobile-menu-btn');
-          const sidebar = document.getElementById('sidebar');
-          const overlay = document.getElementById('sidebar-overlay');
-          const closeBtn = document.getElementById('close-sidebar-btn');
-          function openSidebar() {
-              if(sidebar) sidebar.classList.add('active');
-              if(overlay) overlay.classList.add('active');
-              document.body.style.overflow = 'hidden';
-          }
-          window.openSidebarGlobal = openSidebar;
-          function closeSidebar() {
-              if(sidebar) sidebar.classList.remove('active');
-              if(overlay) overlay.classList.remove('active');
-              document.body.style.overflow = 'auto';
-          }
-          if(menuBtn) menuBtn.addEventListener('click', openSidebar);
-          if(closeBtn) closeBtn.addEventListener('click', closeSidebar);
-          if(overlay) overlay.addEventListener('click', closeSidebar);
-          document.querySelectorAll('.sidebar-link, .sidebar-sublink').forEach(link => {
-              link.addEventListener('click', closeSidebar);
-          });
-          // --- Mobile Sidebar Dropdown Accordion ---
-          const mobileStoreToggle = document.getElementById('mobile-store-toggle');
-          const sidebarDropdown = document.querySelector('.sidebar-dropdown');
-          if (mobileStoreToggle && sidebarDropdown) {
-              mobileStoreToggle.addEventListener('click', (e) => {
-                  e.stopPropagation();
-                  sidebarDropdown.classList.toggle('open');
-              });
-          }
-          // --- Sticky Navbar Effect ---
-          const navbar = document.getElementById('navbar');
-          window.addEventListener('scroll', () => {
-              if (window.scrollY > 20) {
-                  if(navbar) navbar.classList.add('scrolled');
-              } else {
-                  if(navbar) navbar.classList.remove('scrolled');
-              }
-          });
-          // --- Replay Hero Headline Animation on Click ---
-          const heroTitle = document.getElementById('hero-title');
-          if (heroTitle) {
-              heroTitle.addEventListener('click', () => {
-                  const words = heroTitle.querySelectorAll('.animated-word');
-                  words.forEach(word => {
-                      word.style.animation = 'none';
-                      word.offsetHeight;
-                      word.style.animation = '';
-                  });
-              });
-          }
-          // --- Category Filter Tab Clicks ---
-          const categoryTabs = document.querySelectorAll('.category-tab');
-          categoryTabs.forEach(tab => {
-              tab.addEventListener('click', () => {
-                  const cat = tab.getAttribute('data-category');
-                  window.filterCategoryGlobal(cat);
-              });
-          });
-          // Hash Change Listener
-          function handleHashFilter() {
-              const hash = window.location.hash.replace('#', '').toLowerCase();
-              if (['notes', 'ebooks', 'resume', 'report-writing', 'projects', 'all'].includes(hash)) {
-                  window.filterCategoryGlobal(hash);
-                  const storeElem = document.getElementById('store');
-                  if (storeElem) {
-                      storeElem.scrollIntoView({ behavior: 'smooth' });
-                  }
-              }
-          }
-          window.addEventListener('hashchange', handleHashFilter);
-          handleHashFilter();
-          
-          // Initial courses fetch
-          window.loadCourses(getStoredEmail());
-      });
-    </script>
+      btn.innerText = "Submit Report"; btn.disabled = false;
+  };
+
+  // Footer WhatsApp Contact Form logic
+  document.getElementById("whForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    const name = encodeURIComponent(document.getElementById("name").value);
+    const phone = encodeURIComponent(document.getElementById("phone").value);
+    const msg = encodeURIComponent(document.getElementById("message").value);
+    window.open(`https://wa.me/919153950552?text=Name: ${name}%0APhone: ${phone}%0AMessage: ${msg}`, "_blank");
+  });
+
+  const menuBtn = document.getElementById("menu-btn");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+  menuBtn.addEventListener("click", () => { sidebar.classList.add("active"); overlay.classList.add("active"); });
+  overlay.addEventListener("click", () => { sidebar.classList.remove("active"); overlay.classList.remove("active"); });
+  document.querySelectorAll(".sidebar ul li a").forEach(link => {
+    link.addEventListener("click", () => { sidebar.classList.remove("active"); overlay.classList.remove("active"); });
+  });
+
+</script>
+
 </body>
 </html>
