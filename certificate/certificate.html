@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bulk Internship Offer Letter Generator</title>
+    <title>Bulk Certificate Generator</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,12 +24,12 @@
             padding: 20px;
         }
 
-        /* ----- Background Image Setup ----- */
+        /* ----- Background Template ----- */
         .page {
             width: 210mm;
             height: 297mm;
             background-color: white;
-            background-image: url('templete3.jpg');
+            background-image: url('templete3.jpg'); 
             background-size: 210mm 297mm;
             background-repeat: no-repeat;
             background-position: center top;
@@ -40,47 +40,67 @@
             overflow: hidden;
         }
 
-        /* ----- Header Text Aligned exactly like the image ----- */
+        /* ----- Header Text Aligned exactly like the old code ----- */
         .top-container {
             width: 100%;
-            padding-top: 117px; 
-            padding-left: 50%;  
+            padding-top: 113px; /* Updated default */
+            padding-left: 46%;  /* Updated default */
             padding-right: 2mm;
             display: flex;
             justify-content: flex-start;
-            gap: 28px; 
+            gap: 11px; /* Updated default */
             font-size: 15px; 
             color: #111;
             line-height: 1.5;
+            font-family: sans-serif;
         }
         .left-info div { margin-bottom: 8px; }
         .right-info { text-align: right; }
+        
+        .blue-text { color: #02277F; }
 
         /* ----- Body Content Section ----- */
         .content {
-            padding: 4mm 22mm 0 22mm;
+            padding: 2mm 22mm 0 22mm;
             font-size: 17px; 
-            line-height: 1.4; 
+            line-height: 1.5; 
             color: #111; 
             flex-grow: 1; 
         }
-        
-        /* New Heading CSS */
-        .letter-heading {
+
+        .cert-title {
             text-align: center;
-            color: #02277F;
-            font-size: 22px;
+            font-size: 26px;
             font-weight: bold;
+            margin-top: 0px;
             margin-bottom: 25px;
-            text-transform: uppercase;
-            font-family: 'Archivo Black', sans-serif;
             letter-spacing: 1px;
+            font-family: 'Archivo Black', sans-serif; 
         }
 
-        .content p { margin-bottom: 22px; text-align: justify; }
-        .dates-block { margin-bottom: 25px; line-height: 1.8; }
+        .enrollment {
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
 
-        /* ----- Signature & Stamp Section ----- */
+        .content p { 
+            margin-bottom: 22px; 
+            text-align: justify; 
+        }
+
+        .training-details h4 {
+            font-size: 17px;
+            margin-bottom: 8px;
+        }
+
+        .training-details ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+
+        /* ----- Signature & Stamp Layout ----- */
         .signature-area {
             position: relative;
             padding: 0 22mm;
@@ -88,34 +108,34 @@
             margin-bottom: 30mm;
         }
         
-        /* Converted to absolute so you can slide it */
+        /* New styling to allow moving the Signature Text freely */
         #dynamicSignText {
             position: absolute;
-            left: 84px;   
-            bottom: 80px; 
+            left: 82px; /* Updated default */
+            bottom: 82px; /* Updated default */
             font-size: 16px; 
-            line-height: 1.5;
+            line-height: 1.4;
             color: #111;
             z-index: 2; 
         }
-        #dynamicSignText a { color: #0c3375; text-decoration: underline; }
 
         #dynamicStampBox {
             position: absolute;
-            left: 238px;   
-            bottom: 55px;  
+            left: 216px; /* Updated default */
+            bottom: 69px; /* Updated default */
             z-index: 1;
         }
+        
         #dynamicStampImg {
-            width: 138px;  
+            width: 137px;  /* Updated default */
             height: auto;
             display: block;
         }
 
-        /* ----- Control Panel Window ----- */
+        /* ----- Control Panel ----- */
         .controls {
             position: fixed;
-            top: 20px;
+            top: 200px;
             left: 20px;
             background: white;
             padding: 15px;
@@ -134,7 +154,7 @@
             border-radius: 5px;
             margin-bottom: 10px;
         }
-        .controls summary { font-weight: bold; color: #0c3375; cursor: pointer; font-size: 14px; outline: none; }
+        .controls summary { font-weight: bold; color: #1574b6; cursor: pointer; font-size: 14px; outline: none; }
         .controls label { font-size: 12px; font-weight: bold; color: #555; display: block; margin-top: 10px; margin-bottom: 4px; }
         
         .controls input[type="text"], .controls input[type="date"], .controls input[type="number"], .controls textarea {
@@ -148,11 +168,11 @@
         }
         .controls input[type="file"] { font-size: 11px; margin-bottom: 5px; }
         .controls input[type="range"] { width: 100%; margin-bottom: 5px; }
-        .controls .slider-val { font-weight: normal; color: #0c3375; float: right; }
+        .controls .slider-val { font-weight: normal; color: #1574b6; float: right; }
         
         .controls button {
             width: 100%;
-            background: #0c3375;
+            background: #1574b6;
             color: white;
             border: none;
             cursor: pointer;
@@ -175,71 +195,69 @@
 <body>
 
     <div class="controls">
-        <h3 style="margin-bottom:10px; color:#0c3375; font-size: 16px;">Bulk Letter Generator</h3>
+        <h3 style="margin-bottom:10px; color:#1574b6; font-size: 16px;">Bulk Certificate Generator</h3>
         
         <details>
-            <summary>1️⃣ Fix Local Image Errors</summary>
-            <p style="font-size: 11px; color: red; margin-bottom: 5px;">*ZIP PDF generate karne ke liye images browser me load karna zaruri hai warna background white aayega.*</p>
-            <label>Load Background (EL TEMP 2.jpg)</label>
+            <summary>1️⃣ Fix PDF Blank Image Issue</summary>
+            <p style="font-size: 11px; color: red; margin-bottom: 5px;">*Agar ZIP me background/stamp gayab ho jaye, toh wapas yahan se load karein.*</p>
+            <label>Load Background (templete3.jpg)</label>
             <input type="file" accept="image/*" onchange="loadBg(event)">
-            
-            <label>Load Stamp Image (sign.png)</label>
+            <label>Load Stamp & Sign (sign.png)</label>
             <input type="file" accept="image/*" onchange="loadStamp(event)">
         </details>
 
         <details open>
-            <summary>2️⃣ Setup Registration Series</summary>
+            <summary>2️⃣ Setup Enrollment Series</summary>
             <div style="display:flex; gap:10px;">
                 <div style="flex:2;">
                     <label>Prefix</label>
-                    <input type="text" id="regPrefix" value="VED/2026/WEBDEV/">
+                    <input type="text" id="regPrefix" value="VED/INTERN/INDAUTO/2026/">
                 </div>
                 <div style="flex:1;">
                     <label>Start No.</label>
-                    <input type="number" id="startReg" value="16">
+                    <input type="number" id="startReg" value="1">
                 </div>
             </div>
-            <label>Issue Date</label>
-            <input type="date" id="globalIssueDate" value="2026-02-28">
+            <label>Certificate Issue Date</label>
+            <input type="date" id="globalIssueDate" value="2026-03-01">
         </details>
 
         <details open>
             <summary>3️⃣ Paste Excel Data</summary>
-            <label style="color:#f78c1e;">Excel Columns Required (In Order):<br>Name | Course | Duration | Start Date | End Date</label>
-            <textarea id="bulkData" rows="6" placeholder="Vikas Kumar   Basics of HTML  3 months    01/03/2026  01/06/2026&#10;Rahul Singh  Basics of Node  6 months    10/03/2026  10/09/2026"></textarea>
-            
+            <label style="color:#e67e22;">Excel Columns Required (6 Columns):<br>Name | College Reg No | College Name | Course | Start Date | End Date</label>
+            <textarea id="bulkData" rows="5" placeholder="JAY PRAKASH RAM    23603080024 GARHWA POLYTECHNIC, GARHWA  Industrial Automation   01 March 2026   01 June 2026"></textarea>
             <button onclick="previewFirst()">👁️ Preview 1st Student</button>
         </details>
 
         <details>
             <summary>⚙️ Position Adjustments</summary>
-            <label>Gap Between Top Text: <span class="slider-val" id="valHeaderGap">28px</span></label>
-            <input type="range" id="headerGap" min="0" max="150" value="28" oninput="updateElements()">
+            <label>Gap Between Top Text: <span class="slider-val" id="valHeaderGap">11px</span></label>
+            <input type="range" id="headerGap" min="0" max="150" value="11" oninput="updateElements()">
             
-            <label>Top Text Left/Right (X): <span class="slider-val" id="valHeaderX">50%</span></label>
-            <input type="range" id="headerX" min="0" max="100" value="50" oninput="updateElements()">
+            <label>Top Text Left/Right (X): <span class="slider-val" id="valHeaderX">46%</span></label>
+            <input type="range" id="headerX" min="0" max="100" value="46" oninput="updateElements()">
             
-            <label>Top Text Up/Down (Y): <span class="slider-val" id="valHeaderY">117px</span></label>
-            <input type="range" id="headerY" min="0" max="300" value="117" oninput="updateElements()">
-            
-            <hr style="margin:10px 0;">
-            
-            <label>Stamp Size: <span class="slider-val" id="valStampSize">138px</span></label>
-            <input type="range" id="stampSize" min="50" max="350" value="138" oninput="updateElements()">
-            
-            <label>Stamp Left/Right (X): <span class="slider-val" id="valStampX">238px</span></label>
-            <input type="range" id="stampX" min="0" max="500" value="238" oninput="updateElements()">
-            
-            <label>Stamp Up/Down (Y): <span class="slider-val" id="valStampY">55px</span></label>
-            <input type="range" id="stampY" min="-100" max="300" value="55" oninput="updateElements()">
+            <label>Top Text Up/Down (Y): <span class="slider-val" id="valHeaderY">113px</span></label>
+            <input type="range" id="headerY" min="0" max="300" value="113" oninput="updateElements()">
             
             <hr style="margin:10px 0;">
             
-            <label>Sign Text Left/Right (X): <span class="slider-val" id="valSignX">84px</span></label>
-            <input type="range" id="signX" min="0" max="400" value="84" oninput="updateElements()">
+            <label>Stamp Size: <span class="slider-val" id="valStampSize">137px</span></label>
+            <input type="range" id="stampSize" min="50" max="350" value="137" oninput="updateElements()">
             
-            <label>Sign Text Up/Down (Y): <span class="slider-val" id="valSignY">80px</span></label>
-            <input type="range" id="signY" min="-50" max="300" value="80" oninput="updateElements()">
+            <label>Stamp Left/Right (X): <span class="slider-val" id="valStampX">216px</span></label>
+            <input type="range" id="stampX" min="0" max="500" value="216" oninput="updateElements()">
+            
+            <label>Stamp Up/Down (Y): <span class="slider-val" id="valStampY">69px</span></label>
+            <input type="range" id="stampY" min="-100" max="300" value="69" oninput="updateElements()">
+            
+            <hr style="margin:10px 0;">
+            
+            <label>Sign Text Left/Right (X): <span class="slider-val" id="valSignX">82px</span></label>
+            <input type="range" id="signX" min="0" max="400" value="82" oninput="updateElements()">
+            
+            <label>Sign Text Up/Down (Y): <span class="slider-val" id="valSignY">82px</span></label>
+            <input type="range" id="signY" min="-50" max="300" value="82" oninput="updateElements()">
         </details>
         
         <button id="zipBtn" class="zip-btn" onclick="generateZip()">🗂️ Download All as ZIP</button>
@@ -253,51 +271,55 @@
                 <div>GSTIN- 20AAJCV2661E1ZN</div>
             </div>
             <div class="right-info">
-                Date – <span id="issueDate">28/02/2026</span>
+                Date – <span id="issueDate">01/03/2026</span>
             </div>
         </div>
 
         <div class="content">
-            <div class="letter-heading">ENROLLMENT LETTER</div>
+            <div class="cert-title blue-text">CERTIFICATE OF COMPLETION</div>
             
-            <p>Dear <b><span id="studentName">Vikas Kumar</span></b>,</p>
-            
-            <p>Reg. Number – <b><span id="regNumber">VED/2026/WEBDEV/016</span></b></p>
-
-            <p>We are pleased to offer you an opportunity to join our organization for an <b>Internship Program</b> in <b><span id="courseName">Basics of Full stack development (HTML, CSS, JavaScript, React JS )</span></b>.</p>
-
-            <p>This internship program will be conducted over a period of <b><span id="durationStr">3 months</span></b>, during which you will receive practical training and gain hands-on exposure by working on <b>real-time projects</b> under the guidance of our experienced mentors. The objective of this program is to strengthen your fundamental understanding of web development concepts and enhance your technical and professional skills.</p>
-
-            <p>Upon the successful completion of the internship program and satisfactory submission of all assigned tasks and projects, you will be eligible to receive an <b>Internship Completion Certificate</b>.</p>
-
-            <div class="dates-block">
-                <b>Internship Start Date:</b> <span id="startDate">01/03/2026</span><br>
-                <b>Internship End Date:</b> <span id="endDate">01/06/2026</span>
+            <div class="enrollment">
+                <b><span class="blue-text">Enrollment No.:</span> <span id="regNumber">VED/INTERN/INDAUTO/2026/001</span></b>
             </div>
 
-            <p>We look forward to having enthusiastic internship as part of this learning journey and wish you great success in building your future careers in emerging technologies.</p>
+            <p>This is to certify that <b><span id="studentName">JAY PRAKASH RAM</span></b> with Reg No - <b><span id="collegeReg">23603080024</span></b> & College Name - <b><span id="collegeName">GARHWA POLYTECHNIC, GARHWA</span></b> has successfully completed an Industrial Training Program on <span id="courseName1">Industrial Automation</span> conducted by Venturing Digitally Private Limited.</p>
+
+            <p>The training program was designed to provide practical exposure and industry-relevant skills in HTML, CSS, JavaScript, React.js, responsive web design, frontend development, backend fundamentals, database integration, version control (Git/GitHub), and modern web development practices.</p>
+
+            <div class="training-details">
+                <h4 class="blue-text">Training Details</h4>
+                <ul>
+                    <li>Course Name: <span id="courseName2">Industrial Automation</span></li>
+                    <li>Training Mode: Practical & Hands-on Sessions</li>
+                    <li>Start Date: <span id="startDate">01 March 2026</span></li>
+                    <li>End Date: <span id="endDate">01 June 2026</span></li>
+                </ul>
+            </div>
+
+            <p>During the training period, the participant demonstrated sincere involvement, technical skills, and satisfactory performance. We wish them continued success in their academic and professional endeavors.</p>
         </div>
 
         <div class="signature-area">
             <div class="regards" id="dynamicSignText">
-                Regards,<br>
-                Nikky Kumari<br>
-                Venturing Digitally (P) Ltd.<br>
-                <a href="mailto:training@venturingdigitally.com">training@venturingdigitally.com</a>
+                <b>Nikhil Sharma</b><br>
+                Co-Founder & CMO<br>
+                Venturing Digitally Private<br>
+                Limited
             </div>
             <div class="stamp-box" id="dynamicStampBox">
-                <img src="sign.png" alt="Signature & Stamp" id="dynamicStampImg">
+                <img src="sign.png" alt="Stamp" id="dynamicStampImg">
             </div>
         </div>
     </div>
 
     <script>
-        // --- Fix Local Image CORS for PDF Export ---
+        // --- Image Loading for PDF Export Fix ---
         function loadBg(event) {
             const reader = new FileReader();
             reader.onload = function(){ document.getElementById('pageElement').style.backgroundImage = `url(${reader.result})`; }
             if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
         }
+        
         function loadStamp(event) {
             const reader = new FileReader();
             reader.onload = function(){ document.getElementById('dynamicStampImg').src = reader.result; }
@@ -312,8 +334,8 @@
             const lines = data.split('\n');
             const cols = lines[0].split('\t'); 
             
-            if (cols.length < 5) {
-                alert("Data format incorrect! Ensure you copied 5 columns from Excel.");
+            if (cols.length < 6) {
+                alert("Data format incorrect! Ensure you copied 6 columns from Excel:\nName | Reg No | College Name | Course | Start Date | End Date.");
                 return;
             }
             
@@ -329,10 +351,12 @@
             const firstReg = regPrefix + String(startRegNum).padStart(3, '0');
 
             document.getElementById('studentName').innerText = cols[0].trim();
-            document.getElementById('courseName').innerText = cols[1].trim();
-            document.getElementById('durationStr').innerText = cols[2].trim();
-            document.getElementById('startDate').innerText = cols[3].trim(); 
-            document.getElementById('endDate').innerText = cols[4].trim(); 
+            document.getElementById('collegeReg').innerText = cols[1].trim();
+            document.getElementById('collegeName').innerText = cols[2].trim();
+            document.getElementById('courseName1').innerText = cols[3].trim();
+            document.getElementById('courseName2').innerText = cols[3].trim();
+            document.getElementById('startDate').innerText = cols[4].trim(); 
+            document.getElementById('endDate').innerText = cols[5].trim(); 
             
             document.getElementById('regNumber').innerText = firstReg;
             document.getElementById('issueDate').innerText = fIssue;
@@ -366,15 +390,17 @@
 
             for (let i = 0; i < lines.length; i++) {
                 const cols = lines[i].split('\t');
-                if (cols.length < 5) continue; 
+                if (cols.length < 6) continue; 
 
                 const sName = cols[0].trim();
                 
                 document.getElementById('studentName').innerText = sName;
-                document.getElementById('courseName').innerText = cols[1].trim();
-                document.getElementById('durationStr').innerText = cols[2].trim();
-                document.getElementById('startDate').innerText = cols[3].trim(); 
-                document.getElementById('endDate').innerText = cols[4].trim(); 
+                document.getElementById('collegeReg').innerText = cols[1].trim();
+                document.getElementById('collegeName').innerText = cols[2].trim();
+                document.getElementById('courseName1').innerText = cols[3].trim();
+                document.getElementById('courseName2').innerText = cols[3].trim();
+                document.getElementById('startDate').innerText = cols[4].trim(); 
+                document.getElementById('endDate').innerText = cols[5].trim(); 
                 
                 const curReg = regPrefix + String(currentRegNum).padStart(3, '0');
                 document.getElementById('regNumber').innerText = curReg;
@@ -391,14 +417,14 @@
                 
                 const pdfBlob = pdf.output('blob');
                 const safeName = sName.replace(/[^a-zA-Z0-9 ]/g, ""); 
-                zip.file(`${safeName}_VED_EL.pdf`, pdfBlob);
+                zip.file(`${safeName}_Certificate.pdf`, pdfBlob);
 
                 currentRegNum++;
             }
 
             btn.innerText = "📦 Packing ZIP File...";
             const zipContent = await zip.generateAsync({ type: 'blob' });
-            saveAs(zipContent, "All_Internship_Letters.zip");
+            saveAs(zipContent, "All_Certificates.zip");
 
             btn.innerText = "🗂️ Download All as ZIP";
             btn.disabled = false;
@@ -411,30 +437,35 @@
             const stampSize = document.getElementById('stampSize').value;
             const stampX = document.getElementById('stampX').value;
             const stampY = document.getElementById('stampY').value;
+            
             document.getElementById('valStampSize').innerText = stampSize + "px";
             document.getElementById('valStampX').innerText = stampX + "px";
             document.getElementById('valStampY').innerText = stampY + "px";
+            
             document.getElementById('dynamicStampImg').style.width = stampSize + "px";
             document.getElementById('dynamicStampBox').style.left = stampX + "px";
             document.getElementById('dynamicStampBox').style.bottom = stampY + "px";
 
-            // Header Text Adjustments
+            // Header Gap Adjustments 
             const headerGap = document.getElementById('headerGap').value;
             const headerX = document.getElementById('headerX').value;
             const headerY = document.getElementById('headerY').value;
             document.getElementById('valHeaderGap').innerText = headerGap + "px";
             document.getElementById('valHeaderX').innerText = headerX + "%";
             document.getElementById('valHeaderY').innerText = headerY + "px";
+            
             const headerBox = document.getElementById('dynamicHeaderBox');
             headerBox.style.gap = headerGap + "px";
             headerBox.style.paddingLeft = headerX + "%";
             headerBox.style.paddingTop = headerY + "px";
-            
+
             // Signature Text Adjustments
             const signX = document.getElementById('signX').value;
             const signY = document.getElementById('signY').value;
+            
             document.getElementById('valSignX').innerText = signX + "px";
             document.getElementById('valSignY').innerText = signY + "px";
+            
             document.getElementById('dynamicSignText').style.left = signX + "px";
             document.getElementById('dynamicSignText').style.bottom = signY + "px";
         }
