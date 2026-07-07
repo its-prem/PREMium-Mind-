@@ -1352,12 +1352,16 @@
 
         .card-img-wrapper {
             width: 100%;
-            height: 320px;
+            height: auto;
             border-radius: 16px;
             overflow: hidden;
             margin-bottom: 14px;
             position: relative;
             flex-shrink: 0;
+            background: rgba(241, 245, 249, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* Bottom gradient overlay on card image */
@@ -1367,8 +1371,8 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 50%;
-            background: linear-gradient(to top, rgba(9, 9, 11, 0.40) 0%, transparent 100%);
+            height: 35%;
+            background: linear-gradient(to top, rgba(9, 9, 11, 0.12) 0%, transparent 100%);
             z-index: 2;
             border-radius: 0 0 16px 16px;
             pointer-events: none;
@@ -1376,8 +1380,10 @@
 
         .card-img-wrapper img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto;
+            max-height: 320px;
+            display: block;
+            object-fit: contain;
             transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -2133,7 +2139,7 @@
             }
 
             .card-img-wrapper {
-                height: 280px;
+                height: auto;
             }
         }
 
@@ -2212,7 +2218,7 @@
             }
 
             .card-img-wrapper {
-                height: 320px;
+                height: auto;
             }
         }
 
@@ -2234,7 +2240,7 @@
             }
 
             .card-img-wrapper {
-                height: 280px;
+                height: auto;
             }
         }
 
@@ -2256,13 +2262,36 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
         }
+
         .project-website-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(13, 148, 136, 0.45);
             background: linear-gradient(135deg, #0891b2 0%, #0d9488 100%);
         }
+
         .project-website-btn ion-icon {
             font-size: 16px;
+        }
+
+        /* See Project Small Link Badge */
+        .see-project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--smooth);
+            background: rgba(37, 99, 235, 0.08);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .see-project-link:hover {
+            color: var(--primary-hover);
+            background: rgba(37, 99, 235, 0.15);
+            transform: translateX(3px);
         }
     </style>
 </head>
@@ -3219,11 +3248,23 @@
 
                 let oldPriceHTML = course.old_price ? `<span class="old-price">₹${course.old_price}</span>` : '';
 
+                // Category
+                const cat = (course.category || 'projects').toLowerCase();
+
                 // Descriptions
                 let descHTML = '';
-                if (course.desc1) descHTML += `<p class="card-desc">${course.desc1}</p>`;
-                if (course.desc2) descHTML += `<p class="card-desc desc-sub">${course.desc2}</p>`;
-                if (!course.desc1 && !course.desc2 && course.desc) descHTML += `<p class="card-desc">${course.desc}</p>`;
+                if (cat === 'projects') {
+                    if (course.website_link && course.website_link.trim() !== '') {
+                        descHTML = `<a href="${course.website_link}" target="_blank" class="see-project-link">see project <ion-icon name="arrow-forward-outline"></ion-icon></a>`;
+                    } else {
+                        if (course.desc1) descHTML += `<p class="card-desc">${course.desc1}</p>`;
+                        if (course.desc2) descHTML += `<p class="card-desc desc-sub">${course.desc2}</p>`;
+                    }
+                } else {
+                    if (course.desc1) descHTML += `<p class="card-desc">${course.desc1}</p>`;
+                    if (course.desc2) descHTML += `<p class="card-desc desc-sub">${course.desc2}</p>`;
+                    if (!course.desc1 && !course.desc2 && course.desc) descHTML += `<p class="card-desc">${course.desc}</p>`;
+                }
 
                 // Mini Timer Box
                 let timerHTML = '';
@@ -3232,14 +3273,20 @@
                     timerHTML = `<div class="mini-timer">⏰ Limited Offer: <span>${timerVal}</span></div>`;
                 }
 
-                // Report Problem / Solving Button
-                let reportBtnHTML = '';
+                // Report Problem / Solving Button Container
+                let reportBtnContainerHTML = '';
                 if (course.show_report_btn == 1 || course.show_report_btn == "1") {
+                    let reportBtnHTML = '';
                     if (course.report_status === 'pending') {
                         reportBtnHTML = `<button class="btn-solving" disabled>Solving... ⏳</button>`;
                     } else {
                         reportBtnHTML = `<button class="report-btn" onclick="openReportModal(${course.id})">🚩 Report</button>`;
                     }
+                    reportBtnContainerHTML = `
+                      <div class="card-report-slot">
+                          ${reportBtnHTML}
+                      </div>
+                    `;
                 }
 
                 // Main CTA Button
@@ -3256,22 +3303,13 @@
                     btnHTML = `<button class="buy-course-btn" onclick="initiatePurchase('${course.id}', ${course.price}, ${course.show_tnc || 0})">Enroll Now ₹${course.price}</button>`;
                 }
 
-                // Website Link (for Project category)
-                const cat = (course.category || 'projects').toLowerCase();
-                let websiteLinkHTML = '';
-                if (cat === 'projects' && course.website_link && course.website_link.trim() !== '') {
-                    websiteLinkHTML = `<a class="project-website-btn" href="${course.website_link}" target="_blank" rel="noopener noreferrer"><ion-icon name="globe-outline"></ion-icon> Visit Project Website</a>`;
-                }
-
                 const cardHTML = `
                   <div class="course-card fade-in" data-category="${cat}" style="animation-delay: ${0.06 * (index + 1)}s;">
                       <div class="card-img-wrapper">
                           ${badgeHTML}
                           <img src="${course.image || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'}" alt="${course.title}">
                       </div>
-                      <div class="card-report-slot">
-                          ${reportBtnHTML}
-                      </div>
+                      ${reportBtnContainerHTML}
                       <h3>${course.title}</h3>
                       <div class="card-desc-container">
                           ${descHTML}
@@ -3286,7 +3324,6 @@
                       </div>
                       <div class="card-actions">
                           ${btnHTML}
-                          ${websiteLinkHTML}
                       </div>
                   </div>
               `;
