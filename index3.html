@@ -1325,18 +1325,20 @@
 
         .courses-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 24px;
             margin-top: 10px;
         }
 
         .course-card {
-            background: var(--white);
-            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
             padding: 14px 14px 18px;
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
-            transition: var(--smooth);
+            border: 1px solid rgba(226, 232, 240, 0.7);
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.03);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.6s ease;
             display: flex;
             flex-direction: column;
             position: relative;
@@ -1345,9 +1347,9 @@
         }
 
         .course-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 24px 48px -10px rgba(15, 23, 42, 0.16);
-            border-color: rgba(37, 99, 235, 0.2);
+            transform: translateY(-6px) scale(1.015);
+            box-shadow: 0 30px 60px -12px rgba(15, 23, 42, 0.09);
+            border-color: rgba(37, 99, 235, 0.25);
         }
 
         .card-img-wrapper {
@@ -3292,7 +3294,12 @@
                 // Main CTA Button
                 let btnHTML = '';
                 if (course.is_enrolled == 1 || course.is_enrolled == "1") {
-                    btnHTML = `<button class="buy-course-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" onclick="window.location.href='lecture.html?id=${course.id}'">Access Now 🎓</button>`;
+                    if (cat === 'projects') {
+                        const waText = encodeURIComponent(`Hello PREMium Mind! 👋\n\nI have purchased the project: *${course.title}*.\n\nPlease share the project source code/files.\nEmail: ${getStoredEmail()}`);
+                        btnHTML = `<button class="buy-course-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" onclick="window.open('https://wa.me/919153950552?text=${waText}', '_blank')">Access Now 🎓</button>`;
+                    } else {
+                        btnHTML = `<button class="buy-course-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" onclick="window.location.href='lecture.html?id=${course.id}'">Access Now 🎓</button>`;
+                    }
                 } else if (course.req_status === 'pending') {
                     btnHTML = `<button class="btn-reviewing" disabled>Under Review ⏳</button>`;
                 } else if (course.is_free == 1 || course.price == 0) {
@@ -3333,8 +3340,8 @@
             // ── Static Internship Report Card ──
             if (currentActiveCategory === 'all' || currentActiveCategory === 'report-writing') {
                 const internshipCardHTML = `
-                  <div class="course-card fade-in internship-report-card" data-category="report-writing" style="animation-delay: 0.6s; border: 2px solid #e0e7ff; background: linear-gradient(135deg, #fff 60%, #eef2ff 100%); position: relative; overflow: hidden;">
-                      <div style="position:absolute;top:0;right:0;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-size:10px;font-weight:800;padding:5px 14px;border-bottom-left-radius:12px;letter-spacing:0.5px;text-transform:uppercase;">Custom Order</div>
+                  <div class="course-card fade-in internship-report-card" data-category="report-writing" style="animation-delay: 0.6s; border: 2px solid #e0e7ff; background: linear-gradient(135deg, #fff 60%, #eef2ff 100%); position: relative; overflow: hidden; border-radius: 24px;">
+                      <div style="position:absolute;top:0;right:0;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-size:10px;font-weight:800;padding:5px 14px;border-bottom-left-radius:12px;letter-spacing:0.5px;text-transform:uppercase;z-index:12;">Custom Order</div>
                       <div class="card-img-wrapper" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; padding: 24px 16px;">
                           <div style="font-size:48px;">📋</div>
                           <p style="color:#c7d2fe;font-size:12px;font-weight:700;text-align:center;margin:0;letter-spacing:0.5px;">INTERNSHIP REPORT</p>
