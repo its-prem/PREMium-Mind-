@@ -717,9 +717,42 @@
       .footer-container {
         flex-direction: column;
         text-align: center;
+        align-items: center;
+      }
+      .footer-part {
+        width: 100%;
+        margin-bottom: 25px;
+      }
+      .logo-part {
+        justify-content: center;
+        margin: 0 auto;
+      }
+      .logo-part .logo {
+        margin: 0 auto;
+        display: block;
       }
       .footer-part.text-part {
         flex-direction: column;
+        padding: 0;
+        align-items: center;
+      }
+      .contact-info ul {
+        padding: 0;
+        margin: 0;
+      }
+      .footer-part.form-part {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+      }
+      .footer-form {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      .footer-form form {
+        margin: 0 auto;
+        text-align: left;
       }
     }
 
@@ -1707,23 +1740,41 @@ function renderStoreGrid() {
         const cat = (course.category || 'projects').toLowerCase();
 
         // Descriptions
-        let desc1HTML = course.desc1 ? `<p>${course.desc1}</p>` : '';
-        let desc2HTML = course.desc2 ? `<p>${course.desc2}</p>` : '';
+        let descHTML = '';
         if (cat === 'projects') {
             if (course.website_link && course.website_link.trim() !== '') {
-                desc1HTML = `<a href="${course.website_link}" target="_blank" class="see-project-link">see project <ion-icon name="arrow-forward-outline"></ion-icon></a>`;
-                desc2HTML = '';
+                descHTML = `<a href="${course.website_link}" target="_blank" class="see-project-link">see project <ion-icon name="arrow-forward-outline"></ion-icon></a>`;
+            } else {
+                if (course.desc1) descHTML += `<p>${course.desc1}</p>`;
+                if (course.desc2) descHTML += `<p>${course.desc2}</p>`;
             }
+        } else {
+            if (course.desc1) descHTML += `<p>${course.desc1}</p>`;
+            if (course.desc2) descHTML += `<p>${course.desc2}</p>`;
+            if (!course.desc1 && !course.desc2 && course.desc) descHTML += `<p>${course.desc}</p>`;
+        }
+
+        // Mini Timer Box
+        let timerHTML = '';
+        if (course.timer || course.timer_text || course.show_timer == 1 || course.show_timer == "1") {
+            const timerVal = course.timer || course.timer_text || '02h 15m';
+            timerHTML = `<div class="mini-timer">⏰ Limited Offer: <span>${timerVal}</span></div>`;
         }
 
         // Report Problem / Solving Button Container
-        let reportBtnHTML = '';
+        let reportBtnContainerHTML = '';
         if (course.show_report_btn == 1 || course.show_report_btn == "1") {
+            let reportBtnHTML = '';
             if (course.report_status === 'pending') {
                 reportBtnHTML = `<button class="btn-solving" disabled>Solving... ⏳</button>`;
             } else {
                 reportBtnHTML = `<button class="report-btn" onclick="openReportModal(${course.id})">🚩 Report</button>`;
             }
+            reportBtnContainerHTML = `
+              <div class="card-report-slot">
+                  ${reportBtnHTML}
+              </div>
+            `;
         }
 
         // Main CTA Button
@@ -1731,9 +1782,9 @@ function renderStoreGrid() {
         if (course.is_enrolled == 1 || course.is_enrolled == "1") {
             if (cat === 'projects') {
                 const waText = encodeURIComponent(`Hello PREMium Mind! 👋\n\nI have purchased the project: *${course.title}*.\n\nPlease share the project source code/files.\nEmail: ${getStoredEmail()}`);
-                btnHTML = `<button style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.open('https://wa.me/919153950552?text=${waText}', '_blank')">Access Now 🎓</button>`;
+                btnHTML = `<button class="buy-course-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.open('https://wa.me/919153950552?text=${waText}', '_blank')">Access Now 🎓</button>`;
             } else {
-                btnHTML = `<button style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.location.href='lecture.html?id=${course.id}'">Access Now 🎓</button>`;
+                btnHTML = `<button class="buy-course-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.location.href='lecture.html?id=${course.id}'">Access Now 🎓</button>`;
             }
         } else if (course.req_status === 'pending') {
             btnHTML = `<button class="btn-reviewing" disabled>Reviewing... ⏳</button>`;
@@ -1742,7 +1793,7 @@ function renderStoreGrid() {
         } else if (course.is_disabled == 1 || course.disabled == 1 || course.is_disabled == "1") {
             btnHTML = `<button class="disabled-btn" disabled>Sold Out / Closed</button>`;
         } else {
-            btnHTML = `<button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase(${course.id}, ${course.price}, '${course.show_tnc || 0}')">${course.btn_text}</button>`;
+            btnHTML = `<button class="buy-course-btn" style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase(${course.id}, ${course.price}, '${course.show_tnc || 0}')">${course.btn_text}</button>`;
         }
 
         let courseName = course.title.toLowerCase();
@@ -1756,7 +1807,7 @@ function renderStoreGrid() {
                             <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:14px !important; height:14px !important; margin-bottom:0 !important; display:inline-block; border-radius:0 !important;"> WA Unlock
                         </button>
                     </div>
-                    <button style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase(${course.id}, ${course.price}, '${course.show_tnc || 0}')">${course.btn_text}</button>
+                    <button class="buy-course-btn" style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase(${course.id}, ${course.price}, '${course.show_tnc || 0}')">${course.btn_text}</button>
                 `;
             } else {
                 let waBtn = `
@@ -1768,37 +1819,64 @@ function renderStoreGrid() {
             }
         }
 
-        btnHTML = reportBtnHTML + btnHTML;
-
         const cardHTML = `
-            <div class="course-card">
-              <img src="${course.image}" alt="${course.title}" onerror="this.src='small-logo.png'"/>
-              ${badgeHTML}
+          <div class="course-card">
+              <div class="card-img-wrapper">
+                  ${badgeHTML}
+                  <img src="${course.image || 'small-logo.png'}" alt="${course.title}" onerror="this.src='small-logo.png'">
+              </div>
+              ${reportBtnContainerHTML}
               <h2>${course.title}</h2>
-              ${desc1HTML}
-              ${desc2HTML}
-              <p class="price">₹${course.price}${oldPriceHTML}</p>
-              ${btnHTML}
-            </div>
+              <div style="min-height: 44px; margin-bottom: 10px;">
+                  ${descHTML}
+              </div>
+              ${timerHTML}
+              <div class="course-meta">
+                  <div class="price-box">
+                      <span class="price">₹${course.price}</span>
+                      ${oldPriceHTML}
+                  </div>
+                  <div class="rating"><ion-icon name="star"></ion-icon> 4.9</div>
+              </div>
+              <div class="card-actions">
+                  ${btnHTML}
+              </div>
+          </div>
         `;
-        container.innerHTML += cardHTML;
+        container.insertAdjacentHTML('beforeend', cardHTML);
     });
 
     // ── Static Internship Report Card ──
     if (currentActiveCategory === 'all' || currentActiveCategory === 'report-writing') {
         const internshipCardHTML = `
-          <div class="course-card internship-report-card" data-category="report-writing" style="border: 2px solid #e0e7ff; background: linear-gradient(135deg, #fff 60%, #eef2ff 100%); position: relative; overflow: hidden; border-radius: 16px;">
+          <div class="course-card internship-report-card" data-category="report-writing" style="border: 2px solid #e0e7ff; background: linear-gradient(135deg, #fff 60%, #eef2ff 100%); position: relative; overflow: hidden; border-radius: 24px;">
               <div style="position:absolute;top:0;right:0;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-size:10px;font-weight:800;padding:5px 14px;border-bottom-left-radius:12px;letter-spacing:0.5px;text-transform:uppercase;z-index:12;">Custom Order</div>
-              <img src="small-logo.png" alt="Internship Report" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); padding: 24px; box-sizing: border-box;"/>
-              <h2>I Want to Create an Internship Report</h2>
-              <p style="font-weight:700;color:#4f46e5;margin:3px 0;">Need an Internship Report?</p>
-              <p style="color:#475569;font-size:12.5px;line-height:1.6;margin:3px 0;">Professional internship reports start from <strong style="color:#1e1b4b;">₹150</strong>. Final pricing depends on pages, project complexity, formatting &amp; additional requirements.</p>
-              <p style="color:#7c3aed;font-weight:600;font-size:12px;margin:3px 0;">Click below to submit your details &amp; get a customized quote.</p>
-              <p class="price" style="color:#4f46e5;">₹150<span>Custom</span></p>
-              <button style="width: 100%; padding: 10px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.open('https://wa.me/919153950552?text=' + encodeURIComponent('Hello PREMium Mind! 👋%0A%0AI want to create an Internship Report.%0A%0APlease provide me a customized quote based on:%0A• Number of Pages:%0A• Company/Organization Name:%0A• Project Topic:%0A• Any specific formatting requirements:%0A%0AThank you!'), '_blank')">Get Custom Quote on WhatsApp</button>
+              <div class="card-img-wrapper" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; padding: 24px 16px;">
+                  <div style="font-size:48px;">📋</div>
+                  <p style="color:#c7d2fe;font-size:12px;font-weight:700;text-align:center;margin:0;letter-spacing:0.5px;">INTERNSHIP REPORT</p>
+              </div>
+              <div class="card-report-slot"></div>
+              <h2 style="color:#1e1b4b; font-size: 18px; margin: 10px 0;">I Want to Create an Internship Report</h2>
+              <div style="min-height: 44px; margin-bottom: 10px;">
+                  <p style="font-weight:700;color:#4f46e5;font-size:12.5px;margin:3px 0;">Need an Internship Report?</p>
+                  <p style="color:#475569;font-size:12.5px;line-height:1.6;margin:3px 0;">Professional internship reports start from <strong style="color:#1e1b4b;">₹150</strong>. Final pricing depends on pages, project complexity, formatting &amp; additional requirements.</p>
+                  <p style="color:#7c3aed;font-weight:600;font-size:12px;margin:3px 0;">Click below to submit your details &amp; get a customized quote.</p>
+              </div>
+              <div class="course-meta">
+                  <div class="price-box">
+                      <span class="price" style="color:#4f46e5;">₹150+</span>
+                      <span class="old-price">Custom</span>
+                  </div>
+                  <div class="rating"><ion-icon name="star"></ion-icon> 5.0</div>
+              </div>
+              <div class="card-actions">
+                  <button class="buy-course-btn" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); font-size:13px; color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer;" onclick="window.open('https://wa.me/919153950552?text=' + encodeURIComponent('Hello PREMium Mind! 👋%0A%0AI want to create an Internship Report.%0A%0APlease provide me a customized quote based on:%0A• Number of Pages:%0A• Company/Organization Name:%0A• Project Topic:%0A• Any specific formatting requirements:%0A%0AThank you!'), '_blank')">
+                      <ion-icon name="logo-whatsapp" style="font-size:16px;"></ion-icon> Get Custom Quote on WhatsApp
+                  </button>
+              </div>
           </div>
         `;
-        container.innerHTML += internshipCardHTML;
+        container.insertAdjacentHTML('beforeend', internshipCardHTML);
     }
 }
 
