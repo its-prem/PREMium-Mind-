@@ -2090,7 +2090,7 @@
                 } else if (course.is_disabled == 1 || course.disabled == 1 || course.is_disabled == "1") {
                     btnHTML = `<button class="disabled-btn" disabled>Sold Out / Closed</button>`;
                 } else {
-                    btnHTML = `<button class="buy-course-btn" style="width: 100%; padding: 10px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase(${course.id}, ${course.price}, '${course.show_tnc || 0}')">${course.btn_text}</button>`;
+                    btnHTML = `<button class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase(${course.id}, ${course.price}, '${course.show_tnc || 0}')">${course.btn_text}</button>`;
                 }
 
                 let courseName = course.title.toLowerCase();
