@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Courses - PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
-  
+
   <link rel="stylesheet" href="common.css" />
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:wght@400;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:wght@400;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
 
   <style>
     /* ============================================================
@@ -26,182 +29,320 @@
       --text-muted: #6b7280;
     }
 
-    body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: hidden; }
+    body {
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
 
     /* DASHBOARD HEADER */
     .dashboard-header {
       background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-      color: var(--white); padding: 50px 20px; text-align: center; margin-bottom: 30px;
+      color: var(--white);
+      padding: 50px 20px;
+      text-align: center;
+      margin-bottom: 30px;
     }
-    .dashboard-header h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 10px; font-family: 'Montserrat', sans-serif;}
-    .dashboard-header p { font-size: clamp(1rem, 2vw, 1.1rem); color: #ccc; max-width: 600px; margin: 0 auto; }
+
+    .dashboard-header h1 {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 800;
+      margin-bottom: 10px;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .dashboard-header p {
+      font-size: clamp(1rem, 2vw, 1.1rem);
+      color: #ccc;
+      max-width: 600px;
+      margin: 0 auto;
+    }
 
     /* NEW PREMIUM LIBRARY CARD DESIGN */
     .card-container {
-      display: grid; 
+      display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 25px; padding: 0 20px 60px 20px; max-width: 1200px; margin: 0 auto;
+      gap: 25px;
+      padding: 0 20px 60px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
-    
+
     .course-card {
-      background: var(--white); border-radius: 16px; padding: 12px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.06); border: 1px solid #eaeaea;
-      display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      background: var(--white);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+      border: 1px solid #eaeaea;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       position: relative;
     }
-    .course-card:hover { transform: translateY(-6px); box-shadow: 0 15px 30px rgba(0,0,0,0.12); border-color: #d1d5db; }
-    
-    .card-img-box {
-      width: 100%; height: 160px; border-radius: 12px; overflow: hidden; position: relative; margin-bottom: 15px;
+
+    .course-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+      border-color: #d1d5db;
     }
-    .card-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-    .course-card:hover .card-img-box img { transform: scale(1.05); }
+
+    .card-img-box {
+      width: 100%;
+      height: 160px;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 15px;
+    }
+
+    .card-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .course-card:hover .card-img-box img {
+      transform: scale(1.05);
+    }
 
     .status-badge {
-      position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #fff;
-      font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; backdrop-filter: blur(4px); text-transform: uppercase; letter-spacing: 0.5px;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      backdrop-filter: blur(4px);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .course-card h2 { 
-      font-size: 1.1rem; margin-bottom: 8px; color: var(--primary-color); line-height: 1.3; font-weight: 700;
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    .course-card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: var(--primary-color);
+      line-height: 1.3;
+      font-weight: 700;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
-    
-    .course-meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px; display: flex; flex-direction: column; gap: 4px; flex-grow: 1;}
+
+    .course-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex-grow: 1;
+    }
 
     /* Premium Button */
     .btn-access {
-      width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 700;
-      cursor: pointer; font-size: 0.95rem; transition: all 0.3s ease; text-align: center;
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: var(--white);
-      display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: auto;
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      text-align: center;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: auto;
     }
-    .btn-access:hover { box-shadow: 0 6px 15px rgba(0,0,0,0.2); transform: translateY(-2px); }
+
+    .btn-access:hover {
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    }
 
     /* EMPTY STATE */
     .empty-state {
-      grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: var(--white);
-      border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; width: 100%;
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--white);
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      max-width: 600px;
+      margin: 0 auto;
+      width: 100%;
     }
-    .empty-state h2 { font-size: 1.8rem; margin-bottom: 12px; color: var(--primary-color); }
-    .empty-state p { color: var(--text-muted); margin-bottom: 25px; font-size: 1rem; }
+
+    .empty-state h2 {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      color: var(--primary-color);
+    }
+
+    .empty-state p {
+      color: var(--text-muted);
+      margin-bottom: 25px;
+      font-size: 1rem;
+    }
+
     .btn-browse {
       background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-      color: var(--white); padding: 12px 30px; border: none; border-radius: 50px;
-      font-weight: 700; cursor: pointer; font-size: 1rem; transition: all 0.3s; display: inline-block;
+      color: var(--white);
+      padding: 12px 30px;
+      border: none;
+      border-radius: 50px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s;
+      display: inline-block;
     }
-    .btn-browse:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+    .btn-browse:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
 
     @media (max-width: 768px) {
-      .dashboard-header { padding: 40px 15px; }
-      .card-container { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; padding: 0 15px 40px 15px; }
-      .card-img-box { height: 180px; }
+      .dashboard-header {
+        padding: 40px 15px;
+      }
+
+      .card-container {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 20px;
+        padding: 0 15px 40px 15px;
+      }
+
+      .card-img-box {
+        height: 180px;
+      }
     }
   </style>
 </head>
+
 <body>
 
-<nav class="navbar">
-  <div class="logo-container">
-    <img src="PM-LOGO-TEXT.png" alt="PM Logo" class="logo-image" />
-  </div>
-  <ul class="nav-links">
-    <li><a href="index.html">PREMium Store</a></li>
-    <li><a href="courses.html" class="protected-route" id="coursesLinkNav">PREMium Courses</a></li>
-    <li><a href="index.html#help-form">Contact us</a></li>
-    <li><a href="index.html#help-form">Report Problem</a></li>
-  </ul>
-  <div class="menu-btn" id="menu-btn">☰</div>
-</nav>
-
-<div class="sidebar" id="sidebar">
-  <button class="close-sidebar-btn" id="closeSidebarBtn">×</button>
-
-  <div class="user-profile" id="userProfile" style="display: none;">
-    <div class="profile-photo-container">
-      <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile" class="profile-photo" id="profilePhoto" onclick="document.getElementById('photo-input').click()">
-      <button class="change-photo-btn" onclick="document.getElementById('photo-input').click()">📷</button>
+  <nav class="navbar">
+    <div class="logo-container">
+      <img src="PM-LOGO-TEXT.png" alt="PM Logo" class="logo-image" />
     </div>
-    <input type="file" id="photo-input" accept="image/*">
-    <div class="user-name" id="userName">User Name</div>
-    <div class="user-email" id="userEmail">user@example.com</div>
-    <button class="logout-btn-sidebar" onclick="handleLogout()">Logout</button>
+    <ul class="nav-links">
+      <li><a href="index.html">PREMium Store</a></li>
+      <li><a href="courses.html" class="protected-route" id="coursesLinkNav">PREMium Courses</a></li>
+      <li><a href="index.html#help-form">Contact us</a></li>
+      <li><a href="index.html#help-form">Report Problem</a></li>
+    </ul>
+    <div class="menu-btn" id="menu-btn">☰</div>
+  </nav>
+
+  <div class="sidebar" id="sidebar">
+    <button class="close-sidebar-btn" id="closeSidebarBtn">×</button>
+
+    <div class="user-profile" id="userProfile" style="display: none;">
+      <div class="profile-photo-container">
+        <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile"
+          class="profile-photo" id="profilePhoto" onclick="document.getElementById('photo-input').click()">
+        <button class="change-photo-btn" onclick="document.getElementById('photo-input').click()">📷</button>
+      </div>
+      <input type="file" id="photo-input" accept="image/*">
+      <div class="user-name" id="userName">User Name</div>
+      <div class="user-email" id="userEmail">user@example.com</div>
+      <button class="logout-btn-sidebar" onclick="handleLogout()">Logout</button>
+    </div>
+
+    <div class="login-prompt" id="loginPrompt">
+      <h3>Welcome to PREMium Mind</h3>
+      <p>Access your courses and profile.</p>
+      <button class="login-btn" onclick="window.location.href='login.html'">Login / Sign Up</button>
+    </div>
+
+    <ul>
+      <li><a href="index.html"><span class="icon">🏠</span> Home</a></li>
+      <li><a href="lecture.html" class="protected-route" id="coursesLink"><span class="icon">📚</span> PREMium
+          Courses</a></li>
+      <li><a href="lecture.html" class="protected-route active-sidebar" id="courseAccessLink"><span
+            class="icon">🎓</span> My Course</a></li>
+      <li><a href="index.html#help-form"><span class="icon">📞</span> Contact</a></li>
+      <li><a href="index.html#help-form"><span class="icon">❓</span> Help</a></li>
+      <li><a href="termcondition.html"><span class="icon">⚙️</span> Terms & Privacy</a></li>
+    </ul>
   </div>
 
-  <div class="login-prompt" id="loginPrompt">
-    <h3>Welcome to PREMium Mind</h3>
-    <p>Access your courses and profile.</p>
-    <button class="login-btn" onclick="window.location.href='login.html'">Login / Sign Up</button>
+  <div class="overlay" id="overlay"></div>
+
+  <div class="dashboard-header">
+    <h1>My Learning Library</h1>
+    <p>Your premium courses, all in one place. Pick up right where you left off.</p>
   </div>
 
-  <ul>
-    <li><a href="index.html"><span class="icon">🏠</span> Home</a></li>
-    <li><a href="lecture.html" class="protected-route" id="coursesLink"><span class="icon">📚</span> PREMium Courses</a></li>
-    <li><a href="lecture.html" class="protected-route active-sidebar" id="courseAccessLink"><span class="icon">🎓</span> My Course</a></li>
-    <li><a href="index.html#help-form"><span class="icon">📞</span> Contact</a></li>
-    <li><a href="index.html#help-form"><span class="icon">❓</span> Help</a></li>
-    <li><a href="termcondition.html"><span class="icon">⚙️</span> Terms & Privacy</a></li>
-  </ul>
-</div>
-
-<div class="overlay" id="overlay"></div>
-
-<div class="dashboard-header">
-  <h1>My Learning Library</h1>
-  <p>Your premium courses, all in one place. Pick up right where you left off.</p>
-</div>
-
-<div class="card-container" id="my-courses-container">
+  <div class="card-container" id="my-courses-container">
     <div style="text-align: center; width: 100%; padding: 40px; grid-column: 1/-1;">
-        <div style="width: 40px; height: 40px; border: 4px solid #ddd; border-top-color: #111; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
-        <p style="color: #666; font-size: 1.1rem;">Syncing your library...</p>
+      <div
+        style="width: 40px; height: 40px; border: 4px solid #ddd; border-top-color: #111; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;">
+      </div>
+      <p style="color: #666; font-size: 1.1rem;">Syncing your library...</p>
     </div>
-</div>
-<style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
+  </div>
+  <style>
+    @keyframes spin {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 
-<script>
-window.loadMyCourses = async function(userEmail) {
-    if (!userEmail) {
+  <script>
+    window.loadMyCourses = async function (userEmail) {
+      if (!userEmail) {
         window.location.href = 'login.html';
         return;
-    }
+      }
 
-    try {
+      try {
         const container = document.getElementById('my-courses-container');
-        const apiUrl = `https://premind.diplomawallah.in/api.php?email=${encodeURIComponent(userEmail)}`; 
+        const apiUrl = `https://premind.diplomawallah.in/api.php?email=${encodeURIComponent(userEmail)}`;
         const response = await fetch(apiUrl);
         const courses = await response.json();
-        
-        const enrolledCourses = courses.filter(course => course.is_enrolled == 1);
-        container.innerHTML = ''; 
 
-        if(enrolledCourses.length === 0) {
-            container.innerHTML = `
+        const enrolledCourses = courses.filter(course => course.is_enrolled == 1);
+        container.innerHTML = '';
+
+        if (enrolledCourses.length === 0) {
+          container.innerHTML = `
                 <div class="empty-state">
                   <h2>No Courses Yet 😢</h2>
                   <p>You haven't enrolled in any premium courses yet. Explore our store to upgrade your skills!</p>
                   <a href="index.html#products" class="btn-browse">Explore Store</a>
                 </div>
             `;
-            return;
+          return;
         }
 
         enrolledCourses.forEach(course => {
-            let pdfUrl = '';
-            
-            if (course.pdf_file && course.pdf_file.trim() !== '') {
-                pdfUrl = 'https://premind.diplomawallah.in/proxy_pdf.php?file=' + encodeURIComponent(course.pdf_file);
-            } else if (course.pdf_link && course.pdf_link.trim() !== '') {
-                pdfUrl = course.pdf_link;
-            }
-            
-            // 🔥 NAYA CODE: Yahan parameter ko dl ki jagah download kar diya gaya hai 🔥
-            let btnAction = pdfUrl ? `window.location.href='watch.html?pdf=${encodeURIComponent(pdfUrl)}&download=${course.allow_download}'` : `alert('Content is being prepared and will be available soon!')`;
+          let pdfUrl = '';
 
-            const desc1HTML = course.desc1 ? `<span>• ${course.desc1}</span>` : '';
-            const desc2HTML = course.desc2 ? `<span>• ${course.desc2}</span>` : '';
+          if (course.pdf_file && course.pdf_file.trim() !== '') {
+            pdfUrl = 'https://premind.diplomawallah.in/proxy_pdf.php?file=' + encodeURIComponent(course.pdf_file);
+          } else if (course.pdf_link && course.pdf_link.trim() !== '') {
+            pdfUrl = course.pdf_link;
+          }
 
-            const cardHTML = `
+          // 🔥 NAYA CODE: Yahan parameter ko dl ki jagah download kar diya gaya hai 🔥
+          let btnAction = pdfUrl ? `window.location.href='watch.html?pdf=${encodeURIComponent(pdfUrl)}&download=${course.allow_download}'` : `alert('Content is being prepared and will be available soon!')`;
+
+          const desc1HTML = course.desc1 ? `<span>• ${course.desc1}</span>` : '';
+          const desc2HTML = course.desc2 ? `<span>• ${course.desc2}</span>` : '';
+
+          const cardHTML = `
                 <div class="course-card">
                   <div class="card-img-box">
                      <span class="status-badge">Unlocked</span>
@@ -215,105 +356,106 @@ window.loadMyCourses = async function(userEmail) {
                   <button class="btn-access" onclick="${btnAction}">▶ Continue Learning</button>
                 </div>
             `;
-            container.innerHTML += cardHTML;
+          container.innerHTML += cardHTML;
         });
-    } catch (error) {
+      } catch (error) {
         console.error(error);
         document.getElementById('my-courses-container').innerHTML = '<p style="text-align:center; width:100%; grid-column:1/-1; color:red;">Failed to load courses. Check connection.</p>';
+      }
     }
-}
-</script>
+  </script>
 
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-  import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
-    authDomain: "premium-mind-fcb16.firebaseapp.com",
-    projectId: "premium-mind-fcb16",
-    storageBucket: "premium-mind-fcb16.firebasestorage.app",
-    messagingSenderId: "864874199521",
-    appId: "1:864874199521:web:5deb96a956dc404a077aa0"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
+      authDomain: "premium-mind-fcb16.firebaseapp.com",
+      projectId: "premium-mind-fcb16",
+      storageBucket: "premium-mind-fcb16.firebasestorage.app",
+      messagingSenderId: "864874199521",
+      appId: "1:864874199521:web:5deb96a956dc404a077aa0"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const storage = getStorage(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const storage = getStorage(app);
 
-  function setupProfile(email, name, uid) {
-    document.getElementById('userProfile').style.display = 'block';
-    document.getElementById('loginPrompt').style.display = 'none';
-    document.getElementById('userName').textContent = name || 'Student';
-    document.getElementById('userEmail').textContent = email;
-    
-    const savedPhoto = uid ? localStorage.getItem('profilePhoto_' + uid) : null;
-    if(savedPhoto) { document.getElementById('profilePhoto').src = savedPhoto; } 
-    else { document.getElementById('profilePhoto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=000&color=fff&size=80`; }
-    
-    const coursesLinkNav = document.getElementById('coursesLinkNav');
-    const coursesLink = document.getElementById('coursesLink');
-    if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
-    if (coursesLink) { coursesLink.classList.remove('locked'); coursesLink.onclick = null; }
+    function setupProfile(email, name, uid) {
+      document.getElementById('userProfile').style.display = 'block';
+      document.getElementById('loginPrompt').style.display = 'none';
+      document.getElementById('userName').textContent = name || 'Student';
+      document.getElementById('userEmail').textContent = email;
 
-    window.loadMyCourses(email);
-  }
+      const savedPhoto = uid ? localStorage.getItem('profilePhoto_' + uid) : null;
+      if (savedPhoto) { document.getElementById('profilePhoto').src = savedPhoto; }
+      else { document.getElementById('profilePhoto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=000&color=fff&size=80`; }
 
-  const customEmail = localStorage.getItem('customUserEmail');
-  const customName = localStorage.getItem('customUserName');
+      const coursesLinkNav = document.getElementById('coursesLinkNav');
+      const coursesLink = document.getElementById('coursesLink');
+      if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
+      if (coursesLink) { coursesLink.classList.remove('locked'); coursesLink.onclick = null; }
 
-  if (customEmail) {
+      window.loadMyCourses(email);
+    }
+
+    const customEmail = localStorage.getItem('customUserEmail');
+    const customName = localStorage.getItem('customUserName');
+
+    if (customEmail) {
       setupProfile(customEmail, customName, 'custom');
-  } else {
+    } else {
       onAuthStateChanged(auth, (user) => {
-        if (user) { setupProfile(user.email, user.displayName, user.uid); } 
+        if (user) { setupProfile(user.email, user.displayName, user.uid); }
         else { window.location.href = 'login.html'; }
       });
-  }
+    }
 
-  document.getElementById('photo-input').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const user = auth.currentUser;
-    if (!user) return;
-    try {
-      const photoStorageRef = storageRef(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
-      await uploadBytes(photoStorageRef, file);
-      const photoURL = await getDownloadURL(photoStorageRef);
-      localStorage.setItem('profilePhoto_' + user.uid, photoURL);
-      document.getElementById('profilePhoto').src = photoURL;
-      alert('Profile photo updated successfully!');
-    } catch (error) {}
-  });
+    document.getElementById('photo-input').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const user = auth.currentUser;
+      if (!user) return;
+      try {
+        const photoStorageRef = storageRef(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
+        await uploadBytes(photoStorageRef, file);
+        const photoURL = await getDownloadURL(photoStorageRef);
+        localStorage.setItem('profilePhoto_' + user.uid, photoURL);
+        document.getElementById('profilePhoto').src = photoURL;
+        alert('Profile photo updated successfully!');
+      } catch (error) { }
+    });
 
-  window.handleLogout = async () => {
-    try {
-      localStorage.removeItem('customUserEmail');
-      localStorage.removeItem('customUserName');
-      await signOut(auth);
-      window.location.href = 'index.html';
-    } catch (error) {}
-  };
-</script>
+    window.handleLogout = async () => {
+      try {
+        localStorage.removeItem('customUserEmail');
+        localStorage.removeItem('customUserName');
+        await signOut(auth);
+        window.location.href = 'index.html';
+      } catch (error) { }
+    };
+  </script>
 
-<script>
-  const menuBtn = document.getElementById("menu-btn");
-  const sidebar = document.getElementById("sidebar");
-  const overlay = document.getElementById("overlay");
-  const closeBtn = document.getElementById("closeSidebarBtn");
+  <script>
+    const menuBtn = document.getElementById("menu-btn");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+    const closeBtn = document.getElementById("closeSidebarBtn");
 
-  function openSidebar() { sidebar.classList.add("active"); overlay.classList.add("active"); }
-  function closeSidebar() { sidebar.classList.remove("active"); overlay.classList.remove("active"); }
+    function openSidebar() { sidebar.classList.add("active"); overlay.classList.add("active"); }
+    function closeSidebar() { sidebar.classList.remove("active"); overlay.classList.remove("active"); }
 
-  menuBtn.addEventListener("click", openSidebar);
-  closeBtn.addEventListener("click", closeSidebar);
-  overlay.addEventListener("click", closeSidebar);
+    menuBtn.addEventListener("click", openSidebar);
+    closeBtn.addEventListener("click", closeSidebar);
+    overlay.addEventListener("click", closeSidebar);
 
-  document.querySelectorAll(".sidebar ul li a").forEach(link => {
-    link.addEventListener("click", closeSidebar);
-  });
-</script>
+    document.querySelectorAll(".sidebar ul li a").forEach(link => {
+      link.addEventListener("click", closeSidebar);
+    });
+  </script>
 
 </body>
+
 </html>

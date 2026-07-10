@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Certificate Generator</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Crimson+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #525659;
+            font-family: 'Crimson Pro', serif; 
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* ----- Background Template ----- */
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background-color: white;
+            background-image: url('finalved.jpg'); 
+            background-size: 210mm 297mm;
+            background-repeat: no-repeat;
+            background-position: center top;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column; 
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ----- Fixed Top Text ----- */
+        .top-container {
+            width: 100%;
+            padding-top: 113px; 
+            padding-left: 46%;  
+            padding-right: 2mm;
+            display: flex;
+            justify-content: flex-start;
+            gap: 11px; 
+            font-size: 15px; 
+            color: #111;
+            line-height: 1.5;
+            font-family: sans-serif;
+        }
+        .left-info div { margin-bottom: 8px; }
+        .right-info { text-align: right; }
+        
+        .blue-text { color: #02277F; }
+
+        /* ----- Body Content Section ----- */
+        .content {
+            padding: 2mm 22mm 0 22mm;
+            font-size: 17px; 
+            line-height: 1.5; 
+            color: #111; 
+            flex-grow: 1; 
+        }
+
+        .cert-title {
+            text-align: center;
+            font-size: 26px;
+            font-weight: bold;
+            margin-top: 0px;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+            font-family: 'Archivo Black', sans-serif; 
+            color: #02277F;
+        }
+
+        .enrollment {
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .content p { 
+            margin-bottom: 22px; 
+            text-align: justify; 
+        }
+
+        .training-details h4 {
+            font-size: 17px;
+            margin-bottom: 8px;
+        }
+
+        /* Bullets configuration */
+        .training-details ul {
+            list-style-type: disc;
+            margin-left: 25px;
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+        
+        .training-details li {
+            font-weight: bold;
+        }
+
+        /* ----- Fixed Signature & Stamp Layout ----- */
+        .signature-area {
+            position: relative;
+            padding: 0 22mm;
+            height: 150px; 
+            margin-bottom: 30mm;
+        }
+        
+        #dynamicSignText {
+            position: absolute;
+            left: 84px; 
+            bottom: 80px; 
+            font-size: 16px; 
+            line-height: 1.4;
+            color: #111;
+            z-index: 2; 
+        }
+
+        #dynamicStampBox {
+            position: absolute;
+            left: 238px; 
+            bottom: 55px; 
+            z-index: 1;
+        }
+        
+        #dynamicStampImg {
+            width: 138px;  
+            height: auto;
+            display: block;
+        }
+
+        /* ----- Control Panel ----- */
+        .controls {
+            position: fixed;
+            top: 10px;
+            left: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            width: 380px;
+            z-index: 10;
+            max-height: 98vh;
+            overflow-y: auto;
+            font-family: Arial, sans-serif; 
+        }
+        .controls details {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .controls summary { font-weight: bold; color: #02277F; cursor: pointer; font-size: 14px; outline: none; }
+        .controls label { font-size: 12px; font-weight: bold; color: #555; display: block; margin-top: 8px; margin-bottom: 4px; }
+        
+        .controls input[type="text"], .controls input[type="date"], .controls input[type="number"], .controls textarea, .controls select {
+            width: 100%;
+            margin-bottom: 5px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+        }
+        .controls input[type="file"] { font-size: 11px; margin-bottom: 5px; }
+        .controls input[type="range"] { width: 100%; margin-bottom: 5px; }
+        .controls .slider-val { font-weight: normal; color: #1574b6; float: right; }
+        
+        .controls button {
+            width: 100%;
+            background: #02277F;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        .controls button.zip-btn { background: #16a085; font-size: 15px; padding: 12px;}
+        .controls button:disabled { background: #95a5a6; cursor: not-allowed; }
+
+        /* Output Table Styles */
+        #outputTable {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+        #outputTable th, #outputTable td { border: 1px solid #aaa; padding: 5px; text-align: left; }
+        #outputTable th { background-color: #e0e0e0; }
+
+        @media print {
+            body { background: none; padding: 0; }
+            .page { box-shadow: none; width: 210mm; height: 297mm; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            .controls { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <h3 style="margin-bottom:10px; color:#02277F; font-size: 16px;">Bulk Certificate Generator</h3>
+        
+        <details>
+            <summary>1️⃣ Load Local Images</summary>
+            <label>Load Background (finalved.jpg)</label>
+            <input type="file" accept="image/*" onchange="loadBg(event)">
+            <label>Load Stamp & Sign (sign.png)</label>
+            <input type="file" accept="image/*" onchange="loadStamp(event)">
+        </details>
+
+        <details open>
+            <summary>2️⃣ Setup Default Values</summary>
+            
+            <label>Select Batch Course (For Paragraphs)</label>
+            <select id="globalCourseSelect" onchange="updatePrefixAndPreview()">
+                <option value="Basics of Full stack development (HTML, CSS, JavaScript, React JS)">Basics of Full stack development (HTML, CSS, JavaScript, React JS)</option>
+                <option value="Full Stack Web Development (HTML, CSS, JavaScript, React JS, Node.js, Express.js, MongoDB)">Full Stack Web Development (HTML, CSS, JavaScript, React JS, Node.js, Express.js, MongoDB)</option>
+                <option value="Web Development (HTML, CSS, JavaScript, Responsive Web Design)">Web Development (HTML, CSS, JavaScript, Responsive Web Design)</option>
+                <option value="AutoCAD (2D Drafting, 3D Modeling & Engineering Design)">AutoCAD (2D Drafting, 3D Modeling & Engineering Design)</option>
+                <option value="Industrial Automation (Sensors, PLC, SCADA, HMI & Process Control)">Industrial Automation (Sensors, PLC, SCADA, HMI & Process Control)</option>
+                <option value="PLC & SCADA (PLC Programming, SCADA, HMI & Industrial Communication)">PLC & SCADA (PLC Programming, SCADA, HMI & Industrial Communication)</option>
+                <option value="Python Programming (Core Python, OOP, File Handling & Libraries)">Python Programming (Core Python, OOP, File Handling & Libraries)</option>
+                <option value="Internet of Things (IoT) (Arduino, ESP32, Sensors, MQTT & Cloud Integration)">Internet of Things (IoT) (Arduino, ESP32, Sensors, MQTT & Cloud Integration)</option>
+                <option value="Robotics (Arduino, Embedded Systems, Sensors & Automation)">Robotics (Arduino, Embedded Systems, Sensors & Automation)</option>
+                <option value="Artificial Intelligence & Machine Learning (Python, NumPy, Pandas & Scikit-learn)">Artificial Intelligence & Machine Learning (Python, NumPy, Pandas & Scikit-learn)</option>
+                <option value="Java Programming (Core Java, OOP, Collections & JDBC)">Java Programming (Core Java, OOP, Collections & JDBC)</option>
+                <option value="CAD/CAM (Computer-Aided Design & Computer-Aided Manufacturing)">CAD/CAM (Computer-Aided Design & Computer-Aided Manufacturing)</option>
+                <option value="Data Science (Python, Pandas, NumPy, Data Visualization & Machine Learning)">Data Science (Python, Pandas, NumPy, Data Visualization & Machine Learning)</option>
+                <option value="Data Structures & Algorithms (Arrays, Linked Lists, Stacks, Queues, Trees & Graphs)">Data Structures & Algorithms (Arrays, Linked Lists, Stacks, Queues, Trees & Graphs)</option>
+                <option value="PLC & SCADA Systems (PLC Programming, SCADA, HMI & Industrial Automation)">PLC & SCADA Systems (PLC Programming, SCADA, HMI & Industrial Automation)</option>
+            </select>
+
+            <div style="display:flex; gap:10px;">
+                <div style="flex:2;">
+                    <label>Enrollment Prefix</label>
+                    <input type="text" id="regPrefix" value="VED/2026/WEBDEV/">
+                </div>
+                <div style="flex:1;">
+                    <label>Start No.</label>
+                    <input type="number" id="startReg" value="521">
+                </div>
+            </div>
+
+            <label>Global Date of Issue</label>
+            <input type="date" id="globalIssueDate" value="2026-03-01">
+        </details>
+
+        <details open>
+            <summary>3️⃣ Provide Excel/CSV Data</summary>
+            <label style="color:#e67e22;">Excel Sequence (8 Columns Required):<br><b>Name | Course (Short) | Registration No | College Name | Enrollment NO | Starting Date | Ending Date | Date Of Issue</b></label>
+            
+            <label style="color: green; font-size: 11px; margin-top: 8px;">Upload CSV File (Optional):</label>
+            <input type="file" accept=".csv" onchange="loadCSV(event)">
+            <p style="text-align:center; font-size:12px; font-weight:bold; margin: 2px 0;">OR Paste Here</p>
+
+            <textarea id="bulkData" rows="5" placeholder="Vikas Kumar	AI & ML	23603080024	GARHWA POLYTECHNIC	VED/2026/WEBDEV/521	01-06-2026	14-07-2026	28/02/2026"></textarea>
+            <button onclick="previewFirst()">👁️ Preview 1st Student</button>
+        </details>
+
+        <details>
+            <summary>⚙️ Position Adjustments (Stamp)</summary>
+            <label>Stamp Size: <span class="slider-val" id="valStampSize">138px</span></label>
+            <input type="range" id="stampSize" min="50" max="350" value="138" oninput="updateElements()">
+            
+            <label>Stamp Left/Right (X): <span class="slider-val" id="valStampX">238px</span></label>
+            <input type="range" id="stampX" min="0" max="500" value="238" oninput="updateElements()">
+            
+            <label>Stamp Up/Down (Y): <span class="slider-val" id="valStampY">55px</span></label>
+            <input type="range" id="stampY" min="-100" max="300" value="55" oninput="updateElements()">
+        </details>
+
+        <details>
+            <summary>📋 Generated Data (Copy to Excel)</summary>
+            <div style="max-height: 150px; overflow-y: auto;">
+                <table id="outputTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Course</th>
+                            <th>Reg No</th>
+                            <th>College</th>
+                            <th>Enrollment</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Issue Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="outputTbody"></tbody>
+                </table>
+            </div>
+        </details>
+        
+        <button id="zipBtn" class="zip-btn" onclick="generateAndSortFiles()">🗂️ Download & Auto-Sort in Folders</button>
+    </div>
+
+    <div class="page" id="pageElement">
+        
+        <div class="top-container">
+            <div class="left-info">
+                <div>CIN No. U63119JH2023PTC020128</div>
+                <div>GSTIN- 20AAJCV2661E1ZN</div>
+            </div>
+            <div class="right-info">
+                Date – <span id="issueDate">01/03/2026</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="cert-title">CERTIFICATE OF COMPLETION</div>
+            
+            <div class="enrollment">
+                <b>Enrollment No.: <span id="regNumber">VED/2026/WEBDEV/521</span></b>
+            </div>
+
+            <p>This is to certify that <b><span id="studentName">Vikas Kumar</span></b>, bearing Registration No.: <b><span id="collegeReg">23603080024</span></b>, from <b><span id="collegeName">GARHWA POLYTECHNIC</span></b>, has successfully completed the <b><span id="courseNamePara">Artificial Intelligence & Machine Learning (Python, NumPy, Pandas & Scikit-learn)</span></b> Industrial Training & Internship Program conducted by Venturing Digitally Private Limited.</p>
+
+            <p>The training program was designed to provide practical exposure and industry-relevant skills in <b><span id="courseNamePara2">Artificial Intelligence & Machine Learning (Python, NumPy, Pandas & Scikit-learn)</span></b>, enabling the participant to gain hands-on experience, technical knowledge, and practical understanding of modern tools, technologies, and industry practices.</p>
+
+            <div class="training-details">
+                <h4 class="blue-text">Training Details</h4>
+                <ul>
+                    <li><b>Course Name: <span id="courseNameList">AI & ML</span></b></li>
+                    <li><b>Start Date: <span id="startDate">01-06-2026</span></b></li>
+                    <li><b>End Date: <span id="endDate">14-07-2026</span></b></li>
+                </ul>
+            </div>
+
+            <p>During the training period, the participant demonstrated sincere involvement, technical skills, and satisfactory performance. We wish them continued success in their academic and professional endeavors.</p>
+        </div>
+
+        <div class="signature-area">
+            <div class="regards" id="dynamicSignText">
+                <b>Nikhil Sharma</b><br>
+                Co-Founder & CMO<br>
+                Venturing Digitally Private Limited
+            </div>
+            <div class="stamp-box" id="dynamicStampBox">
+                <img src="sign.png" alt="Stamp" id="dynamicStampImg">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Smart Course Mapping Logic ---
+        const courseShortcodes = {
+            "Basics of Full stack development (HTML, CSS, JavaScript, React JS)": "WEBDEV",
+            "Full Stack Web Development (HTML, CSS, JavaScript, React JS, Node.js, Express.js, MongoDB)": "WEBDEV",
+            "Web Development (HTML, CSS, JavaScript, Responsive Web Design)": "WEBDEV",
+            "AutoCAD (2D Drafting, 3D Modeling & Engineering Design)": "AUTOCAD",
+            "Industrial Automation (Sensors, PLC, SCADA, HMI & Process Control)": "INDAUTO",
+            "PLC & SCADA (PLC Programming, SCADA, HMI & Industrial Communication)": "PLCSCADA",
+            "Python Programming (Core Python, OOP, File Handling & Libraries)": "PYTHON",
+            "Internet of Things (IoT) (Arduino, ESP32, Sensors, MQTT & Cloud Integration)": "IOT",
+            "Robotics (Arduino, Embedded Systems, Sensors & Automation)": "ROBOTICS",
+            "Artificial Intelligence & Machine Learning (Python, NumPy, Pandas & Scikit-learn)": "AIML",
+            "Java Programming (Core Java, OOP, Collections & JDBC)": "JAVA",
+            "CAD/CAM (Computer-Aided Design & Computer-Aided Manufacturing)": "CADCAM",
+            "Data Science (Python, Pandas, NumPy, Data Visualization & Machine Learning)": "DATASCI",
+            "Data Structures & Algorithms (Arrays, Linked Lists, Stacks, Queues, Trees & Graphs)": "DSA",
+            "PLC & SCADA Systems (PLC Programming, SCADA, HMI & Industrial Automation)": "PLCSCADA"
+        };
+
+        function updatePrefixAndPreview() {
+            const selectedCourse = document.getElementById('globalCourseSelect').value;
+            const shortcode = courseShortcodes[selectedCourse] || "COURSE";
+            document.getElementById('regPrefix').value = `VED/2026/${shortcode}/`;
+            previewFirst(); // Refresh preview automatically
+        }
+
+        // --- Image Upload Handlers ---
+        function loadBg(event) {
+            const reader = new FileReader();
+            reader.onload = function(){ document.getElementById('pageElement').style.backgroundImage = `url(${reader.result})`; }
+            if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+        }
+        function loadStamp(event) {
+            const reader = new FileReader();
+            reader.onload = function(){ document.getElementById('dynamicStampImg').src = reader.result; }
+            if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+        }
+
+        // --- Stamp Sliders ---
+        function updateElements() {
+            const stampSize = document.getElementById('stampSize').value;
+            const stampX = document.getElementById('stampX').value;
+            const stampY = document.getElementById('stampY').value;
+            
+            document.getElementById('valStampSize').innerText = stampSize + "px";
+            document.getElementById('valStampX').innerText = stampX + "px";
+            document.getElementById('valStampY').innerText = stampY + "px";
+            
+            document.getElementById('dynamicStampImg').style.width = stampSize + "px";
+            document.getElementById('dynamicStampBox').style.left = stampX + "px";
+            document.getElementById('dynamicStampBox').style.bottom = stampY + "px";
+        }
+
+        // --- CSV Parsing ---
+        function parseCSVTextToTSV(text) {
+            let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0, l;
+            for (let l of text) {
+                if ('"' === l) {
+                    if (s && l === p) row[i] += l;
+                    s = !s;
+                } else if (',' === l && s) l = row[++i] = '';
+                else if ('\n' === l && s) {
+                    if ('\r' === p) row[i] = row[i].slice(0, -1);
+                    row = ret[++r] = [l = '']; i = 0;
+                } else row[i] += l;
+                p = l;
+            }
+            return ret.map(r => r.join('\t')).join('\n');
+        }
+
+        function loadCSV(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const tsv = parseCSVTextToTSV(text);
+                document.getElementById('bulkData').value = tsv.trim();
+                previewFirst();
+            };
+            reader.readAsText(file);
+        }
+
+        function formatDate(rawDate) {
+            if(rawDate && rawDate.includes("-") && rawDate.split("-")[0].length === 4) { 
+                const parts = rawDate.split("-");
+                if(parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`; 
+            }
+            return rawDate;
+        }
+
+        // --- Data Extraction Logic ---
+        function parseStudentData(cols, currentRegNumIndex) {
+            let sName = cols[0] ? cols[0].replace(/"/g, '').trim() : "";
+            let sCourseExcel = cols[1] ? cols[1].replace(/"/g, '').trim() : "";
+            let sCollReg = cols[2] ? cols[2].replace(/"/g, '').trim() : "";
+            let sCollName = cols[3] ? cols[3].replace(/"/g, '').trim() : "";
+
+            let sEnroll = (cols[4] && cols[4].trim() !== "" && cols[4].trim() !== "-") ? cols[4].trim() : "";
+            if(!sEnroll) {
+                const regPrefix = document.getElementById('regPrefix').value;
+                sEnroll = regPrefix + String(currentRegNumIndex).padStart(3, '0');
+            }
+
+            let sStart = (cols[5] && cols[5].trim() !== "") ? cols[5].trim() : "[Start Date]";
+            let sEnd = (cols[6] && cols[6].trim() !== "") ? cols[6].trim() : "[End Date]";
+            let sIssue = (cols[7] && cols[7].trim() !== "") ? cols[7].trim() : formatDate(document.getElementById('globalIssueDate').value);
+
+            return { sName, sCourseExcel, sCollReg, sCollName, sEnroll, sStart, sEnd, sIssue };
+        }
+
+        // --- Preview First Item ---
+        function previewFirst() {
+            const data = document.getElementById('bulkData').value.trim();
+            if(!data) { return; }
+            
+            const lines = data.split('\n');
+            const cols = lines[0].split('\t'); 
+            
+            if (cols.length < 4) {
+                alert("Data format incorrect! Expected 8 columns: Name | Course | Reg No | College Name | Enrollment | Start Date | End Date | Issue Date.");
+                return;
+            }
+            
+            const startRegNum = parseInt(document.getElementById('startReg').value);
+            const student = parseStudentData(cols, startRegNum);
+            const selectedCoursePara = document.getElementById('globalCourseSelect').value;
+
+            document.getElementById('studentName').innerText = student.sName;
+            document.getElementById('collegeReg').innerText = student.sCollReg;
+            document.getElementById('collegeName').innerText = student.sCollName;
+            
+            document.getElementById('courseNamePara').innerText = selectedCoursePara;
+            document.getElementById('courseNamePara2').innerText = selectedCoursePara;
+            document.getElementById('courseNameList').innerText = student.sCourseExcel;
+            
+            document.getElementById('regNumber').innerText = student.sEnroll;
+            document.getElementById('startDate').innerText = student.sStart; 
+            document.getElementById('endDate').innerText = student.sEnd; 
+            document.getElementById('issueDate').innerText = student.sIssue;
+        }
+
+        // --- Generation & File Naming Logic ---
+        async function generateAndSortFiles() {
+            const data = document.getElementById('bulkData').value.trim();
+            if(!data) { alert("Please paste student data first!"); return; }
+
+            const lines = data.split('\n');
+            let currentRegNum = parseInt(document.getElementById('startReg').value);
+            const selectedCoursePara = document.getElementById('globalCourseSelect').value;
+            
+            const btn = document.getElementById('zipBtn');
+            btn.innerText = "⏳ Generating & Sorting... Wait!";
+            btn.disabled = true;
+            
+            const pageEl = document.getElementById('pageElement');
+            const tbody = document.getElementById('outputTbody');
+            tbody.innerHTML = ""; 
+            
+            const { jsPDF } = window.jspdf;
+
+            let rootDirHandle = null;
+            let useZip = false;
+            let zip = null;
+            
+            if (window.showDirectoryPicker) {
+                try {
+                    rootDirHandle = await window.showDirectoryPicker();
+                } catch (err) {
+                    console.log("Directory picker cancelled, using ZIP fallback.");
+                    useZip = true;
+                    zip = new window.jspdf.JSZip();
+                }
+            } else {
+                useZip = true;
+                zip = new JSZip();
+            }
+
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].trim() === "") continue;
+
+                const cols = lines[i].split('\t');
+                if (cols.length < 4) continue; 
+
+                const student = parseStudentData(cols, currentRegNum);
+                
+                // DOM Update
+                document.getElementById('studentName').innerText = student.sName;
+                document.getElementById('courseNamePara').innerText = selectedCoursePara;
+                document.getElementById('courseNamePara2').innerText = selectedCoursePara;
+                document.getElementById('courseNameList').innerText = student.sCourseExcel;
+                document.getElementById('collegeReg').innerText = student.sCollReg;
+                document.getElementById('collegeName').innerText = student.sCollName;
+                
+                document.getElementById('regNumber').innerText = student.sEnroll;
+                document.getElementById('startDate').innerText = student.sStart; 
+                document.getElementById('endDate').innerText = student.sEnd; 
+                document.getElementById('issueDate').innerText = student.sIssue;
+
+                await new Promise(r => setTimeout(r, 200));
+
+                const canvas = await html2canvas(pageEl, { scale: 2, useCORS: true, logging: false });
+                const imgData = canvas.toDataURL('image/jpeg', 0.98);
+                
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                const pdfBlob = pdf.output('blob');
+                
+                // FILE & FOLDER NAMING LOGIC
+                const firstName = student.sName.split(' ')[0].replace(/[^a-zA-Z0-9]/g, "").trim() || `Student_${i}`;
+                
+                const enrollParts = student.sEnroll.split('/');
+                let enrollSection = "COURSE";
+                if(enrollParts.length > 2) {
+                    enrollSection = enrollParts[enrollParts.length - 2].replace(/[^a-zA-Z0-9]/g, "");
+                }
+                
+                const fileName = `${firstName}_${enrollSection}_VED_CERTI.pdf`;
+                const safeFolderName = student.sCourseExcel.replace(/[^a-zA-Z0-9 -]/g, "_").trim() || "Unknown_Course";
+
+                if (!useZip && rootDirHandle) {
+                    const courseFolderHandle = await rootDirHandle.getDirectoryHandle(safeFolderName, { create: true });
+                    const fileHandle = await courseFolderHandle.getFileHandle(fileName, { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(pdfBlob);
+                    await writable.close();
+                } else if (useZip) {
+                    zip.folder(safeFolderName).file(fileName, pdfBlob);
+                }
+
+                // Append to Output Table
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${student.sName}</td><td>${student.sCourseExcel}</td><td>${student.sCollReg}</td><td>${student.sCollName}</td><td>${student.sEnroll}</td><td>${student.sStart}</td><td>${student.sEnd}</td><td>${student.sIssue}</td>`;
+                tbody.appendChild(tr);
+
+                if (!cols[4] || cols[4].trim() === "" || cols[4].trim() === "-") {
+                    currentRegNum++;
+                }
+            }
+
+            if (useZip) {
+                btn.innerText = "📦 Packing ZIP File...";
+                const zipContent = await zip.generateAsync({ type: 'blob' });
+                saveAs(zipContent, "All_Sorted_Certificates.zip");
+            }
+
+            btn.innerText = "🗂️ Download & Auto-Sort in Folders";
+            btn.disabled = false;
+            alert(`Success! Files have been saved and sorted into Course-wise folders!`);
+        }
+
+        window.onload = function() {
+            if(document.getElementById('bulkData').value) {
+                updatePrefixAndPreview(); // Trigger smart prefix on load
+            }
+        }
+    </script>
+</body>
+</html>

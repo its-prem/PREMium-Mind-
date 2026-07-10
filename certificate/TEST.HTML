@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Enrollment Letter Generator</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Crimson+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #525659;
+            font-family: 'Crimson Pro', serif; 
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* ----- Background Image Setup ----- */
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background-color: white;
+            background-image: url('finalved.jpg');
+            background-size: 210mm 297mm;
+            background-repeat: no-repeat;
+            background-position: center top;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column; 
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ----- FIXED Header Text Positions ----- */
+        .top-container {
+            width: 100%;
+            padding-top: 117px; 
+            padding-left: 50%;  
+            padding-right: 2mm;
+            display: flex;
+            justify-content: flex-start;
+            gap: 28px; 
+            font-size: 15px; 
+            color: #111;
+            line-height: 1.5;
+        }
+        .left-info div { margin-bottom: 8px; }
+        .right-info { text-align: right; }
+
+        /* ----- Body Content Section ----- */
+        .content {
+            padding: 4mm 22mm 0 22mm;
+            font-size: 17px; 
+            line-height: 1.4; 
+            color: #111; 
+            flex-grow: 1; 
+        }
+        
+        .letter-heading {
+            text-align: center;
+            color: #02277F;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            font-family: 'Archivo Black', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .content p { margin-bottom: 22px; text-align: justify; }
+        .dates-block { margin-bottom: 25px; line-height: 1.8; }
+
+        /* ----- FIXED Signature & Stamp Section ----- */
+        .signature-area {
+            position: relative;
+            padding: 0 22mm;
+            height: 150px; 
+            margin-bottom: 30mm;
+        }
+        
+        #dynamicSignText {
+            position: absolute;
+            left: 84px;   
+            bottom: 80px; 
+            font-size: 16px; 
+            line-height: 1.5;
+            color: #111;
+            z-index: 2; 
+        }
+        #dynamicSignText a { color: #0c3375; text-decoration: underline; }
+
+        #dynamicStampBox {
+            position: absolute;
+            left: 269px;   
+            bottom: 35px;  
+            z-index: 1;
+        }
+        #dynamicStampImg {
+            width: 133px;  
+            height: auto;
+            display: block;
+        }
+
+        /* ----- Control Panel Window ----- */
+        .controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            width: 400px;
+            z-index: 10;
+            max-height: 95vh;
+            overflow-y: auto;
+            font-family: Arial, sans-serif; 
+        }
+        .controls details {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .controls summary { font-weight: bold; color: #0c3375; cursor: pointer; font-size: 14px; outline: none; }
+        .controls label { font-size: 12px; font-weight: bold; color: #555; display: block; margin-top: 10px; margin-bottom: 4px; }
+        
+        .controls input[type="text"], .controls input[type="date"], .controls input[type="number"], .controls textarea, .controls select {
+            width: 100%;
+            margin-bottom: 5px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+        }
+        .controls input[type="file"] { font-size: 11px; margin-bottom: 5px; }
+        .controls input[type="range"] { width: 100%; margin-bottom: 5px; }
+        .controls .slider-val { font-weight: normal; color: #0c3375; float: right; }
+        
+        .action-btn {
+            width: 100%;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            padding: 12px;
+            border-radius: 5px;
+            margin-top: 5px;
+            transition: 0.3s;
+            text-align: center;
+        }
+        .folder-btn { background: #0c3375; }
+        .folder-btn:hover { background: #082459; }
+        .action-btn:disabled { background: #95a5a6; cursor: not-allowed; }
+
+        /* Progress Bar */
+        #progressText {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #d35400;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Output Table Styles */
+        #outputTable {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+        #outputTable th, #outputTable td { border: 1px solid #aaa; padding: 5px; text-align: left; }
+        #outputTable th { background-color: #e0e0e0; }
+
+        @media print {
+            body { background: none; padding: 0; }
+            .page { box-shadow: none; width: 210mm; height: 297mm; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            .controls { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <h3 style="margin-bottom:10px; color:#0c3375; font-size: 16px;">Bulk Enrollment Letter Generator</h3>
+        
+        <details>
+            <summary>1️⃣ Load Local Images</summary>
+            <label>Load Background (finalved.jpg)</label>
+            <input type="file" accept="image/*" onchange="loadBg(event)">
+            
+            <label>Load Stamp Image (sign.png)</label>
+            <input type="file" accept="image/*" onchange="loadStamp(event)">
+        </details>
+
+        <details open>
+            <summary>2️⃣ Setup Registration Series</summary>
+            
+            <label>Select Batch Course (Prints in Letter)</label>
+            <select id="globalCourseSelect" onchange="previewFirst()">
+                <option value="Basics of Full stack development (HTML, CSS, JavaScript, React JS)">Basics of Full stack development (HTML, CSS, JavaScript, React JS)</option>
+                <option value="Full Stack Web Development">Full Stack Web Development</option>
+                <option value="Web Development (HTML, CSS, JavaScript, Responsive Web Design)">Web Development (HTML, CSS, JavaScript, Responsive Web Design)</option>
+                <option value="AutoCAD (2D Drafting, 3D Modeling & Engineering Design)">AutoCAD (2D Drafting, 3D Modeling & Engineering Design)</option>
+                <option value="Industrial Automation (Sensors, PLC, SCADA, HMI & Process Control)">Industrial Automation (Sensors, PLC, SCADA, HMI & Process Control)</option>
+                <option value="PLC & SCADA (PLC Programming, SCADA, HMI)">PLC & SCADA (PLC Programming, SCADA, HMI)</option>
+                <option value="Python Programming (Core Python, OOP, File Handling & Libraries)">Python Programming (Core Python, OOP, File Handling & Libraries)</option>
+                <option value="Internet of Things (IoT)">Internet of Things (IoT)</option>
+                <option value="Robotics (Arduino, Embedded Systems, Sensors & Automation)">Robotics (Arduino, Embedded Systems, Sensors & Automation)</option>
+                <option value="Artificial Intelligence & Machine Learning (Python, NumPy, Pandas)">Artificial Intelligence & Machine Learning (Python, NumPy, Pandas)</option>
+                <option value="Java Programming (Core Java, OOP, Collections & JDBC)">Java Programming (Core Java, OOP, Collections & JDBC)</option>
+                <option value="CAD/CAM (Computer-Aided Design & Computer-Aided Manufacturing)">CAD/CAM (Computer-Aided Design & Computer-Aided Manufacturing)</option>
+                <option value="Data Science (Python, Pandas, NumPy, Data Visualization & Machine Learning)">Data Science (Python, Pandas, NumPy, Data Visualization & Machine Learning)</option>
+                <option value="Data Structures & Algorithms (Arrays, Lists, Stacks, Queues, Graphs)">Data Structures & Algorithms (Arrays, Lists, Stacks, Queues, Graphs)</option>
+                <option value="PLC & SCADA Systems (PLC Programming, SCADA, HMI & Industrial Automation)">PLC & SCADA Systems (PLC Programming, SCADA, HMI & Industrial Automation)</option>
+            </select>
+
+            <div style="display:flex; gap:10px;">
+                <div style="flex:2;">
+                    <label>Prefix</label>
+                    <input type="text" id="regPrefix" value="VED/2026/WEBDEV/">
+                </div>
+                <div style="flex:1;">
+                    <label>Start No.</label>
+                    <input type="number" id="startReg" value="16">
+                </div>
+            </div>
+            <label>Issue Date</label>
+            <input type="date" id="globalIssueDate" value="2026-02-28">
+        </details>
+
+        <details open>
+            <summary>3️⃣ Paste Excel Data</summary>
+            <label style="color:#f78c1e;">Format (6 Columns):<br>Name | Course | Duration | Start Date | End Date | College Reg No</label>
+            <textarea id="bulkData" rows="4" placeholder="Paste data here...">Vikas Kumar	web development	3 months	01/03/2026	01/06/2026	18001012023</textarea>
+            
+            <button class="action-btn folder-btn" style="padding: 8px; font-size: 13px;" onclick="previewFirst()">👁️ Preview 1st Student</button>
+        </details>
+
+        <details>
+            <summary>⚙️ Position Adjustments</summary>
+            <label>Stamp Size: <span class="slider-val" id="valStampSize">133px</span></label>
+            <input type="range" id="stampSize" min="50" max="350" value="133" oninput="updateElements()">
+            
+            <label>Stamp Left/Right (X): <span class="slider-val" id="valStampX">269px</span></label>
+            <input type="range" id="stampX" min="0" max="500" value="269" oninput="updateElements()">
+            
+            <label>Stamp Up/Down (Y): <span class="slider-val" id="valStampY">35px</span></label>
+            <input type="range" id="stampY" min="-100" max="300" value="35" oninput="updateElements()">
+        </details>
+
+        <details>
+            <summary>📋 Generated Data (Copy to Excel)</summary>
+            <p style="font-size:11px; margin-bottom:5px; color:#555;">PDF generate hone ke baad data yaha aayega.</p>
+            <div style="max-height: 150px; overflow-y: auto;">
+                <table id="outputTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>College Reg No</th>
+                            <th>Course</th>
+                            <th>Enrollment No</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="outputTbody"></tbody>
+                </table>
+            </div>
+        </details>
+        
+        <button id="folderBtn" class="action-btn folder-btn" onclick="generateFiles()">📁 Save to Selected Folder</button>
+        <div id="progressText">⏳ Processing... Please wait.</div>
+    </div>
+
+    <div class="page" id="pageElement">
+        
+        <div class="top-container">
+            <div class="left-info">
+                <div>CIN No. U63119JH2023PTC020128</div>
+                <div>GSTIN- 20AAJCV2661E1ZN</div>
+            </div>
+            <div class="right-info">
+                Date – <span id="issueDate">28/02/2026</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="letter-heading">ENROLLMENT LETTER</div>
+            
+            <p>Dear <b><span id="studentName">Vikas Kumar</span></b>,</p>
+            
+            <p>Enrollment No – <b><span id="regNumber">VED/2026/WEBDEV/016</span></b></p>
+
+            <p>We are pleased to offer you an opportunity to join our organization for an <b>Internship Program</b> in <b><span id="courseName">Basics of Full stack development (HTML, CSS, JavaScript, React JS )</span></b>.</p>
+
+            <p>This internship program will be conducted over a period of <b><span id="durationStr">3 months</span></b>, during which you will receive practical training and gain hands-on exposure by working on <b>real-time projects</b> under the guidance of our experienced mentors. The objective of this program is to strengthen your fundamental understanding of web development concepts and enhance your technical and professional skills.</p>
+
+            <p>Upon the successful completion of the internship program and satisfactory submission of all assigned tasks and projects, you will be eligible to receive an <b>Internship Completion Certificate</b>.</p>
+
+            <div class="dates-block">
+                <b>College Reg No -</b> <b><span id="collegeRegNo">18001012023</span></b><br>
+                <b>Internship Start Date:</b> <b><span id="startDate">01/03/2026</span></b><br>
+                <b>Internship End Date:</b> <b><span id="endDate">01/06/2026</span></b>
+            </div>
+
+            <p>We look forward to having enthusiastic internship as part of this learning journey and wish you great success in building your future careers in emerging technologies.</p>
+        </div>
+
+        <div class="signature-area">
+            <div class="regards" id="dynamicSignText">
+                Regards,<br>
+                Nikky Kumari<br>
+                Venturing Digitally (P) Ltd.<br>
+                <a href="mailto:training@venturingdigitally.com">training@venturingdigitally.com</a>
+            </div>
+            <div class="stamp-box" id="dynamicStampBox">
+                <img src="sign.png" alt="Signature & Stamp" id="dynamicStampImg">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadBg(event) {
+            const reader = new FileReader();
+            reader.onload = function(){ document.getElementById('pageElement').style.backgroundImage = `url(${reader.result})`; }
+            if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+        }
+        
+        function loadStamp(event) {
+            const reader = new FileReader();
+            reader.onload = function(){ document.getElementById('dynamicStampImg').src = reader.result; }
+            if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function updateElements() {
+            const stampSize = document.getElementById('stampSize').value;
+            const stampX = document.getElementById('stampX').value;
+            const stampY = document.getElementById('stampY').value;
+
+            document.getElementById('valStampSize').innerText = stampSize + "px";
+            document.getElementById('valStampX').innerText = stampX + "px";
+            document.getElementById('valStampY').innerText = stampY + "px";
+
+            document.getElementById('dynamicStampImg').style.width = stampSize + "px";
+            document.getElementById('dynamicStampBox').style.left = stampX + "px";
+            document.getElementById('dynamicStampBox').style.bottom = stampY + "px";
+        }
+
+        function previewFirst() {
+            const data = document.getElementById('bulkData').value.trim();
+            if(!data) { alert("Please paste data in the text area first."); return; }
+            
+            const lines = data.split('\n').filter(line => line.trim().length > 0); 
+            if(lines.length === 0) return;
+
+            const cols = lines[0].split('\t'); 
+            
+            if (cols.length < 6) {
+                alert("Data format incorrect! Ensure you copied 6 columns from Excel: Name | Course | Duration | Start Date | End Date | College Reg No");
+                return;
+            }
+            
+            const rawIssueDate = document.getElementById('globalIssueDate').value;
+            let fIssue = rawIssueDate;
+            if(rawIssueDate && rawIssueDate.includes("-")) {
+                const parts = rawIssueDate.split("-");
+                fIssue = `${parts[2]}/${parts[1]}/${parts[0]}`; 
+            }
+            
+            const regPrefix = document.getElementById('regPrefix').value;
+            const startRegNum = parseInt(document.getElementById('startReg').value);
+            const firstReg = regPrefix + String(startRegNum).padStart(3, '0');
+            const selectedCourse = document.getElementById('globalCourseSelect').value;
+            
+            document.getElementById('studentName').innerText = cols[0].trim();
+            document.getElementById('courseName').innerText = selectedCourse; 
+            document.getElementById('durationStr').innerText = cols[2].trim();
+            document.getElementById('startDate').innerText = cols[3].trim(); 
+            document.getElementById('endDate').innerText = cols[4].trim(); 
+            document.getElementById('collegeRegNo').innerText = cols[5].trim(); 
+            document.getElementById('regNumber').innerText = firstReg;
+            document.getElementById('issueDate').innerText = fIssue;
+        }
+
+        async function generateFiles() {
+            const data = document.getElementById('bulkData').value.trim();
+            if(!data) { alert("Please paste student data first!"); return; }
+
+            const validLines = data.split('\n').filter(line => line.trim().length > 0);
+            if(validLines.length === 0) return;
+
+            const folderBtn = document.getElementById('folderBtn');
+            const progressText = document.getElementById('progressText');
+            
+            folderBtn.disabled = true;
+            progressText.style.display = "block";
+
+            let dirHandle = null;
+
+            try {
+                // Initialize File System
+                progressText.innerText = "⏳ Requesting folder access...";
+                if (window.showDirectoryPicker) {
+                    try {
+                        // User jo folder select karega (existing ya naya) wo direct rootFolder ban jayega.
+                        // Isme koi naya folder andar create nahi hoga.
+                        dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                    } catch (err) {
+                        alert("Folder selection cancelled. Process stopped.");
+                        folderBtn.disabled = false;
+                        progressText.style.display = "none";
+                        return; 
+                    }
+                } else {
+                    alert("Your browser does not support direct folder saving. Please use Google Chrome or Edge desktop browser.");
+                    folderBtn.disabled = false;
+                    progressText.style.display = "none";
+                    return;
+                }
+
+                // Get common data
+                const regPrefix = document.getElementById('regPrefix').value;
+                let currentRegNum = parseInt(document.getElementById('startReg').value);
+                const selectedCourse = document.getElementById('globalCourseSelect').value;
+                
+                const rawIssueDate = document.getElementById('globalIssueDate').value;
+                let formattedIssueDate = rawIssueDate;
+                if(rawIssueDate && rawIssueDate.includes("-")) {
+                    const parts = rawIssueDate.split("-");
+                    formattedIssueDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                }
+                document.getElementById('issueDate').innerText = formattedIssueDate;
+
+                const pageEl = document.getElementById('pageElement');
+                const tbody = document.getElementById('outputTbody');
+                tbody.innerHTML = ""; 
+
+                const { jsPDF } = window.jspdf;
+
+                // Loop through students
+                for (let i = 0; i < validLines.length; i++) {
+                    const cols = validLines[i].split('\t');
+                    if (cols.length < 6) continue; 
+
+                    progressText.innerText = `⏳ Generating PDF ${i + 1} of ${validLines.length}... Please wait.`;
+
+                    const sName = cols[0].trim();
+                    const sCourseExcel = cols[1].trim();
+                    const sDuration = cols[2].trim();
+                    const sStart = cols[3].trim();
+                    const sEnd = cols[4].trim();
+                    const sCollegeReg = cols[5].trim();
+                    const curReg = regPrefix + String(currentRegNum).padStart(3, '0');
+                    
+                    document.getElementById('studentName').innerText = sName;
+                    document.getElementById('courseName').innerText = selectedCourse;
+                    document.getElementById('durationStr').innerText = sDuration;
+                    document.getElementById('startDate').innerText = sStart; 
+                    document.getElementById('endDate').innerText = sEnd; 
+                    document.getElementById('collegeRegNo').innerText = sCollegeReg; 
+                    document.getElementById('regNumber').innerText = curReg;
+
+                    // Allow DOM to repaint
+                    await new Promise(r => setTimeout(r, 100));
+
+                    const canvas = await html2canvas(pageEl, { scale: 2, useCORS: true, logging: false });
+                    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+                    
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                    
+                    const pdfBlob = pdf.output('blob');
+                    
+                    // Construct File Name
+                    const safeName = sName.replace(/[^a-zA-Z0-9 ]/g, "_"); 
+                    const fileName = `${safeName}_VED_EL.pdf`; 
+                    
+                    // SAVE DIRECTLY TO CHOSEN DIRECTORY
+                    const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(pdfBlob);
+                    await writable.close();
+
+                    // Update Table
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${sName}</td><td>${sCollegeReg}</td><td>${sCourseExcel}</td><td>${curReg}</td><td>${sStart}</td><td>${sEnd}</td>`;
+                    tbody.appendChild(tr);
+
+                    currentRegNum++;
+                }
+
+                alert(`Success! All files have been saved inside the folder you selected.`);
+
+            } catch (error) {
+                console.error(error);
+                alert("An error occurred during file generation. Check console for details.");
+            } finally {
+                folderBtn.disabled = false;
+                progressText.style.display = "none";
+            }
+        }
+        
+        window.onload = function() { previewFirst(); }
+    </script>
+</body>
+</html>
