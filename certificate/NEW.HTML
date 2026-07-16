@@ -225,8 +225,8 @@
             
             <label>Select Batch Course (For Paragraphs)</label>
             <select id="globalCourseSelect" onchange="updatePrefixAndPreview()">
-                <option value="Basics of Full stack development (HTML, CSS, JavaScript, React JS)">Basics of Full stack development (HTML, CSS, JavaScript, React JS)</option>
                 <option value="Full Stack Web Development (HTML, CSS, JavaScript, React JS, Node.js, Express.js, MongoDB)">Full Stack Web Development (HTML, CSS, JavaScript, React JS, Node.js, Express.js, MongoDB)</option>
+                <option value="Basics of Full stack development (HTML, CSS, JavaScript, React JS)">Basics of Full stack development (HTML, CSS, JavaScript, React JS)</option>
                 <option value="Web Development (HTML, CSS, JavaScript, Responsive Web Design)">Web Development (HTML, CSS, JavaScript, Responsive Web Design)</option>
                 <option value="AutoCAD (2D Drafting, 3D Modeling & Engineering Design)">AutoCAD (2D Drafting, 3D Modeling & Engineering Design)</option>
                 <option value="Industrial Automation (Sensors, PLC, SCADA, HMI & Process Control)">Industrial Automation (Sensors, PLC, SCADA, HMI & Process Control)</option>
@@ -253,19 +253,20 @@
                 </div>
             </div>
 
-            <label>Global Date of Issue</label>
-            <input type="date" id="globalIssueDate" value="2026-03-01">
+            <!-- Auto Issue Date based on End Date (NUMBER BOX) -->
+            <label>Issue Date (Days after End Date) <span style="font-weight:normal; font-size:10px;">(1 = +1 Day)</span></label>
+            <input type="number" id="issueDateOffset" value="1" onchange="previewFirst()">
         </details>
 
         <details open>
             <summary>3️⃣ Provide Excel/CSV Data</summary>
-            <label style="color:#e67e22;">Excel Sequence (8 Columns Required):<br><b>Name | Course (Short) | Registration No | College Name | Enrollment NO | Starting Date | Ending Date | Date Of Issue</b></label>
+            <label style="color:#e67e22;">Excel Sequence (8 Columns Required):<br><b>Name | Course (Short) | Registration No | College Name | Enrollment NO | Starting Date | Ending Date | Date Of Issue (Ignored)</b></label>
             
             <label style="color: green; font-size: 11px; margin-top: 8px;">Upload CSV File (Optional):</label>
             <input type="file" accept=".csv" onchange="loadCSV(event)">
             <p style="text-align:center; font-size:12px; font-weight:bold; margin: 2px 0;">OR Paste Here</p>
 
-            <textarea id="bulkData" rows="5" placeholder="Vikas Kumar	AI & ML	23603080024	GARHWA POLYTECHNIC	VED/2026/WEBDEV/521	01-06-2026	14-07-2026	28/02/2026"></textarea>
+            <textarea id="bulkData" rows="5" placeholder="Vikas Kumar	AI & ML	23603080024	GARHWA POLYTECHNIC	VED/2026/AIML/521	01-06-2026	14-07-2026	28/02/2026"></textarea>
             <button onclick="previewFirst()">👁️ Preview 1st Student</button>
         </details>
 
@@ -353,7 +354,22 @@
     </div>
 
     <script>
-        // --- Smart Course Mapping Logic ---
+        // --- Smart Course Mapping Logic (Prefix -> Long Name) ---
+        const prefixToLongCourse = {
+            "WEBDEV": "Full Stack Web Development (HTML, CSS, JavaScript, React JS, Node.js, Express.js, MongoDB)",
+            "AUTOCAD": "AutoCAD (2D Drafting, 3D Modeling & Engineering Design)",
+            "INDAUTO": "Industrial Automation (Sensors, PLC, SCADA, HMI & Process Control)",
+            "PLC-SCADA": "PLC & SCADA (PLC Programming, SCADA, HMI & Industrial Communication)",
+            "PYTHON": "Python Programming (Core Python, OOP, File Handling & Libraries)",
+            "IOT": "Internet of Things (IoT) (Arduino, ESP32, Sensors, MQTT & Cloud Integration)",
+            "ROBOTICS": "Robotics (Arduino, Embedded Systems, Sensors & Automation)",
+            "AIML": "Artificial Intelligence & Machine Learning (Python, NumPy, Pandas & Scikit-learn)",
+            "JAVA": "Java Programming (Core Java, OOP, Collections & JDBC)",
+            "CADCAM": "CAD/CAM (Computer-Aided Design & Computer-Aided Manufacturing)",
+            "DATASCI": "Data Science (Python, Pandas, NumPy, Data Visualization & Machine Learning)",
+            "DSA": "Data Structures & Algorithms (Arrays, Linked Lists, Stacks, Queues, Trees & Graphs)"
+        };
+
         const courseShortcodes = {
             "Basics of Full stack development (HTML, CSS, JavaScript, React JS)": "WEBDEV",
             "Full Stack Web Development (HTML, CSS, JavaScript, React JS, Node.js, Express.js, MongoDB)": "WEBDEV",
@@ -369,14 +385,62 @@
             "CAD/CAM (Computer-Aided Design & Computer-Aided Manufacturing)": "CADCAM",
             "Data Science (Python, Pandas, NumPy, Data Visualization & Machine Learning)": "DATASCI",
             "Data Structures & Algorithms (Arrays, Linked Lists, Stacks, Queues, Trees & Graphs)": "DSA",
-            "PLC & SCADA Systems (PLC Programming, SCADA, HMI & Industrial Automation)": "PLCSCADA"
+            "PLC & SCADA (PLC Programming, SCADA, HMI & Industrial Automation)": "PLCSCADA"
         };
+
+        function predictCourseFromEnrollment(enrollNo, fallbackCourse) {
+            if(!enrollNo) return fallbackCourse;
+            const parts = enrollNo.split('/');
+            if (parts.length >= 3) {
+                const prefix = parts[parts.length - 2].toUpperCase();
+                if (prefixToLongCourse[prefix]) {
+                    return prefixToLongCourse[prefix];
+                }
+            }
+            return fallbackCourse;
+        }
 
         function updatePrefixAndPreview() {
             const selectedCourse = document.getElementById('globalCourseSelect').value;
             const shortcode = courseShortcodes[selectedCourse] || "COURSE";
             document.getElementById('regPrefix').value = `VED/2026/${shortcode}/`;
-            previewFirst(); // Refresh preview automatically
+            previewFirst(); 
+        }
+
+        // --- Calculate Issue Date based on End Date ---
+        function calculateIssueDate(endDateStr, offsetDays) {
+            if (!endDateStr || endDateStr.trim() === "" || endDateStr.includes("[")) return "[Issue Date]";
+            
+            let day, month, year;
+            if (endDateStr.includes("-")) {
+                [day, month, year] = endDateStr.split("-");
+            } else if (endDateStr.includes("/")) {
+                [day, month, year] = endDateStr.split("/");
+            } else {
+                return endDateStr; 
+            }
+            
+            if (year && year.length === 4) {
+                // Format is DD-MM-YYYY
+            } else if (day && day.length === 4) {
+                // Format is YYYY-MM-DD
+                let temp = year;
+                year = day;
+                day = temp;
+            } else {
+                return endDateStr;
+            }
+
+            let dateObj = new Date(`${year}-${month}-${day}`);
+            if (isNaN(dateObj)) return endDateStr;
+
+            dateObj.setDate(dateObj.getDate() + parseInt(offsetDays));
+
+            let outDay = String(dateObj.getDate()).padStart(2, '0');
+            let outMonth = String(dateObj.getMonth() + 1).padStart(2, '0');
+            let outYear = dateObj.getFullYear();
+
+            return `${outDay}/${outMonth}/${outYear}`; // Format back to DD/MM/YYYY
         }
 
         // --- Image Upload Handlers ---
@@ -436,20 +500,12 @@
             reader.readAsText(file);
         }
 
-        function formatDate(rawDate) {
-            if(rawDate && rawDate.includes("-") && rawDate.split("-")[0].length === 4) { 
-                const parts = rawDate.split("-");
-                if(parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`; 
-            }
-            return rawDate;
-        }
-
         // --- Data Extraction Logic ---
         function parseStudentData(cols, currentRegNumIndex) {
             let sName = cols[0] ? cols[0].replace(/"/g, '').trim() : "";
             let sCourseExcel = cols[1] ? cols[1].replace(/"/g, '').trim() : "";
             let sCollReg = cols[2] ? cols[2].replace(/"/g, '').trim() : "";
-            let sCollName = cols[3] ? cols[3].replace(/"/g, '').trim() : "";
+            let sCollName = cols[3] ? cols[3].replace(/"/g, '').trim() : "Unknown College";
 
             let sEnroll = (cols[4] && cols[4].trim() !== "" && cols[4].trim() !== "-") ? cols[4].trim() : "";
             if(!sEnroll) {
@@ -459,7 +515,10 @@
 
             let sStart = (cols[5] && cols[5].trim() !== "") ? cols[5].trim() : "[Start Date]";
             let sEnd = (cols[6] && cols[6].trim() !== "") ? cols[6].trim() : "[End Date]";
-            let sIssue = (cols[7] && cols[7].trim() !== "") ? cols[7].trim() : formatDate(document.getElementById('globalIssueDate').value);
+            
+            // SMART ISSUE DATE LOGIC
+            let offsetDays = document.getElementById('issueDateOffset').value || 0;
+            let sIssue = calculateIssueDate(sEnd, offsetDays);
 
             return { sName, sCourseExcel, sCollReg, sCollName, sEnroll, sStart, sEnd, sIssue };
         }
@@ -479,14 +538,16 @@
             
             const startRegNum = parseInt(document.getElementById('startReg').value);
             const student = parseStudentData(cols, startRegNum);
-            const selectedCoursePara = document.getElementById('globalCourseSelect').value;
+            
+            const fallbackCourse = document.getElementById('globalCourseSelect').value;
+            const predictedCourseName = predictCourseFromEnrollment(student.sEnroll, fallbackCourse);
 
             document.getElementById('studentName').innerText = student.sName;
             document.getElementById('collegeReg').innerText = student.sCollReg;
             document.getElementById('collegeName').innerText = student.sCollName;
             
-            document.getElementById('courseNamePara').innerText = selectedCoursePara;
-            document.getElementById('courseNamePara2').innerText = selectedCoursePara;
+            document.getElementById('courseNamePara').innerText = predictedCourseName;
+            document.getElementById('courseNamePara2').innerText = predictedCourseName;
             document.getElementById('courseNameList').innerText = student.sCourseExcel;
             
             document.getElementById('regNumber').innerText = student.sEnroll;
@@ -502,7 +563,7 @@
 
             const lines = data.split('\n');
             let currentRegNum = parseInt(document.getElementById('startReg').value);
-            const selectedCoursePara = document.getElementById('globalCourseSelect').value;
+            const fallbackCourse = document.getElementById('globalCourseSelect').value;
             
             const btn = document.getElementById('zipBtn');
             btn.innerText = "⏳ Generating & Sorting... Wait!";
@@ -539,10 +600,12 @@
 
                 const student = parseStudentData(cols, currentRegNum);
                 
+                const predictedCourseName = predictCourseFromEnrollment(student.sEnroll, fallbackCourse);
+                
                 // DOM Update
                 document.getElementById('studentName').innerText = student.sName;
-                document.getElementById('courseNamePara').innerText = selectedCoursePara;
-                document.getElementById('courseNamePara2').innerText = selectedCoursePara;
+                document.getElementById('courseNamePara').innerText = predictedCourseName;
+                document.getElementById('courseNamePara2').innerText = predictedCourseName;
                 document.getElementById('courseNameList').innerText = student.sCourseExcel;
                 document.getElementById('collegeReg').innerText = student.sCollReg;
                 document.getElementById('collegeName').innerText = student.sCollName;
@@ -573,11 +636,11 @@
                 }
                 
                 const fileName = `${firstName}_${enrollSection}_VED_CERTI.pdf`;
-                const safeFolderName = student.sCourseExcel.replace(/[^a-zA-Z0-9 -]/g, "_").trim() || "Unknown_Course";
+                const safeFolderName = student.sCollName.replace(/[^a-zA-Z0-9 -]/g, "_").trim() || "Unknown_College";
 
                 if (!useZip && rootDirHandle) {
-                    const courseFolderHandle = await rootDirHandle.getDirectoryHandle(safeFolderName, { create: true });
-                    const fileHandle = await courseFolderHandle.getFileHandle(fileName, { create: true });
+                    const collegeFolderHandle = await rootDirHandle.getDirectoryHandle(safeFolderName, { create: true });
+                    const fileHandle = await collegeFolderHandle.getFileHandle(fileName, { create: true });
                     const writable = await fileHandle.createWritable();
                     await writable.write(pdfBlob);
                     await writable.close();
@@ -603,7 +666,7 @@
 
             btn.innerText = "🗂️ Download & Auto-Sort in Folders";
             btn.disabled = false;
-            alert(`Success! Files have been saved and sorted into Course-wise folders!`);
+            alert(`Success! Files have been saved and sorted into College-wise folders!`);
         }
 
         window.onload = function() {
