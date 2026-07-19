@@ -328,16 +328,15 @@
         }
 
         enrolledCourses.forEach(course => {
-          let pdfUrl = '';
-
+          // Pass only file path — watch.html short-lived token leta hai (secret browser me nahi)
+          let btnAction = '';
           if (course.pdf_file && course.pdf_file.trim() !== '') {
-            pdfUrl = 'https://premind.diplomawallah.in/proxy_pdf.php?file=' + encodeURIComponent(course.pdf_file);
+            btnAction = `window.location.href='watch.html?file=${encodeURIComponent(course.pdf_file)}&download=${course.allow_download}'`;
           } else if (course.pdf_link && course.pdf_link.trim() !== '') {
-            pdfUrl = course.pdf_link;
+            btnAction = `alert('This content uses an external link. Secure reader requires an uploaded PDF file.')`;
+          } else {
+            btnAction = `alert('Content is being prepared and will be available soon!')`;
           }
-
-          // 🔥 NAYA CODE: Yahan parameter ko dl ki jagah download kar diya gaya hai 🔥
-          let btnAction = pdfUrl ? `window.location.href='watch.html?pdf=${encodeURIComponent(pdfUrl)}&download=${course.allow_download}'` : `alert('Content is being prepared and will be available soon!')`;
 
           const desc1HTML = course.desc1 ? `<span>• ${course.desc1}</span>` : '';
           const desc2HTML = course.desc2 ? `<span>• ${course.desc2}</span>` : '';

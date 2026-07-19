@@ -302,8 +302,19 @@
                 </table>
             </div>
         </details>
+
+        <!-- NEW SAVE FOLDER STYLE SELECTOR -->
+        <div style="background: #eef2f5; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #ccc; margin-top:10px;">
+            <label style="color:#02277F; font-size:13px; font-weight:bold; margin-top:0;">📁 Save Folder Option:</label>
+            <label style="font-weight:bold; display:flex; align-items:center; gap:5px; margin-top:8px; font-size:13px; cursor:pointer;">
+                <input type="radio" name="saveStyle" value="single" checked style="width:auto; margin:0;" onchange="updateBtnText()"> Ek Hi Folder Me Sabhi File
+            </label>
+            <label style="font-weight:bold; display:flex; align-items:center; gap:5px; margin-top:8px; font-size:13px; cursor:pointer;">
+                <input type="radio" name="saveStyle" value="college" style="width:auto; margin:0;" onchange="updateBtnText()"> College-wise Alag-Alag Folders
+            </label>
+        </div>
         
-        <button id="zipBtn" class="zip-btn" onclick="generateAndSortFiles()">🗂️ Download & Auto-Sort in Folders</button>
+        <button id="zipBtn" class="zip-btn" onclick="generateAndSortFiles()">📁 Download All in One Folder</button>
     </div>
 
     <div class="page" id="pageElement">
@@ -405,6 +416,16 @@
             const shortcode = courseShortcodes[selectedCourse] || "COURSE";
             document.getElementById('regPrefix').value = `VED/2026/${shortcode}/`;
             previewFirst(); 
+        }
+
+        function updateBtnText() {
+            const style = document.querySelector('input[name="saveStyle"]:checked').value;
+            const btn = document.getElementById('zipBtn');
+            if(style === 'college') {
+                btn.innerText = "🗂️ Download & Auto-Sort in Folders";
+            } else {
+                btn.innerText = "📁 Download All in One Folder";
+            }
         }
 
         // --- Calculate Issue Date based on End Date ---
@@ -564,9 +585,10 @@
             const lines = data.split('\n');
             let currentRegNum = parseInt(document.getElementById('startReg').value);
             const fallbackCourse = document.getElementById('globalCourseSelect').value;
+            const saveStyle = document.querySelector('input[name="saveStyle"]:checked').value;
             
             const btn = document.getElementById('zipBtn');
-            btn.innerText = "⏳ Generating & Sorting... Wait!";
+            btn.innerText = "⏳ Generating Files... Wait!";
             btn.disabled = true;
             
             const pageEl = document.getElementById('pageElement');
@@ -638,14 +660,25 @@
                 const fileName = `${firstName}_${enrollSection}_VED_CERTI.pdf`;
                 const safeFolderName = student.sCollName.replace(/[^a-zA-Z0-9 -]/g, "_").trim() || "Unknown_College";
 
+                // NEW SAVE LOGIC BASED ON USER SELECTION
                 if (!useZip && rootDirHandle) {
-                    const collegeFolderHandle = await rootDirHandle.getDirectoryHandle(safeFolderName, { create: true });
-                    const fileHandle = await collegeFolderHandle.getFileHandle(fileName, { create: true });
+                    let targetFolderHandle = rootDirHandle;
+                    
+                    if (saveStyle === 'college') {
+                        // Create and go inside college folder
+                        targetFolderHandle = await rootDirHandle.getDirectoryHandle(safeFolderName, { create: true });
+                    }
+                    
+                    const fileHandle = await targetFolderHandle.getFileHandle(fileName, { create: true });
                     const writable = await fileHandle.createWritable();
                     await writable.write(pdfBlob);
                     await writable.close();
                 } else if (useZip) {
-                    zip.folder(safeFolderName).file(fileName, pdfBlob);
+                    if (saveStyle === 'college') {
+                        zip.folder(safeFolderName).file(fileName, pdfBlob);
+                    } else {
+                        zip.file(fileName, pdfBlob);
+                    }
                 }
 
                 // Append to Output Table
@@ -661,12 +694,12 @@
             if (useZip) {
                 btn.innerText = "📦 Packing ZIP File...";
                 const zipContent = await zip.generateAsync({ type: 'blob' });
-                saveAs(zipContent, "All_Sorted_Certificates.zip");
+                saveAs(zipContent, saveStyle === 'college' ? "Sorted_Certificates.zip" : "All_Certificates.zip");
             }
 
-            btn.innerText = "🗂️ Download & Auto-Sort in Folders";
+            updateBtnText(); // Reset button text
             btn.disabled = false;
-            alert(`Success! Files have been saved and sorted into College-wise folders!`);
+            alert(`Success! Files have been saved ${saveStyle === 'college' ? 'in College-wise folders' : 'all in one folder'}!`);
         }
 
         window.onload = function() {

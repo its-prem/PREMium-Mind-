@@ -255,31 +255,67 @@
      });
 
      // =========================================================
-     // 5. PDF SECURE FETCHING LOGIC (UPDATED WITH TOKEN)
+     // 5. PDF SECURE FETCH (short-lived one-time tokens — no secret in JS)
      // =========================================================
+     const API_BASE = 'https://premind.diplomawallah.in';
      const urlParams = new URLSearchParams(window.location.search);
-     let rawPdfUrl = urlParams.get('pdf');
-     let allowDownload = urlParams.get('download') === 'true' || urlParams.get('download') === '1'; 
+     // Prefer ?file=uploads/pdfs/...  (legacy ?pdf= full proxy URL still supported)
+     let pdfFile = urlParams.get('file');
+     let legacyPdf = urlParams.get('pdf');
+     let allowDownload = urlParams.get('download') === 'true' || urlParams.get('download') === '1';
      let customTitle = urlParams.get('title');
 
-     // 🛑 SECRET KEY - Ye wahi key honi chahiye jo Hostinger PHP file mein hai 🛑
-     const SECRET_KEY = "PREM_MIND_SECURE_2026";
-     
-     // Secure URL banaya (Token attach karke)
-     let securePdfUrl = rawPdfUrl ? `${rawPdfUrl}&token=${SECRET_KEY}` : null;
+     if (!pdfFile && legacyPdf) {
+         try {
+             const u = new URL(legacyPdf, API_BASE);
+             if (u.pathname.includes('proxy_pdf.php') && u.searchParams.get('file')) {
+                 pdfFile = u.searchParams.get('file');
+             } else if (legacyPdf.indexOf('uploads/pdfs/') === 0) {
+                 pdfFile = legacyPdf;
+             }
+         } catch (e) {
+             if (String(legacyPdf).indexOf('uploads/pdfs/') === 0) pdfFile = legacyPdf;
+         }
+     }
 
-     if (securePdfUrl) {
+     async function getPdfToken(purpose) {
+         const res = await fetch(`${API_BASE}/get_pdf_token.php`, {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ file: pdfFile, email: userEmail, purpose })
+         });
+         const data = await res.json().catch(() => ({}));
+         if (!res.ok || data.status !== 'success' || !data.token) {
+             throw new Error(data.message || 'Token request failed');
+         }
+         return data.token;
+     }
+
+     // POST + one-time token — Network tab URL se dubara download nahi hoga
+     async function fetchSecurePdfBytes(purpose) {
+         const token = await getPdfToken(purpose);
+         const res = await fetch(`${API_BASE}/proxy_pdf.php`, {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ file: pdfFile, email: userEmail, token })
+         });
+         if (!res.ok) throw new Error('Unauthorized Access or Invalid Token');
+         const buf = await res.arrayBuffer();
+         return buf;
+     }
+
+     if (pdfFile) {
          const downloadBtn = document.getElementById('downloadBtn');
-         
-         if(!allowDownload) {
+
+         if (!allowDownload) {
              downloadBtn.classList.add('locked');
              document.getElementById('dl-text').innerText = "Locked";
          }
-         
+
          downloadBtn.addEventListener('click', async () => {
-             if(!allowDownload) {
-                 alert("⚠️ Download available day of exam at 6:00 AM only."); 
-                 return; 
+             if (!allowDownload) {
+                 alert("⚠️ Download available day of exam at 6:00 AM only.");
+                 return;
              }
 
              const originalHtml = downloadBtn.innerHTML;
@@ -287,39 +323,31 @@
              downloadBtn.disabled = true;
 
              try {
-                 // Secure URL se Blob fetch karna
-                 const response = await fetch(securePdfUrl);
-                 if(!response.ok) throw new Error("Unauthorized Download");
-                 
-                 const blob = await response.blob();
-                 const blobUrl = window.URL.createObjectURL(blob);
-                 
-                 let baseName = "Premium_Notes"; 
+                 const buf = await fetchSecurePdfBytes('download');
+                 const blob = new Blob([buf], { type: 'application/pdf' });
+                 const blobUrl = URL.createObjectURL(blob);
+
+                 let baseName = "Premium_Notes";
                  if (customTitle) {
                      baseName = decodeURIComponent(customTitle).replace(/[^a-zA-Z0-9 ]/g, "_");
                  } else {
-                     let extractedName = rawPdfUrl.substring(rawPdfUrl.lastIndexOf('/') + 1).split('?')[0];
-                     if (extractedName && !extractedName.includes('.php')) {
-                         baseName = extractedName.replace(".pdf", "");
-                     }
+                     const extractedName = pdfFile.substring(pdfFile.lastIndexOf('/') + 1);
+                     if (extractedName) baseName = extractedName.replace(/\.pdf$/i, "");
                  }
-                 
-                 let finalFileName = `${baseName}_PREMium_Mind.pdf`;
-                 
+
                  const a = document.createElement('a');
                  a.href = blobUrl;
-                 a.download = finalFileName;
+                 a.download = `${baseName}_PREMium_Mind.pdf`;
                  document.body.appendChild(a);
                  a.click();
                  document.body.removeChild(a);
-                 
-                 window.URL.revokeObjectURL(blobUrl);
+                 URL.revokeObjectURL(blobUrl);
                  downloadBtn.innerHTML = "✅ Done";
              } catch (error) {
                  alert("Download Failed: Connection secure layer active.");
                  downloadBtn.innerHTML = "❌ Failed";
              }
-             
+
              setTimeout(() => {
                  downloadBtn.innerHTML = originalHtml;
                  downloadBtn.disabled = false;
@@ -328,52 +356,43 @@
      }
 
      // =========================================================
-     // 6. RENDER HD PDF VIA BLOB (SECURE PREVIEW)
+     // 6. RENDER HD PDF (ArrayBuffer — no permanent secret / reusable URL)
      // =========================================================
-     if(securePdfUrl) {
+     if (pdfFile) {
          const container = document.getElementById('pdfContainer');
          const loadingState = document.getElementById('loadingState');
 
-         // Blob fetch karke network tab se original file chhupana
-         fetch(securePdfUrl)
-         .then(response => {
-             if (!response.ok) throw new Error('Unauthorized Access or Invalid Token');
-             return response.blob();
-         })
-         .then(blob => {
-             const blobUrl = URL.createObjectURL(blob);
-             
+         fetchSecurePdfBytes('view')
+         .then(async (pdfData) => {
              pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-             pdfjsLib.getDocument(blobUrl).promise.then(async (pdfDoc) => {
-                 for (let num = 1; num <= pdfDoc.numPages; num++) {
-                     const page = await pdfDoc.getPage(num);
-                     const scale = 2.0; 
-                     const viewport = page.getViewport({ scale });
-                     
-                     const wrapper = document.createElement('div');
-                     wrapper.className = 'page-wrapper';
-                     
-                     const canvas = document.createElement('canvas');
-                     const ctx = canvas.getContext('2d', { alpha: false }); 
-                     const dpr = window.devicePixelRatio || 1;
+             const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
+             // Drop reference so casual console reuse is harder
+             pdfData = null;
 
-                     canvas.width = Math.floor(viewport.width * dpr);
-                     canvas.height = Math.floor(viewport.height * dpr);
+             for (let num = 1; num <= pdfDoc.numPages; num++) {
+                 const page = await pdfDoc.getPage(num);
+                 const scale = 2.0;
+                 const viewport = page.getViewport({ scale });
 
-                     const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null;
-                     wrapper.appendChild(canvas);
-                     container.appendChild(wrapper);
+                 const wrapper = document.createElement('div');
+                 wrapper.className = 'page-wrapper';
 
-                     await page.render({ canvasContext: ctx, transform: transform, viewport: viewport }).promise;
-                 }
-                 
-                 loadingState.style.display = 'none';
-                 // Security: Render hote hi URL memory se delete kar do
-                 setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-             }).catch(err => {
-                 loadingState.innerHTML = "<p style='color:#ef4444; font-weight:bold;'>Error rendering document.</p>";
-             });
+                 const canvas = document.createElement('canvas');
+                 const ctx = canvas.getContext('2d', { alpha: false });
+                 const dpr = window.devicePixelRatio || 1;
+
+                 canvas.width = Math.floor(viewport.width * dpr);
+                 canvas.height = Math.floor(viewport.height * dpr);
+
+                 const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null;
+                 wrapper.appendChild(canvas);
+                 container.appendChild(wrapper);
+
+                 await page.render({ canvasContext: ctx, transform: transform, viewport: viewport }).promise;
+             }
+
+             loadingState.style.display = 'none';
          })
          .catch(err => {
              loadingState.innerHTML = "<p style='color:#ef4444; font-weight:bold;'>Access Denied. Secure Connection Failed.</p>";
