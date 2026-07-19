@@ -44,8 +44,9 @@
       align-items: center;
     }
 
+    .logo-container { display: flex; align-items: center; }
     .logo-container a { display: flex; align-items: center; text-decoration: none; }
-    .logo-image { height: 42px; width: auto; display: block; }
+    .logo-image { width: auto !important; height: 46px !important; display: block; }
 
     .nav-links {
       display: flex;
@@ -345,12 +346,15 @@
       padding: 30px 10px;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 768px) {
       .nav-links { display: none; }
       .menu-btn { display: block; }
+      .logo-image { height: 40px !important; }
     }
 
     @media (max-width: 600px) {
+      .navbar { padding: 10px 14px; }
+      .logo-image { height: 36px !important; }
       .dashboard-header { padding: 40px 16px; }
       .card-container { gap: 18px; padding: 0 14px 40px; }
       .course-card img { height: 160px; }
