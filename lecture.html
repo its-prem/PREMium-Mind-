@@ -1,221 +1,585 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Courses - PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
+  <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:wght@400;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-
   <style>
-    :root {
-      --primary: #000;
-      --secondary: #434343;
-      --accent-blue: #2563eb;
-      --bg: #f4f7f6;
-      --muted: #6b7280;
-      --line: #e2e8f0;
-    }
+    /* Exact navbar/sidebar styles copied from index.html */
+/* Fixed navbar container styling */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: var(--bg);
-      color: #111;
-      overflow-x: hidden;
-    }
+/* ==========================================================================
+   NAVBAR COMPONENTS & DROPDOWN
+   ========================================================================== */
+.nav-links {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
 
-    /* ===== NAVBAR (match index) ===== */
-    .navbar {
-      position: sticky; top: 0; z-index: 1000;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 20px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-    .logo-container a { display: flex; align-items: center; text-decoration: none; }
-    .logo-image { height: 46px; width: auto; display: block; }
+.nav-link {
+    text-decoration: none;
+    color: #475569;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+}
 
+.nav-link:hover {
+    color: #111;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.nav-dropdown {
+    position: relative;
+}
+
+.dropdown-arrow {
+    font-size: 14px !important;
+    margin-left: 2px;
+    transition: transform 0.3s ease !important;
+}
+
+.nav-dropdown:hover .dropdown-arrow,
+.nav-dropdown.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(10px) scale(0.95);
+    width: 290px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 1100;
+}
+
+.nav-dropdown:hover .dropdown-menu,
+.nav-dropdown:focus-within .dropdown-menu {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.dropdown-header {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #94a3b8;
+    padding: 8px 12px 4px;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: #f1f5f9;
+    transform: translateX(4px);
+}
+
+.dropdown-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.icon-blue {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.icon-purple {
+    background: #faf5ff;
+    color: #9333ea;
+}
+
+.icon-green {
+    background: #ecfdf5;
+    color: #10b981;
+}
+
+.icon-amber {
+    background: #fffbeb;
+    color: #f59e0b;
+}
+
+.icon-rose {
+    background: #fff1f2;
+    color: #f43f5e;
+}
+
+.dropdown-item:hover .dropdown-icon {
+    transform: scale(1.08);
+}
+
+.dropdown-text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.item-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111;
+    line-height: 1.2;
+}
+
+.item-desc {
+    font-size: 11.5px;
+    color: #64748b;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.dropdown-badge {
+    background: #f43f5e;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 50px;
+    text-transform: uppercase;
+}
+
+/* ==========================================================================
+   ANIMATED MOBILE SIDEBAR MENU & USER PROFILE
+   ========================================================================== */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(10px);
+    z-index: 1500;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* OVERRIDE style.css defaults for the sidebar */
+.sidebar>div:first-of-type {
+    margin-top: 0 !important;
+}
+
+.sidebar ul {
+    padding: 0 !important;
+    margin-top: 0 !important;
+}
+
+.sidebar ul li {
+    border-bottom: none !important;
+    margin: 0 !important;
+}
+
+.sidebar ul li a {
+    margin: 0 !important;
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 320px;
+    max-width: 85vw;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-top-left-radius: 24px;
+    border-bottom-left-radius: 24px;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+    z-index: 2000;
+    transition: right 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden !important;
+}
+
+.sidebar.active {
+    right: 0;
+}
+
+.sidebar-scroll {
+    flex: 1;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 20px 20px 12px;
+}
+
+.sidebar-footer {
+    flex-shrink: 0;
+    margin-top: 0;
+    padding: 14px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+    display: none;
+}
+
+.sidebar-footer.is-visible {
+    display: block !important;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.sidebar-logo {
+    height: 51px;
+    width: auto;
+}
+
+.close-sidebar {
+    background: #f1f5f9;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 20px;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.close-sidebar:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    transform: rotate(90deg);
+}
+
+.sidebar-menu {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-item {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.sidebar.active .sidebar-item {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: var(--delay, 0s);
+}
+
+.sidebar-link {
+    text-decoration: none;
+    color: #111;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.sidebar-link ion-icon {
+    font-size: 20px;
+    color: #666;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+    background: #f8fafc;
+    color: #000;
+    padding-left: 20px;
+}
+
+.sidebar-link:hover ion-icon,
+.sidebar-link.active ion-icon {
+    color: #000;
+}
+
+.sidebar-dropdown-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #111;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sidebar-dropdown-toggle:hover {
+    background: #f8fafc;
+}
+
+.sidebar-link-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar-link-content ion-icon {
+    font-size: 20px;
+    color: #666;
+}
+
+.mobile-dropdown-arrow {
+    font-size: 16px;
+    color: #888;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-dropdown.open .mobile-dropdown-arrow {
+    transform: rotate(180deg);
+    color: #000;
+}
+
+.sidebar-submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 16px;
+    margin-top: 4px;
+}
+
+.sidebar-dropdown.open .sidebar-submenu {
+    max-height: 300px;
+}
+
+.sidebar-sublink {
+    text-decoration: none;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.sidebar-sublink ion-icon {
+    font-size: 16px;
+    color: #888;
+}
+
+.sidebar-sublink:hover {
+    background: #f1f5f9;
+    color: #000;
+    padding-left: 18px;
+}
+
+.sidebar-sublink:hover ion-icon {
+    color: #000;
+}
+
+.user-profile-compact {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+    background: #f8fafc;
+    border-radius: 20px;
+}
+
+.user-profile-compact .profile-photo-container {
+    position: relative;
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+}
+
+.user-profile-compact .profile-photo-container::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    background: #111;
+    border: 1.5px solid #fff;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23fff" d="M351.9 146.4c-9.1-17.7-27.1-29.2-47.1-29.2H207.2c-20 0-38 11.5-47.1 29.2L141.5 182H88c-26.5 0-48 21.5-48 48v160c0 26.5 21.5 48 48 48h336c26.5 0 48-21.5 48-48V230c0-26.5-21.5-48-48-48h-53.5l-18.6-35.6zM256 386c-44.2 0-80-35.8-80-80s35.8-80 80-80 80 35.8 80 80-35.8 80-80 80z"/></svg>');
+    background-size: 10px;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+}
+
+.user-profile-compact .profile-photo {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #fff, 0 0 0 3px #2563eb;
+    background-color: #000;
+    cursor: pointer;
+}
+
+.user-profile-compact .profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.user-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 2px;
+    letter-spacing: -0.2px;
+}
+
+.user-email-chip {
+    font-size: 11.5px;
+    color: #475569;
+    font-weight: 600;
+    background: #e2e8f0;
+    padding: 3px 10px;
+    border-radius: 12px;
+    display: inline-block;
+    border: none;
+    margin-top: 0;
+}
+
+/* --- Navbar Pill Button --- */
+.nav-user-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 16px 5px 5px;
+    border: 1px solid #e2e8f0;
+    border-radius: 30px;
+    background: #fff;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    cursor: pointer;
+}
+
+.nav-user-pill:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.nav-user-pill .nav-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid #fff;
+    box-shadow: 0 0 0 1px #fff, 0 0 0 2.5px #2563eb;
+    background-color: #000;
+    margin-left: 2px;
+}
+
+.nav-user-pill .nav-user-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+}
+
+@media (max-width: 768px) {
     .nav-links {
-      list-style: none; display: flex; align-items: center; gap: 0.75rem; margin: 0; padding: 0;
+        display: none;
+        /* Hide desktop nav links on mobile */
     }
-    .nav-link {
-      text-decoration: none; color: #475569; font-weight: 700; font-size: 15px;
-      padding: 8px 12px; border-radius: 8px;
-      display: flex; align-items: center; gap: 6px; transition: all 0.3s ease;
-    }
-    .nav-link:hover { color: #111; background: rgba(0, 0, 0, 0.05); }
-    .nav-link.active { color: #111; background: rgba(0, 0, 0, 0.06); }
+}
 
-    .nav-dropdown { position: relative; }
-    .dropdown-arrow { font-size: 14px !important; transition: transform 0.3s ease !important; }
-    .nav-dropdown:hover .dropdown-arrow { transform: rotate(180deg); }
-    .dropdown-menu {
-      position: absolute; top: calc(100% + 10px); left: 50%;
-      transform: translateX(-50%) translateY(10px) scale(0.95);
-      width: 290px; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px);
-      border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 16px; padding: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      opacity: 0; pointer-events: none; transition: all 0.3s ease;
-      display: flex; flex-direction: column; gap: 4px; z-index: 1100;
-    }
-    .nav-dropdown:hover .dropdown-menu {
-      opacity: 1; pointer-events: auto;
-      transform: translateX(-50%) translateY(0) scale(1);
-    }
-    .dropdown-header {
-      font-size: 11px; font-weight: 800; text-transform: uppercase;
-      letter-spacing: 0.8px; color: #94a3b8; padding: 8px 12px 4px;
-    }
-    .dropdown-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 12px; border-radius: 12px; text-decoration: none; transition: all 0.3s ease;
-    }
-    .dropdown-item:hover { background: #f1f5f9; transform: translateX(4px); }
-    .dropdown-icon {
-      width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center; font-size: 18px;
-    }
-    .icon-blue { background: #eff6ff; color: #2563eb; }
-    .icon-purple { background: #faf5ff; color: #9333ea; }
-    .icon-green { background: #ecfdf5; color: #10b981; }
-    .icon-amber { background: #fffbeb; color: #f59e0b; }
-    .icon-rose { background: #fff1f2; color: #f43f5e; }
-    .dropdown-text { display: flex; flex-direction: column; flex: 1; }
-    .item-title { font-size: 14px; font-weight: 700; color: #111; line-height: 1.2; }
-    .item-desc { font-size: 11.5px; color: #64748b; font-weight: 500; margin-top: 2px; }
-    .dropdown-badge {
-      background: #f43f5e; color: #fff; font-size: 10px; font-weight: 800;
-      padding: 2px 6px; border-radius: 50px; text-transform: uppercase;
+
+
+
+
+    /* Logo size override so style.css 266px does not break menubar */
+    .logo-image { width: auto !important; height: 46px !important; }
+    @media (max-width: 768px) {
+      .logo-image { height: 40px !important; }
     }
 
-    .nav-user-pill {
-      display: flex; align-items: center; gap: 10px;
-      padding: 5px 16px 5px 5px; border: 1px solid #e2e8f0; border-radius: 30px;
-      background: #fff; cursor: pointer; transition: all 0.3s ease;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-    }
-    .nav-user-pill:hover { border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
-    .nav-user-pill .nav-avatar {
-      width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #000;
-      border: 1.5px solid #fff; box-shadow: 0 0 0 1px #fff, 0 0 0 2.5px #2563eb;
-    }
-    .nav-user-pill .nav-user-name { font-size: 14px; font-weight: 600; color: #000; }
-
-    .menu-btn {
-      display: none; font-size: 24px; cursor: pointer; color: #111;
-      background: none; border: none; line-height: 1;
-    }
-
-    /* ===== SIDEBAR ===== */
-    .overlay {
-      position: fixed; inset: 0; z-index: 1500;
-      background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(10px);
-      opacity: 0; pointer-events: none; transition: all 0.3s ease;
-    }
-    .overlay.active { opacity: 1; pointer-events: auto; }
-
-    .sidebar {
-      position: fixed; top: 0; right: -100%; z-index: 2000;
-      width: 320px; max-width: 85vw; height: 100%;
-      background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px);
-      border-top-left-radius: 24px; border-bottom-left-radius: 24px;
-      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
-      display: flex; flex-direction: column;
-      transition: right 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-      overflow: hidden;
-    }
-    .sidebar.active { right: 0; }
-
-    .sidebar-scroll {
-      flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-      padding: 20px 20px 12px;
-    }
-    .sidebar-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #f1f5f9;
-    }
-    .sidebar-logo { height: 48px; width: auto; }
-    .close-sidebar {
-      background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%;
-      font-size: 20px; color: #333; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
-    }
-    .close-sidebar:hover { background: #fee2e2; color: #ef4444; transform: rotate(90deg); }
-
-    .user-profile-compact {
-      display: none; align-items: center; gap: 15px;
-      padding: 16px; border: 1px solid #e2e8f0; margin-bottom: 20px;
-      background: #f8fafc; border-radius: 20px;
-    }
-    .user-profile-compact.is-visible { display: flex !important; }
-    .user-profile-compact .profile-photo-container { position: relative; flex-shrink: 0; width: 52px; height: 52px; }
-    .user-profile-compact .profile-photo {
-      width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #000; cursor: pointer;
-      border: 2px solid #fff; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #2563eb;
-    }
-    .profile-info { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
-    .user-name { font-size: 15px; font-weight: 700; color: #000; margin-bottom: 2px; letter-spacing: -0.2px; }
-    .user-email-chip {
-      font-size: 11.5px; color: #475569; font-weight: 600; background: #e2e8f0;
-      padding: 3px 10px; border-radius: 12px; display: inline-block;
-      max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-
-    .login-prompt {
-      background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 15px;
-      text-align: center; border: 1px solid #e2e8f0;
-    }
-    .login-prompt.is-hidden { display: none !important; }
-
-    .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-    .sidebar-link {
-      display: flex; align-items: center; gap: 10px; text-decoration: none;
-      color: #334155; font-weight: 600; padding: 12px 16px; border-radius: 12px; transition: all 0.25s ease;
-    }
-    .sidebar-link:hover, .sidebar-link.active { background: #f1f5f9; color: #111; }
-    .sidebar-link ion-icon { font-size: 20px; }
-
-    .sidebar-dropdown-toggle {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 16px; border-radius: 12px; cursor: pointer; color: #334155; font-weight: 600;
-    }
-    .sidebar-dropdown-toggle:hover { background: #f1f5f9; }
-    .sidebar-link-content { display: flex; align-items: center; gap: 10px; }
-    .sidebar-link-content ion-icon { font-size: 20px; }
-    .mobile-dropdown-arrow { transition: transform 0.25s ease; }
-    .sidebar-dropdown.open .mobile-dropdown-arrow { transform: rotate(180deg); }
-    .sidebar-submenu { display: none; flex-direction: column; gap: 4px; padding: 4px 8px 8px 18px; }
-    .sidebar-dropdown.open .sidebar-submenu { display: flex; }
-    .sidebar-sublink {
-      display: flex; align-items: center; gap: 8px; text-decoration: none;
-      color: #64748b; font-weight: 600; font-size: 14px; padding: 10px 12px; border-radius: 10px;
-    }
-    .sidebar-sublink:hover { background: #f8fafc; color: #111; }
-
-    /* Always-visible logout bar */
-    .sidebar-footer {
-      flex-shrink: 0;
-      padding: 14px 20px calc(18px + env(safe-area-inset-bottom, 0px));
-      border-top: 1px solid #e2e8f0;
-      background: #fff;
-    }
-    .logout-btn {
-      width: 100%; padding: 12px;
-      background: #fff1f2; color: #e11d48;
-      border: 1px solid #ffe4e6; border-radius: 10px;
-      font-weight: 700; font-size: 0.95rem; font-family: inherit;
-      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .logout-btn:hover { background: #ffe4e6; }
-
-    /* ===== PAGE ===== */
+    /* Page: My Courses */
+    body { background: #f4f7f6; }
     .dashboard-header {
       background: linear-gradient(135deg, #000 0%, #434343 100%);
       color: #fff; padding: 50px 20px; text-align: center; margin-bottom: 30px;
@@ -224,7 +588,7 @@
       font-family: 'Montserrat', sans-serif;
       font-size: clamp(1.9rem, 4vw, 2.7rem); font-weight: 800; margin-bottom: 10px;
     }
-    .dashboard-header p { color: #ccc; font-size: clamp(0.95rem, 2vw, 1.1rem); max-width: 600px; margin: 0 auto; }
+    .dashboard-header p { color: #ccc; max-width: 600px; margin: 0 auto; font-size: 1.05rem; }
 
     .card-container {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -232,385 +596,285 @@
     }
     .course-card {
       background: #fff; border-radius: 16px; padding: 12px;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06); border: 1px solid #eaeaea;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06); border: 1px solid #eaeaea;
       display: flex; flex-direction: column;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .course-card:hover { transform: translateY(-6px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12); }
-    .card-img-box {
-      width: 100%; height: 160px; border-radius: 12px; overflow: hidden;
-      position: relative; margin-bottom: 14px; background: #f1f5f9;
-    }
-    .card-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .course-card:hover { transform: translateY(-6px); box-shadow: 0 15px 30px rgba(0,0,0,0.12); }
+    .card-img-box { width:100%; height:160px; border-radius:12px; overflow:hidden; position:relative; margin-bottom:14px; background:#f1f5f9; }
+    .card-img-box img { width:100%; height:100%; object-fit:cover; transition: transform 0.5s ease; }
     .course-card:hover .card-img-box img { transform: scale(1.05); }
     .status-badge {
-      position: absolute; top: 10px; left: 10px;
-      background: rgba(0, 0, 0, 0.75); color: #fff;
-      font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 6px;
-      text-transform: uppercase; letter-spacing: 0.5px;
+      position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.75); color:#fff;
+      font-size:0.7rem; font-weight:700; padding:4px 10px; border-radius:6px; text-transform:uppercase;
     }
     .course-card h2 {
-      font-size: 1.08rem; margin-bottom: 8px; color: #000; line-height: 1.3; font-weight: 700;
-      display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      font-size:1.08rem; margin-bottom:8px; color:#000; line-height:1.3; font-weight:700;
+      display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
     }
-    .course-meta {
-      font-size: 0.82rem; color: var(--muted); margin-bottom: 15px;
-      display: flex; flex-direction: column; gap: 4px; flex-grow: 1;
-    }
+    .course-meta { font-size:0.82rem; color:#6b7280; margin-bottom:15px; display:flex; flex-direction:column; gap:4px; flex-grow:1; }
     .btn-access {
-      width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 700;
-      cursor: pointer; font-size: 0.95rem; font-family: inherit; margin-top: auto;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      background: linear-gradient(135deg, #000 0%, #434343 100%); color: #fff;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      width:100%; padding:12px; border-radius:10px; border:none; font-weight:700; cursor:pointer;
+      font-size:0.95rem; font-family:inherit; margin-top:auto;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      background:linear-gradient(135deg,#000 0%,#434343 100%); color:#fff;
     }
-    .btn-access:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); }
-
+    .btn-access:hover { transform:translateY(-2px); box-shadow:0 6px 15px rgba(0,0,0,0.2); }
     .empty-state {
-      grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: #fff;
-      border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-      max-width: 600px; margin: 0 auto; width: 100%;
+      grid-column:1/-1; text-align:center; padding:60px 20px; background:#fff; border-radius:15px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.05); max-width:600px; margin:0 auto; width:100%;
     }
-    .empty-state h2 { font-size: 1.7rem; margin-bottom: 12px; }
-    .empty-state p { color: var(--muted); margin-bottom: 25px; }
+    .empty-state h2 { font-size:1.7rem; margin-bottom:12px; }
+    .empty-state p { color:#6b7280; margin-bottom:25px; }
     .btn-browse {
-      display: inline-block; background: linear-gradient(135deg, #000 0%, #434343 100%);
-      color: #fff; text-decoration: none; padding: 12px 30px; border-radius: 50px; font-weight: 700;
+      display:inline-block; background:linear-gradient(135deg,#000 0%,#434343 100%);
+      color:#fff; text-decoration:none; padding:12px 30px; border-radius:50px; font-weight:700;
     }
-    .state-note { grid-column: 1 / -1; text-align: center; padding: 40px 20px; }
+    .state-note { grid-column:1/-1; text-align:center; padding:40px 20px; }
     .spinner {
-      width: 40px; height: 40px; margin: 0 auto 15px;
-      border: 4px solid #ddd; border-top-color: #111; border-radius: 50%;
-      animation: spin 1s linear infinite;
+      width:40px; height:40px; margin:0 auto 15px;
+      border:4px solid #ddd; border-top-color:#111; border-radius:50%;
+      animation:spin 1s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .menu-btn { display: block; }
-      .logo-image { height: 40px; }
-      .navbar { padding: 10px 14px; }
-      .dashboard-header { padding: 40px 15px; }
-      .card-container {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 16px; padding: 0 14px 40px;
-      }
-      .card-img-box { height: 130px; }
+    @media (max-width:768px) {
+      .dashboard-header { padding:40px 15px; }
+      .card-container { grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:16px; padding:0 14px 40px; }
+      .card-img-box { height:130px; }
     }
   </style>
 </head>
 <body>
 
-  <nav class="navbar">
-    <div class="logo-container">
-      <a href="index.html">
-        <img src="PM-LOGO-TEXT.png" alt="PREMium Mind" class="logo-image" onerror="this.onerror=null;this.src='small-logo.png';" />
+<nav class="navbar">
+  <div class="logo-container">
+    <a href="index.html"><img src="PM-LOGO-TEXT.png" alt="PM Logo" class="logo-image" onerror="this.onerror=null;this.src='small-logo.png';" /></a>
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html" class="nav-link"><ion-icon name="home-outline"></ion-icon> Home</a></li>
+    <li class="nav-dropdown">
+      <a href="index.html#products" class="nav-link store-trigger dropdown-toggle">
+        <ion-icon name="bag-handle-outline"></ion-icon> PREMium Store
+        <ion-icon name="chevron-down-outline" class="dropdown-arrow"></ion-icon>
       </a>
-    </div>
+      <div class="dropdown-menu">
+        <div class="dropdown-header">Explore Categories</div>
+        <a href="index.html#notes" class="dropdown-item"><div class="dropdown-icon icon-blue"><ion-icon name="document-text-outline"></ion-icon></div><div class="dropdown-text"><span class="item-title">Notes</span><span class="item-desc">Handwritten &amp; exam notes</span></div></a>
+        <a href="index.html#ebooks" class="dropdown-item"><div class="dropdown-icon icon-purple"><ion-icon name="book-outline"></ion-icon></div><div class="dropdown-text"><span class="item-title">E-Books</span><span class="item-desc">Complete syllabus guides</span></div></a>
+        <a href="index.html#resume" class="dropdown-item"><div class="dropdown-icon icon-green"><ion-icon name="briefcase-outline"></ion-icon></div><div class="dropdown-text"><span class="item-title">Resume</span><span class="item-desc">ATS-ready professional formats</span></div></a>
+        <a href="index.html#report-writing" class="dropdown-item"><div class="dropdown-icon icon-amber"><ion-icon name="bar-chart-outline"></ion-icon></div><div class="dropdown-text"><span class="item-title">Report Writing</span><span class="item-desc">Industrial &amp; academic reports</span></div></a>
+        <a href="index.html#projects" class="dropdown-item"><div class="dropdown-icon icon-rose"><ion-icon name="code-slash-outline"></ion-icon></div><div class="dropdown-text"><span class="item-title">Project</span><span class="item-desc">Major &amp; minor project code</span></div><span class="dropdown-badge">Hot</span></a>
+      </div>
+    </li>
+    <li><a href="lecture.html" class="nav-link active protected-route" id="coursesLinkNav"><ion-icon name="play-circle-outline"></ion-icon> My Courses</a></li>
+    <li><a href="index.html#help-form" class="nav-link"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us</a></li>
+    <li id="desktopLoginBtnContainer"><a href="login.html" class="nav-link" style="background:#111;color:#fff;"><ion-icon name="person-circle-outline" style="color:#fff;"></ion-icon> Login</a></li>
+    <li id="desktopUserPillContainer" style="display:none;">
+      <div class="nav-user-pill" onclick="openSidebar()">
+        <img src="" id="navAvatarImg" alt="Profile" class="nav-avatar">
+        <span class="nav-user-name" id="navUserName">User</span>
+        <ion-icon name="chevron-down-outline" style="color:#2563eb;font-size:16px;margin-left:2px;"></ion-icon>
+      </div>
+    </li>
+  </ul>
+  <div class="menu-btn" id="menu-btn" style="font-size:24px;cursor:pointer;">☰</div>
+</nav>
 
-    <ul class="nav-links">
-      <li><a href="index.html" class="nav-link"><ion-icon name="home-outline"></ion-icon> Home</a></li>
-      <li class="nav-dropdown">
-        <a href="index.html#products" class="nav-link">
-          <ion-icon name="bag-handle-outline"></ion-icon> PREMium Store
-          <ion-icon name="chevron-down-outline" class="dropdown-arrow"></ion-icon>
-        </a>
-        <div class="dropdown-menu">
-          <div class="dropdown-header">Explore Categories</div>
-          <a href="index.html#notes" class="dropdown-item">
-            <div class="dropdown-icon icon-blue"><ion-icon name="document-text-outline"></ion-icon></div>
-            <div class="dropdown-text"><span class="item-title">Notes</span><span class="item-desc">Handwritten &amp; exam notes</span></div>
-          </a>
-          <a href="index.html#ebooks" class="dropdown-item">
-            <div class="dropdown-icon icon-purple"><ion-icon name="book-outline"></ion-icon></div>
-            <div class="dropdown-text"><span class="item-title">E-Books</span><span class="item-desc">Complete syllabus guides</span></div>
-          </a>
-          <a href="index.html#resume" class="dropdown-item">
-            <div class="dropdown-icon icon-green"><ion-icon name="briefcase-outline"></ion-icon></div>
-            <div class="dropdown-text"><span class="item-title">Resume</span><span class="item-desc">ATS-ready professional formats</span></div>
-          </a>
-          <a href="index.html#report-writing" class="dropdown-item">
-            <div class="dropdown-icon icon-amber"><ion-icon name="bar-chart-outline"></ion-icon></div>
-            <div class="dropdown-text"><span class="item-title">Report Writing</span><span class="item-desc">Industrial &amp; academic reports</span></div>
-          </a>
-          <a href="index.html#projects" class="dropdown-item">
-            <div class="dropdown-icon icon-rose"><ion-icon name="code-slash-outline"></ion-icon></div>
-            <div class="dropdown-text"><span class="item-title">Project</span><span class="item-desc">Major &amp; minor project code</span></div>
-            <span class="dropdown-badge">Hot</span>
-          </a>
+<div class="overlay" id="overlay"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-scroll">
+    <div class="sidebar-header">
+      <img src="PM-LOGO-TEXT.png" alt="PREMium Mind" class="sidebar-logo" onerror="this.onerror=null;this.src='small-logo.png';">
+      <button class="close-sidebar" id="close-sidebar-btn" onclick="closeSidebar()"><ion-icon name="close-outline"></ion-icon></button>
+    </div>
+    <div class="user-profile-compact" id="userProfile" style="display:none;">
+      <div class="profile-photo-container">
+        <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile" class="profile-photo" id="profilePhoto" title="Click to change photo" onclick="document.getElementById('photo-input').click()">
+      </div>
+      <input type="file" id="photo-input" accept="image/*" style="display:none;">
+      <div class="profile-info">
+        <div class="user-name" id="userName">User Name</div>
+        <div class="user-email-chip" id="userEmail">user@example.com</div>
+      </div>
+    </div>
+    <div class="login-prompt" id="loginPrompt" style="background:#f8fafc;padding:15px;border-radius:12px;margin-bottom:15px;text-align:center;border:1px solid #e2e8f0;">
+      <h3 style="margin:0 0 5px 0;font-size:15px;color:#111;">Welcome to PREMium Mind</h3>
+      <p style="margin:0 0 10px 0;font-size:12px;color:#666;">Access your courses and profile.</p>
+      <button onclick="window.location.href='login.html'" style="width:100%;padding:10px;border:none;background:#111;color:#fff;border-radius:8px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><ion-icon name="log-in-outline" style="font-size:18px;"></ion-icon> Login / Sign Up</button>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="sidebar-item"><a href="index.html" class="sidebar-link"><ion-icon name="home-outline"></ion-icon> Home</a></li>
+      <li class="sidebar-item sidebar-dropdown">
+        <div class="sidebar-dropdown-toggle" onclick="this.parentElement.classList.toggle('open')">
+          <span class="sidebar-link-content"><ion-icon name="bag-handle-outline"></ion-icon> PREMium Store</span>
+          <ion-icon name="chevron-down-outline" class="mobile-dropdown-arrow"></ion-icon>
+        </div>
+        <div class="sidebar-submenu">
+          <a href="index.html#notes" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="document-text-outline"></ion-icon> Notes</a>
+          <a href="index.html#ebooks" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="book-outline"></ion-icon> E-Books</a>
+          <a href="index.html#resume" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="briefcase-outline"></ion-icon> Resume</a>
+          <a href="index.html#report-writing" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="bar-chart-outline"></ion-icon> Report Writing</a>
+          <a href="index.html#projects" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="code-slash-outline"></ion-icon> Project</a>
         </div>
       </li>
-      <li><a href="lecture.html" class="nav-link active"><ion-icon name="play-circle-outline"></ion-icon> My Courses</a></li>
-      <li><a href="index.html#help-form" class="nav-link"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us</a></li>
-      <li id="desktopLoginBtnContainer">
-        <a href="login.html" class="nav-link" style="background:#111; color:#fff;">
-          <ion-icon name="person-circle-outline" style="color:#fff;"></ion-icon> Login
-        </a>
-      </li>
-      <li id="desktopUserPillContainer" style="display:none;">
-        <div class="nav-user-pill" onclick="openSidebar()">
-          <img src="" id="navAvatarImg" alt="Profile" class="nav-avatar">
-          <span class="nav-user-name" id="navUserName">User</span>
-          <ion-icon name="chevron-down-outline" style="color:#2563eb; font-size:16px;"></ion-icon>
-        </div>
-      </li>
+      <li class="sidebar-item"><a href="lecture.html" class="sidebar-link active protected-route" id="coursesLink"><ion-icon name="play-circle-outline"></ion-icon> My Courses</a></li>
+      <li class="sidebar-item"><a href="index.html#help-form" class="sidebar-link" onclick="closeSidebar()"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us</a></li>
+      <li class="sidebar-item"><a href="termcondition.html" class="sidebar-link"><ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy</a></li>
     </ul>
-
-    <button type="button" class="menu-btn" id="menu-btn" aria-label="Open menu">☰</button>
-  </nav>
-
-  <div class="overlay" id="overlay"></div>
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-scroll">
-      <div class="sidebar-header">
-        <img src="PM-LOGO-TEXT.png" alt="PREMium Mind" class="sidebar-logo" onerror="this.onerror=null;this.src='small-logo.png';">
-        <button type="button" class="close-sidebar" id="close-sidebar-btn" aria-label="Close menu">
-          <ion-icon name="close-outline"></ion-icon>
-        </button>
-      </div>
-
-      <div class="user-profile-compact" id="userProfile">
-        <div class="profile-photo-container">
-          <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile" class="profile-photo" id="profilePhoto" title="Click to change photo" onclick="document.getElementById('photo-input').click()">
-        </div>
-        <input type="file" id="photo-input" accept="image/*" style="display:none;">
-        <div class="profile-info">
-          <div class="user-name" id="userName">User Name</div>
-          <div class="user-email-chip" id="userEmail">user@example.com</div>
-        </div>
-      </div>
-
-      <div class="login-prompt" id="loginPrompt">
-        <h3 style="margin:0 0 5px; font-size:15px; color:#111;">Welcome to PREMium Mind</h3>
-        <p style="margin:0 0 10px; font-size:12px; color:#666;">Access your courses and profile.</p>
-        <button type="button" onclick="window.location.href='login.html'" style="width:100%; padding:10px; border:none; background:#111; color:#fff; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
-          <ion-icon name="log-in-outline" style="font-size:18px;"></ion-icon> Login / Sign Up
-        </button>
-      </div>
-
-      <ul class="sidebar-menu">
-        <li><a href="index.html" class="sidebar-link"><ion-icon name="home-outline"></ion-icon> Home</a></li>
-        <li class="sidebar-dropdown">
-          <div class="sidebar-dropdown-toggle" onclick="this.parentElement.classList.toggle('open')">
-            <span class="sidebar-link-content"><ion-icon name="bag-handle-outline"></ion-icon> PREMium Store</span>
-            <ion-icon name="chevron-down-outline" class="mobile-dropdown-arrow"></ion-icon>
-          </div>
-          <div class="sidebar-submenu">
-            <a href="index.html#notes" class="sidebar-sublink"><ion-icon name="document-text-outline"></ion-icon> Notes</a>
-            <a href="index.html#ebooks" class="sidebar-sublink"><ion-icon name="book-outline"></ion-icon> E-Books</a>
-            <a href="index.html#resume" class="sidebar-sublink"><ion-icon name="briefcase-outline"></ion-icon> Resume</a>
-            <a href="index.html#report-writing" class="sidebar-sublink"><ion-icon name="bar-chart-outline"></ion-icon> Report Writing</a>
-            <a href="index.html#projects" class="sidebar-sublink"><ion-icon name="code-slash-outline"></ion-icon> Project</a>
-          </div>
-        </li>
-        <li><a href="lecture.html" class="sidebar-link active"><ion-icon name="play-circle-outline"></ion-icon> My Courses</a></li>
-        <li><a href="index.html#help-form" class="sidebar-link"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us</a></li>
-        <li><a href="termcondition.html" class="sidebar-link"><ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy</a></li>
-      </ul>
-    </div>
-
-    <!-- Always visible at bottom when menu opens -->
-    <div class="sidebar-footer" id="sidebarFooter">
-      <button type="button" class="logout-btn" id="logoutBtn" onclick="handleLogout()">
-        <ion-icon name="log-out-outline" style="font-size:18px;"></ion-icon>
-        Logout Account
-      </button>
-    </div>
-  </aside>
-
-  <div class="dashboard-header">
-    <h1>My Learning Library</h1>
-    <p>Your premium courses, all in one place. Pick up right where you left off.</p>
   </div>
-
-  <div class="card-container" id="my-courses-container">
-    <div class="state-note">
-      <div class="spinner"></div>
-      <p style="color:#666;">Syncing your library...</p>
-    </div>
+  <div class="sidebar-footer" id="sidebarFooter">
+    <button id="sidebarLogoutBtn" onclick="handleLogout()" style="width:100%;padding:12px;background:#fff1f2;color:#e11d48;border:1px solid #ffe4e6;border-radius:10px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <ion-icon name="log-out-outline" style="font-size:18px;"></ion-icon> Logout Account
+    </button>
   </div>
+</div>
 
-  <script>
-    function openSidebar() {
-      document.getElementById('sidebar').classList.add('active');
-      document.getElementById('overlay').classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeSidebar() {
-      document.getElementById('sidebar').classList.remove('active');
-      document.getElementById('overlay').classList.remove('active');
-      document.body.style.overflow = '';
-    }
+<div class="dashboard-header">
+  <h1>My Learning Library</h1>
+  <p>Your premium courses, all in one place. Pick up right where you left off.</p>
+</div>
+<div class="card-container" id="my-courses-container">
+  <div class="state-note"><div class="spinner"></div><p style="color:#666;">Syncing your library...</p></div>
+</div>
 
-    document.getElementById('menu-btn').addEventListener('click', openSidebar);
-    document.getElementById('close-sidebar-btn').addEventListener('click', closeSidebar);
-    document.getElementById('overlay').addEventListener('click', closeSidebar);
-    document.querySelectorAll('.sidebar-link, .sidebar-sublink').forEach(link => {
-      link.addEventListener('click', closeSidebar);
-    });
+<script>
+  function openSidebar(){ document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
+  function closeSidebar(){ document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
+  document.getElementById('menu-btn').addEventListener('click', openSidebar);
+  document.getElementById('overlay').addEventListener('click', closeSidebar);
 
-    // Fallback logout (works even before Firebase module finishes)
-    window.handleLogout = async function() {
-      try {
-        localStorage.removeItem('customUserEmail');
-        localStorage.removeItem('customUserName');
-        localStorage.removeItem('customUserPhone');
-        if (window.__firebaseSignOut) await window.__firebaseSignOut();
-      } catch (e) {}
-      window.location.href = 'index.html';
-    };
+  window.handleLogout = async function(){
+    try {
+      localStorage.removeItem('customUserEmail');
+      localStorage.removeItem('customUserName');
+      localStorage.removeItem('customUserPhone');
+      if (window.__firebaseSignOut) await window.__firebaseSignOut();
+    } catch(e){}
+    window.location.href = 'index.html';
+  };
 
-    function showLoggedInChrome(email, name, uid) {
-      const displayName = name || 'Student';
-      const savedPhoto = uid ? localStorage.getItem('profilePhoto_' + uid) : null;
-      const avatar = savedPhoto || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=000&color=fff&size=80`;
+  function updateUI(name, email, photoSrc){
+    const displayName = name || 'User';
+    const avatar = photoSrc || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(displayName) + '&background=000&color=fff&size=80');
+    document.getElementById('userProfile').style.display = 'flex';
+    document.getElementById('loginPrompt').style.display = 'none';
+    document.getElementById('sidebarFooter').classList.add('is-visible');
+    document.getElementById('desktopLoginBtnContainer').style.display = 'none';
+    document.getElementById('desktopUserPillContainer').style.display = 'block';
+    document.getElementById('userName').textContent = displayName;
+    document.getElementById('userEmail').textContent = email || '';
+    document.getElementById('profilePhoto').src = avatar;
+    document.getElementById('navAvatarImg').src = avatar;
+    document.getElementById('navUserName').textContent = displayName.toString().split(' ')[0];
+  }
 
-      document.getElementById('userProfile').classList.add('is-visible');
-      document.getElementById('loginPrompt').classList.add('is-hidden');
-      document.getElementById('desktopLoginBtnContainer').style.display = 'none';
-      document.getElementById('desktopUserPillContainer').style.display = 'list-item';
-
-      document.getElementById('userName').textContent = displayName;
-      document.getElementById('userEmail').textContent = email || '';
-      document.getElementById('profilePhoto').src = avatar;
-      document.getElementById('navAvatarImg').src = avatar;
-      document.getElementById('navUserName').textContent = displayName.split(' ')[0];
-    }
-
-    // Instant UI if session already exists (no wait for Firebase)
-    const earlyEmail = localStorage.getItem('customUserEmail');
-    const earlyName = localStorage.getItem('customUserName');
-    if (earlyEmail) showLoggedInChrome(earlyEmail, earlyName, 'custom');
-
-    window.loadMyCourses = async function(userEmail) {
-      const container = document.getElementById('my-courses-container');
-      if (!userEmail) { window.location.href = 'login.html'; return; }
-
-      try {
-        const apiUrl = `https://premind.diplomawallah.in/api.php?email=${encodeURIComponent(userEmail)}`;
-        const response = await fetch(apiUrl);
-        const courses = await response.json();
-        const enrolledCourses = (Array.isArray(courses) ? courses : []).filter(c => c.is_enrolled == 1);
-        container.innerHTML = '';
-
-        if (enrolledCourses.length === 0) {
-          container.innerHTML = `
-            <div class="empty-state">
-              <h2>No Courses Yet</h2>
-              <p>You haven't enrolled in any premium courses yet. Explore our store to upgrade your skills!</p>
-              <a href="index.html#products" class="btn-browse">Explore Store</a>
-            </div>`;
-          return;
-        }
-
-        enrolledCourses.forEach(course => {
-          let btnAction;
-          if (course.pdf_file && String(course.pdf_file).trim() !== '') {
-            btnAction = `window.location.href='watch.html?file=${encodeURIComponent(course.pdf_file)}&download=${course.allow_download}'`;
-          } else if (course.pdf_link && String(course.pdf_link).trim() !== '') {
-            btnAction = `alert('This content uses an external link. Secure reader requires an uploaded PDF file.')`;
-          } else {
-            btnAction = `alert('Content is being prepared and will be available soon!')`;
-          }
-
-          const desc1HTML = course.desc1 ? `<span>• ${course.desc1}</span>` : '';
-          const desc2HTML = course.desc2 ? `<span>• ${course.desc2}</span>` : '';
-          const title = course.title || 'Untitled Course';
-          const image = course.image || 'small-logo.png';
-
-          container.innerHTML += `
-            <div class="course-card">
-              <div class="card-img-box">
-                <span class="status-badge">Unlocked</span>
-                <img src="${image}" alt="${title}" onerror="this.src='small-logo.png'"/>
-              </div>
-              <h2>${title}</h2>
-              <div class="course-meta">${desc1HTML}${desc2HTML}</div>
-              <button class="btn-access" onclick="${btnAction}"><ion-icon name="play-circle-outline"></ion-icon> Continue Learning</button>
-            </div>`;
-        });
-      } catch (error) {
-        console.error(error);
-        container.innerHTML = '<div class="state-note" style="color:#b91c1c; font-weight:600;">Failed to load courses. Check your connection.</div>';
+  window.loadMyCourses = async function(userEmail){
+    const container = document.getElementById('my-courses-container');
+    if (!userEmail) { window.location.href = 'login.html'; return; }
+    try {
+      const res = await fetch('https://premind.diplomawallah.in/api.php?email=' + encodeURIComponent(userEmail));
+      const courses = await res.json();
+      const enrolled = (Array.isArray(courses)?courses:[]).filter(c => c.is_enrolled == 1);
+      container.innerHTML = '';
+      if (!enrolled.length) {
+        container.innerHTML = '<div class="empty-state"><h2>No Courses Yet</h2><p>You haven\'t enrolled in any premium courses yet. Explore our store to upgrade your skills!</p><a href="index.html#products" class="btn-browse">Explore Store</a></div>';
+        return;
       }
-    };
-  </script>
-
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
-      authDomain: "premium-mind-fcb16.firebaseapp.com",
-      projectId: "premium-mind-fcb16",
-      storageBucket: "premium-mind-fcb16.firebasestorage.app",
-      messagingSenderId: "864874199521",
-      appId: "1:864874199521:web:5deb96a956dc404a077aa0"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const storage = getStorage(app);
-
-    window.__firebaseSignOut = () => signOut(auth);
-
-    window.handleLogout = async function() {
-      try {
-        localStorage.removeItem('customUserEmail');
-        localStorage.removeItem('customUserName');
-        localStorage.removeItem('customUserPhone');
-        await signOut(auth);
-      } catch (e) {}
-      window.location.href = 'index.html';
-    };
-
-    function setupProfile(email, name, uid) {
-      showLoggedInChrome(email, name, uid);
-      window.loadMyCourses(email);
-    }
-
-    const customEmail = localStorage.getItem('customUserEmail');
-    const customName = localStorage.getItem('customUserName');
-
-    if (customEmail) {
-      setupProfile(customEmail, customName, 'custom');
-    } else {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          setupProfile(user.email, user.displayName, user.uid);
+      enrolled.forEach(course => {
+        let btnAction;
+        if (course.pdf_file && String(course.pdf_file).trim() !== '') {
+          btnAction = "window.location.href='watch.html?file=" + encodeURIComponent(course.pdf_file) + "&download=" + course.allow_download + "'";
+        } else if (course.pdf_link && String(course.pdf_link).trim() !== '') {
+          btnAction = "alert('This content uses an external link. Secure reader requires an uploaded PDF file.')";
         } else {
-          window.location.href = 'login.html';
+          btnAction = "alert('Content is being prepared and will be available soon!')";
         }
+        const d1 = course.desc1 ? ('<span>• ' + course.desc1 + '</span>') : '';
+        const d2 = course.desc2 ? ('<span>• ' + course.desc2 + '</span>') : '';
+        const title = course.title || 'Untitled Course';
+        const image = course.image || 'small-logo.png';
+        container.innerHTML += '<div class="course-card"><div class="card-img-box"><span class="status-badge">Unlocked</span><img src="' + image + '" alt="' + title + '" onerror="this.src=\'small-logo.png\'"/></div><h2>' + title + '</h2><div class="course-meta">' + d1 + d2 + '</div><button class="btn-access" onclick="' + btnAction + '"><ion-icon name="play-circle-outline"></ion-icon> Continue Learning</button></div>';
       });
+    } catch (e) {
+      console.error(e);
+      container.innerHTML = '<div class="state-note" style="color:#b91c1c;font-weight:600;">Failed to load courses. Check your connection.</div>';
     }
+  };
 
-    document.getElementById('photo-input').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const user = auth.currentUser;
-      const uid = user ? user.uid : 'custom';
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataUrl = reader.result;
-        document.getElementById('profilePhoto').src = dataUrl;
-        document.getElementById('navAvatarImg').src = dataUrl;
-        localStorage.setItem('profilePhoto_' + uid, dataUrl);
-      };
-      reader.readAsDataURL(file);
+  // Instant chrome if already logged in
+  const earlyEmail = localStorage.getItem('customUserEmail');
+  const earlyName = localStorage.getItem('customUserName');
+  if (earlyEmail) updateUI(earlyName, earlyEmail, localStorage.getItem('profilePhoto_custom'));
+</script>
 
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
+    authDomain: "premium-mind-fcb16.firebaseapp.com",
+    projectId: "premium-mind-fcb16",
+    storageBucket: "premium-mind-fcb16.firebasestorage.app",
+    messagingSenderId: "864874199521",
+    appId: "1:864874199521:web:5deb96a956dc404a077aa0"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const storage = getStorage(app);
+  window.__firebaseSignOut = () => signOut(auth);
+
+  window.handleLogout = async () => {
+    try {
+      localStorage.removeItem('customUserEmail');
+      localStorage.removeItem('customUserName');
+      localStorage.removeItem('customUserPhone');
+      await signOut(auth);
+    } catch(e){}
+    window.location.href = 'index.html';
+  };
+
+  const customEmail = localStorage.getItem('customUserEmail');
+  const customName = localStorage.getItem('customUserName');
+  if (customEmail) {
+    updateUI(customName, customEmail, localStorage.getItem('profilePhoto_custom'));
+    window.loadMyCourses(customEmail);
+  } else {
+    onAuthStateChanged(auth, (user) => {
       if (user) {
-        try {
-          const photoStorageRef = storageRef(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
-          await uploadBytes(photoStorageRef, file);
-          const photoURL = await getDownloadURL(photoStorageRef);
-          localStorage.setItem('profilePhoto_' + user.uid, photoURL);
-          document.getElementById('profilePhoto').src = photoURL;
-          document.getElementById('navAvatarImg').src = photoURL;
-        } catch (error) { console.error('Photo upload failed', error); }
+        const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
+        updateUI(user.displayName, user.email, photoURL);
+        window.loadMyCourses(user.email);
+      } else {
+        window.location.href = 'login.html';
       }
     });
-  </script>
+  }
+
+  document.getElementById('photo-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const user = auth.currentUser;
+    const uid = user ? user.uid : 'custom';
+    const reader = new FileReader();
+    reader.onload = () => {
+      document.getElementById('profilePhoto').src = reader.result;
+      document.getElementById('navAvatarImg').src = reader.result;
+      localStorage.setItem('profilePhoto_' + uid, reader.result);
+    };
+    reader.readAsDataURL(file);
+    if (user) {
+      try {
+        const ref = storageRef(storage, 'profile_photos/' + user.uid + '/' + Date.now() + '_' + file.name);
+        await uploadBytes(ref, file);
+        const url = await getDownloadURL(ref);
+        localStorage.setItem('profilePhoto_' + user.uid, url);
+        document.getElementById('profilePhoto').src = url;
+        document.getElementById('navAvatarImg').src = url;
+      } catch (err) { console.error(err); }
+    }
+  });
+</script>
 </body>
 </html>

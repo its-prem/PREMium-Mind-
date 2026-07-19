@@ -1624,7 +1624,7 @@
             right: -100%;
             width: 320px;
             max-width: 85vw;
-            height: 100vh;
+            height: 100%;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
             border-top-left-radius: 24px;
@@ -1634,15 +1634,33 @@
             transition: right 0.4s cubic-bezier(0.32, 0.72, 0, 1);
             display: flex;
             flex-direction: column;
-            padding: 20px 20px 80px 20px;
-            /* added bottom padding for mobile scroll */
-            overflow-y: auto !important;
-            overflow-x: hidden !important;
-            -webkit-overflow-scrolling: touch;
+            padding: 0;
+            overflow: hidden !important;
         }
 
         .sidebar.active {
             right: 0;
+        }
+
+        .sidebar-scroll {
+            flex: 1;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px 20px 12px;
+        }
+
+        .sidebar-footer {
+            flex-shrink: 0;
+            margin-top: 0;
+            padding: 14px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+            border-top: 1px solid #e2e8f0;
+            background: #fff;
+            display: none;
+        }
+
+        .sidebar-footer.is-visible {
+            display: block !important;
         }
 
         .sidebar-header {
@@ -2038,93 +2056,95 @@
     <!-- ANIMATED SIDEBAR -->
     <div class="overlay" id="overlay"></div>
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <img src="PM-LOGO-TEXT.png" alt="PREMium Mind" class="sidebar-logo"
-                onerror="this.onerror=null; this.src='small-logo.png';">
-            <button class="close-sidebar" id="close-sidebar-btn"
-                onclick="document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active');">
-                <ion-icon name="close-outline"></ion-icon>
-            </button>
-        </div>
-
-        <div class="user-profile-compact" id="userProfile" style="display: none;">
-            <div class="profile-photo-container">
-                <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile"
-                    class="profile-photo" id="profilePhoto" title="Click to change photo"
-                    onclick="document.getElementById('photo-input').click()">
-            </div>
-            <input type="file" id="photo-input" accept="image/*" style="display:none;">
-            <div class="profile-info">
-                <div class="user-name" id="userName">User Name</div>
-                <div class="user-email-chip" id="userEmail">user@example.com</div>
-            </div>
-        </div>
-
-        <div class="login-prompt" id="loginPrompt"
-            style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; border: 1px solid #e2e8f0;">
-            <h3 style="margin:0 0 5px 0; font-size:15px; color:#111;">Welcome to PREMium Mind</h3>
-            <p style="margin:0 0 10px 0; font-size:12px; color:#666;">Access your courses and profile.</p>
-            <button onclick="window.location.href='login.html'"
-                style="width:100%; padding:10px; border:none; background:#111; color:#fff; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
-                <ion-icon name="log-in-outline" style="font-size:18px;"></ion-icon> Login / Sign Up
-            </button>
-        </div>
-
-        <ul class="sidebar-menu">
-            <li class="sidebar-item" style="--delay: 0.1s">
-                <a href="index.html" class="sidebar-link">
-                    <ion-icon name="home-outline"></ion-icon> Home
-                </a>
-            </li>
-
-            <!-- Mobile Store Dropdown Accordion -->
-            <li class="sidebar-item sidebar-dropdown" style="--delay: 0.2s">
-                <div class="sidebar-dropdown-toggle" id="mobile-store-toggle"
-                    onclick="this.parentElement.classList.toggle('open')">
-                    <span class="sidebar-link-content">
-                        <ion-icon name="bag-handle-outline"></ion-icon> PREMium Store
-                    </span>
-                    <ion-icon name="chevron-down-outline" class="mobile-dropdown-arrow"></ion-icon>
-                </div>
-                <div class="sidebar-submenu" id="mobile-store-submenu">
-                    <a href="#notes" class="sidebar-sublink"
-                        onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('notes'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
-                            name="document-text-outline"></ion-icon> Notes</a>
-                    <a href="#ebooks" class="sidebar-sublink"
-                        onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('ebooks'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
-                            name="book-outline"></ion-icon> E-Books</a>
-                    <a href="#resume" class="sidebar-sublink"
-                        onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('resume'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
-                            name="briefcase-outline"></ion-icon> Resume</a>
-                    <a href="#report-writing" class="sidebar-sublink"
-                        onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('report-writing'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
-                            name="bar-chart-outline"></ion-icon> Report Writing</a>
-                    <a href="#projects" class="sidebar-sublink"
-                        onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('projects'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
-                            name="code-slash-outline"></ion-icon> Project</a>
-                </div>
-            </li>
-
-            <li class="sidebar-item" style="--delay: 0.3s">
-                <a href="lecture.html" class="sidebar-link protected-route" id="coursesLink">
-                    <ion-icon name="play-circle-outline"></ion-icon> My Courses
-                </a>
-            </li>
-            <li class="sidebar-item" style="--delay: 0.4s">
-                <a href="#help-form" class="sidebar-link"
+        <div class="sidebar-scroll">
+            <div class="sidebar-header">
+                <img src="PM-LOGO-TEXT.png" alt="PREMium Mind" class="sidebar-logo"
+                    onerror="this.onerror=null; this.src='small-logo.png';">
+                <button class="close-sidebar" id="close-sidebar-btn"
                     onclick="document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active');">
-                    <ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us
-                </a>
-            </li>
-            <li class="sidebar-item" style="--delay: 0.5s">
-                <a href="termcondition.html" class="sidebar-link">
-                    <ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy
-                </a>
-            </li>
-        </ul>
+                    <ion-icon name="close-outline"></ion-icon>
+                </button>
+            </div>
 
-        <!-- Bottom Logout Action -->
-        <div style="margin-top:auto; padding-top:15px; border-top:1px solid #e2e8f0; display:none;" id="sidebarFooter">
+            <div class="user-profile-compact" id="userProfile" style="display: none;">
+                <div class="profile-photo-container">
+                    <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile"
+                        class="profile-photo" id="profilePhoto" title="Click to change photo"
+                        onclick="document.getElementById('photo-input').click()">
+                </div>
+                <input type="file" id="photo-input" accept="image/*" style="display:none;">
+                <div class="profile-info">
+                    <div class="user-name" id="userName">User Name</div>
+                    <div class="user-email-chip" id="userEmail">user@example.com</div>
+                </div>
+            </div>
+
+            <div class="login-prompt" id="loginPrompt"
+                style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; border: 1px solid #e2e8f0;">
+                <h3 style="margin:0 0 5px 0; font-size:15px; color:#111;">Welcome to PREMium Mind</h3>
+                <p style="margin:0 0 10px 0; font-size:12px; color:#666;">Access your courses and profile.</p>
+                <button onclick="window.location.href='login.html'"
+                    style="width:100%; padding:10px; border:none; background:#111; color:#fff; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <ion-icon name="log-in-outline" style="font-size:18px;"></ion-icon> Login / Sign Up
+                </button>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item" style="--delay: 0.1s">
+                    <a href="index.html" class="sidebar-link">
+                        <ion-icon name="home-outline"></ion-icon> Home
+                    </a>
+                </li>
+
+                <!-- Mobile Store Dropdown Accordion -->
+                <li class="sidebar-item sidebar-dropdown" style="--delay: 0.2s">
+                    <div class="sidebar-dropdown-toggle" id="mobile-store-toggle"
+                        onclick="this.parentElement.classList.toggle('open')">
+                        <span class="sidebar-link-content">
+                            <ion-icon name="bag-handle-outline"></ion-icon> PREMium Store
+                        </span>
+                        <ion-icon name="chevron-down-outline" class="mobile-dropdown-arrow"></ion-icon>
+                    </div>
+                    <div class="sidebar-submenu" id="mobile-store-submenu">
+                        <a href="#notes" class="sidebar-sublink"
+                            onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('notes'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
+                                name="document-text-outline"></ion-icon> Notes</a>
+                        <a href="#ebooks" class="sidebar-sublink"
+                            onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('ebooks'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
+                                name="book-outline"></ion-icon> E-Books</a>
+                        <a href="#resume" class="sidebar-sublink"
+                            onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('resume'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
+                                name="briefcase-outline"></ion-icon> Resume</a>
+                        <a href="#report-writing" class="sidebar-sublink"
+                            onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('report-writing'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
+                                name="bar-chart-outline"></ion-icon> Report Writing</a>
+                        <a href="#projects" class="sidebar-sublink"
+                            onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('projects'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
+                                name="code-slash-outline"></ion-icon> Project</a>
+                    </div>
+                </li>
+
+                <li class="sidebar-item" style="--delay: 0.3s">
+                    <a href="lecture.html" class="sidebar-link protected-route" id="coursesLink">
+                        <ion-icon name="play-circle-outline"></ion-icon> My Courses
+                    </a>
+                </li>
+                <li class="sidebar-item" style="--delay: 0.4s">
+                    <a href="#help-form" class="sidebar-link"
+                        onclick="document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active');">
+                        <ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us
+                    </a>
+                </li>
+                <li class="sidebar-item" style="--delay: 0.5s">
+                    <a href="termcondition.html" class="sidebar-link">
+                        <ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Bottom Logout Action (always pinned) -->
+        <div class="sidebar-footer" id="sidebarFooter">
             <button id="sidebarLogoutBtn" onclick="handleLogout()"
                 style="width:100%; padding:12px; background:#fff1f2; color:#e11d48; border:1px solid #ffe4e6; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
                 <ion-icon name="log-out-outline" style="font-size:18px;"></ion-icon> Logout Account
@@ -2446,12 +2466,14 @@
             const loginPrompt = document.getElementById('loginPrompt');
             const coursesLink = document.getElementById('coursesLink');
             const coursesLinkNav = document.getElementById('coursesLinkNav');
+            const sidebarFooter = document.getElementById('sidebarFooter');
             
             const desktopLoginBtn = document.getElementById('desktopLoginBtnContainer');
             const desktopUserPill = document.getElementById('desktopUserPillContainer');
 
             userProfile.style.display = 'flex';
             loginPrompt.style.display = 'none';
+            if (sidebarFooter) sidebarFooter.classList.add('is-visible');
 
             document.getElementById('userName').textContent = name || 'User';
             document.getElementById('userEmail').textContent = email || '';
@@ -2462,7 +2484,7 @@
             if (desktopLoginBtn) desktopLoginBtn.style.display = 'none';
             if (desktopUserPill) {
                 desktopUserPill.style.display = 'block';
-                document.getElementById('navUserName').textContent = name || 'User';
+                document.getElementById('navUserName').textContent = (name || 'User').toString().split(' ')[0];
                 document.getElementById('navAvatarImg').src = finalPhotoSrc;
             }
 
@@ -2479,12 +2501,14 @@
             const loginPrompt = document.getElementById('loginPrompt');
             const coursesLink = document.getElementById('coursesLink');
             const coursesLinkNav = document.getElementById('coursesLinkNav');
+            const sidebarFooter = document.getElementById('sidebarFooter');
             
             const desktopLoginBtn = document.getElementById('desktopLoginBtnContainer');
             const desktopUserPill = document.getElementById('desktopUserPillContainer');
 
             userProfile.style.display = 'none';
             loginPrompt.style.display = 'block';
+            if (sidebarFooter) sidebarFooter.classList.remove('is-visible');
             
             if (desktopLoginBtn) desktopLoginBtn.style.display = 'block';
             if (desktopUserPill) desktopUserPill.style.display = 'none';
