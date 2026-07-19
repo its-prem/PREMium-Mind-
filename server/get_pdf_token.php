@@ -13,6 +13,7 @@ $allowed_origins = [
     'https://premind.diplomawallah.in',
     'https://diplomawallah.in',
     'https://www.diplomawallah.in',
+    'https://premind.netlify.app',
 ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';

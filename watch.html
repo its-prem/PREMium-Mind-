@@ -5,142 +5,338 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <title>Secure Reader - PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  
+
   <style>
     :root {
       --pdf-scale: 1;
+      --ink: #000000;
+      --ink-soft: #434343;
+      --amber: #fbbf24;
+      --amber-deep: #f59e0b;
+      --paper: #f9f9f9;
+      --surface: #ffffff;
+      --muted: #666666;
+      --header-h: 68px;
+      --font: 'Plus Jakarta Sans', 'Poppins', sans-serif;
     }
 
-    /* Security: Print Block */
     @media print { html, body { display: none !important; } }
 
-    /* Body global block */
+    * { box-sizing: border-box; }
+
     body {
-      margin: 0; padding: 0; font-family: 'Poppins', sans-serif;
-      background: #e5e7eb; user-select: none; -webkit-user-select: none;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(251, 191, 36, 0.12), transparent 55%),
+        radial-gradient(ellipse 70% 40% at 100% 0%, rgba(0, 0, 0, 0.06), transparent 50%),
+        linear-gradient(180deg, #f3f3f3 0%, var(--paper) 40%, #ffffff 100%);
+      user-select: none;
+      -webkit-user-select: none;
       transition: filter 0.3s ease;
-      overflow: hidden; 
-      touch-action: none; 
+      overflow: hidden;
+      touch-action: none;
     }
-    
-    /* 🛡️ STATIC HEADER 🛡️ */
+
     .header {
-      background: #111827; color: #fff; padding: 0 15px; 
-      display: flex; align-items: center; justify-content: space-between;
-      height: 65px; width: 100%; box-sizing: border-box;
-      position: absolute; top: 0; left: 0; z-index: 1000;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      position: absolute;
+      top: 0; left: 0;
+      z-index: 1000;
+      width: 100%;
+      height: var(--header-h);
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: #fff;
+      background: linear-gradient(135deg, #000000 0%, #434343 100%);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
       pointer-events: auto;
+      animation: headerIn 0.45s ease both;
     }
-    
+
+    .header::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--amber), transparent);
+      opacity: 0.85;
+    }
+
+    @keyframes headerIn {
+      from { transform: translateY(-12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
     .back-btn {
-      color: #fff; text-decoration: none; font-weight: 500; font-size: 0.9rem;
-      background: rgba(255, 255, 255, 0.1); padding: 8px 14px; border-radius: 50px;
-      display: flex; align-items: center; gap: 5px; transition: 0.3s;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.88rem;
+      padding: 9px 16px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: 2px solid rgba(255, 255, 255, 0.75);
+      transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+      flex-shrink: 0;
     }
-    .back-btn:hover { background: rgba(255, 255, 255, 0.2); }
+    .back-btn:hover {
+      background: #fff;
+      color: #000;
+      transform: translateY(-1px);
+    }
+
+    .brand-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      min-width: 0;
+    }
 
     .brand-title {
-      font-weight: 700; color: #10b981; font-size: 1rem;
-      letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: 0.3px;
+      color: #fff;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+    .brand-title span {
+      background: linear-gradient(135deg, var(--amber) 0%, #fde68a 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    /* 🟢 DOWNLOAD BUTTON 🟢 */
+    .brand-sub {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: rgba(251, 191, 36, 0.9);
+    }
+
     .header-actions {
       display: flex;
       align-items: center;
       gap: 10px;
-    }
-
-    .download-btn {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: #fff; border: none; padding: 8px 16px; border-radius: 50px;
-      font-weight: 600; font-size: 0.85rem; cursor: pointer;
-      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
-      transition: all 0.3s ease; align-items: center; gap: 6px; display: flex; 
-    }
-    .download-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
-    .download-btn:active { transform: translateY(0); }
-
-    .download-btn.locked {
-      background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
     }
 
     #status {
-      background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 6px;
-      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; color: #9ca3af;
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(20, 20, 20, 0.55);
+      backdrop-filter: blur(8px);
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--amber);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      white-space: nowrap;
     }
 
-    /* 🛡️ STATIC WATERMARK 🛡️ */
-    .watermark-overlay {
-      position: absolute; top: 65px; left: 0; width: 100%; height: calc(100vh - 65px);
-      display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr);
-      justify-items: center; align-items: center; 
-      overflow: hidden; z-index: 900; pointer-events: none;
+    .download-btn {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(255, 255, 255, 0.12);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+      align-items: center;
+      gap: 6px;
+      display: inline-flex;
     }
-    
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255, 255, 255, 0.22);
+      background: var(--amber);
+    }
+    .download-btn:active { transform: translateY(0); }
+
+    .download-btn.locked {
+      background: rgba(255, 255, 255, 0.14);
+      color: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: none;
+    }
+    .download-btn.locked:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: none;
+    }
+
+    .watermark-overlay {
+      position: absolute;
+      top: var(--header-h); left: 0;
+      width: 100%;
+      height: calc(100vh - var(--header-h));
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      justify-items: center;
+      align-items: center;
+      overflow: hidden;
+      z-index: 900;
+      pointer-events: none;
+    }
+
     .wm-item {
-      font-size: 12px; font-weight: 600; 
-      color: rgba(0, 0, 0, 0.08); 
-      transform: rotate(-35deg); text-align: center;
-      line-height: 1.4; letter-spacing: 0.8px; white-space: nowrap;
-      text-shadow: 1px 1px 1px rgba(255,255,255,0.1);
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.07);
+      transform: rotate(-35deg);
+      text-align: center;
+      line-height: 1.4;
+      letter-spacing: 0.8px;
+      white-space: nowrap;
     }
 
     .loader-container {
-      position: fixed; inset: 0; background: #e5e7eb; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; z-index: 2000;
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      background:
+        radial-gradient(circle at 30% 40%, rgba(251, 191, 36, 0.1), transparent 45%),
+        linear-gradient(135deg, #000000 0%, #434343 100%);
+      animation: fadeBoot 0.35s ease both;
     }
-    .loader { border: 4px solid #d1d5db; border-top: 4px solid #10b981; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* 📄 PDF SCROLL AREA 📄 */
+    @keyframes fadeBoot {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .loader-brand {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.4px;
+    }
+    .loader-brand span {
+      color: var(--amber);
+    }
+
+    .loader {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.15);
+      border-top-color: var(--amber);
+      border-right-color: #fff;
+      animation: spin 0.85s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loader-text {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-weight: 500;
+      font-size: 0.92rem;
+    }
+
+    .loader-container.is-error {
+      background: linear-gradient(180deg, #f9f9f9 0%, #fff 100%);
+    }
+    .loader-container.is-error .loader-text {
+      color: #b71c1c;
+      font-weight: 700;
+      text-align: center;
+      max-width: 280px;
+      padding: 0 20px;
+    }
+
     .scroll-area {
-      position: absolute; top: 65px; left: 0;
-      width: 100vw; height: calc(100vh - 65px);
-      overflow: auto; 
+      position: absolute;
+      top: var(--header-h); left: 0;
+      width: 100vw;
+      height: calc(100vh - var(--header-h));
+      overflow: auto;
       -webkit-overflow-scrolling: touch;
-      touch-action: pan-x pan-y; 
-      z-index: 10; pointer-events: auto;
+      touch-action: pan-x pan-y;
+      z-index: 10;
+      pointer-events: auto;
     }
 
     .pdf-viewer-container {
-      display: flex; flex-direction: column; align-items: center; 
-      padding: 15px; box-sizing: border-box; gap: 15px;
-      width: calc(100% * var(--pdf-scale)); 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 16px 36px;
+      gap: 18px;
+      width: calc(100% * var(--pdf-scale));
       transform-origin: top left;
+      animation: pagesIn 0.5s ease 0.05s both;
     }
 
-    .page-wrapper { 
-      position: relative; width: 100%; display: flex; justify-content: center; 
-      max-width: 900px; box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-      border-radius: 8px; background: #fff; overflow: hidden;
+    @keyframes pagesIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      max-width: 900px;
+      background: var(--surface);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
     }
 
     canvas {
-      width: 100% !important; height: auto !important;
-      display: block; border-radius: 8px;
+      width: 100% !important;
+      height: auto !important;
+      display: block;
+      border-radius: 12px;
     }
 
     .secure-mode { filter: blur(25px) grayscale(100%); pointer-events: none; }
 
-    /* Mobile Optimizations */
     @media (max-width: 600px) {
-       .wm-item { font-size: 10px; color: rgba(0,0,0,0.06); }
-       .watermark-overlay { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(5, 1fr); }
-       .header { padding: 0 12px; height: 60px; }
-       .scroll-area { top: 60px; height: calc(100vh - 60px); }
-       .watermark-overlay { top: 60px; height: calc(100vh - 60px); }
-       .brand-title { display: none; } 
-       .back-btn span { display: none; } 
-       .back-btn { padding: 8px 12px; }
-       .download-btn { padding: 8px 14px; font-size: 0.8rem; }
+      :root { --header-h: 62px; }
+      .wm-item { font-size: 10px; color: rgba(0, 0, 0, 0.055); }
+      .watermark-overlay {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(5, 1fr);
+      }
+      .header { padding: 0 12px; }
+      .brand-sub { display: none; }
+      .brand-title { font-size: 0.92rem; }
+      .back-btn .back-label { display: none; }
+      .back-btn { padding: 8px 12px; }
+      #status { display: none; }
+      .download-btn { padding: 8px 12px; font-size: 0.8rem; }
+      .pdf-viewer-container { padding: 14px 10px 28px; gap: 14px; }
     }
   </style>
 </head>
@@ -148,12 +344,15 @@
 
   <div class="header">
     <a href="lecture.html" class="back-btn" onclick="window.history.back(); return false;">
-      <span>←</span> <span>Back</span>
+      <span>←</span> <span class="back-label">Back</span>
     </a>
-    <div class="brand-title">PREMium Mind</div>
-    
+    <div class="brand-block">
+      <div class="brand-title">PREM<span>ium</span> Mind</div>
+      <div class="brand-sub">Secure Reader</div>
+    </div>
+
     <div class="header-actions">
-      <div id="status">SECURE HD</div>
+      <div id="status">Secure HD</div>
       <button id="downloadBtn" class="download-btn">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
         <span id="dl-text">Save</span>
@@ -169,8 +368,9 @@
   </div>
 
   <div class="loader-container" id="loadingState">
+     <div class="loader-brand">PREM<span>ium</span> Mind</div>
      <div class="loader"></div>
-     <p style="margin-top:15px; color:#4b5563; font-weight: 500;">Loading Secure PDF...</p>
+     <p class="loader-text">Loading secure notes...</p>
   </div>
 
   <div class="scroll-area" id="scrollArea">
@@ -395,11 +595,14 @@
              loadingState.style.display = 'none';
          })
          .catch(err => {
-             loadingState.innerHTML = "<p style='color:#ef4444; font-weight:bold;'>Access Denied. Secure Connection Failed.</p>";
+             loadingState.classList.add('is-error');
+             loadingState.innerHTML = "<p class='loader-text'>Access Denied. Secure Connection Failed.</p>";
              console.error(err);
          });
      } else {
-         document.getElementById('loadingState').innerHTML = "No PDF URL Provided.";
+         const loadingState = document.getElementById('loadingState');
+         loadingState.classList.add('is-error');
+         loadingState.innerHTML = "<p class='loader-text'>No PDF file provided.</p>";
      }
   </script>
 </body>
