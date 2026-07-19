@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" href="small-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
@@ -21,8 +21,12 @@
       --paper: #f9f9f9;
       --surface: #ffffff;
       --muted: #666666;
-      --header-h: 68px;
-      --font: 'Plus Jakarta Sans', 'Poppins', sans-serif;
+      --header-h: 70px;
+      --tip-h: 0px;
+      --font-ui: 'Montserrat', sans-serif;
+      --font-brand: 'Archivo Black', sans-serif;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
     @media print { html, body { display: none !important; } }
@@ -32,7 +36,7 @@
     body {
       margin: 0;
       padding: 0;
-      font-family: var(--font);
+      font-family: var(--font-ui);
       color: var(--ink);
       background:
         radial-gradient(ellipse 80% 50% at 10% -10%, rgba(251, 191, 36, 0.12), transparent 55%),
@@ -50,12 +54,12 @@
       top: 0; left: 0;
       z-index: 1000;
       width: 100%;
-      height: var(--header-h);
-      padding: 0 18px;
-      display: flex;
+      height: calc(var(--header-h) + var(--safe-top));
+      padding: var(--safe-top) 18px 0;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       color: #fff;
       background: linear-gradient(135deg, #000000 0%, #434343 100%);
       box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
@@ -77,12 +81,22 @@
       to { transform: translateY(0); opacity: 1; }
     }
 
+    .header-left { justify-self: start; }
+    .header-right {
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .back-btn {
       color: #fff;
       text-decoration: none;
+      font-family: var(--font-ui);
       font-weight: 600;
-      font-size: 0.88rem;
-      padding: 9px 16px;
+      font-size: 0.82rem;
+      min-height: 42px;
+      padding: 0 14px;
       border-radius: 10px;
       display: inline-flex;
       align-items: center;
@@ -90,7 +104,6 @@
       background: transparent;
       border: 2px solid rgba(255, 255, 255, 0.75);
       transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
-      flex-shrink: 0;
     }
     .back-btn:hover {
       background: #fff;
@@ -100,21 +113,40 @@
 
     .brand-block {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 2px;
+      justify-content: center;
+      gap: 8px;
+      min-width: 0;
+      text-align: center;
+    }
+
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 1.5px rgba(251, 191, 36, 0.45);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1px;
       min-width: 0;
     }
 
     .brand-title {
-      font-weight: 800;
+      font-family: var(--font-brand);
+      font-weight: 400;
       font-size: 1.05rem;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
       color: #fff;
-      line-height: 1.1;
+      line-height: 1.05;
       white-space: nowrap;
     }
-    .brand-title span {
+    .brand-title .accent {
       background: linear-gradient(135deg, var(--amber) 0%, #fde68a 100%);
       -webkit-background-clip: text;
       background-clip: text;
@@ -122,26 +154,21 @@
     }
 
     .brand-sub {
-      font-size: 0.62rem;
+      font-family: var(--font-ui);
+      font-size: 0.58rem;
       font-weight: 700;
-      letter-spacing: 1.4px;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: rgba(251, 191, 36, 0.9);
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
+      color: rgba(251, 191, 36, 0.92);
     }
 
     #status {
       background: rgba(20, 20, 20, 0.55);
       backdrop-filter: blur(8px);
-      padding: 6px 12px;
-      border-radius: 30px;
-      font-size: 0.65rem;
+      padding: 7px 11px;
+      border-radius: 10px;
+      font-family: var(--font-ui);
+      font-size: 0.62rem;
       font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
@@ -154,11 +181,12 @@
       background: #fff;
       color: #000;
       border: none;
-      padding: 9px 16px;
+      min-height: 42px;
+      padding: 0 14px;
       border-radius: 10px;
-      font-family: inherit;
+      font-family: var(--font-ui);
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       cursor: pointer;
       box-shadow: 0 4px 14px rgba(255, 255, 255, 0.12);
       transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
@@ -184,11 +212,34 @@
       transform: none;
     }
 
+    .zoom-tip {
+      display: none;
+      position: absolute;
+      top: calc(var(--header-h) + var(--safe-top));
+      left: 0;
+      width: 100%;
+      height: var(--tip-h);
+      z-index: 950;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-ui);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      color: #444;
+      background: rgba(255, 255, 255, 0.92);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+    }
+    .zoom-tip strong { color: var(--amber-deep); font-weight: 800; }
+
     .watermark-overlay {
       position: absolute;
-      top: var(--header-h); left: 0;
+      top: calc(var(--header-h) + var(--safe-top) + var(--tip-h)); left: 0;
       width: 100%;
-      height: calc(100vh - var(--header-h));
+      height: calc(100vh - var(--header-h) - var(--safe-top) - var(--tip-h));
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(4, 1fr);
@@ -200,6 +251,7 @@
     }
 
     .wm-item {
+      font-family: var(--font-ui);
       font-size: 12px;
       font-weight: 600;
       color: rgba(0, 0, 0, 0.07);
@@ -219,6 +271,7 @@
       align-items: center;
       justify-content: center;
       gap: 18px;
+      padding: 24px;
       background:
         radial-gradient(circle at 30% 40%, rgba(251, 191, 36, 0.1), transparent 45%),
         linear-gradient(135deg, #000000 0%, #434343 100%);
@@ -231,14 +284,15 @@
     }
 
     .loader-brand {
-      font-size: 1.15rem;
-      font-weight: 800;
+      font-family: var(--font-brand);
+      font-size: clamp(1.2rem, 5vw, 1.55rem);
+      font-weight: 400;
       color: #fff;
       letter-spacing: 0.4px;
+      text-align: center;
     }
-    .loader-brand span {
-      color: var(--amber);
-    }
+    .loader-brand span,
+    .loader-brand .accent { color: var(--amber); }
 
     .loader {
       width: 46px;
@@ -256,9 +310,11 @@
 
     .loader-text {
       margin: 0;
+      font-family: var(--font-ui);
       color: rgba(255, 255, 255, 0.78);
       font-weight: 500;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
+      text-align: center;
     }
 
     .loader-container.is-error {
@@ -267,28 +323,28 @@
     .loader-container.is-error .loader-text {
       color: #b71c1c;
       font-weight: 700;
-      text-align: center;
       max-width: 280px;
-      padding: 0 20px;
     }
 
     .scroll-area {
       position: absolute;
-      top: var(--header-h); left: 0;
+      top: calc(var(--header-h) + var(--safe-top) + var(--tip-h));
+      left: 0;
       width: 100vw;
-      height: calc(100vh - var(--header-h));
+      height: calc(100vh - var(--header-h) - var(--safe-top) - var(--tip-h) - var(--safe-bottom));
       overflow: auto;
       -webkit-overflow-scrolling: touch;
       touch-action: pan-x pan-y;
       z-index: 10;
       pointer-events: auto;
+      overscroll-behavior: contain;
     }
 
     .pdf-viewer-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px 16px 36px;
+      padding: 20px 16px calc(36px + var(--safe-bottom));
       gap: 18px;
       width: calc(100% * var(--pdf-scale));
       transform-origin: top left;
@@ -322,43 +378,124 @@
 
     .secure-mode { filter: blur(25px) grayscale(100%); pointer-events: none; }
 
-    @media (max-width: 600px) {
-      :root { --header-h: 62px; }
-      .wm-item { font-size: 10px; color: rgba(0, 0, 0, 0.055); }
+    /* —— Phone / small screens —— */
+    @media (max-width: 700px) {
+      :root {
+        --header-h: 58px;
+        --tip-h: 34px;
+      }
+
+      .header {
+        padding: var(--safe-top) 10px 0;
+        gap: 6px;
+      }
+
+      .brand-logo { width: 24px; height: 24px; border-radius: 6px; }
+
+      .brand-title {
+        font-size: 0.86rem;
+        letter-spacing: 0;
+      }
+
+      .brand-sub { display: none; }
+
+      .back-btn {
+        min-height: 40px;
+        min-width: 40px;
+        padding: 0;
+        justify-content: center;
+        border-width: 1.5px;
+      }
+      .back-btn .back-label { display: none; }
+
+      #status {
+        padding: 0;
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0;
+        border-radius: 10px;
+        position: relative;
+      }
+      #status::before {
+        content: 'HD';
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        color: var(--amber);
+      }
+
+      .download-btn {
+        min-height: 40px;
+        padding: 0 12px;
+        font-size: 0.75rem;
+        gap: 4px;
+      }
+      .download-btn svg { width: 15px; height: 15px; }
+
+      .zoom-tip { display: flex; }
+
+      .wm-item {
+        font-size: 9px;
+        color: rgba(0, 0, 0, 0.05);
+      }
       .watermark-overlay {
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(5, 1fr);
       }
-      .header { padding: 0 12px; }
-      .brand-sub { display: none; }
-      .brand-title { font-size: 0.92rem; }
-      .back-btn .back-label { display: none; }
-      .back-btn { padding: 8px 12px; }
+
+      .pdf-viewer-container {
+        padding: 10px 8px calc(24px + var(--safe-bottom));
+        gap: 12px;
+      }
+
+      .page-wrapper {
+        border-radius: 8px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+      }
+
+      canvas { border-radius: 8px; }
+
+      .loader-text { font-size: 0.84rem; padding: 0 12px; }
+    }
+
+    @media (max-width: 380px) {
+      .brand-title .brand-mind { display: none; }
+      .download-btn #dl-text { display: none; }
+      .download-btn { min-width: 40px; padding: 0; justify-content: center; }
       #status { display: none; }
-      .download-btn { padding: 8px 12px; font-size: 0.8rem; }
-      .pdf-viewer-container { padding: 14px 10px 28px; gap: 14px; }
     }
   </style>
 </head>
 <body oncontextmenu="return false;">
 
   <div class="header">
-    <a href="lecture.html" class="back-btn" onclick="window.history.back(); return false;">
-      <span>←</span> <span class="back-label">Back</span>
-    </a>
-    <div class="brand-block">
-      <div class="brand-title">PREM<span>ium</span> Mind</div>
-      <div class="brand-sub">Secure Reader</div>
+    <div class="header-left">
+      <a href="lecture.html" class="back-btn" onclick="window.history.back(); return false;" aria-label="Back">
+        <span>←</span> <span class="back-label">Back</span>
+      </a>
     </div>
 
-    <div class="header-actions">
+    <div class="brand-block">
+      <img class="brand-logo" src="small-logo.png" alt="" width="28" height="28">
+      <div class="brand-text">
+        <div class="brand-title">PREM<span class="accent">ium</span> <span class="brand-mind">Mind</span></div>
+        <div class="brand-sub">Secure Reader</div>
+      </div>
+    </div>
+
+    <div class="header-right">
       <div id="status">Secure HD</div>
-      <button id="downloadBtn" class="download-btn">
+      <button id="downloadBtn" class="download-btn" type="button">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
         <span id="dl-text">Save</span>
       </button>
     </div>
   </div>
+
+  <div class="zoom-tip" aria-hidden="true">Pinch to zoom · <strong>Secure</strong> reading mode</div>
 
   <div class="watermark-overlay" id="wmLayer">
       <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
@@ -368,7 +505,7 @@
   </div>
 
   <div class="loader-container" id="loadingState">
-     <div class="loader-brand">PREM<span>ium</span> Mind</div>
+     <div class="loader-brand">PREM<span class="accent">ium</span> Mind</div>
      <div class="loader"></div>
      <p class="loader-text">Loading secure notes...</p>
   </div>
