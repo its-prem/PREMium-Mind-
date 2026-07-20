@@ -14,6 +14,7 @@
   <style>
     :root {
       --pdf-scale: 1;
+      --page-w: 100%;
       --ink: #111111;
       --muted: #6b7280;
       --line: #ececec;
@@ -326,16 +327,17 @@
       align-items: center;
       padding: 18px 14px calc(28px + var(--safe-bottom));
       gap: 14px;
-      width: calc(100% * var(--pdf-scale));
-      max-width: none;
-      transform-origin: top left;
+      width: max-content;
+      min-width: 100%;
+      margin: 0 auto;
+      transform-origin: top center;
       will-change: width;
     }
 
     .page-wrapper {
       position: relative;
-      width: 100%;
-      max-width: 900px;
+      width: calc(var(--page-w, 100%) * var(--pdf-scale));
+      max-width: none;
       display: flex;
       justify-content: center;
       align-items: flex-start;
@@ -509,8 +511,9 @@
          currentScale = clampScale(z);
          document.documentElement.style.setProperty('--pdf-scale', currentScale);
          if (zoomLabel) zoomLabel.textContent = Math.round(currentScale * 100) + '%';
-         if (typeof window.__pdfScheduleSync === 'function') {
-             window.__pdfScheduleSync();
+         // Instant CSS stretch (upar) + zoom pe sharp re-render (neeche)
+         if (typeof window.__pdfOnZoom === 'function') {
+             window.__pdfOnZoom();
          }
      }
 
@@ -789,22 +792,18 @@
                      disableStream: true
                  }).promise;
 
-                 // Fit page to screen — sharp text without huge memory
+                 // Fit page to screen width; zoom pe higher scale re-render hota hai
                  const firstPage = await pdfDoc.getPage(1);
                  const baseVp = firstPage.getViewport({ scale: 1 });
                  const pad = window.innerWidth < 700 ? 20 : 36;
                  const cssWidth = Math.min(900, Math.max(260, scrollArea.clientWidth - pad));
                  const fitScale = cssWidth / baseVp.width;
+                 document.documentElement.style.setProperty('--page-w', cssWidth + 'px');
 
                  // Full retina quality — lazy render karta hai isliye memory safe
                  const isMobile = window.innerWidth < 700 || /Android|iPhone|iPad/i.test(navigator.userAgent);
-                 let pixelRatio = Math.min(window.devicePixelRatio || 1, 3);
-                 // Extra sharpness bump so text crisp lage
-                 pixelRatio = Math.max(pixelRatio, 2);
-                 const MAX_EDGE = isMobile ? 3000 : 4000;
-                 if (baseVp.width * fitScale * pixelRatio > MAX_EDGE) {
-                     pixelRatio = MAX_EDGE / (baseVp.width * fitScale);
-                 }
+                 const basePixelRatio = Math.min(Math.max(window.devicePixelRatio || 1, 2), 3);
+                 const MAX_EDGE = isMobile ? 4000 : 5200;
 
                  const pageSlots = [];
                  const renderTasks = new Map();
@@ -817,25 +816,35 @@
                      wrapper.dataset.page = String(num);
                      wrapper.style.aspectRatio = baseVp.width + ' / ' + baseVp.height;
                      container.appendChild(wrapper);
-                     pageSlots[num] = { wrapper, ready: false, rendering: false };
+                     pageSlots[num] = { wrapper, ready: false, rendering: false, renderedScale: 0 };
                  }
 
                  async function paintPage(num) {
                      const slot = pageSlots[num];
-                     if (!slot || slot.ready || slot.rendering) return;
+                     if (!slot || slot.rendering) return;
+                     const targetScale = fitScale * currentScale;
+                     if (slot.ready && Math.abs(slot.renderedScale - targetScale) < 0.001) return;
                      slot.rendering = true;
 
                      try {
                          const page = await pdfDoc.getPage(num);
-                         const viewport = page.getViewport({ scale: fitScale });
+                         const viewport = page.getViewport({ scale: targetScale });
+
+                         // Device pixels — cap so Chrome "Aw Snap" na aaye
+                         let pr = basePixelRatio;
+                         const longEdge = Math.max(viewport.width, viewport.height) * pr;
+                         if (longEdge > MAX_EDGE) {
+                             pr = MAX_EDGE / Math.max(viewport.width, viewport.height);
+                         }
+
                          const canvas = document.createElement('canvas');
                          const ctx = canvas.getContext('2d', { alpha: false });
-                         canvas.width = Math.floor(viewport.width * pixelRatio);
-                         canvas.height = Math.floor(viewport.height * pixelRatio);
+                         canvas.width = Math.floor(viewport.width * pr);
+                         canvas.height = Math.floor(viewport.height * pr);
                          canvas.style.width = '100%';
                          canvas.style.height = 'auto';
 
-                         const transform = pixelRatio !== 1 ? [pixelRatio, 0, 0, pixelRatio, 0, 0] : null;
+                         const transform = pr !== 1 ? [pr, 0, 0, pr, 0, 0] : null;
                          const task = page.render({ canvasContext: ctx, transform, viewport });
                          renderTasks.set(num, task);
                          await task.promise;
@@ -846,6 +855,7 @@
                          slot.wrapper.classList.remove('is-loading');
                          slot.wrapper.style.aspectRatio = '';
                          slot.ready = true;
+                         slot.renderedScale = targetScale;
                      } catch (err) {
                          if (err && err.name === 'RenderingCancelledException') return;
                          console.warn('page render failed', num, err);
@@ -863,7 +873,6 @@
                          try { task.cancel(); } catch (e) {}
                          renderTasks.delete(num);
                      }
-                     // Keep aspect box, free GPU memory
                      const canvas = slot.wrapper.querySelector('canvas');
                      if (canvas) {
                          canvas.width = 0;
@@ -874,6 +883,7 @@
                      slot.wrapper.style.aspectRatio = baseVp.width + ' / ' + baseVp.height;
                      slot.ready = false;
                      slot.rendering = false;
+                     slot.renderedScale = 0;
                  }
 
                  function visibleRange() {
@@ -915,6 +925,13 @@
                      requestAnimationFrame(() => { syncVisiblePages(); });
                  }
                  window.__pdfScheduleSync = scheduleSync;
+
+                 // Zoom change → visible pages ko us zoom pe sharp re-render (debounced)
+                 let zoomRenderTimer = null;
+                 window.__pdfOnZoom = function () {
+                     clearTimeout(zoomRenderTimer);
+                     zoomRenderTimer = setTimeout(() => { syncVisiblePages(); }, 250);
+                 };
 
                  // Page 1 pehle → loader band, text jaldi
                  await paintPage(1);
