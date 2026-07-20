@@ -1,7 +1,7 @@
 <?php
 /**
- * Upload to Hostinger root as: proxy_pdf.php (REPLACE old file)
- * Serves PDF only with a short-lived, one-time HMAC token from get_pdf_token.php
+ * Upload to Hostinger premind/ as: proxy_pdf.php (REPLACE)
+ * Serves PDF with short-lived HMAC token from get_pdf_token.php
  */
 
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
@@ -16,8 +16,16 @@ $allowed_origins = [
     'https://premind.netlify.app',
 ];
 
+function origin_allowed(string $origin): bool {
+    global $allowed_origins;
+    if ($origin === '') return false;
+    if (in_array($origin, $allowed_origins, true)) return true;
+    if (preg_match('#^https://[a-z0-9-]+\\.netlify\\.app$#i', $origin)) return true;
+    return false;
+}
+
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if ($origin && in_array($origin, $allowed_origins, true)) {
+if ($origin && origin_allowed($origin)) {
     header("Access-Control-Allow-Origin: $origin");
     header('Vary: Origin');
     header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -32,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Block old permanent-token GET URLs (console/Network copy-paste)
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     exit('Error: Method not allowed');
@@ -43,25 +50,19 @@ $SECRET = 'PREM_MIND_SECURE_2026';
 function is_allowed_site_request(): bool {
     global $allowed_origins;
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-    if ($origin && in_array($origin, $allowed_origins, true)) {
-        return true;
-    }
+    if (origin_allowed($origin)) return true;
+
     $referer = $_SERVER['HTTP_REFERER'] ?? '';
-    if ($referer === '') {
-        return false;
-    }
+    if ($referer === '') return false;
+
     foreach ($allowed_origins as $allowed) {
-        if (strpos($referer, $allowed) === 0) {
-            return true;
-        }
+        if (strpos($referer, $allowed) === 0) return true;
     }
-    if (strpos($referer, 'netlify.app') !== false) {
-        return true;
-    }
+    if (strpos($referer, 'netlify.app') !== false) return true;
     return false;
 }
 
-function b64url_decode(string $data): string|false {
+function b64url_decode(string $data) {
     $remainder = strlen($data) % 4;
     if ($remainder) {
         $data .= str_repeat('=', 4 - $remainder);
@@ -69,22 +70,68 @@ function b64url_decode(string $data): string|false {
     return base64_decode(strtr($data, '-_', '+/'), true);
 }
 
+function normalize_pdf_path(string $file): string {
+    $file = trim(rawurldecode($file));
+    $file = str_replace('\\', '/', $file);
+
+    if (stripos($file, 'proxy_pdf.php') !== false && preg_match('/[?&]file=([^&]+)/i', $file, $m)) {
+        $file = rawurldecode($m[1]);
+        $file = str_replace('\\', '/', $file);
+    }
+
+    if (preg_match('#^https?://#i', $file)) {
+        $path = parse_url($file, PHP_URL_PATH) ?: '';
+        $file = ltrim($path, '/');
+    }
+
+    $file = ltrim($file, '/');
+
+    if ($file !== '' && strpos($file, '/') === false && preg_match('/\.pdf$/i', $file)) {
+        $file = 'uploads/pdfs/' . $file;
+    }
+
+    if (preg_match('#uploads/pdfs/uploads/pdfs/#i', $file)) {
+        $file = preg_replace('#(?:uploads/pdfs/)+#i', 'uploads/pdfs/', $file, 1);
+    }
+
+    return $file;
+}
+
+/**
+ * One-time nonce store. Prefer local writable folder under this script.
+ * If storage is unavailable, allow the request (still protected by HMAC + expiry).
+ */
 function mark_token_used(string $nonce): bool {
-    $dir = sys_get_temp_dir() . '/premind_pdf_tokens';
-    if (!is_dir($dir) && !mkdir($dir, 0700, true) && !is_dir($dir)) {
-        return false;
-    }
-    $path = $dir . '/' . hash('sha256', $nonce);
-    if (file_exists($path)) {
-        return false; // already used
-    }
-    // best-effort cleanup of very old nonce files
-    foreach (glob($dir . '/*') ?: [] as $old) {
-        if (is_file($old) && (time() - filemtime($old)) > 300) {
-            @unlink($old);
+    $dirs = [
+        __DIR__ . '/.pdf_tokens',
+        sys_get_temp_dir() . '/premind_pdf_tokens',
+    ];
+
+    foreach ($dirs as $dir) {
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0700, true);
         }
+        if (!is_dir($dir) || !is_writable($dir)) {
+            continue;
+        }
+
+        $path = $dir . '/' . hash('sha256', $nonce);
+        if (file_exists($path)) {
+            return false; // already used
+        }
+
+        foreach (glob($dir . '/*') ?: [] as $old) {
+            if (is_file($old) && (time() - filemtime($old)) > 300) {
+                @unlink($old);
+            }
+        }
+
+        $ok = @file_put_contents($path, (string)time(), LOCK_EX);
+        return $ok !== false;
     }
-    return file_put_contents($path, (string)time(), LOCK_EX) !== false;
+
+    // Could not persist nonce — do not hard-fail PDF viewing
+    return true;
 }
 
 if (!is_allowed_site_request()) {
@@ -98,7 +145,7 @@ if (!is_array($data)) {
     $data = $_POST;
 }
 
-$file  = trim((string)($data['file'] ?? ''));
+$file  = normalize_pdf_path((string)($data['file'] ?? ''));
 $email = strtolower(trim((string)($data['email'] ?? '')));
 $token = trim((string)($data['token'] ?? ''));
 
@@ -132,7 +179,8 @@ if (!is_array($payload)) {
     exit('Error: Unauthorized Access (Invalid Token)');
 }
 
-if (($payload['f'] ?? '') !== $file || strtolower((string)($payload['e'] ?? '')) !== $email) {
+$tokenFile = normalize_pdf_path((string)($payload['f'] ?? ''));
+if ($tokenFile !== $file || strtolower((string)($payload['e'] ?? '')) !== $email) {
     http_response_code(403);
     exit('Error: Unauthorized Access (Token mismatch)');
 }
@@ -148,16 +196,22 @@ if ($nonce === '' || !mark_token_used($nonce)) {
     exit('Error: Token already used');
 }
 
-if (!file_exists($file) || !is_readable($file)) {
-    http_response_code(404);
-    exit('Error: Document not found');
+// Resolve file relative to this PHP location (premind/)
+$fullPath = __DIR__ . '/' . $file;
+if (!is_file($fullPath) || !is_readable($fullPath)) {
+    // Fallback: cwd relative (older setups)
+    if (!is_file($file) || !is_readable($file)) {
+        http_response_code(404);
+        exit('Error: Document not found');
+    }
+    $fullPath = $file;
 }
 
 header('Content-Type: application/pdf');
 header('Content-Disposition: inline; filename="PREMium_Secure_Doc.pdf"');
-header('Content-Length: ' . filesize($file));
+header('Content-Length: ' . filesize($fullPath));
 header('X-Robots-Tag: noindex, nofollow');
 header('Accept-Ranges: none');
 
-readfile($file);
+readfile($fullPath);
 exit;

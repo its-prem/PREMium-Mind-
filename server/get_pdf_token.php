@@ -1,8 +1,7 @@
 <?php
 /**
- * Upload to Hostinger root as: get_pdf_token.php
- * Issues short-lived (60s), one-time PDF access tokens.
- * Secret NEVER goes to the browser.
+ * Upload to Hostinger premind/ as: get_pdf_token.php
+ * Issues short-lived (90s) HMAC tokens. Secret stays on server only.
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -16,8 +15,17 @@ $allowed_origins = [
     'https://premind.netlify.app',
 ];
 
+function origin_allowed(string $origin): bool {
+    global $allowed_origins;
+    if ($origin === '') return false;
+    if (in_array($origin, $allowed_origins, true)) return true;
+    // Allow any Netlify deploy preview / branch URL
+    if (preg_match('#^https://[a-z0-9-]+\\.netlify\\.app$#i', $origin)) return true;
+    return false;
+}
+
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if ($origin && in_array($origin, $allowed_origins, true)) {
+if ($origin && origin_allowed($origin)) {
     header("Access-Control-Allow-Origin: $origin");
     header('Vary: Origin');
     header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -39,30 +47,53 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Same shared secret used by proxy_pdf.php (HMAC only — never accept as plain GET token)
 $SECRET = 'PREM_MIND_SECURE_2026';
-$TOKEN_TTL = 60; // seconds
+$TOKEN_TTL = 90;
 
 function is_allowed_site_request(): bool {
     global $allowed_origins;
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-    if ($origin && in_array($origin, $allowed_origins, true)) {
-        return true;
-    }
+    if (origin_allowed($origin)) return true;
+
     $referer = $_SERVER['HTTP_REFERER'] ?? '';
-    if ($referer === '') {
-        return false;
-    }
+    if ($referer === '') return false;
+
     foreach ($allowed_origins as $allowed) {
-        if (strpos($referer, $allowed) === 0) {
-            return true;
-        }
+        if (strpos($referer, $allowed) === 0) return true;
     }
-    // legacy netlify frontends if still used
-    if (strpos($referer, 'netlify.app') !== false) {
-        return true;
-    }
+    if (strpos($referer, 'netlify.app') !== false) return true;
     return false;
+}
+
+function normalize_pdf_path(string $file): string {
+    $file = trim(rawurldecode($file));
+    $file = str_replace('\\', '/', $file);
+
+    // Full proxy URL? extract file=
+    if (stripos($file, 'proxy_pdf.php') !== false && preg_match('/[?&]file=([^&]+)/i', $file, $m)) {
+        $file = rawurldecode($m[1]);
+        $file = str_replace('\\', '/', $file);
+    }
+
+    // Absolute URL to pdf on our host → keep path only
+    if (preg_match('#^https?://#i', $file)) {
+        $path = parse_url($file, PHP_URL_PATH) ?: '';
+        $file = ltrim($path, '/');
+    }
+
+    $file = ltrim($file, '/');
+
+    // If DB stored only filename, assume uploads/pdfs/
+    if ($file !== '' && strpos($file, '/') === false && preg_match('/\.pdf$/i', $file)) {
+        $file = 'uploads/pdfs/' . $file;
+    }
+
+    // Collapse accidental double prefixes
+    if (preg_match('#uploads/pdfs/uploads/pdfs/#i', $file)) {
+        $file = preg_replace('#(?:uploads/pdfs/)+#i', 'uploads/pdfs/', $file, 1);
+    }
+
+    return $file;
 }
 
 if (!is_allowed_site_request()) {
@@ -77,9 +108,9 @@ if (!is_array($data)) {
     $data = $_POST;
 }
 
-$file  = trim((string)($data['file'] ?? ''));
+$file  = normalize_pdf_path((string)($data['file'] ?? ''));
 $email = strtolower(trim((string)($data['email'] ?? '')));
-$purpose = trim((string)($data['purpose'] ?? 'view')); // view | download
+$purpose = trim((string)($data['purpose'] ?? 'view'));
 
 if ($file === '' || $email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     http_response_code(400);
@@ -87,10 +118,9 @@ if ($file === '' || $email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL))
     exit;
 }
 
-// Path must stay inside uploads/pdfs/
 if (strpos($file, 'uploads/pdfs/') !== 0 || strpos($file, '..') !== false) {
     http_response_code(400);
-    echo json_encode(['status' => 'error', 'message' => 'Invalid file path']);
+    echo json_encode(['status' => 'error', 'message' => 'Invalid file path', 'file' => $file]);
     exit;
 }
 
@@ -116,5 +146,6 @@ $token        = $payload_b64 . '.' . $sig;
 echo json_encode([
     'status'  => 'success',
     'token'   => $token,
+    'file'    => $file,
     'expires' => $exp,
 ]);

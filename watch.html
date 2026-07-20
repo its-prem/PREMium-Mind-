@@ -454,7 +454,7 @@
      // =========================================================
      // 3. FETCH PHONE & SET WATERMARK
      // =========================================================
-     const userEmail = localStorage.getItem('customUserEmail');
+     const userEmail = localStorage.getItem('customUserEmail') || localStorage.getItem('userEmail');
      
      if(!userEmail) {
          alert("Unauthorized Access!");
@@ -496,23 +496,54 @@
      // =========================================================
      const API_BASE = 'https://premind.diplomawallah.in';
      const urlParams = new URLSearchParams(window.location.search);
-     // Prefer ?file=uploads/pdfs/...  (legacy ?pdf= full proxy URL still supported)
      let pdfFile = urlParams.get('file');
      let legacyPdf = urlParams.get('pdf');
      let allowDownload = urlParams.get('download') === 'true' || urlParams.get('download') === '1';
      let customTitle = urlParams.get('title');
 
-     if (!pdfFile && legacyPdf) {
-         try {
-             const u = new URL(legacyPdf, API_BASE);
-             if (u.pathname.includes('proxy_pdf.php') && u.searchParams.get('file')) {
-                 pdfFile = u.searchParams.get('file');
-             } else if (legacyPdf.indexOf('uploads/pdfs/') === 0) {
-                 pdfFile = legacyPdf;
+     function normalizePdfPath(raw) {
+         if (!raw) return null;
+         let f = String(raw).trim();
+         try { f = decodeURIComponent(f); } catch (e) {}
+         f = f.replace(/\\/g, '/');
+
+         // Full proxy URL → extract file=
+         if (/proxy_pdf\.php/i.test(f)) {
+             try {
+                 const u = new URL(f, API_BASE);
+                 const q = u.searchParams.get('file');
+                 if (q) f = q;
+             } catch (e) {
+                 const m = f.match(/[?&]file=([^&]+)/i);
+                 if (m) {
+                     try { f = decodeURIComponent(m[1]); } catch (e2) { f = m[1]; }
+                 }
              }
-         } catch (e) {
-             if (String(legacyPdf).indexOf('uploads/pdfs/') === 0) pdfFile = legacyPdf;
          }
+
+         // Absolute URL → path only
+         if (/^https?:\/\//i.test(f)) {
+             try {
+                 const u = new URL(f);
+                 f = (u.pathname || '').replace(/^\/+/, '');
+             } catch (e) {}
+         }
+
+         f = f.replace(/^\/+/, '');
+
+         // Filename only → assume uploads/pdfs/
+         if (f && f.indexOf('/') === -1 && /\.pdf$/i.test(f)) {
+             f = 'uploads/pdfs/' + f;
+         }
+
+         f = f.replace(/(?:uploads\/pdfs\/)+/i, 'uploads/pdfs/');
+         return f || null;
+     }
+
+     if (!pdfFile && legacyPdf) {
+         pdfFile = normalizePdfPath(legacyPdf);
+     } else {
+         pdfFile = normalizePdfPath(pdfFile);
      }
 
      async function getPdfToken(purpose) {
@@ -523,12 +554,13 @@
          });
          const data = await res.json().catch(() => ({}));
          if (!res.ok || data.status !== 'success' || !data.token) {
-             throw new Error(data.message || 'Token request failed');
+             throw new Error(data.message || ('Token failed (' + res.status + ')'));
          }
+         // Server may normalize path — keep in sync for proxy call
+         if (data.file) pdfFile = data.file;
          return data.token;
      }
 
-     // POST + one-time token — Network tab URL se dubara download nahi hoga
      async function fetchSecurePdfBytes(purpose) {
          const token = await getPdfToken(purpose);
          const res = await fetch(`${API_BASE}/proxy_pdf.php`, {
@@ -536,9 +568,11 @@
              headers: { 'Content-Type': 'application/json' },
              body: JSON.stringify({ file: pdfFile, email: userEmail, token })
          });
-         if (!res.ok) throw new Error('Unauthorized Access or Invalid Token');
-         const buf = await res.arrayBuffer();
-         return buf;
+         if (!res.ok) {
+             const msg = await res.text().catch(() => '');
+             throw new Error(msg || ('PDF fetch failed (' + res.status + ')'));
+         }
+         return await res.arrayBuffer();
      }
 
      if (pdfFile) {
@@ -581,7 +615,8 @@
                  URL.revokeObjectURL(blobUrl);
                  downloadBtn.innerHTML = "✅ Done";
              } catch (error) {
-                 alert("Download Failed: Connection secure layer active.");
+                 console.error(error);
+                 alert("Download Failed: " + (error.message || "Connection secure layer active."));
                  downloadBtn.innerHTML = "❌ Failed";
              }
 
@@ -593,7 +628,7 @@
      }
 
      // =========================================================
-     // 6. RENDER HD PDF (ArrayBuffer — no permanent secret / reusable URL)
+     // 6. RENDER HD PDF
      // =========================================================
      if (pdfFile) {
          const container = document.getElementById('pdfContainer');
@@ -603,9 +638,9 @@
          .then(async (pdfData) => {
              pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-             const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
-             // Drop reference so casual console reuse is harder
-             pdfData = null;
+             // Copy bytes — pdf.js may transfer/detach the ArrayBuffer
+             const bytes = new Uint8Array(pdfData);
+             const pdfDoc = await pdfjsLib.getDocument({ data: bytes }).promise;
 
              for (let num = 1; num <= pdfDoc.numPages; num++) {
                  const page = await pdfDoc.getPage(num);
@@ -632,9 +667,10 @@
              loadingState.style.display = 'none';
          })
          .catch(err => {
-             loadingState.classList.add('is-error');
-             loadingState.innerHTML = "<p class='loader-text'>Access Denied. Secure Connection Failed.</p>";
              console.error(err);
+             loadingState.classList.add('is-error');
+             const tip = (err && err.message) ? String(err.message).slice(0, 120) : 'Secure Connection Failed';
+             loadingState.innerHTML = "<p class='loader-text'>PDF open nahi hua.<br><span style='font-weight:500;font-size:0.85rem;opacity:.85'>" + tip + "</span></p>";
          });
      } else {
          const loadingState = document.getElementById('loadingState');
