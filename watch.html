@@ -802,8 +802,9 @@
 
                  // Full retina quality — lazy render karta hai isliye memory safe
                  const isMobile = window.innerWidth < 700 || /Android|iPhone|iPad/i.test(navigator.userAgent);
-                 const basePixelRatio = Math.min(Math.max(window.devicePixelRatio || 1, 2), 3);
-                 const MAX_EDGE = isMobile ? 4000 : 5200;
+                 // Supersample: display se zyada device pixels → text/scan crisp
+                 const basePixelRatio = Math.min(Math.max(window.devicePixelRatio || 1, 2.5), 4);
+                 const MAX_EDGE = isMobile ? 5200 : 6500;
 
                  const pageSlots = [];
                  const renderTasks = new Map();
