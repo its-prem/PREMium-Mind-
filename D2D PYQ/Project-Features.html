@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Q1 · Define a Project — D2D PYQ</title>
+  <link rel="icon" type="image/png" href="../small-logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --black: #09090b;
+      --black-muted: #27272a;
+      --gray-dark: #52525b;
+      --gray-light: #e4e4e7;
+      --white: #ffffff;
+      --primary: #2563eb;
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.9);
+      --glass-blur: blur(20px);
+      --smooth: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      background-attachment: fixed;
+      color: var(--black);
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .fade-in { animation: fadeIn 0.4s ease forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .top-nav {
+      position: sticky;
+      top: 0;
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid var(--glass-border);
+      z-index: 1000;
+      padding: 15px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+
+    .back-btn {
+      background: var(--white);
+      border: 1px solid var(--gray-light);
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--black);
+      font-family: inherit;
+    }
+    .back-btn:hover { background: var(--black); color: var(--white); }
+
+    .nav-title {
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--black-muted);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px 20px 80px;
+      width: 100%;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .hero h1 {
+      font-size: clamp(26px, 5vw, 34px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin: 0 0 14px;
+    }
+    .funny-tag {
+      font-size: 14px;
+      color: var(--gray-dark);
+      font-weight: 600;
+      background: var(--white);
+      display: inline-block;
+      padding: 10px 22px;
+      border-radius: 30px;
+      border: 1px solid var(--gray-light);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+
+    .q-card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 22px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .q-meta {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gray-dark);
+      margin-bottom: 15px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .q-meta span {
+      background: #f1f5f9;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+    .q-meta .accent {
+      background: #eff6ff;
+      color: var(--primary);
+    }
+
+    .q-text {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .answer-block p {
+      font-size: 15.5px;
+      font-weight: 500;
+      color: var(--black-muted);
+      line-height: 1.7;
+      margin: 0 0 14px;
+    }
+    .answer-block p:last-child { margin-bottom: 0; }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--black-muted);
+      margin: 28px 0 16px;
+    }
+
+    .feature-card {
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 22px 22px 20px;
+      margin-bottom: 14px;
+      transition: transform var(--smooth), box-shadow var(--smooth), background var(--smooth);
+    }
+    .feature-card:hover {
+      transform: translateY(-3px);
+      background: var(--white);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+
+    .feature-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+    .feature-num {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      border-radius: 12px;
+      background: var(--black);
+      color: var(--white);
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .feature-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.35;
+      padding-top: 6px;
+    }
+    .feature-body {
+      margin: 0;
+      margin-left: 50px;
+      font-size: 14.5px;
+      font-weight: 500;
+      color: var(--gray-dark);
+      line-height: 1.65;
+    }
+
+    .summary-card {
+      background: var(--black);
+      color: var(--white);
+      border-radius: 20px;
+      padding: 28px;
+      margin-top: 28px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+    .summary-card h3 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #a1a1aa;
+    }
+    .summary-card p {
+      margin: 0;
+      font-size: 15.5px;
+      font-weight: 600;
+      line-height: 1.7;
+      color: #f4f4f5;
+    }
+
+    .examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .chip {
+      background: #f1f5f9;
+      color: var(--black-muted);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--gray-light);
+    }
+
+    @media (max-width: 600px) {
+      .top-nav { padding: 12px 16px; }
+      .nav-title { font-size: 13px; }
+      .container { padding: 22px 16px 70px; }
+      .q-card { padding: 22px 18px; }
+      .feature-body { margin-left: 0; }
+      .feature-head { margin-bottom: 8px; }
+      .q-text { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="top-nav">
+    <a class="back-btn" href="D2DPYQV2.HTML">← Back</a>
+    <div class="nav-title">D2D PYQ · Theory</div>
+  </nav>
+
+  <main class="container fade-in">
+    <div class="hero">
+      <h1>Project Management 📘</h1>
+      <p class="funny-tag">Simple language · Exam-ready answer</p>
+    </div>
+
+    <article class="q-card">
+      <div class="q-meta">
+        <span class="accent">Q1</span>
+        <span>Long Answer</span>
+        <span>Features</span>
+      </div>
+      <div class="q-text">
+        Define a project. Explain the features of a project in detail.
+      </div>
+
+      <div class="answer-block">
+        <p>
+          A project is a special piece of work that is done to achieve one particular goal within a fixed time.
+          It is different from normal daily work because it has a clear beginning and a clear end.
+          Once the goal is achieved, the project is closed.
+        </p>
+        <p>
+          For example, building a new bridge, developing a new mobile app, or constructing a new house —
+          all these are projects because each one has a specific target and a fixed time limit.
+        </p>
+        <div class="examples">
+          <span class="chip">🌉 New Bridge</span>
+          <span class="chip">📱 Mobile App</span>
+          <span class="chip">🏠 New House</span>
+        </div>
+      </div>
+    </article>
+
+    <div class="section-label">Important Features of a Project</div>
+
+    <div class="feature-card">
+      <div class="feature-head">
+        <div class="feature-num">01</div>
+        <h2 class="feature-title">Unique Objective</h2>
+      </div>
+      <p class="feature-body">
+        Every project has its own special goal. No two projects are exactly the same, even if they look similar from outside,
+        because the situation, location, and requirements are always different.
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-head">
+        <div class="feature-num">02</div>
+        <h2 class="feature-title">Fixed Time Period</h2>
+      </div>
+      <p class="feature-body">
+        A project always has a start date and an end date. This is called the “life span” of the project.
+        The work must be completed within this given time, otherwise it is considered a delay.
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-head">
+        <div class="feature-num">03</div>
+        <h2 class="feature-title">Limited Resources</h2>
+      </div>
+      <p class="feature-body">
+        Every project gets a limited amount of money, workers, and materials.
+        Because these resources are limited, proper planning is very important so that nothing is wasted.
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-head">
+        <div class="feature-num">04</div>
+        <h2 class="feature-title">Team Effort</h2>
+      </div>
+      <p class="feature-body">
+        A project is never completed by one person alone. People from different departments — such as engineers,
+        managers, and workers — work together as a team to finish the project.
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-head">
+        <div class="feature-num">05</div>
+        <h2 class="feature-title">Risk and Uncertainty</h2>
+      </div>
+      <p class="feature-body">
+        Since a project deals with the future, there is always some risk involved.
+        For example, the cost may increase, or the work may take more time than planned.
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-head">
+        <div class="feature-num">06</div>
+        <h2 class="feature-title">Step-by-Step Activities</h2>
+      </div>
+      <p class="feature-body">
+        The work in a project is done in a proper sequence. One task must be completed before the next task can start.
+        This is called a logical order.
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-head">
+        <div class="feature-num">07</div>
+        <h2 class="feature-title">Based on Customer’s Need</h2>
+      </div>
+      <p class="feature-body">
+        A project is designed according to what the customer wants.
+        The final result must match the customer’s requirement.
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-head">
+        <div class="feature-num">08</div>
+        <h2 class="feature-title">Life Cycle</h2>
+      </div>
+      <p class="feature-body">
+        Every project passes through four main stages:
+        Starting the project (Initiation), Making a plan (Planning),
+        Doing the actual work (Execution), and Finishing the project (Closure).
+      </p>
+    </div>
+
+    <div class="summary-card">
+      <h3>In Simple Words</h3>
+      <p>
+        A project is a temporary activity, done by a team, with a fixed goal, fixed time, and limited resources,
+        to give a final result that satisfies the customer’s need.
+      </p>
+    </div>
+  </main>
+
+</body>
+</html>
