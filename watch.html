@@ -2,14 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
   <title>Secure Reader - PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
   <style>
     :root {
@@ -308,17 +306,20 @@
       left: 0;
       width: 100vw;
       height: calc(100vh - var(--header-h) - var(--safe-top));
-      overflow-x: auto;
-      overflow-y: auto;
-      scroll-behavior: auto;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
-      touch-action: pan-x pan-y;
+      overflow: hidden;
       z-index: 10;
       pointer-events: auto;
-      background:
-        linear-gradient(180deg, #fafafa 0%, var(--page-bg) 100%);
+      background: var(--page-bg);
       padding-bottom: var(--safe-bottom);
+    }
+
+    .pdf-frame {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #fff;
     }
 
     .pdf-viewer-container {
@@ -478,82 +479,16 @@
      <p class="loader-text">Loading notes...</p>
   </div>
 
-  <div class="scroll-area" id="scrollArea">
-      <div class="pdf-viewer-container" id="pdfContainer"></div>
-  </div>
+  <div class="scroll-area" id="scrollArea"></div>
 
   <script>
      // =========================================================
-     // 1. GLOBAL NATIVE ZOOM BLOCKER (screenshot / pinch protection)
-     // =========================================================
-     document.addEventListener('touchmove', function(e) {
-         if (e.touches && e.touches.length > 1) { e.preventDefault(); }
-     }, { passive: false });
-
-     // =========================================================
-     // 2. FAST CSS ZOOM (no re-render — same as original concept)
+     // 1/2. NATIVE PDF VIEWER MODE — full quality + smooth pinch zoom
+     // Zoom native engine khud handle karta hai, isliye custom zoom hataya
      // =========================================================
      const scrollArea = document.getElementById('scrollArea');
-     const zoomLabel = document.getElementById('zoomLabel');
-     const ZOOM_MIN = 1;
-     const ZOOM_MAX = 3.5;
-     const ZOOM_STEP = 0.25;
-
-     let currentScale = 1;
-     let initialDistance = 0;
-     let initialScale = 1;
-
-     function clampScale(z) {
-         return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(z * 100) / 100));
-     }
-
-     function applyScale(z) {
-         currentScale = clampScale(z);
-         document.documentElement.style.setProperty('--pdf-scale', currentScale);
-         if (zoomLabel) zoomLabel.textContent = Math.round(currentScale * 100) + '%';
-         // Instant CSS stretch (upar) + zoom pe sharp re-render (neeche)
-         if (typeof window.__pdfOnZoom === 'function') {
-             window.__pdfOnZoom();
-         }
-     }
-
-     document.getElementById('zoomInBtn').addEventListener('click', () => {
-         applyScale(currentScale + ZOOM_STEP);
-     });
-     document.getElementById('zoomOutBtn').addEventListener('click', () => {
-         applyScale(currentScale - ZOOM_STEP);
-     });
-     zoomLabel.addEventListener('click', () => applyScale(1));
-
-     scrollArea.addEventListener('touchstart', (e) => {
-         if (e.touches.length === 2) {
-             initialDistance = Math.hypot(
-                 e.touches[0].clientX - e.touches[1].clientX,
-                 e.touches[0].clientY - e.touches[1].clientY
-             );
-             initialScale = currentScale;
-         }
-     }, { passive: false });
-
-     scrollArea.addEventListener('touchmove', (e) => {
-         if (e.touches.length === 2 && initialDistance > 0) {
-             e.preventDefault();
-             const dist = Math.hypot(
-                 e.touches[0].clientX - e.touches[1].clientX,
-                 e.touches[0].clientY - e.touches[1].clientY
-             );
-             applyScale(initialScale * (dist / initialDistance));
-         }
-     }, { passive: false });
-
-     scrollArea.addEventListener('wheel', (e) => {
-         if (e.ctrlKey || e.metaKey) {
-             e.preventDefault();
-             applyScale(currentScale + (e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP));
-         }
-     }, { passive: false });
-
-     applyScale(1);
+     const zoomControlsEl = document.querySelector('.zoom-controls');
+     if (zoomControlsEl) zoomControlsEl.style.display = 'none';
 
      // =========================================================
      // 3. FETCH PHONE & SET WATERMARK
@@ -772,178 +707,45 @@
      }
 
      // =========================================================
-     // 6. FAST + SHARP + NO CRASH — fit-width, lazy pages
+     // 6. NATIVE PDF ENGINE — exact quality + smooth pinch zoom
      // =========================================================
      if (pdfFile) {
-         const container = document.getElementById('pdfContainer');
-
-         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+         let activeBlobUrl = null;
 
          (async () => {
              try {
-                 setLoadMsg('Connecting...');
-                 const pdfData = await fetchSecurePdfBytes();
-                 setLoadMsg('Opening pages...');
+                 setLoadMsg('Loading PDF...');
+                 const buf = await fetchSecurePdfBytes();
+                 const blob = new Blob([buf], { type: 'application/pdf' });
+                 activeBlobUrl = URL.createObjectURL(blob);
 
-                 const bytes = new Uint8Array(pdfData);
-                 const pdfDoc = await pdfjsLib.getDocument({
-                     data: bytes,
-                     disableAutoFetch: true,
-                     disableStream: true
-                 }).promise;
+                 // #toolbar=0 → download/print buttons chhupte hain (Chromium)
+                 const viewerUrl = activeBlobUrl + '#toolbar=0&navpanes=0&statusbar=0&view=FitH';
 
-                 // Fit page to screen width; zoom pe higher scale re-render hota hai
-                 const firstPage = await pdfDoc.getPage(1);
-                 const baseVp = firstPage.getViewport({ scale: 1 });
-                 const pad = window.innerWidth < 700 ? 20 : 36;
-                 const cssWidth = Math.min(900, Math.max(260, scrollArea.clientWidth - pad));
-                 const fitScale = cssWidth / baseVp.width;
-                 document.documentElement.style.setProperty('--page-w', cssWidth + 'px');
+                 const frame = document.createElement('iframe');
+                 frame.className = 'pdf-frame';
+                 frame.setAttribute('title', 'Secure PDF');
+                 frame.setAttribute('allow', 'fullscreen');
 
-                 // Full retina quality — lazy render karta hai isliye memory safe
-                 const isMobile = window.innerWidth < 700 || /Android|iPhone|iPad/i.test(navigator.userAgent);
-                 // Supersample: display se zyada device pixels → text/scan crisp
-                 const basePixelRatio = Math.min(Math.max(window.devicePixelRatio || 1, 2.5), 4);
-                 const MAX_EDGE = isMobile ? 5200 : 6500;
+                 let loaded = false;
+                 frame.addEventListener('load', () => {
+                     loaded = true;
+                     loadingState.style.display = 'none';
+                 });
 
-                 const pageSlots = [];
-                 const renderTasks = new Map();
-                 const BUFFER = 1;
+                 scrollArea.appendChild(frame);
+                 frame.src = viewerUrl;
 
-                 // Placeholders pehle — scroll smooth, height ready
-                 for (let num = 1; num <= pdfDoc.numPages; num++) {
-                     const wrapper = document.createElement('div');
-                     wrapper.className = 'page-wrapper is-loading';
-                     wrapper.dataset.page = String(num);
-                     wrapper.style.aspectRatio = baseVp.width + ' / ' + baseVp.height;
-                     container.appendChild(wrapper);
-                     pageSlots[num] = { wrapper, ready: false, rendering: false, renderedScale: 0 };
-                 }
-
-                 async function paintPage(num) {
-                     const slot = pageSlots[num];
-                     if (!slot || slot.rendering) return;
-                     const targetScale = fitScale * currentScale;
-                     if (slot.ready && Math.abs(slot.renderedScale - targetScale) < 0.001) return;
-                     slot.rendering = true;
-
-                     try {
-                         const page = await pdfDoc.getPage(num);
-                         const viewport = page.getViewport({ scale: targetScale });
-
-                         // Device pixels — cap so Chrome "Aw Snap" na aaye
-                         let pr = basePixelRatio;
-                         const longEdge = Math.max(viewport.width, viewport.height) * pr;
-                         if (longEdge > MAX_EDGE) {
-                             pr = MAX_EDGE / Math.max(viewport.width, viewport.height);
-                         }
-
-                         const canvas = document.createElement('canvas');
-                         const ctx = canvas.getContext('2d', { alpha: false });
-                         canvas.width = Math.floor(viewport.width * pr);
-                         canvas.height = Math.floor(viewport.height * pr);
-                         canvas.style.width = '100%';
-                         canvas.style.height = 'auto';
-
-                         const transform = pr !== 1 ? [pr, 0, 0, pr, 0, 0] : null;
-                         const task = page.render({ canvasContext: ctx, transform, viewport });
-                         renderTasks.set(num, task);
-                         await task.promise;
-                         renderTasks.delete(num);
-
-                         slot.wrapper.innerHTML = '';
-                         slot.wrapper.appendChild(canvas);
-                         slot.wrapper.classList.remove('is-loading');
-                         slot.wrapper.style.aspectRatio = '';
-                         slot.ready = true;
-                         slot.renderedScale = targetScale;
-                     } catch (err) {
-                         if (err && err.name === 'RenderingCancelledException') return;
-                         console.warn('page render failed', num, err);
-                         slot.wrapper.classList.remove('is-loading');
-                     } finally {
-                         slot.rendering = false;
+                 // Fallback: kuch mobile browsers iframe me PDF render nahi karte
+                 setTimeout(() => {
+                     if (!loaded) {
+                         loadingState.style.display = 'none';
                      }
-                 }
+                 }, 4000);
 
-                 function releasePage(num) {
-                     const slot = pageSlots[num];
-                     if (!slot || !slot.ready) return;
-                     const task = renderTasks.get(num);
-                     if (task) {
-                         try { task.cancel(); } catch (e) {}
-                         renderTasks.delete(num);
-                     }
-                     const canvas = slot.wrapper.querySelector('canvas');
-                     if (canvas) {
-                         canvas.width = 0;
-                         canvas.height = 0;
-                     }
-                     slot.wrapper.innerHTML = '';
-                     slot.wrapper.classList.add('is-loading');
-                     slot.wrapper.style.aspectRatio = baseVp.width + ' / ' + baseVp.height;
-                     slot.ready = false;
-                     slot.rendering = false;
-                     slot.renderedScale = 0;
-                 }
-
-                 function visibleRange() {
-                     const rootRect = scrollArea.getBoundingClientRect();
-                     let first = 1;
-                     let last = pdfDoc.numPages;
-                     let found = false;
-                     for (let num = 1; num <= pdfDoc.numPages; num++) {
-                         const r = pageSlots[num].wrapper.getBoundingClientRect();
-                         const onScreen = r.bottom >= rootRect.top - 80 && r.top <= rootRect.bottom + 80;
-                         if (onScreen) {
-                             if (!found) { first = num; found = true; }
-                             last = num;
-                         } else if (found) {
-                             break;
-                         }
-                     }
-                     return {
-                         from: Math.max(1, first - BUFFER),
-                         to: Math.min(pdfDoc.numPages, last + BUFFER)
-                     };
-                 }
-
-                 let syncScheduled = false;
-                 async function syncVisiblePages() {
-                     syncScheduled = false;
-                     const { from, to } = visibleRange();
-                     const jobs = [];
-                     for (let num = 1; num <= pdfDoc.numPages; num++) {
-                         if (num >= from && num <= to) jobs.push(paintPage(num));
-                         else if (num < from - 2 || num > to + 2) releasePage(num);
-                     }
-                     await Promise.all(jobs);
-                 }
-
-                 function scheduleSync() {
-                     if (syncScheduled) return;
-                     syncScheduled = true;
-                     requestAnimationFrame(() => { syncVisiblePages(); });
-                 }
-                 window.__pdfScheduleSync = scheduleSync;
-
-                 // Zoom change → visible pages ko us zoom pe sharp re-render (debounced)
-                 let zoomRenderTimer = null;
-                 window.__pdfOnZoom = function () {
-                     clearTimeout(zoomRenderTimer);
-                     zoomRenderTimer = setTimeout(() => { syncVisiblePages(); }, 250);
-                 };
-
-                 // Page 1 pehle → loader band, text jaldi
-                 await paintPage(1);
-                 loadingState.style.display = 'none';
-
-                 // Nearby pages, phir scroll pe lazy
-                 if (pdfDoc.numPages >= 2) await paintPage(2);
-                 scheduleSync();
-
-                 scrollArea.addEventListener('scroll', scheduleSync, { passive: true });
-                 window.addEventListener('resize', scheduleSync, { passive: true });
+                 window.addEventListener('pagehide', () => {
+                     if (activeBlobUrl) URL.revokeObjectURL(activeBlobUrl);
+                 });
              } catch (err) {
                  console.error(err);
                  loadingState.classList.add('is-error');
