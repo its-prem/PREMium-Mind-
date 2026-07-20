@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
   <title>Secure Reader - PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +13,7 @@
 
   <style>
     :root {
-      --pdf-scale: 1;
+      --pdf-zoom: 1;
       --ink: #111111;
       --muted: #6b7280;
       --line: #ececec;
@@ -42,7 +42,7 @@
       -webkit-user-select: none;
       transition: filter 0.3s ease;
       overflow: hidden;
-      touch-action: none;
+      touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -142,7 +142,46 @@
       justify-self: end;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+    }
+
+    .zoom-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      background: #fff;
+      border: 1px solid #e8e8ea;
+      border-radius: 10px;
+      padding: 2px;
+      box-shadow: 0 1px 2px rgba(17, 17, 17, 0.04);
+    }
+
+    .zoom-btn {
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--ink);
+      font-size: 1.15rem;
+      font-weight: 600;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease;
+    }
+    .zoom-btn:hover { background: var(--amber-soft); }
+    .zoom-btn:active { background: #fde68a; }
+
+    #zoomLabel {
+      min-width: 44px;
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 650;
+      color: var(--muted);
+      user-select: none;
     }
 
     #status {
@@ -269,8 +308,10 @@
       width: 100vw;
       height: calc(100vh - var(--header-h) - var(--safe-top));
       overflow: auto;
+      scroll-behavior: smooth;
       -webkit-overflow-scrolling: touch;
-      touch-action: pan-x pan-y;
+      overscroll-behavior: contain;
+      touch-action: pan-x pan-y pinch-zoom;
       z-index: 10;
       pointer-events: auto;
       background:
@@ -283,9 +324,10 @@
       flex-direction: column;
       align-items: center;
       padding: 18px 14px calc(28px + var(--safe-bottom));
-      gap: 14px;
-      width: calc(100% * var(--pdf-scale));
-      transform-origin: top left;
+      gap: 16px;
+      width: max-content;
+      min-width: 100%;
+      margin: 0 auto;
       animation: pagesIn 0.45s ease both;
     }
 
@@ -296,22 +338,21 @@
 
     .page-wrapper {
       position: relative;
-      width: 100%;
       display: flex;
       justify-content: center;
-      max-width: 900px;
       background: #fff;
       border-radius: 10px;
       overflow: hidden;
       border: 1px solid var(--line);
       box-shadow: 0 6px 20px rgba(17, 17, 17, 0.06);
+      flex-shrink: 0;
     }
 
-    canvas {
-      width: 100% !important;
-      height: auto !important;
+    .page-wrapper canvas {
       display: block;
       border-radius: 10px;
+      image-rendering: auto;
+      -ms-interpolation-mode: bicubic;
     }
 
     .secure-mode { filter: blur(25px) grayscale(100%); pointer-events: none; }
@@ -350,16 +391,21 @@
 
       #status { display: none; }
 
+      .zoom-controls { gap: 0; }
+      .zoom-btn { width: 32px; height: 32px; font-size: 1.05rem; }
+      #zoomLabel { min-width: 38px; font-size: 0.68rem; }
+
       .download-btn {
         min-height: 38px;
-        padding: 0 12px;
+        padding: 0 10px;
         font-size: 0.82rem;
       }
       .download-btn svg { width: 15px; height: 15px; }
+      #dl-text { display: none; }
 
       .pdf-viewer-container {
         padding: 10px 8px calc(22px + var(--safe-bottom));
-        gap: 10px;
+        gap: 12px;
       }
 
       .page-wrapper {
@@ -367,7 +413,7 @@
         box-shadow: 0 3px 12px rgba(17, 17, 17, 0.05);
       }
 
-      canvas { border-radius: 8px; }
+      .page-wrapper canvas { border-radius: 8px; }
 
       .wm-item { font-size: 9px; color: rgba(17, 17, 17, 0.05); }
       .watermark-overlay {
@@ -390,6 +436,11 @@
     </a>
     <div class="brand-title">PREM<em>ium</em> Mind</div>
     <div class="header-actions">
+      <div class="zoom-controls" aria-label="Zoom controls">
+        <button type="button" class="zoom-btn" id="zoomOutBtn" title="Zoom out" aria-label="Zoom out">−</button>
+        <span id="zoomLabel">100%</span>
+        <button type="button" class="zoom-btn" id="zoomInBtn" title="Zoom in" aria-label="Zoom in">+</button>
+      </div>
       <div id="status">Secure</div>
       <button id="downloadBtn" class="download-btn">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -416,40 +467,157 @@
 
   <script>
      // =========================================================
-     // 1. GLOBAL NATIVE ZOOM BLOCKER
-     // =========================================================
-     document.addEventListener('touchmove', function(e) {
-         if (e.touches && e.touches.length > 1) { e.preventDefault(); }
-     }, { passive: false });
-
-     // =========================================================
-     // 2. CUSTOM PINCH-TO-ZOOM FOR PDF ONLY
+     // 1. ZOOM + SMOOTH SCROLL (pinch, buttons, ctrl+wheel)
      // =========================================================
      const scrollArea = document.getElementById('scrollArea');
-     let currentScale = 1, initialDistance = 0, initialScale = 1;
+     const zoomLabel = document.getElementById('zoomLabel');
+     const pdfContainerEl = document.getElementById('pdfContainer');
+     const ZOOM_MIN = 0.75;
+     const ZOOM_MAX = 3.5;
+     const ZOOM_STEP = 0.25;
+
+     let currentZoom = 1;
+     let renderedZoom = 1;
+     let fitScale = 1;
+     let pdfDocRef = null;
+     let renderToken = 0;
+     let zoomRerenderTimer = null;
+     let pinchStartDist = 0;
+     let pinchStartZoom = 1;
+     let isPinching = false;
+
+     function clampZoom(z) {
+         return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(z * 100) / 100));
+     }
+
+     function updateZoomLabel() {
+         if (zoomLabel) zoomLabel.textContent = Math.round(currentZoom * 100) + '%';
+     }
+
+     function applyCssPreview() {
+         // Instant visual zoom while waiting for crisp re-render
+         const ratio = currentZoom / renderedZoom;
+         pdfContainerEl.style.transform = 'scale(' + ratio + ')';
+         pdfContainerEl.style.transformOrigin = 'top center';
+         // Keep scroll height roughly correct while previewing
+         pdfContainerEl.style.marginBottom = ((ratio - 1) * pdfContainerEl.scrollHeight) + 'px';
+     }
+
+     function clearCssPreview() {
+         pdfContainerEl.style.transform = '';
+         pdfContainerEl.style.marginBottom = '';
+     }
+
+     async function renderOnePage(pdfDoc, num, displayScale, dpr, container) {
+         const page = await pdfDoc.getPage(num);
+         const viewport = page.getViewport({ scale: displayScale });
+         const wrapper = document.createElement('div');
+         wrapper.className = 'page-wrapper';
+         const canvas = document.createElement('canvas');
+         const ctx = canvas.getContext('2d', { alpha: false });
+
+         const outputScale = dpr;
+         canvas.width = Math.floor(viewport.width * outputScale);
+         canvas.height = Math.floor(viewport.height * outputScale);
+         canvas.style.width = Math.floor(viewport.width) + 'px';
+         canvas.style.height = Math.floor(viewport.height) + 'px';
+
+         wrapper.appendChild(canvas);
+         container.appendChild(wrapper);
+
+         const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
+         await page.render({
+             canvasContext: ctx,
+             transform,
+             viewport,
+             intent: 'display'
+         }).promise;
+     }
+
+     async function rerenderAllPages() {
+         if (!pdfDocRef) return;
+         const token = ++renderToken;
+         const displayScale = fitScale * currentZoom;
+         const dpr = Math.min(window.devicePixelRatio || 1, 3);
+
+         pdfContainerEl.innerHTML = '';
+         clearCssPreview();
+
+         for (let num = 1; num <= pdfDocRef.numPages; num++) {
+             if (token !== renderToken) return;
+             await renderOnePage(pdfDocRef, num, displayScale, dpr, pdfContainerEl);
+             if (num === 1) {
+                 const ls = document.getElementById('loadingState');
+                 if (ls) ls.style.display = 'none';
+             }
+             await new Promise(r => setTimeout(r, 0));
+         }
+
+         if (token === renderToken) {
+             renderedZoom = currentZoom;
+             clearCssPreview();
+         }
+     }
+
+     function scheduleRerender() {
+         clearTimeout(zoomRerenderTimer);
+         zoomRerenderTimer = setTimeout(() => { rerenderAllPages(); }, 220);
+     }
+
+     function setZoom(next, { previewOnly = false } = {}) {
+         currentZoom = clampZoom(next);
+         updateZoomLabel();
+         applyCssPreview();
+         if (!previewOnly) scheduleRerender();
+     }
+
+     document.getElementById('zoomInBtn').addEventListener('click', () => {
+         setZoom(currentZoom + ZOOM_STEP);
+     });
+     document.getElementById('zoomOutBtn').addEventListener('click', () => {
+         setZoom(currentZoom - ZOOM_STEP);
+     });
+     zoomLabel.addEventListener('click', () => setZoom(1));
 
      scrollArea.addEventListener('touchstart', (e) => {
          if (e.touches.length === 2) {
-             initialDistance = Math.hypot(
+             isPinching = true;
+             pinchStartDist = Math.hypot(
                  e.touches[0].clientX - e.touches[1].clientX,
                  e.touches[0].clientY - e.touches[1].clientY
              );
-             initialScale = currentScale;
+             pinchStartZoom = currentZoom;
          }
-     }, {passive: false});
+     }, { passive: true });
 
      scrollArea.addEventListener('touchmove', (e) => {
-         if (e.touches.length === 2) {
-             e.preventDefault(); 
-             const currentDistance = Math.hypot(
+         if (e.touches.length === 2 && pinchStartDist > 0) {
+             e.preventDefault();
+             const dist = Math.hypot(
                  e.touches[0].clientX - e.touches[1].clientX,
                  e.touches[0].clientY - e.touches[1].clientY
              );
-             currentScale = initialScale * (currentDistance / initialDistance);
-             currentScale = Math.max(1, Math.min(currentScale, 3.5));
-             document.documentElement.style.setProperty('--pdf-scale', currentScale);
+             setZoom(pinchStartZoom * (dist / pinchStartDist), { previewOnly: true });
          }
-     }, {passive: false});
+     }, { passive: false });
+
+     scrollArea.addEventListener('touchend', (e) => {
+         if (isPinching && e.touches.length < 2) {
+             isPinching = false;
+             pinchStartDist = 0;
+             scheduleRerender();
+         }
+     }, { passive: true });
+
+     scrollArea.addEventListener('wheel', (e) => {
+         if (e.ctrlKey || e.metaKey) {
+             e.preventDefault();
+             const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+             setZoom(currentZoom + delta);
+         }
+     }, { passive: false });
+
+     updateZoomLabel();
 
      // =========================================================
      // 3. FETCH PHONE & SET WATERMARK
@@ -621,12 +789,11 @@
      }
 
      // =========================================================
-     // 6. FAST RENDER — show page 1 first, then rest
+     // 6. FULL-QUALITY RENDER + progressive first page
      // =========================================================
      if (pdfFile) {
          const container = document.getElementById('pdfContainer');
 
-         // Warm PDF.js worker early
          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
          (async () => {
@@ -638,37 +805,33 @@
                  const bytes = new Uint8Array(pdfData);
                  const pdfDoc = await pdfjsLib.getDocument({
                      data: bytes,
-                     disableAutoFetch: true,
-                     disableStream: true
+                     disableAutoFetch: false,
+                     disableStream: false
                  }).promise;
 
-                 const isMobile = window.innerWidth < 700;
-                 const scale = isMobile ? 1.25 : 1.6;
-                 const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+                 pdfDocRef = pdfDoc;
 
-                 async function renderPage(num) {
-                     const page = await pdfDoc.getPage(num);
-                     const viewport = page.getViewport({ scale });
-                     const wrapper = document.createElement('div');
-                     wrapper.className = 'page-wrapper';
-                     const canvas = document.createElement('canvas');
-                     const ctx = canvas.getContext('2d', { alpha: false });
-                     canvas.width = Math.floor(viewport.width * dpr);
-                     canvas.height = Math.floor(viewport.height * dpr);
-                     const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null;
-                     wrapper.appendChild(canvas);
-                     container.appendChild(wrapper);
-                     await page.render({ canvasContext: ctx, transform, viewport }).promise;
-                 }
+                 // Fit page width to screen (full crisp quality via devicePixelRatio)
+                 const page1 = await pdfDoc.getPage(1);
+                 const baseViewport = page1.getViewport({ scale: 1 });
+                 const pad = window.innerWidth < 700 ? 16 : 28;
+                 const available = Math.max(280, scrollArea.clientWidth - pad);
+                 fitScale = available / baseViewport.width;
+                 // Slight bump so text stays sharp on retina without being huge
+                 fitScale = Math.min(fitScale, window.innerWidth < 700 ? 2.2 : 2.8);
 
-                 // First page ASAP → hide loader
-                 await renderPage(1);
+                 const displayScale = fitScale * currentZoom;
+                 const dpr = Math.min(window.devicePixelRatio || 1, 3);
+                 const token = ++renderToken;
+
+                 await renderOnePage(pdfDoc, 1, displayScale, dpr, container);
+                 renderedZoom = currentZoom;
+                 clearCssPreview();
                  loadingState.style.display = 'none';
 
-                 // Remaining pages in background (UI stays responsive)
                  for (let num = 2; num <= pdfDoc.numPages; num++) {
-                     await renderPage(num);
-                     // Yield to browser between pages
+                     if (token !== renderToken) return;
+                     await renderOnePage(pdfDoc, num, displayScale, dpr, container);
                      await new Promise(r => setTimeout(r, 0));
                  }
              } catch (err) {
