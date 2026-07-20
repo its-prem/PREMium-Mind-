@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
   <title>Secure Reader - PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,7 +42,7 @@
       -webkit-user-select: none;
       transition: filter 0.3s ease;
       overflow: hidden;
-      touch-action: manipulation;
+      touch-action: none;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -311,7 +311,7 @@
       scroll-behavior: smooth;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
-      touch-action: pan-x pan-y pinch-zoom;
+      touch-action: pan-x pan-y;
       z-index: 10;
       pointer-events: auto;
       background:
@@ -467,7 +467,14 @@
 
   <script>
      // =========================================================
-     // 1. FAST CSS ZOOM (no re-render — same as original concept)
+     // 1. GLOBAL NATIVE ZOOM BLOCKER (screenshot / pinch protection)
+     // =========================================================
+     document.addEventListener('touchmove', function(e) {
+         if (e.touches && e.touches.length > 1) { e.preventDefault(); }
+     }, { passive: false });
+
+     // =========================================================
+     // 2. FAST CSS ZOOM (no re-render — same as original concept)
      // =========================================================
      const scrollArea = document.getElementById('scrollArea');
      const zoomLabel = document.getElementById('zoomLabel');
@@ -505,7 +512,7 @@
              );
              initialScale = currentScale;
          }
-     }, { passive: true });
+     }, { passive: false });
 
      scrollArea.addEventListener('touchmove', (e) => {
          if (e.touches.length === 2 && initialDistance > 0) {
@@ -553,19 +560,53 @@
      fetchUserInfoAndSetWatermark();
 
      // =========================================================
-     // 4. SECURITY: ANTI-SCREENSHOT & BLUR
+     // 4. SECURITY: ANTI-SCREENSHOT & BLUR (original)
      // =========================================================
-     window.addEventListener('blur', () => { document.body.classList.add('secure-mode'); });
-     window.addEventListener('focus', () => { document.body.classList.remove('secure-mode'); });
+     function enableSecureBlur() {
+         document.body.classList.add('secure-mode');
+     }
+     function disableSecureBlur() {
+         document.body.classList.remove('secure-mode');
+     }
+
+     window.addEventListener('blur', enableSecureBlur);
+     window.addEventListener('focus', disableSecureBlur);
+
+     // App switch / screenshot gesture — page hide hone pe blur
+     document.addEventListener('visibilitychange', () => {
+         if (document.hidden) enableSecureBlur();
+         else disableSecureBlur();
+     });
 
      document.addEventListener('keydown', (e) => {
-         if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'c' || e.key === 'u')) e.preventDefault();
+         if (
+             (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'c' || e.key === 'u')) ||
+             (e.metaKey && (e.key === 'p' || e.key === 's' || e.key === 'c' || e.key === 'u')) ||
+             (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'S' || e.key === 's')) ||
+             e.key === 'PrintScreen'
+         ) {
+             e.preventDefault();
+         }
          if (e.key === 'PrintScreen') {
-            navigator.clipboard.writeText('Screenshots not allowed');
-            document.body.classList.add('secure-mode');
-            setTimeout(() => document.body.classList.remove('secure-mode'), 2000);
+             try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
+             enableSecureBlur();
+             setTimeout(disableSecureBlur, 2000);
          }
      });
+
+     document.addEventListener('keyup', (e) => {
+         if (e.key === 'PrintScreen') {
+             try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
+             enableSecureBlur();
+             setTimeout(disableSecureBlur, 2000);
+         }
+     });
+
+     // Drag / select / drop block
+     document.addEventListener('dragstart', (e) => e.preventDefault());
+     document.addEventListener('selectstart', (e) => e.preventDefault());
+     document.addEventListener('copy', (e) => e.preventDefault());
+     document.addEventListener('cut', (e) => e.preventDefault());
 
      // =========================================================
      // 5. PDF FAST SECURE FETCH (single request)
