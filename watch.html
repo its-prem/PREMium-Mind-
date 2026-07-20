@@ -578,22 +578,32 @@
      fetchUserInfoAndSetWatermark();
 
      // =========================================================
-     // 4. SECURITY: ANTI-SCREENSHOT & BLUR (original)
+     // 4. SECURITY: ANTI-SCREENSHOT & BLUR (mobile-safe)
      // =========================================================
+     let secureBlurTimer = null;
      function enableSecureBlur() {
          document.body.classList.add('secure-mode');
      }
      function disableSecureBlur() {
+         clearTimeout(secureBlurTimer);
          document.body.classList.remove('secure-mode');
      }
 
-     window.addEventListener('blur', enableSecureBlur);
-     window.addEventListener('focus', disableSecureBlur);
-
-     // App switch / screenshot gesture — page hide hone pe blur
+     // Reliable across devices: blur only when tab/app actually hidden
      document.addEventListener('visibilitychange', () => {
          if (document.hidden) enableSecureBlur();
          else disableSecureBlur();
+     });
+
+     // Desktop window switch (flaky on mobile) — auto-clear on any interaction
+     window.addEventListener('blur', () => {
+         if (!('ontouchstart' in window)) enableSecureBlur();
+     });
+     window.addEventListener('focus', disableSecureBlur);
+     ['touchstart', 'pointerdown', 'click', 'scroll'].forEach(evt => {
+         window.addEventListener(evt, () => {
+             if (!document.hidden) disableSecureBlur();
+         }, { passive: true });
      });
 
      document.addEventListener('keydown', (e) => {
@@ -608,7 +618,7 @@
          if (e.key === 'PrintScreen') {
              try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
              enableSecureBlur();
-             setTimeout(disableSecureBlur, 2000);
+             secureBlurTimer = setTimeout(disableSecureBlur, 1500);
          }
      });
 
@@ -616,11 +626,14 @@
          if (e.key === 'PrintScreen') {
              try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
              enableSecureBlur();
-             setTimeout(disableSecureBlur, 2000);
+             secureBlurTimer = setTimeout(disableSecureBlur, 1500);
          }
      });
 
-     // Drag / select / drop block
+     // Safety: kabhi bhi stuck na rahe
+     disableSecureBlur();
+
+     // Drag / select block
      document.addEventListener('dragstart', (e) => e.preventDefault());
      document.addEventListener('selectstart', (e) => e.preventDefault());
      document.addEventListener('copy', (e) => e.preventDefault());
@@ -783,10 +796,12 @@
                  const cssWidth = Math.min(900, Math.max(260, scrollArea.clientWidth - pad));
                  const fitScale = cssWidth / baseVp.width;
 
-                 // Retina quality, but capped so Chrome "Aw Snap" na aaye
+                 // Full retina quality — lazy render karta hai isliye memory safe
                  const isMobile = window.innerWidth < 700 || /Android|iPhone|iPad/i.test(navigator.userAgent);
-                 let pixelRatio = Math.min(window.devicePixelRatio || 1, isMobile ? 2 : 2);
-                 const MAX_EDGE = isMobile ? 1800 : 2400;
+                 let pixelRatio = Math.min(window.devicePixelRatio || 1, 3);
+                 // Extra sharpness bump so text crisp lage
+                 pixelRatio = Math.max(pixelRatio, 2);
+                 const MAX_EDGE = isMobile ? 3000 : 4000;
                  if (baseVp.width * fitScale * pixelRatio > MAX_EDGE) {
                      pixelRatio = MAX_EDGE / (baseVp.width * fitScale);
                  }
