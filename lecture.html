@@ -782,12 +782,28 @@
       }
       enrolled.forEach(course => {
         let btnAction;
-        if (course.pdf_file && String(course.pdf_file).trim() !== '') {
-          btnAction = "window.location.href='watch.html?file=" + encodeURIComponent(course.pdf_file) + "&download=" + course.allow_download + "'";
-        } else if (course.pdf_link && String(course.pdf_link).trim() !== '') {
-          btnAction = "alert('This content uses an external link. Secure reader requires an uploaded PDF file.')";
+        function pickPdfPath(c) {
+          const candidates = [c.pdf_file, c.pdf_link, c.link].filter(Boolean).map(String);
+          for (const raw of candidates) {
+            let p = raw.trim();
+            if (!p || p === 'null') continue;
+            if (/^https?:\/\//i.test(p)) {
+              try {
+                const u = new URL(p);
+                p = (u.pathname || '').replace(/^\/+/, '');
+              } catch (e) { continue; }
+            }
+            p = p.replace(/^\/+/, '');
+            if (p.indexOf('uploads/pdfs/') === 0) return p;
+            if (p.indexOf('/') === -1 && /\.pdf$/i.test(p)) return 'uploads/pdfs/' + p;
+          }
+          return '';
+        }
+        const pdfPath = pickPdfPath(course);
+        if (pdfPath) {
+          btnAction = "window.location.href='watch.html?file=" + encodeURIComponent(pdfPath) + "&download=" + course.allow_download + "'";
         } else {
-          btnAction = "alert('Content is being prepared and will be available soon!')";
+          btnAction = "alert('PDF abhi upload nahi hui. Admin panel me pdf_file column check karo (uploads/pdfs/...)')";
         }
         const d1 = course.desc1 ? ('<span>• ' + course.desc1 + '</span>') : '';
         const d2 = course.desc2 ? ('<span>• ' + course.desc2 + '</span>') : '';

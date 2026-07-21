@@ -126,9 +126,28 @@
     canvas {
       width: 100% !important; height: auto !important;
       display: block; border-radius: 8px;
+      -webkit-touch-callout: none;
+      -webkit-user-drag: none;
+      user-drag: none;
     }
 
     .secure-mode { filter: blur(25px) grayscale(100%); pointer-events: none; }
+
+    /* Instant opaque cover shown the moment the tab loses focus / is
+       backgrounded. Stronger than the blur alone since nothing at all is
+       readable behind a solid layer, whereas a screen-recorder running in
+       another window can still pick up some structure through a blur. */
+    #privacyShield {
+      position: fixed; inset: 0; z-index: 100000;
+      background: #e5e7eb;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 10px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+    #privacyShield.show { opacity: 1; pointer-events: auto; }
+    #privacyShield .shield-icon { font-size: 30px; }
+    #privacyShield p { color: #4b5563; font-weight: 600; font-size: 0.9rem; margin: 0; }
 
     /* Mobile Optimizations */
     @media (max-width: 600px) {
@@ -144,7 +163,7 @@
     }
   </style>
 </head>
-<body oncontextmenu="return false;">
+<body oncontextmenu="return false;" ondragstart="return false;">
 
   <div class="header">
     <a href="lecture.html" class="back-btn" onclick="window.history.back(); return false;">
@@ -175,6 +194,14 @@
 
   <div class="scroll-area" id="scrollArea">
       <div class="pdf-viewer-container" id="pdfContainer"></div>
+  </div>
+
+  <!-- Instant opaque cover: shown the moment the tab loses focus / is
+       backgrounded, so nothing readable can be caught in an app-switcher
+       snapshot or a screen recording running in another window. -->
+  <div id="privacyShield">
+    <div class="shield-icon">🔒</div>
+    <p>Content hidden — tab not in focus</p>
   </div>
 
   <script>
@@ -217,7 +244,7 @@
      // =========================================================
      // 3. FETCH PHONE & SET WATERMARK
      // =========================================================
-     const userEmail = localStorage.getItem('customUserEmail');
+     const userEmail = localStorage.getItem('customUserEmail') || localStorage.getItem('userEmail');
      
      if(!userEmail) {
          alert("Unauthorized Access!");
@@ -234,41 +261,155 @@
              }
          } catch (error) { console.error("Failed to fetch phone number"); }
 
-         const wmContent = `${userEmail}<br>+91 ${userPhone}`;
+         // Timestamp baked into the watermark: if a leaked photo/screenshot
+         // ever surfaces, the exact viewing session (who + when) is right
+         // there in the image — a stronger deterrent than email alone.
+         const now = new Date();
+         const stamp = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
+         const wmContent = `${userEmail}<br>+91 ${userPhone}<br>${stamp}`;
          document.querySelectorAll('.wm-item').forEach(el => el.innerHTML = wmContent);
      }
      fetchUserInfoAndSetWatermark();
 
      // =========================================================
      // 4. SECURITY: ANTI-SCREENSHOT & BLUR
+     //
+     // Reminder: none of this can detect or block an actual OS-level
+     // screenshot (Print Screen, a phone's power+volume button, or another
+     // device's camera pointed at the screen) — browsers give web pages no
+     // API for that, on any platform. This hides content when the tab is
+     // backgrounded/unfocused and blocks the easy desktop shortcuts; the
+     // watermark above remains the strongest real-world deterrent.
      // =========================================================
-     window.addEventListener('blur', () => { document.body.classList.add('secure-mode'); });
-     window.addEventListener('focus', () => { document.body.classList.remove('secure-mode'); });
+     const privacyShield = document.getElementById('privacyShield');
+
+     function engageShield() {
+         document.body.classList.add('secure-mode');
+         privacyShield.classList.add('show');
+     }
+     function releaseShield() {
+         document.body.classList.remove('secure-mode');
+         privacyShield.classList.remove('show');
+     }
+
+     window.addEventListener('blur', engageShield);
+     window.addEventListener('focus', releaseShield);
+
+     document.addEventListener('visibilitychange', () => {
+         if (document.hidden) engageShield();
+         else releaseShield();
+     });
+
+     // Covers the gap before a real OS screenshot tool takes focus on
+     // desktop (e.g. Windows Snipping Tool / Win+Shift+S).
+     document.addEventListener('mouseleave', (e) => {
+         if (e.clientY <= 0 || e.clientX <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
+             engageShield();
+         }
+     });
+     document.addEventListener('mouseenter', releaseShield);
 
      document.addEventListener('keydown', (e) => {
-         if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'c' || e.key === 'u')) e.preventDefault();
+         const k = (e.key || '').toLowerCase();
+
+         if ((e.ctrlKey || e.metaKey) && ['p','s','c','u'].includes(k)) e.preventDefault();
+
+         // DevTools shortcuts (Windows/Linux + Mac)
+         if (k === 'f12') e.preventDefault();
+         if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i','j','c'].includes(k)) e.preventDefault();
+         if (e.metaKey && e.altKey && ['i','j','c'].includes(k)) e.preventDefault();
+
          if (e.key === 'PrintScreen') {
-            navigator.clipboard.writeText('Screenshots not allowed');
-            document.body.classList.add('secure-mode');
-            setTimeout(() => document.body.classList.remove('secure-mode'), 2000);
+            try { navigator.clipboard.writeText('Screenshots not allowed'); } catch(err) {}
+            engageShield();
+            setTimeout(releaseShield, 2000);
          }
      });
 
      // =========================================================
-     // 5. PDF SECURE FETCHING LOGIC (UPDATED WITH TOKEN)
+     // 5. PDF SECURE FETCH (short-lived one-time tokens — no secret in JS)
+     //
+     // Replaces the old hardcoded SECRET_KEY + GET-request approach. Now
+     // every view/download requests a fresh, short-lived token from
+     // get_pdf_token.php (POST), then fetches the actual bytes from
+     // proxy_pdf.php (POST) — nothing reusable is ever visible in the URL,
+     // page source, browser history, or server access logs.
      // =========================================================
+     const API_BASE = 'https://premind.diplomawallah.in';
      const urlParams = new URLSearchParams(window.location.search);
-     let rawPdfUrl = urlParams.get('pdf');
-     let allowDownload = urlParams.get('download') === 'true' || urlParams.get('download') === '1'; 
+     let pdfFile = urlParams.get('file');
+     let legacyPdf = urlParams.get('pdf');
+     let allowDownload = urlParams.get('download') === 'true' || urlParams.get('download') === '1';
      let customTitle = urlParams.get('title');
 
-     // 🛑 SECRET KEY - Ye wahi key honi chahiye jo Hostinger PHP file mein hai 🛑
-     const SECRET_KEY = "PREM_MIND_SECURE_2026";
-     
-     // Secure URL banaya (Token attach karke)
-     let securePdfUrl = rawPdfUrl ? `${rawPdfUrl}&token=${SECRET_KEY}` : null;
+     function normalizePdfPath(raw) {
+         if (!raw) return null;
+         let f = String(raw).trim();
+         if (!f || f === 'null' || f === 'undefined') return null;
+         try { f = decodeURIComponent(f); } catch (e) {}
+         f = f.replace(/\\/g, '/');
 
-     if (securePdfUrl) {
+         // proxy_pdf.php?file=... → extract path
+         if (/proxy_pdf\.php/i.test(f)) {
+             try {
+                 const u = new URL(f, API_BASE);
+                 const q = u.searchParams.get('file');
+                 if (q) f = q;
+             } catch (e) {
+                 const m = f.match(/[?&]file=([^&]+)/i);
+                 if (m) {
+                     try { f = decodeURIComponent(m[1]); } catch (e2) { f = m[1]; }
+                 }
+             }
+         }
+
+         // Full URL → path only (https://premind.../uploads/pdfs/x.pdf)
+         if (/^https?:\/\//i.test(f)) {
+             try {
+                 const u = new URL(f);
+                 f = (u.pathname || '').replace(/^\/+/, '');
+             } catch (e) {}
+         }
+
+         f = f.replace(/^\/+/, '');
+         // Sirf filename ho to uploads/pdfs/ prefix
+         if (f && f.indexOf('/') === -1 && /\.pdf$/i.test(f)) {
+             f = 'uploads/pdfs/' + f;
+         }
+         f = f.replace(/(?:uploads\/pdfs\/)+/i, 'uploads/pdfs/');
+         return f || null;
+     }
+
+     if (!pdfFile && legacyPdf) pdfFile = normalizePdfPath(legacyPdf);
+     else pdfFile = normalizePdfPath(pdfFile);
+
+     async function getPdfToken(purpose) {
+         const res = await fetch(`${API_BASE}/get_pdf_token.php`, {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ file: pdfFile, email: userEmail, purpose })
+         });
+         const data = await res.json().catch(() => ({}));
+         if (!res.ok || data.status !== 'success' || !data.token) {
+             throw new Error(data.message || 'Token request failed');
+         }
+         return data.token;
+     }
+
+     // POST + one-time token — Network tab URL se dubara download nahi hoga
+     async function fetchSecurePdfBytes(purpose) {
+         const token = await getPdfToken(purpose);
+         const res = await fetch(`${API_BASE}/proxy_pdf.php`, {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ file: pdfFile, email: userEmail, token })
+         });
+         if (!res.ok) throw new Error('Unauthorized Access or Invalid Token');
+         const buf = await res.arrayBuffer();
+         return buf;
+     }
+
+     if (pdfFile) {
          const downloadBtn = document.getElementById('downloadBtn');
          
          if(!allowDownload) {
@@ -287,21 +428,16 @@
              downloadBtn.disabled = true;
 
              try {
-                 // Secure URL se Blob fetch karna
-                 const response = await fetch(securePdfUrl);
-                 if(!response.ok) throw new Error("Unauthorized Download");
-                 
-                 const blob = await response.blob();
+                 const buf = await fetchSecurePdfBytes('download');
+                 const blob = new Blob([buf], { type: 'application/pdf' });
                  const blobUrl = window.URL.createObjectURL(blob);
                  
                  let baseName = "Premium_Notes"; 
                  if (customTitle) {
                      baseName = decodeURIComponent(customTitle).replace(/[^a-zA-Z0-9 ]/g, "_");
                  } else {
-                     let extractedName = rawPdfUrl.substring(rawPdfUrl.lastIndexOf('/') + 1).split('?')[0];
-                     if (extractedName && !extractedName.includes('.php')) {
-                         baseName = extractedName.replace(".pdf", "");
-                     }
+                     const extractedName = pdfFile.substring(pdfFile.lastIndexOf('/') + 1);
+                     if (extractedName) baseName = extractedName.replace(/\.pdf$/i, "");
                  }
                  
                  let finalFileName = `${baseName}_PREMium_Mind.pdf`;
@@ -328,59 +464,52 @@
      }
 
      // =========================================================
-     // 6. RENDER HD PDF VIA BLOB (SECURE PREVIEW)
+     // 6. RENDER HD PDF — bytes fetched securely, no blob URL ever created
+     //    for viewing (only for an explicit user-triggered download above)
      // =========================================================
-     if(securePdfUrl) {
+     if (pdfFile) {
          const container = document.getElementById('pdfContainer');
          const loadingState = document.getElementById('loadingState');
 
-         // Blob fetch karke network tab se original file chhupana
-         fetch(securePdfUrl)
-         .then(response => {
-             if (!response.ok) throw new Error('Unauthorized Access or Invalid Token');
-             return response.blob();
-         })
-         .then(blob => {
-             const blobUrl = URL.createObjectURL(blob);
-             
+         fetchSecurePdfBytes('view')
+         .then(async (pdfData) => {
              pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-             pdfjsLib.getDocument(blobUrl).promise.then(async (pdfDoc) => {
-                 for (let num = 1; num <= pdfDoc.numPages; num++) {
-                     const page = await pdfDoc.getPage(num);
-                     const scale = 2.0; 
-                     const viewport = page.getViewport({ scale });
-                     
-                     const wrapper = document.createElement('div');
-                     wrapper.className = 'page-wrapper';
-                     
-                     const canvas = document.createElement('canvas');
-                     const ctx = canvas.getContext('2d', { alpha: false }); 
-                     const dpr = window.devicePixelRatio || 1;
+             const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
+             pdfData = null;
 
-                     canvas.width = Math.floor(viewport.width * dpr);
-                     canvas.height = Math.floor(viewport.height * dpr);
+             for (let num = 1; num <= pdfDoc.numPages; num++) {
+                 const page = await pdfDoc.getPage(num);
+                 const scale = 2.0;
+                 const viewport = page.getViewport({ scale });
 
-                     const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null;
-                     wrapper.appendChild(canvas);
-                     container.appendChild(wrapper);
+                 const wrapper = document.createElement('div');
+                 wrapper.className = 'page-wrapper';
 
-                     await page.render({ canvasContext: ctx, transform: transform, viewport: viewport }).promise;
-                 }
-                 
-                 loadingState.style.display = 'none';
-                 // Security: Render hote hi URL memory se delete kar do
-                 setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-             }).catch(err => {
-                 loadingState.innerHTML = "<p style='color:#ef4444; font-weight:bold;'>Error rendering document.</p>";
-             });
+                 const canvas = document.createElement('canvas');
+                 canvas.oncontextmenu = () => false;
+                 canvas.draggable = false;
+                 const ctx = canvas.getContext('2d', { alpha: false });
+                 const dpr = window.devicePixelRatio || 1;
+
+                 canvas.width = Math.floor(viewport.width * dpr);
+                 canvas.height = Math.floor(viewport.height * dpr);
+
+                 const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null;
+                 wrapper.appendChild(canvas);
+                 container.appendChild(wrapper);
+
+                 await page.render({ canvasContext: ctx, transform: transform, viewport: viewport }).promise;
+             }
+
+             loadingState.style.display = 'none';
          })
          .catch(err => {
              loadingState.innerHTML = "<p style='color:#ef4444; font-weight:bold;'>Access Denied. Secure Connection Failed.</p>";
              console.error(err);
          });
      } else {
-         document.getElementById('loadingState').innerHTML = "No PDF URL Provided.";
+         document.getElementById('loadingState').innerHTML = "<p style='color:#ef4444;font-weight:bold;'>No PDF file in link.<br><span style='font-weight:500;font-size:0.85rem;color:#666'>My Courses se kholo — URL me ?file=uploads/pdfs/... hona chahiye.</span></p>";
      }
   </script>
 </body>
