@@ -218,6 +218,28 @@
 
     .secure-mode { filter: blur(25px) grayscale(100%); pointer-events: none; }
 
+    /* Full opaque cover shown the instant the tab is backgrounded / loses
+       focus. This is stronger than the blur alone: a screen-recording tool
+       running in the background can still pick up *some* structure through
+       a CSS blur, but nothing can be read through a solid, empty layer. */
+    #privacyShield {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+    #privacyShield.show { opacity: 1; pointer-events: auto; }
+    #privacyShield .shield-icon { font-size: 30px; }
+    #privacyShield p { color: var(--muted); font-weight: 600; font-size: 0.9rem; }
+
     .loader-container {
       position: fixed;
       inset: 0;
@@ -317,6 +339,8 @@
       display: block;
       border-radius: 10px;
       -webkit-touch-callout: none;
+      -webkit-user-drag: none;
+      user-drag: none;
       pointer-events: auto;
     }
 
@@ -381,7 +405,7 @@
     }
   </style>
 </head>
-<body oncontextmenu="return false;">
+<body oncontextmenu="return false;" ondragstart="return false;">
 
   <div class="header">
     <a href="lecture.html" class="back-btn" onclick="window.history.back(); return false;" aria-label="Go back">
@@ -416,6 +440,14 @@
 
   <div class="scroll-area" id="scrollArea">
       <div class="pdf-viewer-container" id="pdfContainer"></div>
+  </div>
+
+  <!-- Instant opaque cover: shown the moment the tab loses focus / is
+       backgrounded / the app-switcher preview is taken, so nothing but a
+       blank shield can ever be captured in that snapshot. -->
+  <div id="privacyShield">
+    <div class="shield-icon">🔒</div>
+    <p>Content hidden — tab not in focus</p>
   </div>
 
   <script>
@@ -512,32 +544,88 @@
              }
          } catch (error) { console.error("Failed to fetch phone number"); }
 
-         const wmContent = `${userEmail}<br>+91 ${userPhone}`;
+         // Timestamp added to the watermark: if a leaked photo/screenshot
+         // ever surfaces, the exact viewing session (who + when) is baked
+         // right into the image, which is a much stronger deterrent than a
+         // static "email only" mark.
+         const now = new Date();
+         const stamp = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
+         const wmContent = `${userEmail}<br>+91 ${userPhone}<br>${stamp}`;
          document.querySelectorAll('.wm-item').forEach(el => el.innerHTML = wmContent);
      }
      fetchUserInfoAndSetWatermark();
 
      // =========================================================
-     // 4. SECURITY: ANTI-SCREENSHOT & BLUR (original — chat se pehle)
+     // 4. SECURITY: ANTI-SCREENSHOT & BLUR
+     //
+     // IMPORTANT — read this before relying on it:
+     // None of this can detect or block an actual OS-level screenshot
+     // (Print Screen, a phone's power+volume button, or a second device's
+     // camera pointed at the screen). Browsers give web pages no
+     // permission or API to see that a screenshot happened, on any
+     // platform. What this section *does* do:
+     //   - Hides content instantly behind an opaque shield the moment the
+     //     tab loses focus / is backgrounded — this covers the "recent
+     //     apps switcher" snapshot some mobile OSes take, and stops
+     //     anything readable from showing up if a screen recorder is
+     //     running in another window.
+     //   - Blocks the easy desktop shortcuts for saving/printing/copying/
+     //     viewing source and opening DevTools. A determined user can
+     //     still get around most of these; they mainly stop casual copying.
+     //   - The watermark (above) remains the most effective real-world
+     //     deterrent, since it survives any screenshot and identifies who
+     //     it came from.
      // =========================================================
-     window.addEventListener('blur', () => { document.body.classList.add('secure-mode'); });
-     window.addEventListener('focus', () => { document.body.classList.remove('secure-mode'); });
+     const privacyShield = document.getElementById('privacyShield');
+
+     function engageShield() {
+         document.body.classList.add('secure-mode');
+         privacyShield.classList.add('show');
+     }
+     function releaseShield() {
+         document.body.classList.remove('secure-mode');
+         privacyShield.classList.remove('show');
+     }
+
+     window.addEventListener('blur', engageShield);
+     window.addEventListener('focus', releaseShield);
 
      document.addEventListener('visibilitychange', () => {
-         if (document.hidden) document.body.classList.add('secure-mode');
-         else document.body.classList.remove('secure-mode');
+         if (document.hidden) engageShield();
+         else releaseShield();
      });
 
-     document.addEventListener('keydown', (e) => {
-         if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'c' || e.key === 'u')) e.preventDefault();
-         if (e.metaKey && (e.key === 'p' || e.key === 's' || e.key === 'c' || e.key === 'u')) e.preventDefault();
-         if (e.key === 'PrintScreen') {
-            try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
-            document.body.classList.add('secure-mode');
-            setTimeout(() => document.body.classList.remove('secure-mode'), 2000);
+     // Also engage the moment the pointer/finger leaves the window edge on
+     // desktop (covers the gap before a real OS screenshot tool takes
+     // focus, e.g. Windows Snipping Tool / Win+Shift+S).
+     document.addEventListener('mouseleave', (e) => {
+         if (e.clientY <= 0 || e.clientX <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
+             engageShield();
          }
      });
+     document.addEventListener('mouseenter', releaseShield);
 
+     document.addEventListener('keydown', (e) => {
+         const k = (e.key || '').toLowerCase();
+
+         // Save / Print / Copy / View-source
+         if ((e.ctrlKey || e.metaKey) && ['p','s','c','u'].includes(k)) e.preventDefault();
+
+         // DevTools shortcuts (Windows/Linux + Mac)
+         if (k === 'f12') e.preventDefault();
+         if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i','j','c'].includes(k)) e.preventDefault();
+         if (e.metaKey && e.altKey && ['i','j','c'].includes(k)) e.preventDefault(); // Mac Cmd+Option+I/J/C
+
+         if (e.key === 'PrintScreen') {
+            // Best-effort only: this cannot actually stop the OS from
+            // having already captured the screen by the time this fires.
+            try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
+            engageShield();
+            setTimeout(releaseShield, 2000);
+         }
+     });
+    </script>
+  <script>
      // =========================================================
      // 5. PDF SECURE FETCH (short-lived one-time tokens — no secret in JS)
      // =========================================================
@@ -674,6 +762,8 @@
                  if (longEdge > MAX_EDGE) pr = MAX_EDGE / Math.max(viewport.width, viewport.height);
 
                  const canvas = document.createElement('canvas');
+                 canvas.oncontextmenu = () => false;
+                 canvas.draggable = false;
                  const ctx = canvas.getContext('2d', { alpha: false });
                  canvas.width = Math.floor(viewport.width * pr);
                  canvas.height = Math.floor(viewport.height * pr);
