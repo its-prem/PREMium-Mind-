@@ -41,7 +41,7 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
-      transition: filter 0.15s ease;
+      transition: filter 0.3s ease;
       overflow: hidden;
       touch-action: none;
       -webkit-tap-highlight-color: transparent;
@@ -206,8 +206,8 @@
     .wm-item {
       font-family: var(--font);
       font-size: 11px;
-      font-weight: 600;
-      color: rgba(17, 17, 17, 0.09);
+      font-weight: 500;
+      color: rgba(17, 17, 17, 0.06);
       transform: rotate(-32deg);
       text-align: center;
       line-height: 1.35;
@@ -216,32 +216,7 @@
       pointer-events: none;
     }
 
-    .secure-banner {
-      position: fixed;
-      bottom: calc(10px + var(--safe-bottom));
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 950;
-      pointer-events: none;
-      font-size: 0.62rem;
-      font-weight: 600;
-      color: rgba(17, 17, 17, 0.35);
-      background: rgba(255, 255, 255, 0.72);
-      border: 1px solid rgba(17, 17, 17, 0.08);
-      border-radius: 999px;
-      padding: 5px 12px;
-      white-space: nowrap;
-      max-width: 92vw;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      backdrop-filter: blur(4px);
-    }
-
-    .secure-mode {
-      filter: blur(40px) grayscale(100%) brightness(0.4) !important;
-      pointer-events: none;
-    }
-    .secure-mode .secure-banner { opacity: 0; }
+    .secure-mode { filter: blur(25px) grayscale(100%); pointer-events: none; }
 
     .loader-container {
       position: fixed;
@@ -398,12 +373,11 @@
 
       canvas { border-radius: 8px; }
 
-      .wm-item { font-size: 10px; color: rgba(17, 17, 17, 0.14); font-weight: 700; }
+      .wm-item { font-size: 9px; color: rgba(17, 17, 17, 0.05); }
       .watermark-overlay {
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: repeat(6, 1fr);
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(5, 1fr);
       }
-      .secure-banner { font-size: 0.58rem; bottom: calc(6px + var(--safe-bottom)); }
     }
   </style>
 </head>
@@ -433,11 +407,7 @@
       <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
       <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
       <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
-      <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
-      <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
   </div>
-
-  <div class="secure-banner" id="secureBanner">Protected content</div>
 
   <div class="loader-container" id="loadingState">
      <div class="loader"></div>
@@ -544,92 +514,29 @@
 
          const wmContent = `${userEmail}<br>+91 ${userPhone}`;
          document.querySelectorAll('.wm-item').forEach(el => el.innerHTML = wmContent);
-         const banner = document.getElementById('secureBanner');
-         if (banner) banner.textContent = userEmail + ' · +91 ' + userPhone;
      }
      fetchUserInfoAndSetWatermark();
 
      // =========================================================
-     // 4. SECURITY: MOBILE + DESKTOP — blur, watermark, no save
+     // 4. SECURITY: ANTI-SCREENSHOT & BLUR (original — chat se pehle)
      // =========================================================
-     let secureBlurTimer = null;
-
-     function enableSecureBlur() { document.body.classList.add('secure-mode'); }
-     function disableSecureBlur() {
-         clearTimeout(secureBlurTimer);
-         document.body.classList.remove('secure-mode');
-     }
-
-     function onHidden() { enableSecureBlur(); }
-     function onVisible() {
-         if (document.visibilityState === 'visible' && document.hasFocus()) {
-             disableSecureBlur();
-         }
-     }
+     window.addEventListener('blur', () => { document.body.classList.add('secure-mode'); });
+     window.addEventListener('focus', () => { document.body.classList.remove('secure-mode'); });
 
      document.addEventListener('visibilitychange', () => {
-         document.hidden ? onHidden() : onVisible();
+         if (document.hidden) document.body.classList.add('secure-mode');
+         else document.body.classList.remove('secure-mode');
      });
-     window.addEventListener('pagehide', onHidden);
-     window.addEventListener('pageshow', onVisible);
-     document.addEventListener('freeze', onHidden);
-     document.addEventListener('resume', onVisible);
-
-     // App switch / screenshot UI — mobile + desktop dono
-     window.addEventListener('blur', onHidden);
-     window.addEventListener('focus', onVisible);
-
-     window.addEventListener('beforeprint', (e) => {
-         enableSecureBlur();
-         e.preventDefault && e.preventDefault();
-     });
-     window.addEventListener('afterprint', disableSecureBlur);
 
      document.addEventListener('keydown', (e) => {
-         const k = e.key.toLowerCase();
-         if (
-             (e.ctrlKey && (k === 'p' || k === 's' || k === 'c' || k === 'u')) ||
-             (e.metaKey && (k === 'p' || k === 's' || k === 'c' || k === 'u')) ||
-             (e.ctrlKey && e.shiftKey && (k === 'i' || k === 's')) ||
-             k === 'printscreen'
-         ) {
-             e.preventDefault();
-             e.stopPropagation();
-         }
-         if (e.key === 'PrintScreen' || k === 'printscreen') {
-             try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
-             enableSecureBlur();
-             secureBlurTimer = setTimeout(disableSecureBlur, 2500);
-         }
-     }, true);
-
-     document.addEventListener('keyup', (e) => {
+         if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'c' || e.key === 'u')) e.preventDefault();
+         if (e.metaKey && (e.key === 'p' || e.key === 's' || e.key === 'c' || e.key === 'u')) e.preventDefault();
          if (e.key === 'PrintScreen') {
-             try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
-             enableSecureBlur();
-             secureBlurTimer = setTimeout(disableSecureBlur, 2500);
+            try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
+            document.body.classList.add('secure-mode');
+            setTimeout(() => document.body.classList.remove('secure-mode'), 2000);
          }
-     }, true);
-
-     document.addEventListener('contextmenu', (e) => e.preventDefault());
-     document.addEventListener('dragstart', (e) => e.preventDefault());
-     document.addEventListener('selectstart', (e) => e.preventDefault());
-     document.addEventListener('copy', (e) => e.preventDefault());
-     document.addEventListener('cut', (e) => e.preventDefault());
-
-     // iOS long-press save image block
-     document.addEventListener('touchstart', (e) => {
-         if (e.touches.length > 1) return;
-     }, { passive: true });
-
-     function protectCanvas(el) {
-         if (!el || el.tagName !== 'CANVAS') return;
-         el.addEventListener('contextmenu', (e) => e.preventDefault());
-         el.addEventListener('dragstart', (e) => e.preventDefault());
-     }
-     window.__protectCanvas = protectCanvas;
-
-     disableSecureBlur();
+     });
 
      // =========================================================
      // 5. PDF SECURE FETCH (short-lived one-time tokens — no secret in JS)
@@ -778,7 +685,6 @@
 
                  entry.wrapper.innerHTML = '';
                  entry.wrapper.appendChild(canvas);
-                 if (typeof window.__protectCanvas === 'function') window.__protectCanvas(canvas);
                  entry.renderedScale = renderScale;
              }
 
