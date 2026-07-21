@@ -299,7 +299,7 @@
       width: 100%;
       display: flex;
       justify-content: center;
-      max-width: 900px;
+      max-width: calc(900px * var(--pdf-scale));
       background: #fff;
       border-radius: 10px;
       overflow: hidden;
@@ -439,15 +439,32 @@
      }, {passive: false});
 
      scrollArea.addEventListener('touchmove', (e) => {
-         if (e.touches.length === 2) {
+         if (e.touches.length === 2 && initialDistance > 0) {
              e.preventDefault(); 
              const currentDistance = Math.hypot(
                  e.touches[0].clientX - e.touches[1].clientX,
                  e.touches[0].clientY - e.touches[1].clientY
              );
              currentScale = initialScale * (currentDistance / initialDistance);
-             currentScale = Math.max(1, Math.min(currentScale, 3.5));
+             currentScale = Math.max(1, Math.min(currentScale, 4));
              document.documentElement.style.setProperty('--pdf-scale', currentScale);
+         }
+     }, {passive: false});
+
+     // Pinch khatam → us zoom pe full quality re-render
+     scrollArea.addEventListener('touchend', () => {
+         initialDistance = 0;
+         if (typeof window.__reRenderZoom === 'function') window.__reRenderZoom();
+     }, {passive: true});
+
+     // Desktop: Ctrl + wheel se zoom
+     scrollArea.addEventListener('wheel', (e) => {
+         if (e.ctrlKey || e.metaKey) {
+             e.preventDefault();
+             currentScale += (e.deltaY > 0 ? -0.25 : 0.25);
+             currentScale = Math.max(1, Math.min(currentScale, 4));
+             document.documentElement.style.setProperty('--pdf-scale', currentScale);
+             if (typeof window.__reRenderZoom === 'function') window.__reRenderZoom();
          }
      }, {passive: false});
 
@@ -593,43 +610,98 @@
      }
 
      // =========================================================
-     // 6. RENDER HD PDF (ArrayBuffer — no permanent secret / reusable URL)
+     // 6. RENDER HD PDF — pehle poori load, fir show; zoom pe full quality
      // =========================================================
      if (pdfFile) {
          const container = document.getElementById('pdfContainer');
          const loadingState = document.getElementById('loadingState');
+         const loaderText = loadingState.querySelector('.loader-text');
 
          fetchSecurePdfBytes('view')
          .then(async (pdfData) => {
              pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
              const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
-             // Drop reference so casual console reuse is harder
              pdfData = null;
 
-             for (let num = 1; num <= pdfDoc.numPages; num++) {
-                 const page = await pdfDoc.getPage(num);
-                 const scale = 2.0;
-                 const viewport = page.getViewport({ scale });
+             const isMobile = window.innerWidth < 700 || /Android|iPhone|iPad/i.test(navigator.userAgent);
+             const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 2 : 1.5);
+             const MAX_EDGE = isMobile ? 4200 : 5200;
 
-                 const wrapper = document.createElement('div');
-                 wrapper.className = 'page-wrapper';
+             // Fit page to screen width (100% pe sharp, memory safe)
+             const firstPage = await pdfDoc.getPage(1);
+             const baseVp = firstPage.getViewport({ scale: 1 });
+             const pad = isMobile ? 16 : 36;
+             const cssWidth = Math.min(900, Math.max(280, scrollArea.clientWidth - pad));
+             const fitScale = cssWidth / baseVp.width;
+
+             const entries = [];
+
+             async function renderEntry(entry, renderScale) {
+                 const viewport = entry.page.getViewport({ scale: renderScale });
+                 let pr = dpr;
+                 const longEdge = Math.max(viewport.width, viewport.height) * pr;
+                 if (longEdge > MAX_EDGE) pr = MAX_EDGE / Math.max(viewport.width, viewport.height);
 
                  const canvas = document.createElement('canvas');
                  const ctx = canvas.getContext('2d', { alpha: false });
-                 const dpr = window.devicePixelRatio || 1;
+                 canvas.width = Math.floor(viewport.width * pr);
+                 canvas.height = Math.floor(viewport.height * pr);
+                 canvas.style.width = '100%';
+                 canvas.style.height = 'auto';
 
-                 canvas.width = Math.floor(viewport.width * dpr);
-                 canvas.height = Math.floor(viewport.height * dpr);
+                 const transform = pr !== 1 ? [pr, 0, 0, pr, 0, 0] : null;
+                 await entry.page.render({ canvasContext: ctx, transform, viewport }).promise;
 
-                 const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null;
-                 wrapper.appendChild(canvas);
+                 entry.wrapper.innerHTML = '';
+                 entry.wrapper.appendChild(canvas);
+                 entry.renderedScale = renderScale;
+             }
+
+             // Saari pages pehle render (full load), tab loader hatega
+             for (let num = 1; num <= pdfDoc.numPages; num++) {
+                 if (loaderText) loaderText.textContent = 'Loading ' + num + '/' + pdfDoc.numPages + '...';
+                 const page = await pdfDoc.getPage(num);
+                 const wrapper = document.createElement('div');
+                 wrapper.className = 'page-wrapper';
                  container.appendChild(wrapper);
-
-                 await page.render({ canvasContext: ctx, transform: transform, viewport: viewport }).promise;
+                 const entry = { page, wrapper, renderedScale: 0 };
+                 entries.push(entry);
+                 await renderEntry(entry, fitScale);
              }
 
              loadingState.style.display = 'none';
+
+             // Zoom pe: dikhne wali pages full quality me, baaki wapas fit (memory safe)
+             let zoomTimer = null;
+             let zoomBusy = false;
+             window.__reRenderZoom = function () {
+                 clearTimeout(zoomTimer);
+                 zoomTimer = setTimeout(async () => {
+                     if (zoomBusy) return;
+                     zoomBusy = true;
+                     try {
+                         const target = fitScale * currentScale;
+                         const rootRect = scrollArea.getBoundingClientRect();
+                         for (const entry of entries) {
+                             const r = entry.wrapper.getBoundingClientRect();
+                             const visible = r.bottom >= rootRect.top - 60 && r.top <= rootRect.bottom + 60;
+                             if (visible) {
+                                 if (Math.abs(entry.renderedScale - target) > 0.05) await renderEntry(entry, target);
+                             } else if (entry.renderedScale > fitScale + 0.05) {
+                                 await renderEntry(entry, fitScale);
+                             }
+                         }
+                     } finally {
+                         zoomBusy = false;
+                     }
+                 }, 220);
+             };
+
+             // Scroll karte waqt naye visible pages ko current zoom pe sharp karo
+             scrollArea.addEventListener('scroll', () => {
+                 if (currentScale > 1.05) window.__reRenderZoom();
+             }, { passive: true });
          })
          .catch(err => {
              loadingState.classList.add('is-error');
