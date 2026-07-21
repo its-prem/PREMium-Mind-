@@ -25,6 +25,7 @@
       overflow: hidden; 
       touch-action: none;
       -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
     }
     
     /* 🛡️ STATIC HEADER 🛡️ */
@@ -132,7 +133,32 @@
       user-drag: none;
     }
 
-    .secure-mode { filter: blur(25px) grayscale(100%); pointer-events: none; }
+    .secure-mode {
+      filter: blur(40px) grayscale(100%) brightness(0.35) !important;
+      pointer-events: none;
+    }
+    .secure-mode .secure-banner { opacity: 0; }
+
+    .secure-banner {
+      position: fixed;
+      bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 950;
+      pointer-events: none;
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: rgba(17, 17, 17, 0.4);
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(17, 17, 17, 0.08);
+      border-radius: 999px;
+      padding: 5px 12px;
+      white-space: nowrap;
+      max-width: 92vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      backdrop-filter: blur(4px);
+    }
 
     /* Instant opaque cover shown the moment the tab loses focus / is
        backgrounded. Stronger than the blur alone since nothing at all is
@@ -152,8 +178,10 @@
 
     /* Mobile Optimizations */
     @media (max-width: 600px) {
-       .wm-item { font-size: 10px; color: rgba(0,0,0,0.06); }
-       .watermark-overlay { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(5, 1fr); }
+       /* Phone screenshot pe email/phone clearly dikhe — leak trace ho sake */
+       .wm-item { font-size: 10px; color: rgba(0,0,0,0.14); font-weight: 700; }
+       .watermark-overlay { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(6, 1fr); }
+       .secure-banner { font-size: 0.58rem; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
        .header { padding: 0 12px; height: 60px; }
        .scroll-area { top: 60px; height: calc(100vh - 60px); }
        .watermark-overlay { top: 60px; height: calc(100vh - 60px); }
@@ -186,7 +214,11 @@
       <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
       <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
       <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
+      <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
+      <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
   </div>
+
+  <div class="secure-banner" id="secureBanner">Protected content</div>
 
   <div class="loader-container" id="loadingState">
      <div class="loader"></div>
@@ -269,32 +301,52 @@
          const stamp = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
          const wmContent = `${userEmail}<br>+91 ${userPhone}<br>${stamp}`;
          document.querySelectorAll('.wm-item').forEach(el => el.innerHTML = wmContent);
+         const banner = document.getElementById('secureBanner');
+         if (banner) banner.textContent = userEmail + ' · +91 ' + userPhone;
      }
      fetchUserInfoAndSetWatermark();
 
      // =========================================================
-     // 4. SECURITY: ANTI-SCREENSHOT, NO PRINT, NO COPY
+     // 4. SECURITY: MOBILE + DESKTOP — blur, shield, no save
      // =========================================================
      const privacyShield = document.getElementById('privacyShield');
+     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+     let secureBlurTimer = null;
 
      function engageShield() {
          document.body.classList.add('secure-mode');
          if (privacyShield) privacyShield.classList.add('show');
      }
      function releaseShield() {
+         clearTimeout(secureBlurTimer);
          document.body.classList.remove('secure-mode');
          if (privacyShield) privacyShield.classList.remove('show');
      }
 
-     // Tab / app switch pe turant blur + shield (mobile + desktop)
-     window.addEventListener('blur', engageShield);
-     window.addEventListener('focus', releaseShield);
+     function onHidden() { engageShield(); }
+     function onVisible() {
+         if (document.visibilityState === 'visible' && document.hasFocus()) {
+             releaseShield();
+         }
+     }
+
+     // Tab / app switch — mobile recent-apps snapshot cover
      document.addEventListener('visibilitychange', () => {
-         if (document.hidden) engageShield();
-         else releaseShield();
+         document.hidden ? onHidden() : onVisible();
      });
-     window.addEventListener('pagehide', engageShield);
-     window.addEventListener('pageshow', releaseShield);
+     window.addEventListener('pagehide', onHidden);
+     window.addEventListener('pageshow', onVisible);
+     document.addEventListener('freeze', onHidden);
+     document.addEventListener('resume', onVisible);
+     window.addEventListener('blur', onHidden);
+     window.addEventListener('focus', onVisible);
+
+     // Mobile: stuck blur na ho — padhte waqt wapas clear
+     ['touchstart', 'pointerdown', 'click'].forEach(evt => {
+         window.addEventListener(evt, () => {
+             if (!document.hidden && document.hasFocus()) releaseShield();
+         }, { passive: true });
+     });
 
      // Print block
      window.addEventListener('beforeprint', (e) => {
@@ -312,10 +364,10 @@
          }
          if (k === 'f12') e.preventDefault();
          if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i','j','c'].includes(k)) e.preventDefault();
-         if (e.key === 'PrintScreen') {
+         if (e.key === 'PrintScreen' || k === 'printscreen') {
              try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
              engageShield();
-             setTimeout(releaseShield, 2000);
+             secureBlurTimer = setTimeout(releaseShield, 2500);
          }
      }, true);
 
@@ -323,7 +375,7 @@
          if (e.key === 'PrintScreen') {
              try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
              engageShield();
-             setTimeout(releaseShield, 2000);
+             secureBlurTimer = setTimeout(releaseShield, 2500);
          }
      }, true);
 
@@ -334,13 +386,26 @@
      document.addEventListener('copy', (e) => e.preventDefault());
      document.addEventListener('cut', (e) => e.preventDefault());
 
+     // iOS long-press "Save Image" block
+     document.addEventListener('touchstart', (e) => {
+         if (e.touches.length > 1) return;
+     }, { passive: true });
+
+     function protectCanvas(el) {
+         if (!el || el.tagName !== 'CANVAS') return;
+         el.addEventListener('contextmenu', (e) => e.preventDefault());
+         el.addEventListener('dragstart', (e) => e.preventDefault());
+     }
+
      // Desktop: snipping tool se pehle shield
-     document.addEventListener('mouseleave', (e) => {
-         if (e.clientY <= 0 || e.clientX <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
-             engageShield();
-         }
-     });
-     document.addEventListener('mouseenter', releaseShield);
+     if (!isTouchDevice) {
+         document.addEventListener('mouseleave', (e) => {
+             if (e.clientY <= 0 || e.clientX <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
+                 engageShield();
+             }
+         });
+         document.addEventListener('mouseenter', onVisible);
+     }
 
      releaseShield();
 
@@ -507,6 +572,7 @@
                  const canvas = document.createElement('canvas');
                  canvas.oncontextmenu = () => false;
                  canvas.draggable = false;
+                 protectCanvas(canvas);
                  const ctx = canvas.getContext('2d', { alpha: false });
                  const dpr = window.devicePixelRatio || 1;
 
