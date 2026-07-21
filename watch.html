@@ -305,6 +305,23 @@
       overflow: hidden;
       border: 1px solid var(--line);
       box-shadow: 0 6px 20px rgba(17, 17, 17, 0.06);
+      flex-shrink: 0;
+      contain: layout paint;
+    }
+
+    .page-wrapper.is-loading::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, #f3f3f4 25%, #ebebec 37%, #f3f3f4 63%);
+      background-size: 400% 100%;
+      animation: pageShimmer 1.1s ease infinite;
+    }
+
+    @keyframes pageShimmer {
+      0% { background-position: 100% 0; }
+      100% { background-position: 0 0; }
     }
 
     canvas {
@@ -610,7 +627,7 @@
      }
 
      // =========================================================
-     // 6. RENDER HD PDF — pehle poori load, fir show; zoom pe full quality
+     // 6. VIRTUAL SCROLL — sirf visible pages full quality render
      // =========================================================
      if (pdfFile) {
          const container = document.getElementById('pdfContainer');
@@ -625,83 +642,170 @@
              pdfData = null;
 
              const isMobile = window.innerWidth < 700 || /Android|iPhone|iPad/i.test(navigator.userAgent);
-             const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 2 : 1.5);
+             const BUFFER = 2; // visible ±2 = max ~5 pages in memory
+             const TARGET_LONG_EDGE = isMobile ? 1600 : 2000;
              const MAX_EDGE = isMobile ? 4200 : 5200;
 
-             // Fit page to screen width (100% pe sharp, memory safe)
              const firstPage = await pdfDoc.getPage(1);
              const baseVp = firstPage.getViewport({ scale: 1 });
-             const pad = isMobile ? 16 : 36;
-             const cssWidth = Math.min(900, Math.max(280, scrollArea.clientWidth - pad));
-             const fitScale = cssWidth / baseVp.width;
+             const baseLong = Math.max(baseVp.width, baseVp.height);
+             const fullScale = TARGET_LONG_EDGE / baseLong;
 
-             const entries = [];
-
-             async function renderEntry(entry, renderScale) {
-                 const viewport = entry.page.getViewport({ scale: renderScale });
-                 let pr = dpr;
-                 const longEdge = Math.max(viewport.width, viewport.height) * pr;
-                 if (longEdge > MAX_EDGE) pr = MAX_EDGE / Math.max(viewport.width, viewport.height);
-
-                 const canvas = document.createElement('canvas');
-                 const ctx = canvas.getContext('2d', { alpha: false });
-                 canvas.width = Math.floor(viewport.width * pr);
-                 canvas.height = Math.floor(viewport.height * pr);
-                 canvas.style.width = '100%';
-                 canvas.style.height = 'auto';
-
-                 const transform = pr !== 1 ? [pr, 0, 0, pr, 0, 0] : null;
-                 await entry.page.render({ canvasContext: ctx, transform, viewport }).promise;
-
-                 entry.wrapper.innerHTML = '';
-                 entry.wrapper.appendChild(canvas);
-                 entry.renderedScale = renderScale;
-             }
-
-             // Saari pages pehle render (full load), tab loader hatega
-             for (let num = 1; num <= pdfDoc.numPages; num++) {
-                 if (loaderText) loaderText.textContent = 'Loading ' + num + '/' + pdfDoc.numPages + '...';
-                 const page = await pdfDoc.getPage(num);
-                 const wrapper = document.createElement('div');
-                 wrapper.className = 'page-wrapper';
-                 container.appendChild(wrapper);
-                 const entry = { page, wrapper, renderedScale: 0 };
-                 entries.push(entry);
-                 await renderEntry(entry, fitScale);
-             }
-
-             loadingState.style.display = 'none';
-
-             // Zoom pe: dikhne wali pages full quality me, baaki wapas fit (memory safe)
+             const slots = [];
+             const renderTasks = new Map();
+             let syncScheduled = false;
              let zoomTimer = null;
-             let zoomBusy = false;
+
+             // Step 1: saari pages ke placeholders — scroll height ready (Netflix style)
+             if (loaderText) loaderText.textContent = 'Preparing ' + pdfDoc.numPages + ' pages...';
+             for (let num = 1; num <= pdfDoc.numPages; num++) {
+                 const wrapper = document.createElement('div');
+                 wrapper.className = 'page-wrapper is-loading';
+                 wrapper.dataset.page = String(num);
+                 wrapper.style.aspectRatio = baseVp.width + ' / ' + baseVp.height;
+                 container.appendChild(wrapper);
+                 slots[num] = { wrapper, ready: false, rendering: false, renderedScale: 0 };
+             }
+
+             function targetRenderScale() {
+                 return fullScale * currentScale;
+             }
+
+             async function paintPage(num) {
+                 const slot = slots[num];
+                 if (!slot || slot.rendering) return;
+                 const scale = targetRenderScale();
+                 if (slot.ready && Math.abs(slot.renderedScale - scale) < 0.001) return;
+
+                 slot.rendering = true;
+                 try {
+                     const page = await pdfDoc.getPage(num);
+                     const viewport = page.getViewport({ scale });
+
+                     let pr = Math.min(window.devicePixelRatio || 1, 2);
+                     const longEdge = Math.max(viewport.width, viewport.height) * pr;
+                     if (longEdge > MAX_EDGE) {
+                         pr = MAX_EDGE / Math.max(viewport.width, viewport.height);
+                     }
+
+                     const canvas = document.createElement('canvas');
+                     const ctx = canvas.getContext('2d', { alpha: false });
+                     canvas.width = Math.floor(viewport.width * pr);
+                     canvas.height = Math.floor(viewport.height * pr);
+                     canvas.style.width = '100%';
+                     canvas.style.height = 'auto';
+
+                     const transform = pr !== 1 ? [pr, 0, 0, pr, 0, 0] : null;
+                     const task = page.render({ canvasContext: ctx, transform, viewport });
+                     renderTasks.set(num, task);
+                     await task.promise;
+                     renderTasks.delete(num);
+
+                     slot.wrapper.innerHTML = '';
+                     slot.wrapper.appendChild(canvas);
+                     slot.wrapper.classList.remove('is-loading');
+                     slot.ready = true;
+                     slot.renderedScale = scale;
+                 } catch (err) {
+                     if (err && err.name === 'RenderingCancelledException') return;
+                     console.warn('Page render failed:', num, err);
+                     slot.wrapper.classList.remove('is-loading');
+                 } finally {
+                     slot.rendering = false;
+                 }
+             }
+
+             function unloadPage(num) {
+                 const slot = slots[num];
+                 if (!slot || (!slot.ready && !slot.rendering)) return;
+
+                 const task = renderTasks.get(num);
+                 if (task) {
+                     try { task.cancel(); } catch (e) {}
+                     renderTasks.delete(num);
+                 }
+
+                 const canvas = slot.wrapper.querySelector('canvas');
+                 if (canvas) {
+                     canvas.width = 0;
+                     canvas.height = 0;
+                 }
+                 slot.wrapper.innerHTML = '';
+                 slot.wrapper.classList.add('is-loading');
+                 slot.ready = false;
+                 slot.rendering = false;
+                 slot.renderedScale = 0;
+             }
+
+             function visibleRange() {
+                 const rootRect = scrollArea.getBoundingClientRect();
+                 let first = 1;
+                 let last = 1;
+                 let found = false;
+
+                 for (let num = 1; num <= pdfDoc.numPages; num++) {
+                     const r = slots[num].wrapper.getBoundingClientRect();
+                     const onScreen = r.bottom >= rootRect.top - 100 && r.top <= rootRect.bottom + 100;
+                     if (onScreen) {
+                         if (!found) { first = num; found = true; }
+                         last = num;
+                     } else if (found) {
+                         break;
+                     }
+                 }
+                 if (!found) {
+                     first = 1;
+                     last = Math.min(pdfDoc.numPages, BUFFER + 1);
+                 }
+                 return {
+                     from: Math.max(1, first - BUFFER),
+                     to: Math.min(pdfDoc.numPages, last + BUFFER)
+                 };
+             }
+
+             async function syncVisiblePages() {
+                 syncScheduled = false;
+                 const { from, to } = visibleRange();
+                 const jobs = [];
+
+                 for (let num = 1; num <= pdfDoc.numPages; num++) {
+                     if (num >= from && num <= to) {
+                         jobs.push(paintPage(num));
+                     } else if (num < from - 1 || num > to + 1) {
+                         unloadPage(num);
+                     }
+                 }
+                 await Promise.all(jobs);
+             }
+
+             function scheduleSync() {
+                 if (syncScheduled) return;
+                 syncScheduled = true;
+                 requestAnimationFrame(() => { syncVisiblePages(); });
+             }
+
+             // Zoom: visible pages ko naye scale pe sharp render, baaki unload
              window.__reRenderZoom = function () {
                  clearTimeout(zoomTimer);
                  zoomTimer = setTimeout(async () => {
-                     if (zoomBusy) return;
-                     zoomBusy = true;
-                     try {
-                         const target = fitScale * currentScale;
-                         const rootRect = scrollArea.getBoundingClientRect();
-                         for (const entry of entries) {
-                             const r = entry.wrapper.getBoundingClientRect();
-                             const visible = r.bottom >= rootRect.top - 60 && r.top <= rootRect.bottom + 60;
-                             if (visible) {
-                                 if (Math.abs(entry.renderedScale - target) > 0.05) await renderEntry(entry, target);
-                             } else if (entry.renderedScale > fitScale + 0.05) {
-                                 await renderEntry(entry, fitScale);
-                             }
+                     const { from, to } = visibleRange();
+                     for (let num = 1; num <= pdfDoc.numPages; num++) {
+                         if (num < from || num > to) unloadPage(num);
+                         else if (slots[num].ready && Math.abs(slots[num].renderedScale - targetRenderScale()) > 0.05) {
+                             unloadPage(num);
                          }
-                     } finally {
-                         zoomBusy = false;
                      }
-                 }, 220);
+                     await syncVisiblePages();
+                 }, 200);
              };
 
-             // Scroll karte waqt naye visible pages ko current zoom pe sharp karo
-             scrollArea.addEventListener('scroll', () => {
-                 if (currentScale > 1.05) window.__reRenderZoom();
-             }, { passive: true });
+             // Step 2: pehli visible pages render → turant dikhao
+             await syncVisiblePages();
+             loadingState.style.display = 'none';
+
+             // Step 3: scroll pe load/unload (virtual scroll)
+             scrollArea.addEventListener('scroll', scheduleSync, { passive: true });
+             window.addEventListener('resize', scheduleSync, { passive: true });
          })
          .catch(err => {
              loadingState.classList.add('is-error');
