@@ -23,7 +23,8 @@
       background: #e5e7eb; user-select: none; -webkit-user-select: none;
       transition: filter 0.3s ease;
       overflow: hidden; 
-      touch-action: none; 
+      touch-action: none;
+      -webkit-touch-callout: none;
     }
     
     /* 🛡️ STATIC HEADER 🛡️ */
@@ -272,36 +273,68 @@
      fetchUserInfoAndSetWatermark();
 
      // =========================================================
-     // 4. SECURITY: ANTI-SCREENSHOT & BLUR
-     //
-     // Reminder: none of this can detect or block an actual OS-level
-     // screenshot (Print Screen, a phone's power+volume button, or another
-     // device's camera pointed at the screen) — browsers give web pages no
-     // API for that, on any platform. This hides content when the tab is
-     // backgrounded/unfocused and blocks the easy desktop shortcuts; the
-     // watermark above remains the strongest real-world deterrent.
+     // 4. SECURITY: ANTI-SCREENSHOT, NO PRINT, NO COPY
      // =========================================================
      const privacyShield = document.getElementById('privacyShield');
 
      function engageShield() {
          document.body.classList.add('secure-mode');
-         privacyShield.classList.add('show');
+         if (privacyShield) privacyShield.classList.add('show');
      }
      function releaseShield() {
          document.body.classList.remove('secure-mode');
-         privacyShield.classList.remove('show');
+         if (privacyShield) privacyShield.classList.remove('show');
      }
 
+     // Tab / app switch pe turant blur + shield (mobile + desktop)
      window.addEventListener('blur', engageShield);
      window.addEventListener('focus', releaseShield);
-
      document.addEventListener('visibilitychange', () => {
          if (document.hidden) engageShield();
          else releaseShield();
      });
+     window.addEventListener('pagehide', engageShield);
+     window.addEventListener('pageshow', releaseShield);
 
-     // Covers the gap before a real OS screenshot tool takes focus on
-     // desktop (e.g. Windows Snipping Tool / Win+Shift+S).
+     // Print block
+     window.addEventListener('beforeprint', (e) => {
+         engageShield();
+         if (e.preventDefault) e.preventDefault();
+     });
+     window.addEventListener('afterprint', releaseShield);
+
+     // Keyboard shortcuts block
+     document.addEventListener('keydown', (e) => {
+         const k = (e.key || '').toLowerCase();
+         if ((e.ctrlKey || e.metaKey) && ['p','s','c','u'].includes(k)) {
+             e.preventDefault();
+             e.stopPropagation();
+         }
+         if (k === 'f12') e.preventDefault();
+         if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i','j','c'].includes(k)) e.preventDefault();
+         if (e.key === 'PrintScreen') {
+             try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
+             engageShield();
+             setTimeout(releaseShield, 2000);
+         }
+     }, true);
+
+     document.addEventListener('keyup', (e) => {
+         if (e.key === 'PrintScreen') {
+             try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
+             engageShield();
+             setTimeout(releaseShield, 2000);
+         }
+     }, true);
+
+     // Copy / save / select block
+     document.addEventListener('contextmenu', (e) => e.preventDefault());
+     document.addEventListener('dragstart', (e) => e.preventDefault());
+     document.addEventListener('selectstart', (e) => e.preventDefault());
+     document.addEventListener('copy', (e) => e.preventDefault());
+     document.addEventListener('cut', (e) => e.preventDefault());
+
+     // Desktop: snipping tool se pehle shield
      document.addEventListener('mouseleave', (e) => {
          if (e.clientY <= 0 || e.clientX <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
              engageShield();
@@ -309,22 +342,7 @@
      });
      document.addEventListener('mouseenter', releaseShield);
 
-     document.addEventListener('keydown', (e) => {
-         const k = (e.key || '').toLowerCase();
-
-         if ((e.ctrlKey || e.metaKey) && ['p','s','c','u'].includes(k)) e.preventDefault();
-
-         // DevTools shortcuts (Windows/Linux + Mac)
-         if (k === 'f12') e.preventDefault();
-         if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i','j','c'].includes(k)) e.preventDefault();
-         if (e.metaKey && e.altKey && ['i','j','c'].includes(k)) e.preventDefault();
-
-         if (e.key === 'PrintScreen') {
-            try { navigator.clipboard.writeText('Screenshots not allowed'); } catch(err) {}
-            engageShield();
-            setTimeout(releaseShield, 2000);
-         }
-     });
+     releaseShield();
 
      // =========================================================
      // 5. PDF SECURE FETCH (short-lived one-time tokens — no secret in JS)
