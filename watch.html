@@ -40,7 +40,8 @@
       background: var(--page-bg);
       user-select: none;
       -webkit-user-select: none;
-      transition: filter 0.3s ease;
+      -webkit-touch-callout: none;
+      transition: filter 0.15s ease;
       overflow: hidden;
       touch-action: none;
       -webkit-tap-highlight-color: transparent;
@@ -205,14 +206,42 @@
     .wm-item {
       font-family: var(--font);
       font-size: 11px;
-      font-weight: 500;
-      color: rgba(17, 17, 17, 0.06);
+      font-weight: 600;
+      color: rgba(17, 17, 17, 0.09);
       transform: rotate(-32deg);
       text-align: center;
       line-height: 1.35;
       letter-spacing: 0.3px;
       white-space: nowrap;
+      pointer-events: none;
     }
+
+    .secure-banner {
+      position: fixed;
+      bottom: calc(10px + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 950;
+      pointer-events: none;
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: rgba(17, 17, 17, 0.35);
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(17, 17, 17, 0.08);
+      border-radius: 999px;
+      padding: 5px 12px;
+      white-space: nowrap;
+      max-width: 92vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      backdrop-filter: blur(4px);
+    }
+
+    .secure-mode {
+      filter: blur(40px) grayscale(100%) brightness(0.4) !important;
+      pointer-events: none;
+    }
+    .secure-mode .secure-banner { opacity: 0; }
 
     .loader-container {
       position: fixed;
@@ -312,9 +341,9 @@
       height: auto !important;
       display: block;
       border-radius: 10px;
+      -webkit-touch-callout: none;
+      pointer-events: auto;
     }
-
-    .secure-mode { filter: blur(25px) grayscale(100%); pointer-events: none; }
 
     @media (max-width: 700px) {
       :root { --header-h: 58px; }
@@ -369,11 +398,12 @@
 
       canvas { border-radius: 8px; }
 
-      .wm-item { font-size: 9px; color: rgba(17, 17, 17, 0.05); }
+      .wm-item { font-size: 10px; color: rgba(17, 17, 17, 0.14); font-weight: 700; }
       .watermark-overlay {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(5, 1fr);
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(6, 1fr);
       }
+      .secure-banner { font-size: 0.58rem; bottom: calc(6px + var(--safe-bottom)); }
     }
   </style>
 </head>
@@ -403,7 +433,11 @@
       <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
       <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
       <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
+      <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
+      <div class="wm-item"></div><div class="wm-item"></div><div class="wm-item"></div>
   </div>
+
+  <div class="secure-banner" id="secureBanner">Protected content</div>
 
   <div class="loader-container" id="loadingState">
      <div class="loader"></div>
@@ -510,39 +544,41 @@
 
          const wmContent = `${userEmail}<br>+91 ${userPhone}`;
          document.querySelectorAll('.wm-item').forEach(el => el.innerHTML = wmContent);
+         const banner = document.getElementById('secureBanner');
+         if (banner) banner.textContent = userEmail + ' · +91 ' + userPhone;
      }
      fetchUserInfoAndSetWatermark();
 
      // =========================================================
-     // 4. SECURITY: NO SCREENSHOT, NO PRINT, NO DOWNLOAD (until allowed)
+     // 4. SECURITY: MOBILE + DESKTOP — blur, watermark, no save
      // =========================================================
      let secureBlurTimer = null;
+
      function enableSecureBlur() { document.body.classList.add('secure-mode'); }
      function disableSecureBlur() {
          clearTimeout(secureBlurTimer);
          document.body.classList.remove('secure-mode');
      }
 
-     // Tab hide / app switch pe blur
+     function onHidden() { enableSecureBlur(); }
+     function onVisible() {
+         if (document.visibilityState === 'visible' && document.hasFocus()) {
+             disableSecureBlur();
+         }
+     }
+
      document.addEventListener('visibilitychange', () => {
-         if (document.hidden) enableSecureBlur();
-         else disableSecureBlur();
+         document.hidden ? onHidden() : onVisible();
      });
+     window.addEventListener('pagehide', onHidden);
+     window.addEventListener('pageshow', onVisible);
+     document.addEventListener('freeze', onHidden);
+     document.addEventListener('resume', onVisible);
 
-     // Desktop window switch
-     window.addEventListener('blur', () => {
-         if (!('ontouchstart' in window)) enableSecureBlur();
-     });
-     window.addEventListener('focus', disableSecureBlur);
+     // App switch / screenshot UI — mobile + desktop dono
+     window.addEventListener('blur', onHidden);
+     window.addEventListener('focus', onVisible);
 
-     // Touch pe blur hat jaye (stuck na ho)
-     ['touchstart', 'pointerdown', 'click'].forEach(evt => {
-         window.addEventListener(evt, () => {
-             if (!document.hidden) disableSecureBlur();
-         }, { passive: true });
-     });
-
-     // Print block — CSS + JS dono
      window.addEventListener('beforeprint', (e) => {
          enableSecureBlur();
          e.preventDefault && e.preventDefault();
@@ -563,7 +599,7 @@
          if (e.key === 'PrintScreen' || k === 'printscreen') {
              try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
              enableSecureBlur();
-             secureBlurTimer = setTimeout(disableSecureBlur, 2000);
+             secureBlurTimer = setTimeout(disableSecureBlur, 2500);
          }
      }, true);
 
@@ -571,15 +607,27 @@
          if (e.key === 'PrintScreen') {
              try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
              enableSecureBlur();
-             secureBlurTimer = setTimeout(disableSecureBlur, 2000);
+             secureBlurTimer = setTimeout(disableSecureBlur, 2500);
          }
      }, true);
 
-     // Copy / drag / select block
+     document.addEventListener('contextmenu', (e) => e.preventDefault());
      document.addEventListener('dragstart', (e) => e.preventDefault());
      document.addEventListener('selectstart', (e) => e.preventDefault());
      document.addEventListener('copy', (e) => e.preventDefault());
      document.addEventListener('cut', (e) => e.preventDefault());
+
+     // iOS long-press save image block
+     document.addEventListener('touchstart', (e) => {
+         if (e.touches.length > 1) return;
+     }, { passive: true });
+
+     function protectCanvas(el) {
+         if (!el || el.tagName !== 'CANVAS') return;
+         el.addEventListener('contextmenu', (e) => e.preventDefault());
+         el.addEventListener('dragstart', (e) => e.preventDefault());
+     }
+     window.__protectCanvas = protectCanvas;
 
      disableSecureBlur();
 
@@ -730,6 +778,7 @@
 
                  entry.wrapper.innerHTML = '';
                  entry.wrapper.appendChild(canvas);
+                 if (typeof window.__protectCanvas === 'function') window.__protectCanvas(canvas);
                  entry.renderedScale = renderScale;
              }
 
