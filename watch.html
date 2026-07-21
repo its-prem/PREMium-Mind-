@@ -2,423 +2,158 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <title>Secure Reader - PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-
+  
   <style>
     :root {
       --pdf-scale: 1;
-      --ink: #111111;
-      --muted: #6b7280;
-      --line: #ececec;
-      --amber: #f59e0b;
-      --amber-soft: #fff7e6;
-      --bg: #ffffff;
-      --page-bg: #f7f7f8;
-      --header-h: 64px;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --font: 'Outfit', system-ui, sans-serif;
-      --display: 'Fraunces', Georgia, serif;
     }
 
+    /* Security: Print Block */
     @media print { html, body { display: none !important; } }
 
-    * { box-sizing: border-box; }
-
+    /* Body global block */
     body {
-      margin: 0;
-      padding: 0;
-      font-family: var(--font);
-      color: var(--ink);
-      background: var(--page-bg);
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
+      margin: 0; padding: 0; font-family: 'Poppins', sans-serif;
+      background: #e5e7eb; user-select: none; -webkit-user-select: none;
       transition: filter 0.3s ease;
-      overflow: hidden;
-      touch-action: none;
-      -webkit-tap-highlight-color: transparent;
+      overflow: hidden; 
+      touch-action: none; 
     }
-
+    
+    /* 🛡️ STATIC HEADER 🛡️ */
     .header {
-      position: absolute;
-      top: 0; left: 0;
-      z-index: 1000;
-      width: 100%;
-      height: calc(var(--header-h) + var(--safe-top));
-      padding: var(--safe-top) 14px 0;
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: 8px;
-      background: var(--bg);
-      border-bottom: 1px solid var(--line);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 8px 24px rgba(17, 17, 17, 0.04);
+      background: #111827; color: #fff; padding: 0 15px; 
+      display: flex; align-items: center; justify-content: space-between;
+      height: 65px; width: 100%; box-sizing: border-box;
+      position: absolute; top: 0; left: 0; z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
       pointer-events: auto;
-      animation: headerIn 0.4s ease both;
     }
-
-    @keyframes headerIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
+    
     .back-btn {
-      justify-self: start;
-      color: var(--ink);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.88rem;
-      min-height: 42px;
-      padding: 0 14px 0 10px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #fff;
-      border: 1px solid #e8e8ea;
-      box-shadow: 0 1px 2px rgba(17, 17, 17, 0.04), 0 4px 12px rgba(17, 17, 17, 0.04);
-      transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      color: #fff; text-decoration: none; font-weight: 500; font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.1); padding: 8px 14px; border-radius: 50px;
+      display: flex; align-items: center; gap: 5px; transition: 0.3s;
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
-    .back-btn:hover {
-      background: var(--amber-soft);
-      border-color: #f6d98a;
-      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.18);
-      transform: translateX(-1px);
-    }
-    .back-btn:active {
-      transform: scale(0.97);
-    }
-
-    .back-btn .back-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: #111;
-      color: #fff;
-      flex-shrink: 0;
-      transition: background 0.2s ease, transform 0.2s ease;
-    }
-    .back-btn:hover .back-icon {
-      background: var(--amber);
-      transform: translateX(-1px);
-    }
-    .back-btn .back-icon svg {
-      width: 14px;
-      height: 14px;
-      display: block;
-    }
-    .back-btn .back-label {
-      letter-spacing: 0.01em;
-      padding-right: 2px;
-    }
+    .back-btn:hover { background: rgba(255, 255, 255, 0.2); }
 
     .brand-title {
-      justify-self: center;
-      font-family: var(--display);
-      font-weight: 700;
-      font-size: 1.15rem;
-      letter-spacing: -0.02em;
-      color: var(--ink);
-      line-height: 1;
-      white-space: nowrap;
-      text-align: center;
-    }
-    .brand-title em {
-      font-style: normal;
-      color: var(--amber);
+      font-weight: 700; color: #10b981; font-size: 1rem;
+      letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px;
     }
 
+    /* 🟢 DOWNLOAD BUTTON 🟢 */
     .header-actions {
-      justify-self: end;
       display: flex;
       align-items: center;
-      gap: 8px;
-    }
-
-    #status {
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #92400e;
-      background: var(--amber-soft);
-      border: 1px solid #fde68a;
-      padding: 6px 10px;
-      border-radius: 8px;
-      white-space: nowrap;
+      gap: 10px;
     }
 
     .download-btn {
-      min-height: 40px;
-      background: var(--ink);
-      color: #fff;
-      border: none;
-      padding: 0 14px;
-      border-radius: 10px;
-      font-family: inherit;
-      font-weight: 650;
-      font-size: 0.88rem;
-      cursor: pointer;
-      transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
-      align-items: center;
-      gap: 6px;
-      display: inline-flex;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff; border: none; padding: 8px 16px; border-radius: 50px;
+      font-weight: 600; font-size: 0.85rem; cursor: pointer;
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+      transition: all 0.3s ease; align-items: center; gap: 6px; display: flex; 
     }
-    .download-btn:hover {
-      background: #000;
-      transform: translateY(-1px);
-    }
+    .download-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
     .download-btn:active { transform: translateY(0); }
 
     .download-btn.locked {
-      background: #e5e7eb;
-      color: #9ca3af;
+      background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
-    .download-btn.locked:hover { transform: none; background: #e5e7eb; }
 
+    #status {
+      background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 6px;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; color: #9ca3af;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* 🛡️ STATIC WATERMARK 🛡️ */
     .watermark-overlay {
-      position: absolute;
-      top: calc(var(--header-h) + var(--safe-top));
-      left: 0;
-      width: 100%;
-      height: calc(100vh - var(--header-h) - var(--safe-top));
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(4, 1fr);
-      justify-items: center;
-      align-items: center;
-      overflow: hidden;
-      z-index: 900;
-      pointer-events: none;
+      position: absolute; top: 65px; left: 0; width: 100%; height: calc(100vh - 65px);
+      display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr);
+      justify-items: center; align-items: center; 
+      overflow: hidden; z-index: 900; pointer-events: none;
+    }
+    
+    .wm-item {
+      font-size: 12px; font-weight: 600; 
+      color: rgba(0, 0, 0, 0.08); 
+      transform: rotate(-35deg); text-align: center;
+      line-height: 1.4; letter-spacing: 0.8px; white-space: nowrap;
+      text-shadow: 1px 1px 1px rgba(255,255,255,0.1);
     }
 
-    .wm-item {
-      font-family: var(--font);
-      font-size: 11px;
-      font-weight: 500;
-      color: rgba(17, 17, 17, 0.06);
-      transform: rotate(-32deg);
-      text-align: center;
-      line-height: 1.35;
-      letter-spacing: 0.3px;
-      white-space: nowrap;
-      pointer-events: none;
+    .loader-container {
+      position: fixed; inset: 0; background: #e5e7eb; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; z-index: 2000;
+    }
+    .loader { border: 4px solid #d1d5db; border-top: 4px solid #10b981; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* 📄 PDF SCROLL AREA 📄 */
+    .scroll-area {
+      position: absolute; top: 65px; left: 0;
+      width: 100vw; height: calc(100vh - 65px);
+      overflow: auto; 
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-x pan-y; 
+      z-index: 10; pointer-events: auto;
+    }
+
+    .pdf-viewer-container {
+      display: flex; flex-direction: column; align-items: center; 
+      padding: 15px; box-sizing: border-box; gap: 15px;
+      width: calc(100% * var(--pdf-scale)); 
+      transform-origin: top left;
+    }
+
+    .page-wrapper { 
+      position: relative; width: 100%; display: flex; justify-content: center; 
+      max-width: 900px; box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      border-radius: 8px; background: #fff; overflow: hidden;
+    }
+
+    canvas {
+      width: 100% !important; height: auto !important;
+      display: block; border-radius: 8px;
     }
 
     .secure-mode { filter: blur(25px) grayscale(100%); pointer-events: none; }
 
-    /* Full opaque cover shown the instant the tab is backgrounded / loses
-       focus. This is stronger than the blur alone: a screen-recording tool
-       running in the background can still pick up *some* structure through
-       a CSS blur, but nothing can be read through a solid, empty layer. */
-    #privacyShield {
-      position: fixed;
-      inset: 0;
-      z-index: 100000;
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 10px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.15s ease;
-    }
-    #privacyShield.show { opacity: 1; pointer-events: auto; }
-    #privacyShield .shield-icon { font-size: 30px; }
-    #privacyShield p { color: var(--muted); font-weight: 600; font-size: 0.9rem; }
-
-    .loader-container {
-      position: fixed;
-      inset: 0;
-      z-index: 2000;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      background:
-        radial-gradient(circle at 50% 35%, var(--amber-soft), transparent 42%),
-        var(--bg);
-      animation: fadeBoot 0.3s ease both;
-    }
-
-    @keyframes fadeBoot {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .loader {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      border: 3px solid #eee;
-      border-top-color: var(--amber);
-      border-right-color: var(--ink);
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .loader-text {
-      margin: 0;
-      color: var(--muted);
-      font-weight: 500;
-      font-size: 0.95rem;
-      letter-spacing: 0.01em;
-    }
-
-    .loader-container.is-error .loader-text {
-      color: #b91c1c;
-      font-weight: 650;
-      text-align: center;
-      max-width: 280px;
-      padding: 0 20px;
-    }
-
-    .scroll-area {
-      position: absolute;
-      top: calc(var(--header-h) + var(--safe-top));
-      left: 0;
-      width: 100vw;
-      height: calc(100vh - var(--header-h) - var(--safe-top));
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-x pan-y;
-      z-index: 10;
-      pointer-events: auto;
-      background:
-        linear-gradient(180deg, #fafafa 0%, var(--page-bg) 100%);
-      padding-bottom: var(--safe-bottom);
-    }
-
-    .pdf-viewer-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 18px 14px calc(28px + var(--safe-bottom));
-      gap: 14px;
-      width: calc(100% * var(--pdf-scale));
-      transform-origin: top left;
-      animation: pagesIn 0.45s ease both;
-    }
-
-    @keyframes pagesIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .page-wrapper {
-      position: relative;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      max-width: calc(900px * var(--pdf-scale));
-      background: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      box-shadow: 0 6px 20px rgba(17, 17, 17, 0.06);
-    }
-
-    canvas {
-      width: 100% !important;
-      height: auto !important;
-      display: block;
-      border-radius: 10px;
-      -webkit-touch-callout: none;
-      -webkit-user-drag: none;
-      user-drag: none;
-      pointer-events: auto;
-    }
-
-    @media (max-width: 700px) {
-      :root { --header-h: 58px; }
-
-      .header {
-        padding-left: 10px;
-        padding-right: 10px;
-        gap: 6px;
-      }
-
-      .brand-title {
-        font-size: 1rem;
-        max-width: 42vw;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .back-btn {
-        min-height: 40px;
-        min-width: 40px;
-        padding: 0;
-        justify-content: center;
-        gap: 0;
-        border-radius: 50%;
-      }
-      .back-btn .back-label { display: none; }
-      .back-btn .back-icon {
-        width: 40px;
-        height: 40px;
-        background: #111;
-      }
-      .back-btn:hover .back-icon { background: var(--amber); }
-
-      #status { display: none; }
-
-      .download-btn {
-        min-height: 38px;
-        padding: 0 12px;
-        font-size: 0.82rem;
-      }
-      .download-btn svg { width: 15px; height: 15px; }
-
-      .pdf-viewer-container {
-        padding: 10px 8px calc(22px + var(--safe-bottom));
-        gap: 10px;
-      }
-
-      .page-wrapper {
-        border-radius: 8px;
-        box-shadow: 0 3px 12px rgba(17, 17, 17, 0.05);
-      }
-
-      canvas { border-radius: 8px; }
-
-      .wm-item { font-size: 9px; color: rgba(17, 17, 17, 0.05); }
-      .watermark-overlay {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(5, 1fr);
-      }
+    /* Mobile Optimizations */
+    @media (max-width: 600px) {
+       .wm-item { font-size: 10px; color: rgba(0,0,0,0.06); }
+       .watermark-overlay { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(5, 1fr); }
+       .header { padding: 0 12px; height: 60px; }
+       .scroll-area { top: 60px; height: calc(100vh - 60px); }
+       .watermark-overlay { top: 60px; height: calc(100vh - 60px); }
+       .brand-title { display: none; } 
+       .back-btn span { display: none; } 
+       .back-btn { padding: 8px 12px; }
+       .download-btn { padding: 8px 14px; font-size: 0.8rem; }
     }
   </style>
 </head>
-<body oncontextmenu="return false;" ondragstart="return false;">
+<body oncontextmenu="return false;">
 
   <div class="header">
-    <a href="lecture.html" class="back-btn" onclick="window.history.back(); return false;" aria-label="Go back">
-      <span class="back-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M15 18l-6-6 6-6"/>
-        </svg>
-      </span>
-      <span class="back-label">Back</span>
+    <a href="lecture.html" class="back-btn" onclick="window.history.back(); return false;">
+      <span>←</span> <span>Back</span>
     </a>
-    <div class="brand-title">PREM<em>ium</em> Mind</div>
+    <div class="brand-title">PREMium Mind</div>
+    
     <div class="header-actions">
-      <div id="status">Secure</div>
+      <div id="status">SECURE HD</div>
       <button id="downloadBtn" class="download-btn">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
         <span id="dl-text">Save</span>
@@ -435,19 +170,11 @@
 
   <div class="loader-container" id="loadingState">
      <div class="loader"></div>
-     <p class="loader-text">Loading notes...</p>
+     <p style="margin-top:15px; color:#4b5563; font-weight: 500;">Loading Secure PDF...</p>
   </div>
 
   <div class="scroll-area" id="scrollArea">
       <div class="pdf-viewer-container" id="pdfContainer"></div>
-  </div>
-
-  <!-- Instant opaque cover: shown the moment the tab loses focus / is
-       backgrounded / the app-switcher preview is taken, so nothing but a
-       blank shield can ever be captured in that snapshot. -->
-  <div id="privacyShield">
-    <div class="shield-icon">🔒</div>
-    <p>Content hidden — tab not in focus</p>
   </div>
 
   <script>
@@ -459,68 +186,31 @@
      }, { passive: false });
 
      // =========================================================
-     // 2. PINCH-TO-ZOOM — zoom point fixed (pinch center pe hi rahe)
+     // 2. CUSTOM PINCH-TO-ZOOM FOR PDF ONLY
      // =========================================================
      const scrollArea = document.getElementById('scrollArea');
-     const ZOOM_MIN = 1;
-     const ZOOM_MAX = 4;
-     let currentScale = 1;
-     let pinchStartDist = 0;
-     let pinchStartScale = 1;
-     let pinchCenterX = 0;
-     let pinchCenterY = 0;
-
-     function applyZoom(newScale, anchorX, anchorY) {
-         const prev = currentScale;
-         currentScale = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newScale));
-         if (Math.abs(currentScale - prev) < 0.001) return;
-
-         const ratio = currentScale / prev;
-         scrollArea.scrollLeft = (scrollArea.scrollLeft + anchorX) * ratio - anchorX;
-         scrollArea.scrollTop = (scrollArea.scrollTop + anchorY) * ratio - anchorY;
-         document.documentElement.style.setProperty('--pdf-scale', currentScale);
-     }
+     let currentScale = 1, initialDistance = 0, initialScale = 1;
 
      scrollArea.addEventListener('touchstart', (e) => {
          if (e.touches.length === 2) {
-             pinchStartDist = Math.hypot(
+             initialDistance = Math.hypot(
                  e.touches[0].clientX - e.touches[1].clientX,
                  e.touches[0].clientY - e.touches[1].clientY
              );
-             pinchStartScale = currentScale;
-             const rect = scrollArea.getBoundingClientRect();
-             pinchCenterX = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left;
-             pinchCenterY = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top;
+             initialScale = currentScale;
          }
      }, {passive: false});
 
      scrollArea.addEventListener('touchmove', (e) => {
-         if (e.touches.length === 2 && pinchStartDist > 0) {
-             e.preventDefault();
-             const dist = Math.hypot(
+         if (e.touches.length === 2) {
+             e.preventDefault(); 
+             const currentDistance = Math.hypot(
                  e.touches[0].clientX - e.touches[1].clientX,
                  e.touches[0].clientY - e.touches[1].clientY
              );
-             const rect = scrollArea.getBoundingClientRect();
-             pinchCenterX = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left;
-             pinchCenterY = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top;
-             applyZoom(pinchStartScale * (dist / pinchStartDist), pinchCenterX, pinchCenterY);
-         }
-     }, {passive: false});
-
-     scrollArea.addEventListener('touchend', () => {
-         if (pinchStartDist > 0) {
-             pinchStartDist = 0;
-             if (typeof window.__reRenderZoom === 'function') window.__reRenderZoom();
-         }
-     }, {passive: true});
-
-     scrollArea.addEventListener('wheel', (e) => {
-         if (e.ctrlKey || e.metaKey) {
-             e.preventDefault();
-             const rect = scrollArea.getBoundingClientRect();
-             applyZoom(currentScale + (e.deltaY > 0 ? -0.25 : 0.25), e.clientX - rect.left, e.clientY - rect.top);
-             if (typeof window.__reRenderZoom === 'function') window.__reRenderZoom();
+             currentScale = initialScale * (currentDistance / initialDistance);
+             currentScale = Math.max(1, Math.min(currentScale, 3.5));
+             document.documentElement.style.setProperty('--pdf-scale', currentScale);
          }
      }, {passive: false});
 
@@ -544,150 +234,52 @@
              }
          } catch (error) { console.error("Failed to fetch phone number"); }
 
-         // Timestamp added to the watermark: if a leaked photo/screenshot
-         // ever surfaces, the exact viewing session (who + when) is baked
-         // right into the image, which is a much stronger deterrent than a
-         // static "email only" mark.
-         const now = new Date();
-         const stamp = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
-         const wmContent = `${userEmail}<br>+91 ${userPhone}<br>${stamp}`;
+         const wmContent = `${userEmail}<br>+91 ${userPhone}`;
          document.querySelectorAll('.wm-item').forEach(el => el.innerHTML = wmContent);
      }
      fetchUserInfoAndSetWatermark();
 
      // =========================================================
      // 4. SECURITY: ANTI-SCREENSHOT & BLUR
-     //
-     // IMPORTANT — read this before relying on it:
-     // None of this can detect or block an actual OS-level screenshot
-     // (Print Screen, a phone's power+volume button, or a second device's
-     // camera pointed at the screen). Browsers give web pages no
-     // permission or API to see that a screenshot happened, on any
-     // platform. What this section *does* do:
-     //   - Hides content instantly behind an opaque shield the moment the
-     //     tab loses focus / is backgrounded — this covers the "recent
-     //     apps switcher" snapshot some mobile OSes take, and stops
-     //     anything readable from showing up if a screen recorder is
-     //     running in another window.
-     //   - Blocks the easy desktop shortcuts for saving/printing/copying/
-     //     viewing source and opening DevTools. A determined user can
-     //     still get around most of these; they mainly stop casual copying.
-     //   - The watermark (above) remains the most effective real-world
-     //     deterrent, since it survives any screenshot and identifies who
-     //     it came from.
      // =========================================================
-     const privacyShield = document.getElementById('privacyShield');
-
-     function engageShield() {
-         document.body.classList.add('secure-mode');
-         privacyShield.classList.add('show');
-     }
-     function releaseShield() {
-         document.body.classList.remove('secure-mode');
-         privacyShield.classList.remove('show');
-     }
-
-     window.addEventListener('blur', engageShield);
-     window.addEventListener('focus', releaseShield);
-
-     document.addEventListener('visibilitychange', () => {
-         if (document.hidden) engageShield();
-         else releaseShield();
-     });
-
-     // Also engage the moment the pointer/finger leaves the window edge on
-     // desktop (covers the gap before a real OS screenshot tool takes
-     // focus, e.g. Windows Snipping Tool / Win+Shift+S).
-     document.addEventListener('mouseleave', (e) => {
-         if (e.clientY <= 0 || e.clientX <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
-             engageShield();
-         }
-     });
-     document.addEventListener('mouseenter', releaseShield);
+     window.addEventListener('blur', () => { document.body.classList.add('secure-mode'); });
+     window.addEventListener('focus', () => { document.body.classList.remove('secure-mode'); });
 
      document.addEventListener('keydown', (e) => {
-         const k = (e.key || '').toLowerCase();
-
-         // Save / Print / Copy / View-source
-         if ((e.ctrlKey || e.metaKey) && ['p','s','c','u'].includes(k)) e.preventDefault();
-
-         // DevTools shortcuts (Windows/Linux + Mac)
-         if (k === 'f12') e.preventDefault();
-         if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i','j','c'].includes(k)) e.preventDefault();
-         if (e.metaKey && e.altKey && ['i','j','c'].includes(k)) e.preventDefault(); // Mac Cmd+Option+I/J/C
-
+         if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'c' || e.key === 'u')) e.preventDefault();
          if (e.key === 'PrintScreen') {
-            // Best-effort only: this cannot actually stop the OS from
-            // having already captured the screen by the time this fires.
-            try { navigator.clipboard.writeText('Screenshots not allowed'); } catch (err) {}
-            engageShield();
-            setTimeout(releaseShield, 2000);
+            navigator.clipboard.writeText('Screenshots not allowed');
+            document.body.classList.add('secure-mode');
+            setTimeout(() => document.body.classList.remove('secure-mode'), 2000);
          }
      });
-    </script>
-  <script>
+
      // =========================================================
-     // 5. PDF SECURE FETCH (short-lived one-time tokens — no secret in JS)
+     // 5. PDF SECURE FETCHING LOGIC (UPDATED WITH TOKEN)
      // =========================================================
-     const API_BASE = 'https://premind.diplomawallah.in';
      const urlParams = new URLSearchParams(window.location.search);
-     // Prefer ?file=uploads/pdfs/...  (legacy ?pdf= full proxy URL still supported)
-     let pdfFile = urlParams.get('file');
-     let legacyPdf = urlParams.get('pdf');
-     let allowDownload = urlParams.get('download') === 'true' || urlParams.get('download') === '1';
+     let rawPdfUrl = urlParams.get('pdf');
+     let allowDownload = urlParams.get('download') === 'true' || urlParams.get('download') === '1'; 
      let customTitle = urlParams.get('title');
 
-     if (!pdfFile && legacyPdf) {
-         try {
-             const u = new URL(legacyPdf, API_BASE);
-             if (u.pathname.includes('proxy_pdf.php') && u.searchParams.get('file')) {
-                 pdfFile = u.searchParams.get('file');
-             } else if (legacyPdf.indexOf('uploads/pdfs/') === 0) {
-                 pdfFile = legacyPdf;
-             }
-         } catch (e) {
-             if (String(legacyPdf).indexOf('uploads/pdfs/') === 0) pdfFile = legacyPdf;
-         }
-     }
+     // 🛑 SECRET KEY - Ye wahi key honi chahiye jo Hostinger PHP file mein hai 🛑
+     const SECRET_KEY = "PREM_MIND_SECURE_2026";
+     
+     // Secure URL banaya (Token attach karke)
+     let securePdfUrl = rawPdfUrl ? `${rawPdfUrl}&token=${SECRET_KEY}` : null;
 
-     async function getPdfToken(purpose) {
-         const res = await fetch(`${API_BASE}/get_pdf_token.php`, {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ file: pdfFile, email: userEmail, purpose })
-         });
-         const data = await res.json().catch(() => ({}));
-         if (!res.ok || data.status !== 'success' || !data.token) {
-             throw new Error(data.message || 'Token request failed');
-         }
-         return data.token;
-     }
-
-     // POST + one-time token — Network tab URL se dubara download nahi hoga
-     async function fetchSecurePdfBytes(purpose) {
-         const token = await getPdfToken(purpose);
-         const res = await fetch(`${API_BASE}/proxy_pdf.php`, {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ file: pdfFile, email: userEmail, token })
-         });
-         if (!res.ok) throw new Error('Unauthorized Access or Invalid Token');
-         const buf = await res.arrayBuffer();
-         return buf;
-     }
-
-     if (pdfFile) {
+     if (securePdfUrl) {
          const downloadBtn = document.getElementById('downloadBtn');
-
-         if (!allowDownload) {
+         
+         if(!allowDownload) {
              downloadBtn.classList.add('locked');
              document.getElementById('dl-text').innerText = "Locked";
          }
-
+         
          downloadBtn.addEventListener('click', async () => {
-             if (!allowDownload) {
-                 alert("⚠️ Download available day of exam at 6:00 AM only.");
-                 return;
+             if(!allowDownload) {
+                 alert("⚠️ Download available day of exam at 6:00 AM only."); 
+                 return; 
              }
 
              const originalHtml = downloadBtn.innerHTML;
@@ -695,31 +287,39 @@
              downloadBtn.disabled = true;
 
              try {
-                 const buf = await fetchSecurePdfBytes('download');
-                 const blob = new Blob([buf], { type: 'application/pdf' });
-                 const blobUrl = URL.createObjectURL(blob);
-
-                 let baseName = "Premium_Notes";
+                 // Secure URL se Blob fetch karna
+                 const response = await fetch(securePdfUrl);
+                 if(!response.ok) throw new Error("Unauthorized Download");
+                 
+                 const blob = await response.blob();
+                 const blobUrl = window.URL.createObjectURL(blob);
+                 
+                 let baseName = "Premium_Notes"; 
                  if (customTitle) {
                      baseName = decodeURIComponent(customTitle).replace(/[^a-zA-Z0-9 ]/g, "_");
                  } else {
-                     const extractedName = pdfFile.substring(pdfFile.lastIndexOf('/') + 1);
-                     if (extractedName) baseName = extractedName.replace(/\.pdf$/i, "");
+                     let extractedName = rawPdfUrl.substring(rawPdfUrl.lastIndexOf('/') + 1).split('?')[0];
+                     if (extractedName && !extractedName.includes('.php')) {
+                         baseName = extractedName.replace(".pdf", "");
+                     }
                  }
-
+                 
+                 let finalFileName = `${baseName}_PREMium_Mind.pdf`;
+                 
                  const a = document.createElement('a');
                  a.href = blobUrl;
-                 a.download = `${baseName}_PREMium_Mind.pdf`;
+                 a.download = finalFileName;
                  document.body.appendChild(a);
                  a.click();
                  document.body.removeChild(a);
-                 URL.revokeObjectURL(blobUrl);
+                 
+                 window.URL.revokeObjectURL(blobUrl);
                  downloadBtn.innerHTML = "✅ Done";
              } catch (error) {
                  alert("Download Failed: Connection secure layer active.");
                  downloadBtn.innerHTML = "❌ Failed";
              }
-
+             
              setTimeout(() => {
                  downloadBtn.innerHTML = originalHtml;
                  downloadBtn.disabled = false;
@@ -728,110 +328,59 @@
      }
 
      // =========================================================
-     // 6. RENDER HD PDF — pehle poori load, fir show; zoom pe full quality
+     // 6. RENDER HD PDF VIA BLOB (SECURE PREVIEW)
      // =========================================================
-     if (pdfFile) {
+     if(securePdfUrl) {
          const container = document.getElementById('pdfContainer');
          const loadingState = document.getElementById('loadingState');
-         const loaderText = loadingState.querySelector('.loader-text');
 
-         fetchSecurePdfBytes('view')
-         .then(async (pdfData) => {
+         // Blob fetch karke network tab se original file chhupana
+         fetch(securePdfUrl)
+         .then(response => {
+             if (!response.ok) throw new Error('Unauthorized Access or Invalid Token');
+             return response.blob();
+         })
+         .then(blob => {
+             const blobUrl = URL.createObjectURL(blob);
+             
              pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-             const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
-             pdfData = null;
+             pdfjsLib.getDocument(blobUrl).promise.then(async (pdfDoc) => {
+                 for (let num = 1; num <= pdfDoc.numPages; num++) {
+                     const page = await pdfDoc.getPage(num);
+                     const scale = 2.0; 
+                     const viewport = page.getViewport({ scale });
+                     
+                     const wrapper = document.createElement('div');
+                     wrapper.className = 'page-wrapper';
+                     
+                     const canvas = document.createElement('canvas');
+                     const ctx = canvas.getContext('2d', { alpha: false }); 
+                     const dpr = window.devicePixelRatio || 1;
 
-             const isMobile = window.innerWidth < 700 || /Android|iPhone|iPad/i.test(navigator.userAgent);
-             const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 2 : 1.5);
-             const MAX_EDGE = isMobile ? 4200 : 5200;
+                     canvas.width = Math.floor(viewport.width * dpr);
+                     canvas.height = Math.floor(viewport.height * dpr);
 
-             // Fit page to screen width (100% pe sharp, memory safe)
-             const firstPage = await pdfDoc.getPage(1);
-             const baseVp = firstPage.getViewport({ scale: 1 });
-             const pad = isMobile ? 16 : 36;
-             const cssWidth = Math.min(900, Math.max(280, scrollArea.clientWidth - pad));
-             const fitScale = cssWidth / baseVp.width;
+                     const transform = dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null;
+                     wrapper.appendChild(canvas);
+                     container.appendChild(wrapper);
 
-             const entries = [];
-
-             async function renderEntry(entry, renderScale) {
-                 const viewport = entry.page.getViewport({ scale: renderScale });
-                 let pr = dpr;
-                 const longEdge = Math.max(viewport.width, viewport.height) * pr;
-                 if (longEdge > MAX_EDGE) pr = MAX_EDGE / Math.max(viewport.width, viewport.height);
-
-                 const canvas = document.createElement('canvas');
-                 canvas.oncontextmenu = () => false;
-                 canvas.draggable = false;
-                 const ctx = canvas.getContext('2d', { alpha: false });
-                 canvas.width = Math.floor(viewport.width * pr);
-                 canvas.height = Math.floor(viewport.height * pr);
-                 canvas.style.width = '100%';
-                 canvas.style.height = 'auto';
-
-                 const transform = pr !== 1 ? [pr, 0, 0, pr, 0, 0] : null;
-                 await entry.page.render({ canvasContext: ctx, transform, viewport }).promise;
-
-                 entry.wrapper.innerHTML = '';
-                 entry.wrapper.appendChild(canvas);
-                 entry.renderedScale = renderScale;
-             }
-
-             // Saari pages pehle render (full load), tab loader hatega
-             for (let num = 1; num <= pdfDoc.numPages; num++) {
-                 if (loaderText) loaderText.textContent = 'Loading ' + num + '/' + pdfDoc.numPages + '...';
-                 const page = await pdfDoc.getPage(num);
-                 const wrapper = document.createElement('div');
-                 wrapper.className = 'page-wrapper';
-                 container.appendChild(wrapper);
-                 const entry = { page, wrapper, renderedScale: 0 };
-                 entries.push(entry);
-                 await renderEntry(entry, fitScale);
-             }
-
-             loadingState.style.display = 'none';
-
-             // Zoom pe: dikhne wali pages full quality me, baaki wapas fit (memory safe)
-             let zoomTimer = null;
-             let zoomBusy = false;
-             window.__reRenderZoom = function () {
-                 clearTimeout(zoomTimer);
-                 zoomTimer = setTimeout(async () => {
-                     if (zoomBusy) return;
-                     zoomBusy = true;
-                     try {
-                         const target = fitScale * currentScale;
-                         const rootRect = scrollArea.getBoundingClientRect();
-                         for (const entry of entries) {
-                             const r = entry.wrapper.getBoundingClientRect();
-                             const visible = r.bottom >= rootRect.top - 60 && r.top <= rootRect.bottom + 60;
-                             if (visible) {
-                                 if (Math.abs(entry.renderedScale - target) > 0.05) await renderEntry(entry, target);
-                             } else if (entry.renderedScale > fitScale + 0.05) {
-                                 await renderEntry(entry, fitScale);
-                             }
-                         }
-                     } finally {
-                         zoomBusy = false;
-                     }
-                 }, 220);
-             };
-
-             // Scroll karte waqt naye visible pages ko current zoom pe sharp karo
-             scrollArea.addEventListener('scroll', () => {
-                 if (currentScale > 1.05) window.__reRenderZoom();
-             }, { passive: true });
+                     await page.render({ canvasContext: ctx, transform: transform, viewport: viewport }).promise;
+                 }
+                 
+                 loadingState.style.display = 'none';
+                 // Security: Render hote hi URL memory se delete kar do
+                 setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+             }).catch(err => {
+                 loadingState.innerHTML = "<p style='color:#ef4444; font-weight:bold;'>Error rendering document.</p>";
+             });
          })
          .catch(err => {
-             loadingState.classList.add('is-error');
-             loadingState.innerHTML = "<p class='loader-text'>Access Denied. Secure Connection Failed.</p>";
+             loadingState.innerHTML = "<p style='color:#ef4444; font-weight:bold;'>Access Denied. Secure Connection Failed.</p>";
              console.error(err);
          });
      } else {
-         const loadingState = document.getElementById('loadingState');
-         loadingState.classList.add('is-error');
-         loadingState.innerHTML = "<p class='loader-text'>No PDF file provided.</p>";
+         document.getElementById('loadingState').innerHTML = "No PDF URL Provided.";
      }
   </script>
 </body>
