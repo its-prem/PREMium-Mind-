@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Attendance Sheet Generator</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        :root {
+            --navy: #02277F;
+            --navy-soft: #0d3a9e;
+            --accent: #e67e22;
+            --accent-soft: #fef3e8;
+            --ink: #1a1a2e;
+            --muted: #64748b;
+            --line: #e2e8f0;
+            --panel: #ffffff;
+            --canvas-bg: #4a5568;
+            --radius: 12px;
+            --shadow: 0 8px 32px rgba(2, 39, 127, 0.12);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #3d4852 0%, #525659 50%, #434b54 100%);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            display: flex;
+            gap: 24px;
+            padding: 20px 20px 20px 400px;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        /* ----- Sidebar Controls ----- */
+        .controls {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            width: 368px;
+            max-height: calc(100vh - 32px);
+            background: var(--panel);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        .controls-header {
+            padding: 18px 20px 14px;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-soft) 100%);
+            color: #fff;
+        }
+        .controls-header h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .controls-header p {
+            font-size: 0.72rem;
+            opacity: 0.85;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        .controls-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 16px 16px;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+
+        .step-card {
+            background: #f8fafc;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .step-card[open] {
+            border-color: #bfdbfe;
+            box-shadow: 0 2px 12px rgba(2, 39, 127, 0.06);
+        }
+        .step-card summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 12px 14px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--navy);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            user-select: none;
+        }
+        .step-card summary::-webkit-details-marker { display: none; }
+        .step-num {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            background: var(--navy);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .step-inner { padding: 0 14px 14px; }
+
+        .controls label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--muted);
+            display: block;
+            margin: 10px 0 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .controls label:first-child { margin-top: 0; }
+
+        .hint-box {
+            background: var(--accent-soft);
+            border: 1px solid #fcd9b8;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.75rem;
+            color: #9a3412;
+            line-height: 1.45;
+            margin-bottom: 8px;
+        }
+        .hint-box b { color: var(--navy); }
+
+        .controls input[type="text"],
+        .controls input[type="date"],
+        .controls input[type="number"],
+        .controls textarea,
+        .controls select {
+            width: 100%;
+            padding: 9px 11px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.82rem;
+            color: var(--ink);
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .controls textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.78rem;
+        }
+        .controls input:focus,
+        .controls textarea:focus {
+            outline: none;
+            border-color: var(--navy-soft);
+            box-shadow: 0 0 0 3px rgba(2, 39, 127, 0.1);
+        }
+        .controls input[type="file"] { font-size: 0.75rem; width: 100%; margin-bottom: 4px; }
+        .controls input[type="range"] { width: 100%; accent-color: var(--navy); }
+        .slider-val { font-weight: 600; color: var(--navy-soft); float: right; font-size: 0.72rem; }
+
+        .btn {
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.84rem;
+            padding: 11px 14px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-family: inherit;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--navy); color: #fff; }
+        .btn-primary:hover { background: var(--navy-soft); box-shadow: 0 4px 14px rgba(2,39,127,0.25); }
+        .btn-secondary { background: #fff; color: var(--navy); border: 1.5px solid var(--line); }
+        .btn-secondary:hover { border-color: var(--navy); background: #f8fafc; }
+        .btn-success {
+            background: linear-gradient(135deg, #0d9488 0%, #059669 100%);
+            color: #fff;
+            font-size: 0.9rem;
+            padding: 13px;
+            margin-top: 12px;
+        }
+        .btn-success:hover { box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35); }
+        .btn:disabled { background: #94a3b8 !important; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .save-options {
+            background: #f1f5f9;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-top: 4px;
+        }
+        .radio-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--ink);
+            line-height: 1.35;
+        }
+        .radio-row:first-of-type { margin-top: 6px; }
+        .radio-row input { width: auto; margin-top: 2px; accent-color: var(--navy); }
+
+        #outputTable {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.68rem;
+            margin-top: 8px;
+        }
+        #outputTable th, #outputTable td {
+            border: 1px solid var(--line);
+            padding: 6px 5px;
+            text-align: left;
+        }
+        #outputTable th {
+            background: #e2e8f0;
+            font-weight: 600;
+            color: var(--navy);
+            position: sticky;
+            top: 0;
+        }
+        #outputTable tbody tr:nth-child(even) { background: #fff; }
+        .table-wrap { max-height: 140px; overflow-y: auto; border-radius: 8px; border: 1px solid var(--line); }
+
+        /* ----- A4 Page ----- */
+        .preview-wrap {
+            flex-shrink: 0;
+            padding-bottom: 40px;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background-color: #fff;
+            background-image: url('finalved.jpg');
+            background-size: 210mm 297mm;
+            background-repeat: no-repeat;
+            background-position: center top;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.35);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .content {
+            padding: 158px 20mm 18mm 20mm;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--ink);
+        }
+
+        .sheet-title {
+            text-align: center;
+            font-size: 21px;
+            font-weight: 400;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            color: var(--navy);
+            letter-spacing: 2px;
+            font-family: 'Archivo Black', sans-serif;
+        }
+        .sheet-title::after {
+            content: "";
+            display: block;
+            width: 72px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), #f39c12);
+            margin: 8px auto 0;
+            border-radius: 2px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 0;
+            margin-bottom: 18px;
+            font-size: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .info-grid dt {
+            background: #f1f5f9;
+            padding: 7px 12px;
+            font-weight: 700;
+            color: #334155;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+        }
+        .info-grid dd {
+            padding: 7px 12px;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+            border-left: 1px solid #e2e8f0;
+            min-height: 34px;
+            display: flex;
+            align-items: center;
+        }
+        .info-grid dt:last-of-type,
+        .info-grid dd:last-of-type { border-bottom: none; }
+
+        .tables-row {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Note + attendance — tables ke turant baad (upar) */
+        .eval-block {
+            margin-top: 10px;
+            margin-bottom: 0;
+        }
+
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .attendance-table th,
+        .attendance-table td {
+            border: 1px solid #94a3b8;
+            padding: 6px 4px;
+            text-align: center;
+            height: 30px;
+        }
+        .attendance-table th {
+            background: var(--navy);
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.4px;
+        }
+        .attendance-table th.month-head {
+            background: var(--accent);
+            font-size: 11px;
+            letter-spacing: 0.6px;
+        }
+        .attendance-table td:first-child {
+            font-weight: 700;
+            text-align: left;
+            padding-left: 10px;
+            background: #f1f5f9;
+            width: 18%;
+            color: #334155;
+        }
+        .attendance-table tbody tr:nth-child(even) td:not(:first-child) {
+            background: #fafbfc;
+        }
+        .attendance-table td.tick {
+            color: #059669;
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        .tick-picker-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .tick-picker-actions button {
+            flex: 1;
+            padding: 6px 8px;
+            font-size: 0.72rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            color: var(--navy);
+        }
+        .tick-picker-actions button:hover { background: #f1f5f9; }
+        .tick-check-grid {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.68rem;
+        }
+        .tick-check-head,
+        .tick-check-row {
+            display: grid;
+            grid-template-columns: 42px repeat(5, 1fr);
+            align-items: center;
+        }
+        .tick-check-head {
+            background: var(--navy);
+            color: #fff;
+            font-weight: 700;
+            text-align: center;
+        }
+        .tick-check-head span,
+        .tick-check-row span,
+        .tick-check-cell {
+            padding: 5px 2px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
+        }
+        .tick-check-head span:last-child,
+        .tick-check-row .tick-check-cell:last-child { border-right: none; }
+        .tick-check-row:last-child .tick-check-cell,
+        .tick-check-row:last-child .tick-week-label { border-bottom: none; }
+        .tick-week-label {
+            font-weight: 700;
+            color: var(--navy);
+            background: #f1f5f9;
+            border-right: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .tick-check-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            cursor: pointer;
+            background: #fff;
+        }
+        .tick-check-cell:hover { background: #f8fafc; }
+        .tick-check-cell input {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+        .tick-check-cell.in-range { background: #eff6ff; }
+        .tick-picker-note {
+            font-size: 0.72rem;
+            color: var(--muted);
+            margin: 8px 0 0;
+            line-height: 1.4;
+        }
+
+        .bottom-note {
+            font-size: 12.5px;
+            color: #475569;
+            line-height: 1.45;
+            margin-bottom: 8px;
+        }
+        .attendance-result-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+            padding: 7px 14px;
+            border-left: 4px solid var(--navy);
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+        }
+        .attendance-result-box span {
+            font-size: 17px;
+            color: var(--navy);
+            font-weight: 800;
+        }
+
+        /* Certificate jaisa signature + stamp */
+        .signature-area {
+            position: relative;
+            padding: 0 22mm;
+            height: 150px;
+            margin-bottom: 28mm;
+            flex-shrink: 0;
+        }
+        #dynamicSignText {
+            position: absolute;
+            left: 82px;
+            bottom: 82px;
+            font-size: 16px;
+            line-height: 1.4;
+            color: #111;
+            z-index: 2;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        #dynamicStampBox {
+            position: absolute;
+            left: 216px;
+            bottom: 69px;
+            z-index: 1;
+        }
+        #dynamicStampImg {
+            width: 137px;
+            height: auto;
+            display: block;
+        }
+
+        @media print {
+            body { background: none; padding: 0; }
+            .controls { display: none; }
+            .page { box-shadow: none; }
+            .preview-wrap { padding: 0; }
+        }
+
+        @media (max-width: 1100px) {
+            body {
+                flex-direction: column;
+                padding: 16px;
+                align-items: center;
+            }
+            .controls {
+                position: relative;
+                top: auto;
+                left: auto;
+                width: 100%;
+                max-width: 480px;
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="controls">
+        <div class="controls-header">
+            <h3>Attendance Generator</h3>
+            <p>Bulk PDF sheets — paste Excel rows, preview, then download.</p>
+        </div>
+        <div class="controls-body">
+
+            <details class="step-card">
+                <summary><span class="step-num">1</span> Load Images</summary>
+                <div class="step-inner">
+                    <label>Background (finalved.jpg)</label>
+                    <input type="file" accept="image/*" onchange="loadBg(event)">
+                    <label>Stamp & Sign (sign.png)</label>
+                    <input type="file" accept="image/*" onchange="loadStamp(event)">
+                </div>
+            </details>
+
+            <details class="step-card" open>
+                <summary><span class="step-num">2</span> Student Data</summary>
+                <div class="step-inner">
+                    <div class="hint-box">
+                        <b>8 columns</b> (Excel se copy — tab separated):<br>
+                        Name · Course · Registration No · College Name · Enrollment NO · Starting Date · Ending Date · Date Of Issue
+                    </div>
+                    <textarea id="bulkData" rows="7" placeholder="Bikram Kumar&#9;AutoCAD&#9;24116120004&#9;Girija Institute of Polytechnic, Ramgarh&#9;VED/2026/AUTOCAD/430&#9;08-06-2026&#9;12-07-2026&#9;01-07-2026&#10;Sachin Kumar&#9;AutoCAD&#9;25116030008&#9;Girija Institute of Polytechnic, Ramgarh&#9;VED/2026/AUTOCAD/433&#9;08-06-2026&#9;12-07-2026&#9;01-07-2026"></textarea>
+                    <p style="font-size:0.72rem;color:var(--muted);margin:6px 0 0;">Sab students ko auto <b>90%</b> Overall Attendance.</p>
+                    <button class="btn btn-secondary" onclick="previewFirst()">Preview first student</button>
+                </div>
+            </details>
+
+            <details class="step-card" open>
+                <summary><span class="step-num">3</span> Attendance Ticks (✓)</summary>
+                <div class="step-inner">
+                    <div class="tick-picker-actions">
+                        <button type="button" onclick="selectAllTickChecks()">Select all</button>
+                        <button type="button" onclick="clearTickChecks()">Clear all</button>
+                        <button type="button" onclick="highlightDateRange()">Show date range</button>
+                    </div>
+                    <div id="tickCheckGrid" class="tick-check-grid"></div>
+                    <p class="tick-picker-note">Jis box ko <b>check</b> karoge, sheet par <b>✓</b> aayega. Khud tick lagao — sab PDFs mein same pattern use hoga.</p>
+                </div>
+            </details>
+
+            <details class="step-card">
+                <summary><span class="step-num">4</span> Stamp & Sign Position</summary>
+                <div class="step-inner">
+                    <label>Stamp Size <span class="slider-val" id="valStampSize">137px</span></label>
+                    <input type="range" id="stampSize" min="50" max="350" value="137" oninput="updateElements()">
+                    <label>Stamp Left / Right <span class="slider-val" id="valStampX">216px</span></label>
+                    <input type="range" id="stampX" min="0" max="500" value="216" oninput="updateElements()">
+                    <label>Stamp Up / Down <span class="slider-val" id="valStampY">69px</span></label>
+                    <input type="range" id="stampY" min="-100" max="300" value="69" oninput="updateElements()">
+                    <label>Sign Text Left / Right <span class="slider-val" id="valSignX">82px</span></label>
+                    <input type="range" id="signX" min="0" max="400" value="82" oninput="updateElements()">
+                    <label>Sign Text Up / Down <span class="slider-val" id="valSignY">82px</span></label>
+                    <input type="range" id="signY" min="-50" max="300" value="82" oninput="updateElements()">
+                </div>
+            </details>
+
+            <details class="step-card">
+                <summary><span class="step-num">5</span> Generated List</summary>
+                <div class="step-inner">
+                    <div class="table-wrap">
+                        <table id="outputTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Enroll</th>
+                                    <th>Course</th>
+                                    <th>Attd.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="outputTbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </details>
+
+            <div class="save-options">
+                <label style="margin-top:0; text-transform:none; font-size:0.78rem; color:var(--navy);">Save layout</label>
+                <label class="radio-row">
+                    <input type="radio" name="saveStyle" value="single" checked onchange="updateBtnText()">
+                    All files in one folder
+                </label>
+                <label class="radio-row">
+                    <input type="radio" name="saveStyle" value="college" onchange="updateBtnText()">
+                    Separate folder per college
+                </label>
+            </div>
+
+            <button id="zipBtn" class="btn btn-success" onclick="generateAndSortFiles()">Download all PDFs</button>
+        </div>
+    </aside>
+
+    <div class="preview-wrap">
+        <div class="page" id="pageElement">
+            <div class="content">
+                <h1 class="sheet-title">Internship Attendance Sheet</h1>
+
+                <dl class="info-grid">
+                    <dt>Intern full name</dt>
+                    <dd id="studentName">&nbsp;</dd>
+                    <dt>Enrollment No.</dt>
+                    <dd id="regNumber">&nbsp;</dd>
+                    <dt>Duration</dt>
+                    <dd id="duration">&nbsp;</dd>
+                    <dt>Company Name</dt>
+                    <dd>Venturing Digitally Private Limited</dd>
+                </dl>
+
+                <div class="tables-row">
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>
+                                <th class="month-head">Month 1</th>
+                                <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Week 1</td><td></td><td></td><td></td><td></td><td></td></tr>
+                            <tr><td>Week 2</td><td></td><td></td><td></td><td></td><td></td></tr>
+                            <tr><td>Week 3</td><td></td><td></td><td></td><td></td><td></td></tr>
+                            <tr><td>Week 4</td><td></td><td></td><td></td><td></td><td></td></tr>
+                        </tbody>
+                    </table>
+
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>
+                                <th class="month-head">Month 2</th>
+                                <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Week 5</td><td></td><td></td><td></td><td></td><td></td></tr>
+                            <tr><td>Week 6</td><td></td><td></td><td></td><td></td><td></td></tr>
+                            <tr><td>Week 7</td><td></td><td></td><td></td><td></td><td></td></tr>
+                            <tr><td>Week 8</td><td></td><td></td><td></td><td></td><td></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="eval-block">
+                    <p class="bottom-note">Interns are expected to maintain proper attendance. This sheet reflects the monthly evaluation.</p>
+                    <div class="attendance-result-box">
+                        <b>Overall Attendance:</b>
+                        <span id="attendancePercent">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="signature-area">
+                <div class="regards" id="dynamicSignText">
+                    <b>Nikhil Sharma</b><br>
+                    Co-Founder &amp; CMO<br>
+                    Venturing Digitally Private<br>
+                    Limited
+                </div>
+                <div id="dynamicStampBox">
+                    <img src="sign.png" alt="Stamp" id="dynamicStampImg">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateBtnText() {
+            const style = document.querySelector('input[name="saveStyle"]:checked').value;
+            const btn = document.getElementById('zipBtn');
+            btn.innerText = style === 'college'
+                ? 'Download — college folders'
+                : 'Download all PDFs';
+        }
+
+        function loadBg(event) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                document.getElementById('pageElement').style.backgroundImage = `url(${reader.result})`;
+            };
+            if (event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function loadStamp(event) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                const img = document.getElementById('dynamicStampImg');
+                img.src = reader.result;
+                updateElements();
+            };
+            if (event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function updateElements() {
+            const stampSize = document.getElementById('stampSize').value;
+            const stampX = document.getElementById('stampX').value;
+            const stampY = document.getElementById('stampY').value;
+            const signX = document.getElementById('signX').value;
+            const signY = document.getElementById('signY').value;
+
+            document.getElementById('valStampSize').innerText = stampSize + 'px';
+            document.getElementById('valStampX').innerText = stampX + 'px';
+            document.getElementById('valStampY').innerText = stampY + 'px';
+            document.getElementById('valSignX').innerText = signX + 'px';
+            document.getElementById('valSignY').innerText = signY + 'px';
+
+            const img = document.getElementById('dynamicStampImg');
+            if (img) img.style.width = stampSize + 'px';
+
+            const stampBox = document.getElementById('dynamicStampBox');
+            stampBox.style.left = stampX + 'px';
+            stampBox.style.bottom = stampY + 'px';
+
+            document.getElementById('dynamicSignText').style.left = signX + 'px';
+            document.getElementById('dynamicSignText').style.bottom = signY + 'px';
+        }
+
+        const DEFAULT_ATTENDANCE = 90;
+
+        function splitCols(line) {
+            return line.split('\t').map(c => c.trim());
+        }
+
+        function parseRows(text) {
+            return text.split('\n')
+                .map(l => l.trim())
+                .filter(l => l.length > 0)
+                .filter((line, idx) => {
+                    if (idx === 0 && /^name/i.test(line) && /course/i.test(line)) return false;
+                    return true;
+                });
+        }
+
+        function parseDateDMY(str) {
+            if (!str) return null;
+            const m = String(str).trim().match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+            if (!m) return null;
+            return new Date(parseInt(m[3], 10), parseInt(m[2], 10) - 1, parseInt(m[1], 10), 12, 0, 0, 0);
+        }
+
+        function formatDMY(str) {
+            const d = parseDateDMY(str);
+            if (!d) return str || '';
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            return `${dd}-${mm}-${d.getFullYear()}`;
+        }
+
+        function mondayOfWeekContaining(date) {
+            const d = new Date(date);
+            d.setHours(12, 0, 0, 0);
+            const dow = d.getDay();
+            const diff = dow === 0 ? -6 : 1 - dow;
+            d.setDate(d.getDate() + diff);
+            return d;
+        }
+
+        function parseStudentData(cols) {
+            if (cols.length >= 7) {
+                const startRaw = cols[5] || '';
+                const endRaw = cols[6] || '';
+                const startDate = parseDateDMY(startRaw);
+                const endDate = parseDateDMY(endRaw);
+                const course = cols[1] ? cols[1].trim() : '';
+                const duration = startRaw && endRaw
+                    ? `${formatDMY(startRaw)} to ${formatDMY(endRaw)}${course ? ' (' + course + ')' : ''}`
+                    : '';
+
+                return {
+                    sName: cols[0] ? cols[0].trim() : '',
+                    sCourse: course,
+                    sCollegeReg: cols[2] ? cols[2].trim() : '',
+                    sCollege: cols[3] ? cols[3].trim() : 'General',
+                    sEnroll: cols[4] ? cols[4].trim() : '',
+                    sStart: startRaw,
+                    sEnd: endRaw,
+                    sIssue: cols[7] ? cols[7].trim() : '',
+                    startDate,
+                    endDate,
+                    sDuration: duration,
+                    sAtt: DEFAULT_ATTENDANCE + '%'
+                };
+            }
+
+            return {
+                sName: cols[0] ? cols[0].trim() : '',
+                sCourse: '',
+                sCollegeReg: '',
+                sEnroll: cols[1] ? cols[1].trim() : '',
+                sDuration: cols[2] ? cols[2].trim() : '',
+                sAtt: cols[3] ? cols[3].trim() : DEFAULT_ATTENDANCE + '%',
+                sCollege: cols[4] ? cols[4].trim() : 'General',
+                startDate: null,
+                endDate: null
+            };
+        }
+
+        const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+        let currentStartDate = null;
+        let currentEndDate = null;
+
+        function buildTickCheckGrid() {
+            const grid = document.getElementById('tickCheckGrid');
+            grid.innerHTML = '';
+
+            const head = document.createElement('div');
+            head.className = 'tick-check-head';
+            head.innerHTML = '<span></span>' + DAY_LABELS.map(d => `<span>${d}</span>`).join('');
+            grid.appendChild(head);
+
+            for (let w = 0; w < 8; w++) {
+                const row = document.createElement('div');
+                row.className = 'tick-check-row';
+
+                const weekLabel = document.createElement('span');
+                weekLabel.className = 'tick-week-label';
+                weekLabel.textContent = `W${w + 1}`;
+                row.appendChild(weekLabel);
+
+                for (let d = 0; d < 5; d++) {
+                    const lbl = document.createElement('label');
+                    lbl.className = 'tick-check-cell';
+                    lbl.title = `Week ${w + 1} — ${DAY_LABELS[d]}`;
+                    lbl.dataset.week = String(w);
+                    lbl.dataset.day = String(d);
+
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.dataset.week = String(w);
+                    cb.dataset.day = String(d);
+                    cb.addEventListener('change', syncTicksToSheet);
+
+                    lbl.appendChild(cb);
+                    lbl.appendChild(document.createTextNode('✓'));
+                    row.appendChild(lbl);
+                }
+                grid.appendChild(row);
+            }
+        }
+
+        function clearAttendanceTicks() {
+            document.querySelectorAll('.attendance-table tbody tr').forEach(row => {
+                row.querySelectorAll('td').forEach((td, idx) => {
+                    if (idx === 0) return;
+                    td.textContent = '';
+                    td.classList.remove('tick');
+                });
+            });
+        }
+
+        function syncTicksToSheet() {
+            clearAttendanceTicks();
+            const bodies = document.querySelectorAll('.attendance-table tbody');
+
+            document.querySelectorAll('#tickCheckGrid input[type="checkbox"]').forEach(cb => {
+                if (!cb.checked) return;
+                const w = parseInt(cb.dataset.week, 10);
+                const d = parseInt(cb.dataset.day, 10);
+                const tableIdx = w < 4 ? 0 : 1;
+                const rowIdx = w < 4 ? w : w - 4;
+                const row = bodies[tableIdx] && bodies[tableIdx].rows[rowIdx];
+                const td = row && row.cells[d + 1];
+                if (td) {
+                    td.textContent = '✓';
+                    td.classList.add('tick');
+                }
+            });
+        }
+
+        function clearTickChecks() {
+            document.querySelectorAll('#tickCheckGrid input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            document.querySelectorAll('#tickCheckGrid .tick-check-cell').forEach(cell => {
+                cell.classList.remove('in-range');
+            });
+            syncTicksToSheet();
+        }
+
+        function selectAllTickChecks() {
+            document.querySelectorAll('#tickCheckGrid input[type="checkbox"]').forEach(cb => {
+                cb.checked = true;
+            });
+            syncTicksToSheet();
+        }
+
+        function highlightDateRange() {
+            document.querySelectorAll('#tickCheckGrid .tick-check-cell').forEach(cell => {
+                cell.classList.remove('in-range');
+            });
+            if (!currentStartDate || !currentEndDate || currentEndDate < currentStartDate) {
+                alert('Pehle student preview karo — start/end date se range highlight hogi.');
+                return;
+            }
+
+            const gridStart = mondayOfWeekContaining(currentStartDate);
+            for (let w = 0; w < 8; w++) {
+                for (let d = 0; d < 5; d++) {
+                    const cellDate = new Date(gridStart);
+                    cellDate.setDate(gridStart.getDate() + w * 7 + d);
+                    cellDate.setHours(12, 0, 0, 0);
+                    if (cellDate < currentStartDate || cellDate > currentEndDate) continue;
+
+                    const cell = document.querySelector(
+                        `#tickCheckGrid .tick-check-cell[data-week="${w}"][data-day="${d}"]`
+                    );
+                    if (cell) cell.classList.add('in-range');
+                }
+            }
+        }
+
+        function applyStudentToSheet(student) {
+            document.getElementById('studentName').innerText = student.sName || '—';
+            document.getElementById('regNumber').innerText = student.sEnroll || '—';
+            document.getElementById('duration').innerText = student.sDuration || '—';
+            document.getElementById('attendancePercent').innerText = student.sAtt || (DEFAULT_ATTENDANCE + '%');
+            currentStartDate = student.startDate || null;
+            currentEndDate = student.endDate || null;
+            syncTicksToSheet();
+        }
+
+        function previewFirst() {
+            const data = document.getElementById('bulkData').value.trim();
+            if (!data) return;
+
+            const lines = parseRows(data);
+            if (lines.length === 0) return;
+
+            const cols = splitCols(lines[0]);
+            if (cols.length < 7) {
+                alert('7–8 columns chahiye:\nName | Course | Registration No | College | Enrollment NO | Start Date | End Date | Issue Date');
+                return;
+            }
+            applyStudentToSheet(parseStudentData(cols));
+        }
+
+        async function generateAndSortFiles() {
+            const data = document.getElementById('bulkData').value.trim();
+            if (!data) { alert('Please paste student data first.'); return; }
+
+            const lines = parseRows(data);
+            const saveStyle = document.querySelector('input[name="saveStyle"]:checked').value;
+
+            const btn = document.getElementById('zipBtn');
+            btn.innerText = 'Generating… please wait';
+            btn.disabled = true;
+
+            const pageEl = document.getElementById('pageElement');
+            const tbody = document.getElementById('outputTbody');
+            tbody.innerHTML = '';
+
+            const { jsPDF } = window.jspdf;
+
+            let rootDirHandle = null;
+            let useZip = false;
+            let zip = null;
+
+            if (window.showDirectoryPicker) {
+                try {
+                    rootDirHandle = await window.showDirectoryPicker();
+                } catch (err) {
+                    useZip = true;
+                    zip = new JSZip();
+                }
+            } else {
+                useZip = true;
+                zip = new JSZip();
+            }
+
+            const filenameTracker = {};
+
+            for (let i = 0; i < lines.length; i++) {
+                const cols = splitCols(lines[i]);
+                if (cols.length < 7) continue;
+
+                const student = parseStudentData(cols);
+                applyStudentToSheet(student);
+
+                await new Promise(r => setTimeout(r, 200));
+
+                const canvas = await html2canvas(pageEl, { scale: 2, useCORS: true, logging: false });
+                const imgData = canvas.toDataURL('image/jpeg', 0.98);
+
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                const pdfBlob = pdf.output('blob');
+
+                const safeName = student.sName.replace(/[^a-zA-Z0-9 ]/g, '_').trim() || `Student_${i}`;
+                const safeEnroll = student.sEnroll.replace(/[^a-zA-Z0-9]/g, '_');
+                const baseFileName = `${safeName}_${safeEnroll}_Attendance`;
+                let fileName;
+
+                if (filenameTracker[baseFileName]) {
+                    filenameTracker[baseFileName]++;
+                    fileName = `${baseFileName}_${filenameTracker[baseFileName]}.pdf`;
+                } else {
+                    filenameTracker[baseFileName] = 1;
+                    fileName = `${baseFileName}.pdf`;
+                }
+
+                const safeFolderName = student.sCollege.replace(/[^a-zA-Z0-9 -]/g, '_').trim() || 'General';
+
+                if (!useZip && rootDirHandle) {
+                    let targetFolderHandle = rootDirHandle;
+                    if (saveStyle === 'college') {
+                        targetFolderHandle = await rootDirHandle.getDirectoryHandle(safeFolderName, { create: true });
+                    }
+                    const fileHandle = await targetFolderHandle.getFileHandle(fileName, { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(pdfBlob);
+                    await writable.close();
+                } else if (useZip) {
+                    if (saveStyle === 'college') {
+                        zip.folder(safeFolderName).file(fileName, pdfBlob);
+                    } else {
+                        zip.file(fileName, pdfBlob);
+                    }
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${student.sName}</td><td>${student.sEnroll}</td><td>${student.sCourse || '—'}</td><td>${student.sAtt}</td>`;
+                tbody.appendChild(tr);
+            }
+
+            if (useZip) {
+                btn.innerText = 'Packing ZIP…';
+                const zipContent = await zip.generateAsync({ type: 'blob' });
+                saveAs(zipContent, saveStyle === 'college' ? 'Sorted_Attendance.zip' : 'All_Attendance.zip');
+            }
+
+            updateBtnText();
+            btn.disabled = false;
+            alert('Attendance sheets generated successfully.');
+        }
+
+        window.onload = function () {
+            buildTickCheckGrid();
+            updateElements();
+            if (document.getElementById('bulkData').value.trim()) previewFirst();
+        };
+    </script>
+</body>
+</html>
