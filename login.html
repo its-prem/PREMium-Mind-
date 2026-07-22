@@ -282,7 +282,7 @@
 
 <script type="module">
   import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-  import { getAuth, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
   const firebaseConfig = {
     apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
@@ -297,14 +297,34 @@
   const auth     = getAuth(app);
   const provider = new GoogleAuthProvider();
 
+  // Runs inside the Android/iOS app (Capacitor)? Google popup WebView me block hota hai,
+  // isliye app me native Google sign-in use karte hain aur browser me normal popup.
+  function isNativeApp() {
+    return !!(window.Capacitor
+      && typeof window.Capacitor.isNativePlatform === 'function'
+      && window.Capacitor.isNativePlatform());
+  }
+
+  async function doGoogleSignIn() {
+    if (isNativeApp() && window.Capacitor.Plugins && window.Capacitor.Plugins.FirebaseAuthentication) {
+      const res = await window.Capacitor.Plugins.FirebaseAuthentication.signInWithGoogle();
+      const idToken = res && res.credential && res.credential.idToken;
+      if (!idToken) throw new Error('native-google-no-idtoken');
+      const credential = GoogleAuthProvider.credential(idToken);
+      const userCred = await signInWithCredential(auth, credential);
+      return userCred.user;
+    }
+    const result = await signInWithPopup(auth, provider);
+    return result.user;
+  }
+
   const googleBtn = document.getElementById('googleLoginBtn');
   if (googleBtn) {
     googleBtn.addEventListener('click', async () => {
       const originalBtnContent = googleBtn.innerHTML;
       try {
         googleBtn.textContent = 'Verifying...';
-        const result = await signInWithPopup(auth, provider);
-        const user   = result.user;
+        const user = await doGoogleSignIn();
 
         const fd = new FormData();
         fd.append('email', user.email);
