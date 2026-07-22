@@ -482,6 +482,49 @@
             font-weight: 800;
         }
 
+        .sign-stamp-toggles {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .toggle-check {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #fff;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--navy);
+            transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+            user-select: none;
+        }
+        .toggle-check:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+        .toggle-check:has(input:checked) {
+            background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+        .toggle-check input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+            flex-shrink: 0;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+        .toggle-check .toggle-icon {
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
         /* Certificate jaisa signature + stamp */
         .signature-area {
             position: relative;
@@ -563,7 +606,7 @@
                         Name · Course · Registration No · College Name · Enrollment NO · Starting Date · Ending Date · Date Of Issue
                     </div>
                     <textarea id="bulkData" rows="7" placeholder="Bikram Kumar&#9;AutoCAD&#9;24116120004&#9;Girija Institute of Polytechnic, Ramgarh&#9;VED/2026/AUTOCAD/430&#9;08-06-2026&#9;12-07-2026&#9;01-07-2026&#10;Sachin Kumar&#9;AutoCAD&#9;25116030008&#9;Girija Institute of Polytechnic, Ramgarh&#9;VED/2026/AUTOCAD/433&#9;08-06-2026&#9;12-07-2026&#9;01-07-2026"></textarea>
-                    <p style="font-size:0.72rem;color:var(--muted);margin:6px 0 0;">Sab students ko auto <b>90%</b> Overall Attendance.</p>
+                    <p style="font-size:0.72rem;color:var(--muted);margin:6px 0 0;">Neeche checkboxes se ✓ lagao — PDF mein wahi dikhega.</p>
                     <button class="btn btn-secondary" onclick="previewFirst()">Preview first student</button>
                 </div>
             </details>
@@ -581,9 +624,22 @@
                 </div>
             </details>
 
-            <details class="step-card">
-                <summary><span class="step-num">4</span> Stamp & Sign Position</summary>
+            <details class="step-card" open>
+                <summary><span class="step-num">4</span> Sign &amp; Stamp</summary>
                 <div class="step-inner">
+                    <div class="sign-stamp-toggles">
+                        <label class="toggle-check">
+                            <input type="checkbox" id="showSignCheck" onchange="syncSignatureVisibility()">
+                            <span class="toggle-icon">✍️</span>
+                            <span>Show Signature (Nikhil Sharma)</span>
+                        </label>
+                        <label class="toggle-check">
+                            <input type="checkbox" id="showStampCheck" onchange="syncSignatureVisibility()">
+                            <span class="toggle-icon">🔏</span>
+                            <span>Show Stamp (sign.png)</span>
+                        </label>
+                    </div>
+                    <p style="font-size:0.72rem;color:var(--muted);margin:0 0 12px;">Checkbox tick karo — sheet par dikhega. Uncheck = PDF mein nahi aayega.</p>
                     <label>Stamp Size <span class="slider-val" id="valStampSize">137px</span></label>
                     <input type="range" id="stampSize" min="50" max="350" value="137" oninput="updateElements()">
                     <label>Stamp Left / Right <span class="slider-val" id="valStampX">216px</span></label>
@@ -682,21 +738,17 @@
 
                 <div class="eval-block">
                     <p class="bottom-note">Interns are expected to maintain proper attendance. This sheet reflects the monthly evaluation.</p>
-                    <div class="attendance-result-box">
-                        <b>Overall Attendance:</b>
-                        <span id="attendancePercent">—</span>
-                    </div>
                 </div>
             </div>
 
             <div class="signature-area">
-                <div class="regards" id="dynamicSignText">
+                <div class="regards" id="dynamicSignText" style="display:none;">
                     <b>Nikhil Sharma</b><br>
                     Co-Founder &amp; CMO<br>
                     Venturing Digitally Private<br>
                     Limited
                 </div>
-                <div id="dynamicStampBox">
+                <div id="dynamicStampBox" style="display:none;">
                     <img src="sign.png" alt="Stamp" id="dynamicStampImg">
                 </div>
             </div>
@@ -728,6 +780,13 @@
                 updateElements();
             };
             if (event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function syncSignatureVisibility() {
+            const showSign = document.getElementById('showSignCheck').checked;
+            const showStamp = document.getElementById('showStampCheck').checked;
+            document.getElementById('dynamicSignText').style.display = showSign ? 'block' : 'none';
+            document.getElementById('dynamicStampBox').style.display = showStamp ? 'block' : 'none';
         }
 
         function updateElements() {
@@ -952,7 +1011,6 @@
             document.getElementById('studentName').innerText = student.sName || '—';
             document.getElementById('regNumber').innerText = student.sEnroll || '—';
             document.getElementById('duration').innerText = student.sDuration || '—';
-            document.getElementById('attendancePercent').innerText = student.sAtt || (DEFAULT_ATTENDANCE + '%');
             currentStartDate = student.startDate || null;
             currentEndDate = student.endDate || null;
             syncTicksToSheet();
@@ -1076,6 +1134,7 @@
 
         window.onload = function () {
             buildTickCheckGrid();
+            syncSignatureVisibility();
             updateElements();
             if (document.getElementById('bulkData').value.trim()) previewFirst();
         };
