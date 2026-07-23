@@ -297,22 +297,48 @@
   const auth     = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  // Runs inside the Android/iOS app (Capacitor)? Google popup WebView me block hota hai,
-  // isliye app me native Google sign-in use karte hain aur browser me normal popup.
+  // App WebView me popup block hota hai — native Google sign-in use karo.
   function isNativeApp() {
-    return !!(window.Capacitor
+    if (window.Capacitor
       && typeof window.Capacitor.isNativePlatform === 'function'
-      && window.Capacitor.isNativePlatform());
+      && window.Capacitor.isNativePlatform()) return true;
+    const ua = navigator.userAgent || '';
+    return /Android/.test(ua) && (/; wv\)/.test(ua) || /Capacitor/i.test(ua));
+  }
+
+  function getFirebaseAuthPlugin() {
+    return window.Capacitor
+      && window.Capacitor.Plugins
+      && window.Capacitor.Plugins.FirebaseAuthentication;
+  }
+
+  async function nativeGoogleSignIn() {
+    const plugin = getFirebaseAuthPlugin();
+    if (!plugin || typeof plugin.signInWithGoogle !== 'function') {
+      throw new Error('Google Sign-In plugin missing. Reinstall the latest app from Android Studio.');
+    }
+
+    let result;
+    try {
+      result = await plugin.signInWithGoogle({ useCredentialManager: true });
+    } catch (firstErr) {
+      console.warn('Credential Manager Google sign-in failed, retrying legacy flow.', firstErr);
+      result = await plugin.signInWithGoogle({ useCredentialManager: false });
+    }
+
+    const idToken = result && result.credential && result.credential.idToken;
+    if (!idToken) {
+      throw new Error('Google did not return a valid token. Try again.');
+    }
+
+    const credential = GoogleAuthProvider.credential(idToken);
+    const userCred = await signInWithCredential(auth, credential);
+    return userCred.user;
   }
 
   async function doGoogleSignIn() {
-    if (isNativeApp() && window.Capacitor.Plugins && window.Capacitor.Plugins.FirebaseAuthentication) {
-      const res = await window.Capacitor.Plugins.FirebaseAuthentication.signInWithGoogle();
-      const idToken = res && res.credential && res.credential.idToken;
-      if (!idToken) throw new Error('native-google-no-idtoken');
-      const credential = GoogleAuthProvider.credential(idToken);
-      const userCred = await signInWithCredential(auth, credential);
-      return userCred.user;
+    if (isNativeApp()) {
+      return nativeGoogleSignIn();
     }
     const result = await signInWithPopup(auth, provider);
     return result.user;
@@ -346,7 +372,11 @@
           window.switchTab('register'); 
         }
       } catch (error) {
-        if(error.code !== 'auth/popup-closed-by-user') alert('Google login failed.');
+        console.error('Google login error:', error);
+        if (error.code !== 'auth/popup-closed-by-user') {
+          const msg = (error && error.message) ? error.message : 'Google login failed.';
+          alert(msg);
+        }
         googleBtn.innerHTML = originalBtnContent;
       }
     });
