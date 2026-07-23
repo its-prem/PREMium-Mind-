@@ -171,6 +171,7 @@
   <div class="state-note"><div class="spinner"></div><p style="color:#666;">Syncing your library...</p></div>
 </div>
 
+<script src="pm-session.js"></script>
 <script>
   function openSidebar(){ document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
   function closeSidebar(){ document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
@@ -178,10 +179,8 @@
   document.getElementById('overlay').addEventListener('click', closeSidebar);
 
   window.handleLogout = async function(){
+    clearStoredSession();
     try {
-      localStorage.removeItem('customUserEmail');
-      localStorage.removeItem('customUserName');
-      localStorage.removeItem('customUserPhone');
       if (window.__firebaseSignOut) await window.__firebaseSignOut();
     } catch(e){}
     window.location.href = 'index.html';
@@ -250,8 +249,8 @@
   };
 
   // Instant chrome if already logged in
-  const earlyEmail = localStorage.getItem('customUserEmail');
-  const earlyName = localStorage.getItem('customUserName');
+  const earlyEmail = getStoredEmail();
+  const earlyName = getStoredName();
   if (earlyEmail) updateUI(earlyName, earlyEmail, localStorage.getItem('profilePhoto_custom'));
 </script>
 
@@ -274,17 +273,13 @@
   window.__firebaseSignOut = () => signOut(auth);
 
   window.handleLogout = async () => {
-    try {
-      localStorage.removeItem('customUserEmail');
-      localStorage.removeItem('customUserName');
-      localStorage.removeItem('customUserPhone');
-      await signOut(auth);
-    } catch(e){}
+    clearStoredSession();
+    try { await signOut(auth); } catch(e){}
     window.location.href = 'index.html';
   };
 
-  const customEmail = localStorage.getItem('customUserEmail');
-  const customName = localStorage.getItem('customUserName');
+  const customEmail = getStoredEmail();
+  const customName = getStoredName();
   if (customEmail) {
     updateUI(customName, customEmail, localStorage.getItem('profilePhoto_custom'));
     window.loadMyCourses(customEmail);

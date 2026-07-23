@@ -280,27 +280,13 @@
   </div>
 </div>
 
+<script src="pm-session.js"></script>
 <script>
   // Auth API — must load before Google module (modules cannot see classic script const)
   (function () {
     const HOSTINGER_API = 'https://premind.diplomawallah.in';
     const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
     const apiBase = isLocal ? HOSTINGER_API : '/api-proxy';
-
-    function setSessionCookie(name, value, days = 30) {
-      const expires = new Date(Date.now() + days * 86400000).toUTCString();
-      const secure = location.protocol === 'https:' ? '; Secure' : '';
-      document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax' + secure;
-    }
-
-    function saveLoginSession(email, name, phone) {
-      localStorage.setItem('customUserEmail', email);
-      localStorage.setItem('customUserName', name || 'User');
-      localStorage.setItem('customUserPhone', phone || '0000000000');
-      setSessionCookie('customUserEmail', email);
-      setSessionCookie('customUserName', name || 'User');
-      setSessionCookie('customUserPhone', phone || '0000000000');
-    }
 
     async function apiPost(path, formData) {
       const urls = isLocal ? [apiBase] : [apiBase, HOSTINGER_API];
@@ -311,7 +297,12 @@
           const res = await fetch(base + path, { method: 'POST', body: formData });
           const text = await res.text();
           try {
-            return JSON.parse(text);
+            const data = JSON.parse(text);
+            if (!res.ok && !window.pmIsApiSuccess(data)) {
+              lastError = new Error((data && data.message) || 'Request failed.');
+              continue;
+            }
+            return data;
           } catch (e) {
             lastError = new Error('Invalid server response. Try again.');
           }
@@ -325,7 +316,6 @@
 
     window.PM_API_BASE = apiBase;
     window.PM_HOSTINGER_API = HOSTINGER_API;
-    window.saveLoginSession = saveLoginSession;
     window.pmApiPost = apiPost;
   })();
 </script>
@@ -417,8 +407,10 @@
         const checkData = await checkRes.json();
 
         if (checkData.exists) {
-          window.saveLoginSession(user.email, user.displayName || checkData.name || 'User', checkData.phone);
-          window.location.href = 'index.html';
+          if (!window.saveLoginSession(user.email, user.displayName || checkData.name || 'User', checkData.phone)) {
+            throw new Error('Could not save session. Allow cookies/storage.');
+          }
+          window.location.replace('index.html');
         } else {
           await auth.signOut();
           alert('Account not found in our database. Please Sign Up first.');
@@ -443,8 +435,8 @@
   const API_BASE = window.PM_API_BASE || 'https://premind.diplomawallah.in';
   const BASE_URL = API_BASE;
   let   pendingEmail = '';
-  const saveLoginSession = window.saveLoginSession;
   const apiPost = window.pmApiPost;
+  const apiOk = window.pmIsApiSuccess;
 
   // ── Screen switcher with Smooth Animation ──
   window.showScreen = function(screenId) {
@@ -505,8 +497,8 @@
     try {
       const data = await apiPost('/register_api.php', formData);
 
-      if (data.status === 'success') {
-        pendingEmail = document.getElementById('regEmail').value;
+      if (apiOk(data)) {
+        pendingEmail = document.getElementById('regEmail').value.trim();
         document.getElementById('otpEmail').value = pendingEmail;
         document.getElementById('displayOtpEmail').innerText = pendingEmail;
         showScreen('otpForm');
@@ -530,7 +522,7 @@
 
     apiPost('/verify_otp.php', formData)
       .then(data => {
-        if (data.status === 'success') {
+        if (apiOk(data)) {
           alert('✅ Account created successfully! Please login now.');
           showScreen('mainScreen');
           switchTab('login');
@@ -549,17 +541,21 @@
     btn.textContent = 'Logging in...'; btn.disabled = true;
 
     const formData = new FormData();
-    formData.append('email',    document.getElementById('loginEmail').value);
+    formData.append('email',    document.getElementById('loginEmail').value.trim());
     formData.append('password', document.getElementById('loginPassword').value);
 
     try {
       const data = await apiPost('/login_api.php', formData);
 
-      if (data.status === 'success') {
-        saveLoginSession(data.email, data.name, data.phone);
-        window.location.href = 'index.html';
+      if (apiOk(data)) {
+        const email = (data.email || document.getElementById('loginEmail').value).trim();
+        if (!window.saveLoginSession(email, data.name || data.user_name, data.phone)) {
+          showMessage('loginMsg', 'Login OK but session save failed. Allow cookies/storage in app settings.', true);
+          return;
+        }
+        window.location.replace('index.html');
       } else {
-        showMessage('loginMsg', data.message || 'Login failed.', true);
+        showMessage('loginMsg', data.message || 'Invalid email or password.', true);
       }
     } catch (err) { showMessage('loginMsg', err.message || 'Network error.', true); }
 
@@ -579,7 +575,7 @@
     try {
       const data = await apiPost('/forgot_password.php', formData);
 
-      if (data.status === 'success') {
+      if (apiOk(data)) {
         showMessage('forgotMsg', '✅ OTP sent! Check your email.', false);
         setTimeout(() => { showScreen('resetScreen'); }, 1500);
       } else { showMessage('forgotMsg', data.message, true); }
@@ -602,7 +598,7 @@
     try {
       const data = await apiPost('/reset_password.php', formData);
 
-      if (data.status === 'success') {
+      if (apiOk(data)) {
         showMessage('resetMsg', '✅ Password reset! Redirecting to login...', false);
         setTimeout(() => { showScreen('mainScreen'); switchTab('login'); }, 1500);
       } else { showMessage('resetMsg', data.message, true); }

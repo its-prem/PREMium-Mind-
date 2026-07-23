@@ -1821,66 +1821,22 @@
         </div>
     </footer>
 
+    <script src="pm-session.js"></script>
     <script>
-        // ================================================================
-        // 🍪 UPGRADED SECURE COOKIE UTILITIES
-        // ================================================================
+        // Cookie helpers for profile photos (session lives in pm-session.js)
         function setCookie(name, value, days = 30) {
             const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-            // Added SameSite=Strict and Secure for maximum frontend protection
-            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Strict; Secure`;
+            const secure = location.protocol === 'https:' ? '; Secure' : '';
+            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax${secure}`;
         }
 
         function getCookie(name) {
-            const match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + '=([^;]*)'));
-            return match ? decodeURIComponent(match[1]) : null;
+            return window.pmGetCookie ? window.pmGetCookie(name) : null;
         }
 
         function deleteCookie(name) {
-            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict; Secure`;
-        }
-
-        // Session helpers: read from localStorage first, fall back to cookie,
-        // and keep both storages in sync so the session survives even if
-        // localStorage is cleared/blocked (private browsing, etc).
-        function getStoredEmail() {
-            const val = localStorage.getItem('customUserEmail') || getCookie('customUserEmail');
-            if (val) {
-                localStorage.setItem('customUserEmail', val);
-                setCookie('customUserEmail', val);
-            }
-            return val;
-        }
-
-        function getStoredName() {
-            const val = localStorage.getItem('customUserName') || getCookie('customUserName');
-            if (val) {
-                localStorage.setItem('customUserName', val);
-                setCookie('customUserName', val);
-            }
-            return val;
-        }
-
-        function getStoredPhone() {
-            const val = localStorage.getItem('customUserPhone') || getCookie('customUserPhone');
-            if (val) {
-                localStorage.setItem('customUserPhone', val);
-                setCookie('customUserPhone', val);
-            }
-            return val;
-        }
-
-        window.getStoredEmail = getStoredEmail;
-        window.getStoredName = getStoredName;
-        window.getStoredPhone = getStoredPhone;
-
-        function clearStoredSession() {
-            localStorage.removeItem('customUserEmail');
-            localStorage.removeItem('customUserName');
-            localStorage.removeItem('customUserPhone');
-            deleteCookie('customUserEmail');
-            deleteCookie('customUserName');
-            deleteCookie('customUserPhone');
+            const secure = location.protocol === 'https:' ? '; Secure' : '';
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax${secure}`;
         }
     </script>
 
@@ -1972,8 +1928,8 @@
         }
 
         // Cookie-aware session check (falls back to cookie if localStorage is empty)
-        const customEmail = window.getStoredEmail ? window.getStoredEmail() : localStorage.getItem('customUserEmail');
-        const customName = window.getStoredName ? window.getStoredName() : localStorage.getItem('customUserName');
+        const customEmail = getStoredEmail();
+        const customName = getStoredName();
 
         if (customEmail) {
             updateUI(customName, customEmail, null);

@@ -148,6 +148,7 @@
   </div>
 </footer>
 
+<script src="pm-session.js"></script>
 <script>
   function openSidebar(){ document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
   function closeSidebar(){ document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
@@ -208,17 +209,13 @@
   window.__firebaseSignOut = function(){ return signOut(auth); };
 
   window.handleLogout = async function(){
-    try {
-      localStorage.removeItem('customUserEmail');
-      localStorage.removeItem('customUserName');
-      localStorage.removeItem('customUserPhone');
-      await signOut(auth);
-    } catch(e){}
+    clearStoredSession();
+    try { await signOut(auth); } catch(e){}
     window.location.href = 'index.html';
   };
 
-  const customEmail = localStorage.getItem('customUserEmail');
-  const customName = localStorage.getItem('customUserName');
+  const customEmail = getStoredEmail();
+  const customName = getStoredName();
   if (customEmail) {
     updateUI(customName, customEmail, localStorage.getItem('profilePhoto_custom'));
   } else {
