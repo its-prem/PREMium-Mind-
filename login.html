@@ -282,39 +282,36 @@
 
 <script src="pm-session.js"></script>
 <script>
-  // Auth API — must load before Google module (modules cannot see classic script const)
+  // Auth API helpers — load before Google module
   (function () {
     const HOSTINGER_API = 'https://premind.diplomawallah.in';
-    const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-    const apiBase = isLocal ? HOSTINGER_API : '/api-proxy';
 
-    async function apiPost(path, formData) {
-      const urls = isLocal ? [apiBase] : [apiBase, HOSTINGER_API];
-      let lastError = null;
+    // Always hit Hostinger directly. CORS already allows premind.netlify.app.
+    // Avoid Netlify proxy (can drop/empty POST body) and FormData reuse bugs.
+    async function apiPost(path, fields) {
+      const body = fields instanceof FormData
+        ? fields
+        : new URLSearchParams(fields);
 
-      for (const base of urls) {
-        try {
-          const res = await fetch(base + path, { method: 'POST', body: formData });
-          const text = await res.text();
-          try {
-            const data = JSON.parse(text);
-            if (!res.ok && !window.pmIsApiSuccess(data)) {
-              lastError = new Error((data && data.message) || 'Request failed.');
-              continue;
-            }
-            return data;
-          } catch (e) {
-            lastError = new Error('Invalid server response. Try again.');
-          }
-        } catch (err) {
-          lastError = err;
-        }
+      const res = await fetch(HOSTINGER_API + path, {
+        method: 'POST',
+        body: body,
+        mode: 'cors',
+        credentials: 'omit'
+      });
+
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text.trim());
+      } catch (e) {
+        console.error('Auth API non-JSON:', path, text.slice(0, 200));
+        throw new Error('Server error. Please try again.');
       }
-
-      throw lastError || new Error('Network error. Try again.');
+      return data;
     }
 
-    window.PM_API_BASE = apiBase;
+    window.PM_API_BASE = HOSTINGER_API;
     window.PM_HOSTINGER_API = HOSTINGER_API;
     window.pmApiPost = apiPost;
   })();
@@ -395,16 +392,12 @@
         const fd = new FormData();
         fd.append('email', user.email);
 
-        const apiBase = window.PM_API_BASE || 'https://premind.diplomawallah.in';
-        const fallback = window.PM_HOSTINGER_API || 'https://premind.diplomawallah.in';
-        let checkRes;
+        let checkData;
         try {
-          checkRes = await fetch(`${apiBase}/check_user.php`, { method: 'POST', body: fd });
-          if (!checkRes.ok) throw new Error('proxy failed');
+          checkData = await window.pmApiPost('/check_user.php', fd);
         } catch (e) {
-          checkRes = await fetch(`${fallback}/check_user.php`, { method: 'POST', body: fd });
+          throw new Error('Could not verify account. Check your internet and try again.');
         }
-        const checkData = await checkRes.json();
 
         if (checkData.exists) {
           if (!window.saveLoginSession(user.email, user.displayName || checkData.name || 'User', checkData.phone)) {
@@ -488,17 +481,18 @@
     const btn = document.getElementById('regBtn');
     btn.textContent = 'Sending OTP...'; btn.disabled = true;
 
-    const formData = new FormData();
-    formData.append('name',     document.getElementById('regName').value);
-    formData.append('email',    document.getElementById('regEmail').value);
-    formData.append('phone',    document.getElementById('regPhone').value);
-    formData.append('password', document.getElementById('regPassword').value);
+    const formData = {
+      name: document.getElementById('regName').value.trim(),
+      email: document.getElementById('regEmail').value.trim(),
+      phone: document.getElementById('regPhone').value.trim(),
+      password: document.getElementById('regPassword').value
+    };
 
     try {
       const data = await apiPost('/register_api.php', formData);
 
       if (apiOk(data)) {
-        pendingEmail = document.getElementById('regEmail').value.trim();
+        pendingEmail = formData.email;
         document.getElementById('otpEmail').value = pendingEmail;
         document.getElementById('displayOtpEmail').innerText = pendingEmail;
         showScreen('otpForm');
@@ -516,11 +510,10 @@
     const btn = document.getElementById('otpBtn');
     btn.textContent = 'Verifying & Saving...'; btn.disabled = true;
 
-    const formData = new FormData();
-    formData.append('email', document.getElementById('otpEmail').value);
-    formData.append('otp',   document.getElementById('otpInput').value);
-
-    apiPost('/verify_otp.php', formData)
+    apiPost('/verify_otp.php', {
+      email: document.getElementById('otpEmail').value,
+      otp: document.getElementById('otpInput').value
+    })
       .then(data => {
         if (apiOk(data)) {
           alert('✅ Account created successfully! Please login now.');
@@ -540,24 +533,26 @@
     const btn = document.getElementById('loginBtn');
     btn.textContent = 'Logging in...'; btn.disabled = true;
 
-    const formData = new FormData();
-    formData.append('email',    document.getElementById('loginEmail').value.trim());
-    formData.append('password', document.getElementById('loginPassword').value);
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
 
     try {
-      const data = await apiPost('/login_api.php', formData);
+      const data = await apiPost('/login_api.php', { email, password });
 
       if (apiOk(data)) {
-        const email = (data.email || document.getElementById('loginEmail').value).trim();
-        if (!window.saveLoginSession(email, data.name || data.user_name, data.phone)) {
-          showMessage('loginMsg', 'Login OK but session save failed. Allow cookies/storage in app settings.', true);
+        const sessionEmail = String(data.email || email).trim();
+        if (!window.saveLoginSession(sessionEmail, data.name || data.user_name, data.phone)) {
+          showMessage('loginMsg', 'Login OK but session save failed. Allow site cookies.', true);
           return;
         }
         window.location.replace('index.html');
       } else {
-        showMessage('loginMsg', data.message || 'Invalid email or password.', true);
+        showMessage('loginMsg', data.message || data.error || 'Invalid email or password.', true);
       }
-    } catch (err) { showMessage('loginMsg', err.message || 'Network error.', true); }
+    } catch (err) {
+      console.error('Login error:', err);
+      showMessage('loginMsg', err.message || 'Network error. Please try again.', true);
+    }
 
     btn.textContent = 'Login to Continue'; btn.disabled = false;
   });
@@ -568,12 +563,10 @@
     const btn = document.getElementById('forgotBtn');
     btn.textContent = 'Sending...'; btn.disabled = true;
 
-    pendingEmail = document.getElementById('forgotEmail').value;
-    const formData = new FormData();
-    formData.append('email', pendingEmail);
+    pendingEmail = document.getElementById('forgotEmail').value.trim();
 
     try {
-      const data = await apiPost('/forgot_password.php', formData);
+      const data = await apiPost('/forgot_password.php', { email: pendingEmail });
 
       if (apiOk(data)) {
         showMessage('forgotMsg', '✅ OTP sent! Check your email.', false);
@@ -590,13 +583,12 @@
     const btn = document.getElementById('resetBtn');
     btn.textContent = 'Resetting...'; btn.disabled = true;
 
-    const formData = new FormData();
-    formData.append('email',        pendingEmail);
-    formData.append('otp',          document.getElementById('resetOtp').value);
-    formData.append('new_password', document.getElementById('newPassword').value);
-
     try {
-      const data = await apiPost('/reset_password.php', formData);
+      const data = await apiPost('/reset_password.php', {
+        email: pendingEmail,
+        otp: document.getElementById('resetOtp').value,
+        new_password: document.getElementById('newPassword').value
+      });
 
       if (apiOk(data)) {
         showMessage('resetMsg', '✅ Password reset! Redirecting to login...', false);

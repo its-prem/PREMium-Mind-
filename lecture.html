@@ -249,8 +249,8 @@
   };
 
   // Instant chrome if already logged in
-  const earlyEmail = getStoredEmail();
-  const earlyName = getStoredName();
+  const earlyEmail = window.getStoredEmail();
+  const earlyName = window.getStoredName();
   if (earlyEmail) updateUI(earlyName, earlyEmail, localStorage.getItem('profilePhoto_custom'));
 </script>
 
@@ -273,13 +273,13 @@
   window.__firebaseSignOut = () => signOut(auth);
 
   window.handleLogout = async () => {
-    clearStoredSession();
+    window.clearStoredSession();
     try { await signOut(auth); } catch(e){}
     window.location.href = 'index.html';
   };
 
-  const customEmail = getStoredEmail();
-  const customName = getStoredName();
+  const customEmail = window.getStoredEmail();
+  const customName = window.getStoredName();
   if (customEmail) {
     updateUI(customName, customEmail, localStorage.getItem('profilePhoto_custom'));
     window.loadMyCourses(customEmail);
@@ -288,6 +288,7 @@
       if (user) {
         const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
         updateUI(user.displayName, user.email, photoURL);
+        window.saveLoginSession(user.email, user.displayName || 'User', '0000000000');
         window.loadMyCourses(user.email);
       } else {
         window.location.href = 'login.html';

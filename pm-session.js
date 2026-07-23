@@ -28,42 +28,74 @@
     return val;
   }
 
-  function getStoredEmail() {
-    const val = localStorage.getItem('customUserEmail') || getCookie('customUserEmail');
-    return val ? syncSession('customUserEmail', val) : null;
-  }
-
-  function getStoredName() {
-    const val = localStorage.getItem('customUserName') || getCookie('customUserName');
-    return val ? syncSession('customUserName', val) : null;
-  }
-
-  function getStoredPhone() {
-    const val = localStorage.getItem('customUserPhone') || getCookie('customUserPhone');
-    return val ? syncSession('customUserPhone', val) : null;
+  function isApiSuccess(data) {
+    if (!data || typeof data !== 'object') return false;
+    const status = String(data.status || data.Status || data.result || '').toLowerCase();
+    if (status === 'success' || status === 'ok' || status === 'true' || status === '1') return true;
+    if (data.success === true || data.success === 1 || data.success === '1') return true;
+    // Some PHP APIs only return user fields on success
+    if (data.email && (data.name || data.user_name) && !data.message) return true;
+    return false;
   }
 
   function saveLoginSession(email, name, phone) {
     if (!email) return false;
-    syncSession('customUserEmail', String(email).trim());
-    syncSession('customUserName', name || 'User');
-    syncSession('customUserPhone', phone || '0000000000');
-    return !!getStoredEmail();
+    const e = String(email).trim();
+    const n = name || 'User';
+    const p = phone || '0000000000';
+    syncSession('customUserEmail', e);
+    syncSession('customUserName', n);
+    syncSession('customUserPhone', p);
+    try {
+      sessionStorage.setItem('customUserEmail', e);
+      sessionStorage.setItem('customUserName', n);
+      sessionStorage.setItem('customUserPhone', p);
+    } catch (err) { /* ignore */ }
+    return !!(localStorage.getItem('customUserEmail') || getCookie('customUserEmail') || sessionStorage.getItem('customUserEmail'));
+  }
+
+  function getStoredEmail() {
+    let val = null;
+    try { val = localStorage.getItem('customUserEmail'); } catch (e) {}
+    if (!val) {
+      try { val = sessionStorage.getItem('customUserEmail'); } catch (e) {}
+    }
+    if (!val) val = getCookie('customUserEmail');
+    return val ? syncSession('customUserEmail', val) : null;
+  }
+
+  function getStoredName() {
+    let val = null;
+    try { val = localStorage.getItem('customUserName'); } catch (e) {}
+    if (!val) {
+      try { val = sessionStorage.getItem('customUserName'); } catch (e) {}
+    }
+    if (!val) val = getCookie('customUserName');
+    return val ? syncSession('customUserName', val) : null;
+  }
+
+  function getStoredPhone() {
+    let val = null;
+    try { val = localStorage.getItem('customUserPhone'); } catch (e) {}
+    if (!val) {
+      try { val = sessionStorage.getItem('customUserPhone'); } catch (e) {}
+    }
+    if (!val) val = getCookie('customUserPhone');
+    return val ? syncSession('customUserPhone', val) : null;
   }
 
   function clearStoredSession() {
-    localStorage.removeItem('customUserEmail');
-    localStorage.removeItem('customUserName');
-    localStorage.removeItem('customUserPhone');
+    try {
+      localStorage.removeItem('customUserEmail');
+      localStorage.removeItem('customUserName');
+      localStorage.removeItem('customUserPhone');
+      sessionStorage.removeItem('customUserEmail');
+      sessionStorage.removeItem('customUserName');
+      sessionStorage.removeItem('customUserPhone');
+    } catch (e) {}
     deleteCookie('customUserEmail');
     deleteCookie('customUserName');
     deleteCookie('customUserPhone');
-  }
-
-  function isApiSuccess(data) {
-    if (!data || typeof data !== 'object') return false;
-    const status = String(data.status || data.Status || '').toLowerCase();
-    return status === 'success' || data.success === true;
   }
 
   window.getStoredEmail = getStoredEmail;

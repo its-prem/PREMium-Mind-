@@ -1928,8 +1928,8 @@
         }
 
         // Cookie-aware session check (falls back to cookie if localStorage is empty)
-        const customEmail = getStoredEmail();
-        const customName = getStoredName();
+        const customEmail = window.getStoredEmail();
+        const customName = window.getStoredName();
 
         if (customEmail) {
             updateUI(customName, customEmail, null);
@@ -1938,6 +1938,8 @@
                 if (user) {
                     const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || getCookie('profilePhoto_' + user.uid) || user.photoURL;
                     updateUI(user.displayName, user.email, photoURL);
+                    // Persist Firebase Google session into the same store email-password uses
+                    window.saveLoginSession(user.email, user.displayName || 'User', window.getStoredPhone() || '0000000000');
                 } else {
                     showLoggedOut();
                 }
@@ -1964,7 +1966,7 @@
         });
 
         window.handleLogout = async () => {
-            clearStoredSession();
+            window.clearStoredSession();
             try { await signOut(auth); } catch (error) { }
             alert('Logged out successfully!');
             window.location.reload();
