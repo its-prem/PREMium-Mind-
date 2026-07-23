@@ -1896,11 +1896,24 @@
             color: #475569;
             font-weight: 600;
             background: #e2e8f0;
-            padding: 3px 10px;
+            padding: 3px 8px;
             border-radius: 12px;
             display: inline-block;
             border: none;
             margin-top: 0;
+            margin-left: -4px;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+
+        .user-profile-compact .profile-info {
+            min-width: 0;
+            flex: 1;
+            overflow: hidden;
+            padding-right: 2px;
         }
 
         /* --- Navbar Pill Button --- */
