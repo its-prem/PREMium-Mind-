@@ -478,7 +478,7 @@
 
   <div class="header">
     <div class="header-start">
-      <a href="lecture.html" class="back-btn" aria-label="Back to My Courses" onclick="if(window.history.length>1){event.preventDefault();window.history.back();}">
+      <a href="lecture.html" class="back-btn" aria-label="Back to My Courses" onclick="window.pmWatchGoBack(event);">
         <span class="back-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M15 18l-6-6 6-6"/>
@@ -639,6 +639,28 @@
      let legacyPdf = urlParams.get('pdf');
      let allowDownload = urlParams.get('download') === 'true' || urlParams.get('download') === '1';
      let customTitle = urlParams.get('title');
+
+     (function initWatchReturnUrl() {
+         try {
+             const fromParam = urlParams.get('from');
+             if (fromParam) {
+                 sessionStorage.setItem('pmWatchReturn', fromParam);
+                 return;
+             }
+             if (sessionStorage.getItem('pmWatchReturn')) return;
+             const ref = document.referrer || '';
+             if (/lecture\.html/i.test(ref)) {
+                 try {
+                     const u = new URL(ref);
+                     sessionStorage.setItem('pmWatchReturn', u.pathname.split('/').pop() + u.search);
+                 } catch (e) {
+                     sessionStorage.setItem('pmWatchReturn', 'lecture.html');
+                 }
+             } else {
+                 sessionStorage.setItem('pmWatchReturn', 'lecture.html');
+             }
+         } catch (e) {}
+     })();
 
      function normalizePdfPath(raw) {
          if (!raw) return null;
@@ -874,8 +896,22 @@
              pdfData = null;
 
              const isMobile = window.innerWidth < 700 || /Android|iPhone|iPad/i.test(navigator.userAgent);
-             const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 2 : 1.5);
-             const MAX_EDGE = isMobile ? 4200 : 5200;
+             const nativeApp = isNativeApp();
+
+             function getRenderQuality() {
+                 if (nativeApp) {
+                     return {
+                         dpr: Math.min(window.devicePixelRatio || 2.5, 3),
+                         maxEdge: 8192
+                     };
+                 }
+                 return {
+                     dpr: Math.min(window.devicePixelRatio || 1, isMobile ? 2.5 : 2),
+                     maxEdge: isMobile ? 5600 : 6400
+                 };
+             }
+
+             const quality = getRenderQuality();
 
              const firstPage = await pdfDoc.getPage(1);
              const baseVp = firstPage.getViewport({ scale: 1 });
@@ -888,11 +924,18 @@
                  return cssWidth / baseVp.width;
              }
 
+             function calcPixelRatio(viewport) {
+                 let pr = Math.max(quality.dpr, nativeApp ? 2 : 1);
+                 const longEdge = Math.max(viewport.width, viewport.height) * pr;
+                 if (longEdge > quality.maxEdge) {
+                     pr = quality.maxEdge / Math.max(viewport.width, viewport.height);
+                 }
+                 return Math.max(pr, nativeApp ? 1.75 : 1);
+             }
+
              async function renderEntry(entry, renderScale) {
                  const viewport = entry.page.getViewport({ scale: renderScale });
-                 let pr = dpr;
-                 const longEdge = Math.max(viewport.width, viewport.height) * pr;
-                 if (longEdge > MAX_EDGE) pr = MAX_EDGE / Math.max(viewport.width, viewport.height);
+                 const pr = calcPixelRatio(viewport);
 
                  const canvas = document.createElement('canvas');
                  canvas.oncontextmenu = () => false;
@@ -903,7 +946,12 @@
                  canvas.style.height = 'auto';
 
                  const transform = pr !== 1 ? [pr, 0, 0, pr, 0, 0] : null;
-                 await entry.page.render({ canvasContext: ctx, transform, viewport }).promise;
+                 await entry.page.render({
+                     canvasContext: ctx,
+                     transform,
+                     viewport,
+                     intent: 'display'
+                 }).promise;
 
                  entry.wrapper.innerHTML = '';
                  entry.wrapper.appendChild(canvas);

@@ -801,7 +801,7 @@
         }
         const pdfPath = pickPdfPath(course);
         if (pdfPath) {
-          btnAction = "window.location.href='watch.html?file=" + encodeURIComponent(pdfPath) + "&download=" + course.allow_download + "'";
+          btnAction = "sessionStorage.setItem('pmWatchReturn','lecture.html'+window.location.search);window.location.href='watch.html?file=" + encodeURIComponent(pdfPath) + "&download=" + course.allow_download + "'";
         } else {
           btnAction = "alert('PDF abhi upload nahi hui. Admin panel me pdf_file column check karo (uploads/pdfs/...)')";
         }
