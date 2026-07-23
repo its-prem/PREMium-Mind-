@@ -5,118 +5,165 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Terms & Conditions | PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
-  
-  <link rel="stylesheet" href="common.css" />
-  
+  <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Montserrat:wght@400;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
   <style>
-    /* ============================================================
-       PAGE SPECIFIC STYLES ONLY
-    ============================================================ */
+    /* Navbar/sidebar — same as index.html & lecture.html */
+    .navbar { position: sticky; top: 0; z-index: 1000; background-color: rgba(255,255,255,0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-links { display: flex; gap: 1rem; align-items: center; list-style: none; margin: 0; padding: 0; }
+    .nav-link { text-decoration: none; color: #475569; font-weight: 700; font-size: 15px; padding: 8px 12px; border-radius: 8px; transition: all 0.3s ease; display: flex; align-items: center; gap: 6px; position: relative; }
+    .nav-link:hover, .nav-link.active { color: #111; background: rgba(0,0,0,0.05); }
+    .nav-dropdown { position: relative; }
+    .dropdown-arrow { font-size: 14px !important; margin-left: 2px; transition: transform 0.3s ease !important; }
+    .nav-dropdown:hover .dropdown-arrow, .nav-dropdown.active .dropdown-arrow { transform: rotate(180deg); }
+    .dropdown-menu { position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(10px) scale(0.95); width: 290px; background: rgba(255,255,255,0.98); backdrop-filter: blur(20px); border: 1px solid rgba(226,232,240,0.8); border-radius: 16px; padding: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); opacity: 0; pointer-events: none; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 4px; z-index: 1100; }
+    .nav-dropdown:hover .dropdown-menu, .nav-dropdown:focus-within .dropdown-menu { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0) scale(1); }
+    .dropdown-header { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; padding: 8px 12px 4px; }
+    .dropdown-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; text-decoration: none; transition: all 0.3s ease; }
+    .dropdown-item:hover { background: #f1f5f9; transform: translateX(4px); }
+    .dropdown-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .icon-blue { background: #eff6ff; color: #2563eb; } .icon-purple { background: #faf5ff; color: #9333ea; } .icon-green { background: #ecfdf5; color: #10b981; } .icon-amber { background: #fffbeb; color: #f59e0b; } .icon-rose { background: #fff1f2; color: #f43f5e; }
+    .dropdown-text { display: flex; flex-direction: column; flex: 1; } .item-title { font-size: 14px; font-weight: 700; color: #111; line-height: 1.2; } .item-desc { font-size: 11.5px; color: #64748b; font-weight: 500; margin-top: 2px; }
+    .dropdown-badge { background: #f43f5e; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 50px; text-transform: uppercase; }
+    .overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.65); backdrop-filter: blur(10px); z-index: 1500; opacity: 0; pointer-events: none; transition: all 0.3s ease; }
+    .overlay.active { opacity: 1; pointer-events: auto; }
+    .sidebar>div:first-of-type { margin-top: 0 !important; } .sidebar ul { padding: 0 !important; margin-top: 0 !important; } .sidebar ul li { border-bottom: none !important; margin: 0 !important; }
+    .sidebar { position: fixed; top: 0; right: -100%; width: 320px; max-width: 85vw; height: 100%; background: rgba(255,255,255,0.98); backdrop-filter: blur(20px); border-top-left-radius: 24px; border-bottom-left-radius: 24px; box-shadow: -10px 0 30px rgba(0,0,0,0.1); z-index: 2000; transition: right 0.4s cubic-bezier(0.32,0.72,0,1); display: flex; flex-direction: column; padding: 0; overflow: hidden !important; }
+    .sidebar.active { right: 0; } .sidebar-scroll { flex: 1; overflow-y: auto !important; padding: 20px 20px 12px; }
+    .sidebar-footer { flex-shrink: 0; padding: 14px 20px calc(16px + env(safe-area-inset-bottom,0px)); border-top: 1px solid #e2e8f0; background: #fff; display: none; }
+    .sidebar-footer.is-visible { display: block !important; }
+    .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #f1f5f9; }
+    .sidebar-logo { height: 51px; width: auto; }
+    .close-sidebar { background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+    .close-sidebar:hover { background: #fee2e2; color: #ef4444; transform: rotate(90deg); }
+    .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; padding: 0; margin: 0; }
+    .sidebar-item { opacity: 0; transform: translateX(20px); transition: opacity 0.4s ease, transform 0.4s ease; }
+    .sidebar.active .sidebar-item { opacity: 1; transform: translateX(0); transition-delay: var(--delay, 0s); }
+    .sidebar-link { text-decoration: none; color: #111; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; transition: all 0.3s ease; }
+    .sidebar-link ion-icon { font-size: 20px; color: #666; }
+    .sidebar-link:hover, .sidebar-link.active { background: #f8fafc; color: #000; padding-left: 20px; }
+    .sidebar-link:hover ion-icon, .sidebar-link.active ion-icon { color: #000; }
+    .sidebar-dropdown-toggle { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-radius: 12px; font-size: 15px; font-weight: 700; color: #111; cursor: pointer; transition: all 0.3s ease; }
+    .sidebar-dropdown-toggle:hover { background: #f8fafc; }
+    .sidebar-link-content { display: flex; align-items: center; gap: 12px; } .sidebar-link-content ion-icon { font-size: 20px; color: #666; }
+    .mobile-dropdown-arrow { font-size: 16px; color: #888; transition: transform 0.3s ease; }
+    .sidebar-dropdown.open .mobile-dropdown-arrow { transform: rotate(180deg); color: #000; }
+    .sidebar-submenu { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; display: flex; flex-direction: column; gap: 4px; padding-left: 16px; margin-top: 4px; }
+    .sidebar-dropdown.open .sidebar-submenu { max-height: 300px; }
+    .sidebar-sublink { text-decoration: none; color: #475569; font-size: 14px; font-weight: 600; padding: 10px 14px; border-radius: 10px; display: flex; align-items: center; gap: 10px; transition: all 0.3s ease; }
+    .sidebar-sublink ion-icon { font-size: 16px; color: #888; }
+    .sidebar-sublink:hover { background: #f1f5f9; color: #000; padding-left: 18px; }
+    .user-profile-compact { display: flex; align-items: center; gap: 15px; padding: 16px; border: 1px solid #e2e8f0; margin-bottom: 20px; background: #f8fafc; border-radius: 20px; }
+    .user-profile-compact .profile-photo-container { position: relative; flex-shrink: 0; width: 52px; height: 52px; }
+    .user-profile-compact .profile-photo { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #fff; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #2563eb; background-color: #000; cursor: pointer; }
+    .user-profile-compact .profile-info { display: flex; flex-direction: column; align-items: flex-start; }
+    .user-name { font-size: 15px; font-weight: 700; color: #000; margin-bottom: 2px; }
+    .user-email-chip { font-size: 11.5px; color: #475569; font-weight: 600; background: #e2e8f0; padding: 3px 10px; border-radius: 12px; display: inline-block; }
+    .nav-user-pill { display: flex; align-items: center; gap: 10px; padding: 5px 16px 5px 5px; border: 1px solid #e2e8f0; border-radius: 30px; background: #fff; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+    .nav-user-pill .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid #fff; box-shadow: 0 0 0 1px #fff, 0 0 0 2.5px #2563eb; background-color: #000; }
+    .nav-user-pill .nav-user-name { font-size: 14px; font-weight: 600; color: #000; }
+    .logo-image { width: auto !important; height: 46px !important; }
+    @media (max-width: 768px) { .nav-links { display: none; } .logo-image { height: 65px !important; } }
+
+    /* Terms page */
     html { scroll-behavior: smooth; }
     body { font-family: 'Poppins', sans-serif; background-color: #f9f9f9; margin: 0; }
-
-    /* Hero Section for Terms */
-    .terms-hero {
-      background: linear-gradient(135deg, #000000 0%, #434343 100%);
-      color: white;
-      padding: 100px 20px 80px;
-      text-align: center;
-      position: relative;
-    }
-
-    .terms-hero h1 {
-      font-size: 3rem;
-      font-weight: 800;
-      margin-bottom: 10px;
-      font-family: 'Montserrat', sans-serif;
-    }
-
-    /* Content Card */
-    .terms-container {
-      max-width: 1000px;
-      margin: -50px auto 60px;
-      padding: 40px;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      position: relative;
-      z-index: 5;
-    }
-
-    .terms-content h2 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #000;
-      margin-top: 30px;
-      border-left: 5px solid #000;
-      padding-left: 15px;
-    }
-
-    .terms-content p, .terms-content li {
-      color: #666;
-      line-height: 1.8;
-      font-size: 1.05rem;
-    }
-
-    /* Responsive adjustments */
-    @media screen and (max-width: 768px) {
-      .terms-hero h1 { font-size: 2.2rem; }
-      .terms-container { margin: -30px 15px 40px; padding: 25px; }
-    }
+    .terms-hero { background: linear-gradient(135deg, #000 0%, #434343 100%); color: white; padding: 60px 20px 80px; text-align: center; }
+    .terms-hero h1 { font-size: 3rem; font-weight: 800; margin-bottom: 10px; font-family: 'Montserrat', sans-serif; }
+    .terms-container { max-width: 1000px; margin: -50px auto 60px; padding: 40px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; z-index: 5; }
+    .terms-content h2 { font-size: 1.5rem; font-weight: 700; color: #000; margin-top: 30px; border-left: 5px solid #000; padding-left: 15px; }
+    .terms-content p, .terms-content li { color: #666; line-height: 1.8; font-size: 1.05rem; }
+    @media (max-width: 768px) { .terms-hero h1 { font-size: 2.2rem; } .terms-container { margin: -30px 15px 40px; padding: 25px; } }
   </style>
 </head>
 <body>
 
 <nav class="navbar">
   <div class="logo-container">
-    <img src="PM-LOGO-TEXT.png" alt="PM Logo" class="logo-image" />
+    <a href="index.html"><img src="PM-LOGO-TEXT.png" alt="PM Logo" class="logo-image" onerror="this.onerror=null;this.src='small-logo.png';" /></a>
   </div>
-
   <ul class="nav-links">
-    <li><a href="index.html">PREMium Store</a></li>
-    <li><a href="courses.html" class="protected-route" id="coursesLinkNav">PREMium Courses</a></li>
-    <li><a href="index.html#help-form">Contact us</a></li>
-    <li><a href="index.html#help-form">Report Problem</a></li>
+    <li><a href="index.html" class="nav-link"><ion-icon name="home-outline"></ion-icon> Home</a></li>
+    <li class="nav-dropdown">
+      <a href="index.html#products" class="nav-link store-trigger dropdown-toggle">
+        <ion-icon name="bag-handle-outline"></ion-icon> PREMium Store
+        <ion-icon name="chevron-down-outline" class="dropdown-arrow"></ion-icon>
+      </a>
+      <div class="dropdown-menu">
+        <div class="dropdown-header">Explore Categories</div>
+        <a href="index.html#notes" class="dropdown-item"><div class="dropdown-icon icon-blue"><ion-icon name="document-text-outline"></ion-icon></div><div class="dropdown-text"><span class="item-title">Notes</span><span class="item-desc">Handwritten &amp; exam notes</span></div></a>
+        <a href="index.html#ebooks" class="dropdown-item"><div class="dropdown-icon icon-purple"><ion-icon name="book-outline"></ion-icon></div><div class="dropdown-text"><span class="item-title">E-Books</span><span class="item-desc">Complete syllabus guides</span></div></a>
+        <a href="index.html#resume" class="dropdown-item"><div class="dropdown-icon icon-green"><ion-icon name="briefcase-outline"></ion-icon></div><div class="dropdown-text"><span class="item-title">Resume</span><span class="item-desc">ATS-ready professional formats</span></div></a>
+        <a href="index.html#report-writing" class="dropdown-item"><div class="dropdown-icon icon-amber"><ion-icon name="bar-chart-outline"></ion-icon></div><div class="dropdown-text"><span class="item-title">Report Writing</span><span class="item-desc">Industrial &amp; academic reports</span></div></a>
+        <a href="index.html#projects" class="dropdown-item"><div class="dropdown-icon icon-rose"><ion-icon name="code-slash-outline"></ion-icon></div><div class="dropdown-text"><span class="item-title">Project</span><span class="item-desc">Major &amp; minor project code</span></div><span class="dropdown-badge">Hot</span></a>
+      </div>
+    </li>
+    <li><a href="lecture.html" class="nav-link protected-route" id="coursesLinkNav"><ion-icon name="play-circle-outline"></ion-icon> My Courses</a></li>
+    <li><a href="index.html#help-form" class="nav-link"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us</a></li>
+    <li id="desktopLoginBtnContainer"><a href="login.html" class="nav-link" style="background:#111;color:#fff;"><ion-icon name="person-circle-outline" style="color:#fff;"></ion-icon> Login</a></li>
+    <li id="desktopUserPillContainer" style="display:none;">
+      <div class="nav-user-pill" onclick="openSidebar()">
+        <img src="" id="navAvatarImg" alt="Profile" class="nav-avatar">
+        <span class="nav-user-name" id="navUserName">User</span>
+        <ion-icon name="chevron-down-outline" style="color:#2563eb;font-size:16px;margin-left:2px;"></ion-icon>
+      </div>
+    </li>
   </ul>
-  <div class="menu-btn" id="menu-btn">☰</div>
+  <div class="menu-btn" id="menu-btn" style="font-size:24px;cursor:pointer;">☰</div>
 </nav>
 
-<div class="sidebar" id="sidebar">
-  <button class="close-sidebar-btn" id="closeSidebarBtn">×</button>
-
-  <div class="user-profile" id="userProfile" style="display: none;">
-    <div class="profile-photo-container">
-      <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" 
-           alt="Profile" class="profile-photo" id="profilePhoto" onclick="document.getElementById('photo-input').click()">
-      <button class="change-photo-btn" onclick="document.getElementById('photo-input').click()">📷</button>
-    </div>
-    <input type="file" id="photo-input" accept="image/*">
-    <div class="user-name" id="userName">User Name</div>
-    <div class="user-email" id="userEmail">user@example.com</div>
-    <button class="logout-btn-sidebar" onclick="handleLogout()">Logout</button>
-  </div>
-
-  <div class="login-prompt" id="loginPrompt">
-    <h3>Welcome to PREMium Mind</h3>
-    <p>Access your courses and profile.</p>
-    <button class="login-btn" onclick="window.location.href='login.html'">Login / Sign Up</button>
-  </div>
-
-  <ul>
-    <li><a href="index.html"><span class="icon">🏠</span> Home</a></li>
-    <li><a href="courses.html" class="protected-route" id="coursesLink"><span class="icon">📚</span> PREMium Courses</a></li>
-    <li><a href="lecture.html" class="protected-route" id="courseAccessLink"><span class="icon">🎓</span> My Course</a></li>
-    <li><a href="index.html#help-form"><span class="icon">📞</span> Contact</a></li>
-    <li><a href="index.html#help-form"><span class="icon">❓</span> Help</a></li>
-    <li><a href="termcondition.html" class="active-sidebar"><span class="icon">⚙️</span> Terms & Privacy</a></li>
-  </ul>
-</div>
-
 <div class="overlay" id="overlay"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-scroll">
+    <div class="sidebar-header">
+      <img src="PM-LOGO-TEXT.png" alt="PREMium Mind" class="sidebar-logo" onerror="this.onerror=null;this.src='small-logo.png';">
+      <button class="close-sidebar" id="close-sidebar-btn" onclick="closeSidebar()"><ion-icon name="close-outline"></ion-icon></button>
+    </div>
+    <div class="user-profile-compact" id="userProfile" style="display:none;">
+      <div class="profile-photo-container">
+        <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile" class="profile-photo" id="profilePhoto" title="Click to change photo" onclick="document.getElementById('photo-input').click()">
+      </div>
+      <input type="file" id="photo-input" accept="image/*" style="display:none;">
+      <div class="profile-info">
+        <div class="user-name" id="userName">User Name</div>
+        <div class="user-email-chip" id="userEmail">user@example.com</div>
+      </div>
+    </div>
+    <div class="login-prompt" id="loginPrompt" style="background:#f8fafc;padding:15px;border-radius:12px;margin-bottom:15px;text-align:center;border:1px solid #e2e8f0;">
+      <h3 style="margin:0 0 5px 0;font-size:15px;color:#111;">Welcome to PREMium Mind</h3>
+      <p style="margin:0 0 10px 0;font-size:12px;color:#666;">Access your courses and profile.</p>
+      <button onclick="window.location.href='login.html'" style="width:100%;padding:10px;border:none;background:#111;color:#fff;border-radius:8px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><ion-icon name="log-in-outline" style="font-size:18px;"></ion-icon> Login / Sign Up</button>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="sidebar-item"><a href="index.html" class="sidebar-link"><ion-icon name="home-outline"></ion-icon> Home</a></li>
+      <li class="sidebar-item sidebar-dropdown">
+        <div class="sidebar-dropdown-toggle" onclick="this.parentElement.classList.toggle('open')">
+          <span class="sidebar-link-content"><ion-icon name="bag-handle-outline"></ion-icon> PREMium Store</span>
+          <ion-icon name="chevron-down-outline" class="mobile-dropdown-arrow"></ion-icon>
+        </div>
+        <div class="sidebar-submenu">
+          <a href="index.html#notes" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="document-text-outline"></ion-icon> Notes</a>
+          <a href="index.html#ebooks" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="book-outline"></ion-icon> E-Books</a>
+          <a href="index.html#resume" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="briefcase-outline"></ion-icon> Resume</a>
+          <a href="index.html#report-writing" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="bar-chart-outline"></ion-icon> Report Writing</a>
+          <a href="index.html#projects" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="code-slash-outline"></ion-icon> Project</a>
+        </div>
+      </li>
+      <li class="sidebar-item"><a href="lecture.html" class="sidebar-link protected-route" id="coursesLink"><ion-icon name="play-circle-outline"></ion-icon> My Courses</a></li>
+      <li class="sidebar-item"><a href="index.html#help-form" class="sidebar-link" onclick="closeSidebar()"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us</a></li>
+      <li class="sidebar-item"><a href="termcondition.html" class="sidebar-link active"><ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy</a></li>
+    </ul>
+  </div>
+  <div class="sidebar-footer" id="sidebarFooter">
+    <button id="sidebarLogoutBtn" onclick="handleLogout()" style="width:100%;padding:12px;background:#fff1f2;color:#e11d48;border:1px solid #ffe4e6;border-radius:10px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <ion-icon name="log-out-outline" style="font-size:18px;"></ion-icon> Logout Account
+    </button>
+  </div>
+</div>
 
 <section class="terms-hero">
   <h1>Terms & Conditions</h1>
@@ -157,6 +204,46 @@
   </div>
 </footer>
 
+<script>
+  function openSidebar(){ document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
+  function closeSidebar(){ document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
+  document.getElementById('menu-btn').addEventListener('click', openSidebar);
+  document.getElementById('overlay').addEventListener('click', closeSidebar);
+  document.querySelectorAll('.sidebar-link, .sidebar-sublink').forEach(function(link){ link.addEventListener('click', closeSidebar); });
+
+  function updateUI(name, email, photoSrc){
+    var displayName = name || 'User';
+    var avatar = photoSrc || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(displayName) + '&background=000&color=fff&size=80');
+    document.getElementById('userProfile').style.display = 'flex';
+    document.getElementById('loginPrompt').style.display = 'none';
+    document.getElementById('sidebarFooter').classList.add('is-visible');
+    document.getElementById('desktopLoginBtnContainer').style.display = 'none';
+    document.getElementById('desktopUserPillContainer').style.display = 'block';
+    document.getElementById('userName').textContent = displayName;
+    document.getElementById('userEmail').textContent = email || '';
+    document.getElementById('profilePhoto').src = avatar;
+    document.getElementById('navAvatarImg').src = avatar;
+    document.getElementById('navUserName').textContent = displayName.toString().split(' ')[0];
+    var coursesLinkNav = document.getElementById('coursesLinkNav');
+    var coursesLink = document.getElementById('coursesLink');
+    if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
+    if (coursesLink) { coursesLink.classList.remove('locked'); coursesLink.onclick = null; }
+  }
+
+  function showLoggedOut(){
+    document.getElementById('userProfile').style.display = 'none';
+    document.getElementById('loginPrompt').style.display = 'block';
+    document.getElementById('sidebarFooter').classList.remove('is-visible');
+    document.getElementById('desktopLoginBtnContainer').style.display = 'block';
+    document.getElementById('desktopUserPillContainer').style.display = 'none';
+    var handleLock = function(e){ e.preventDefault(); alert('Please login to access PREMium Courses!'); window.location.href = 'login.html'; };
+    var coursesLinkNav = document.getElementById('coursesLinkNav');
+    var coursesLink = document.getElementById('coursesLink');
+    if (coursesLinkNav) { coursesLinkNav.classList.add('locked'); coursesLinkNav.onclick = handleLock; }
+    if (coursesLink) { coursesLink.classList.add('locked'); coursesLink.onclick = handleLock; }
+  }
+</script>
+
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -174,99 +261,58 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const storage = getStorage(app);
+  window.__firebaseSignOut = function(){ return signOut(auth); };
 
-  function updateUI(name, email, photoSrc) {
-    document.getElementById('userProfile').style.display = 'block';
-    document.getElementById('loginPrompt').style.display = 'none';
-    document.getElementById('userName').textContent = name || 'Student';
-    document.getElementById('userEmail').textContent = email || '';
-
-    document.getElementById('profilePhoto').src = photoSrc || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=000&color=fff&size=80`;
-
-    const coursesLinkNav = document.getElementById('coursesLinkNav');
-    const coursesLink = document.getElementById('coursesLink');
-    const courseAccessLink = document.getElementById('courseAccessLink');
-    
-    if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
-    if (coursesLink) { coursesLink.classList.remove('locked'); coursesLink.onclick = null; }
-    if (courseAccessLink) { courseAccessLink.classList.remove('locked'); courseAccessLink.onclick = null; }
-  }
-
-  function showLoggedOut() {
-    document.getElementById('userProfile').style.display = 'none';
-    document.getElementById('loginPrompt').style.display = 'block';
-
-    const handleLock = (e) => {
-        e.preventDefault();
-        alert('Please login to access PREMium Courses!');
-        window.location.href = 'login.html';
-      };
-
-    const coursesLinkNav = document.getElementById('coursesLinkNav');
-    const coursesLink = document.getElementById('coursesLink');
-    const courseAccessLink = document.getElementById('courseAccessLink');
-    
-    if (coursesLink) { coursesLink.classList.add('locked'); coursesLink.onclick = handleLock; }
-    if (coursesLinkNav) { coursesLinkNav.classList.add('locked'); coursesLinkNav.onclick = handleLock; }
-    if (courseAccessLink) { courseAccessLink.classList.add('locked'); courseAccessLink.onclick = handleLock; }
-  }
-
-  const customEmail = localStorage.getItem('customUserEmail');
-  const customName  = localStorage.getItem('customUserName');
-
-  if (customEmail) {
-      updateUI(customName, customEmail, null);
-  } else {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
-          updateUI(user.displayName, user.email, photoURL);
-        } else {
-          showLoggedOut();
-        }
-      });
-  }
-
-  document.getElementById('photo-input').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const user = auth.currentUser;
-    if (!user) return;
+  window.handleLogout = async function(){
     try {
-      const photoStorageRef = storageRef(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
-      await uploadBytes(photoStorageRef, file);
-      const photoURL = await getDownloadURL(photoStorageRef);
-      localStorage.setItem('profilePhoto_' + user.uid, photoURL);
-      document.getElementById('profilePhoto').src = photoURL;
-      alert('Profile photo updated successfully!');
-    } catch (error) {}
-  });
-
-  window.handleLogout = async () => {
-    localStorage.removeItem('customUserEmail');
-    localStorage.removeItem('customUserName');
-    try { await signOut(auth); } catch (error) {}
+      localStorage.removeItem('customUserEmail');
+      localStorage.removeItem('customUserName');
+      localStorage.removeItem('customUserPhone');
+      await signOut(auth);
+    } catch(e){}
     window.location.href = 'index.html';
   };
-</script>
 
-<script>
-  const menuBtn = document.getElementById("menu-btn");
-  const sidebar = document.getElementById("sidebar");
-  const overlay = document.getElementById("overlay");
-  const closeBtn = document.getElementById("closeSidebarBtn");
+  const customEmail = localStorage.getItem('customUserEmail');
+  const customName = localStorage.getItem('customUserName');
+  if (customEmail) {
+    updateUI(customName, customEmail, localStorage.getItem('profilePhoto_custom'));
+  } else {
+    onAuthStateChanged(auth, function(user){
+      if (user) {
+        var photoURL = localStorage.getItem('profilePhoto_' + user.uid) || user.photoURL;
+        updateUI(user.displayName, user.email, photoURL);
+      } else {
+        showLoggedOut();
+      }
+    });
+  }
 
-  function openSidebar() { sidebar.classList.add("active"); overlay.classList.add("active"); }
-  function closeSidebar() { sidebar.classList.remove("active"); overlay.classList.remove("active"); }
-
-  menuBtn.addEventListener("click", openSidebar);
-  closeBtn.addEventListener("click", closeSidebar);
-  overlay.addEventListener("click", closeSidebar);
-
-  document.querySelectorAll(".sidebar ul li a").forEach(link => {
-    link.addEventListener("click", closeSidebar);
+  document.getElementById('photo-input').addEventListener('change', async function(e){
+    var file = e.target.files[0];
+    if (!file) return;
+    var user = auth.currentUser;
+    var uid = user ? user.uid : 'custom';
+    var reader = new FileReader();
+    reader.onload = function(){
+      document.getElementById('profilePhoto').src = reader.result;
+      document.getElementById('navAvatarImg').src = reader.result;
+      localStorage.setItem('profilePhoto_' + uid, reader.result);
+    };
+    reader.readAsDataURL(file);
+    if (user) {
+      try {
+        var ref = storageRef(storage, 'profile_photos/' + user.uid + '/' + Date.now() + '_' + file.name);
+        await uploadBytes(ref, file);
+        var url = await getDownloadURL(ref);
+        localStorage.setItem('profilePhoto_' + user.uid, url);
+        document.getElementById('profilePhoto').src = url;
+        document.getElementById('navAvatarImg').src = url;
+      } catch (err) { console.error(err); }
+    }
   });
 </script>
+<script src="app-back.js"></script>
 
 </body>
 </html>
