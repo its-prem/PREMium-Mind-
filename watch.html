@@ -648,37 +648,82 @@
          return data.token;
      }
 
+     async function fetchSecurePdfBytesWithTimeout(purpose, ms) {
+         const ctrl = new AbortController();
+         const t = setTimeout(() => ctrl.abort(), ms);
+         try {
+             const tokenRes = await fetch(`${API_BASE}/get_pdf_token.php`, {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({ file: pdfFile, email: userEmail, purpose }),
+                 signal: ctrl.signal
+             });
+             const tokenData = await tokenRes.json().catch(() => ({}));
+             if (!tokenRes.ok || tokenData.status !== 'success' || !tokenData.token) {
+                 throw new Error(tokenData.message || 'Token request failed');
+             }
+             const res = await fetch(`${API_BASE}/proxy_pdf.php`, {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({ file: pdfFile, email: userEmail, token: tokenData.token }),
+                 signal: ctrl.signal
+             });
+             if (!res.ok) throw new Error('Unauthorized Access or Invalid Token');
+             return await res.arrayBuffer();
+         } catch (err) {
+             if (err && err.name === 'AbortError') throw new Error('Download timeout — check internet and retry');
+             throw err;
+         } finally {
+             clearTimeout(t);
+         }
+     }
+
      async function fetchSecurePdfBytes(purpose) {
-         const token = await getPdfToken(purpose);
-         const res = await fetch(`${API_BASE}/proxy_pdf.php`, {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ file: pdfFile, email: userEmail, token })
-         });
-         if (!res.ok) throw new Error('Unauthorized Access or Invalid Token');
-         return res.arrayBuffer();
+         return fetchSecurePdfBytesWithTimeout(purpose, 60000);
      }
 
      function isNativeApp() {
-         // Bridge present = definitely inside Android WebView app
          if (window.AndroidPdfSaver) return true;
-         return !!(window.Capacitor
-             && typeof window.Capacitor.isNativePlatform === 'function'
-             && window.Capacitor.isNativePlatform());
+         if (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) return true;
+         const ua = navigator.userAgent || '';
+         return /Android/.test(ua) && (/; wv\)/.test(ua) || /Capacitor/i.test(ua));
+     }
+
+     function bytesToBase64(bytes) {
+         const CHUNK = 0x8000;
+         let binary = '';
+         for (let i = 0; i < bytes.length; i += CHUNK) {
+             binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + CHUNK, bytes.length)));
+         }
+         return btoa(binary);
      }
 
      async function savePdfViaAndroidBridge(buf, fileName) {
-         if (!window.AndroidPdfSaver) throw new Error('AndroidPdfSaver missing — rebuild app');
+         if (!window.AndroidPdfSaver) {
+             throw new Error('App update required — rebuild & reinstall from Android Studio');
+         }
+         if (window.AndroidPdfSaver.showToast) {
+             window.AndroidPdfSaver.showToast('Saving to Downloads...');
+         }
          window.AndroidPdfSaver.begin(fileName);
          const bytes = new Uint8Array(buf);
-         const chunkSize = 256 * 1024;
+         const chunkSize = 128 * 1024;
          for (let i = 0; i < bytes.length; i += chunkSize) {
              const slice = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
-             let binary = '';
-             for (let j = 0; j < slice.length; j++) binary += String.fromCharCode(slice[j]);
-             window.AndroidPdfSaver.appendChunk(btoa(binary));
+             window.AndroidPdfSaver.appendChunk(bytesToBase64(slice));
+             if (i > 0 && i % (chunkSize * 4) === 0) {
+                 await new Promise(r => setTimeout(r, 0));
+             }
          }
          window.AndroidPdfSaver.finish();
+     }
+
+     function toastNative(msg) {
+         try {
+             if (window.AndroidPdfSaver && window.AndroidPdfSaver.showToast) {
+                 window.AndroidPdfSaver.showToast(msg);
+             }
+         } catch (e) {}
      }
 
      if (pdfFile) {
@@ -693,15 +738,18 @@
          downloadBtn.addEventListener('click', async () => {
              if (!allowDownload) {
                  alert("⚠️ Download available day of exam at 6:00 AM only.");
+                 toastNative("Download locked until exam day");
                  return;
              }
 
              const originalHtml = downloadBtn.innerHTML;
              downloadBtn.innerHTML = "⏳ Wait...";
              downloadBtn.disabled = true;
+             toastNative("Download started...");
 
              try {
-                 const buf = await fetchSecurePdfBytes('download');
+                 downloadBtn.innerHTML = "⏬ Fetching...";
+                 const buf = await fetchSecurePdfBytesWithTimeout('download', 90000);
 
                  let baseName = "Premium_Notes";
                  if (customTitle) {
@@ -713,6 +761,10 @@
                  const fileName = `${baseName}_PREMium_Mind.pdf`;
 
                  if (isNativeApp()) {
+                     if (!window.AndroidPdfSaver) {
+                         throw new Error('App rebuild required — PDF saver missing. Run app from Android Studio again.');
+                     }
+                     downloadBtn.innerHTML = "💾 Saving...";
                      await savePdfViaAndroidBridge(buf, fileName);
                  } else {
                      const blob = new Blob([buf], { type: 'application/pdf' });
@@ -726,16 +778,19 @@
                      URL.revokeObjectURL(blobUrl);
                  }
                  downloadBtn.innerHTML = "✅ Done";
+                 toastNative("PDF saved!");
              } catch (error) {
                  console.error(error);
-                 alert("Download Failed: " + (error && error.message ? error.message : "secure layer"));
+                 const msg = (error && error.message) ? error.message : "secure layer";
+                 alert("Download Failed: " + msg);
+                 toastNative("Failed: " + msg);
                  downloadBtn.innerHTML = "❌ Failed";
              }
 
              setTimeout(() => {
                  downloadBtn.innerHTML = originalHtml;
                  downloadBtn.disabled = false;
-             }, 2000);
+             }, 2500);
          });
      }
 
