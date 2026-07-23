@@ -659,6 +659,28 @@
          return res.arrayBuffer();
      }
 
+     function isNativeApp() {
+         // Bridge present = definitely inside Android WebView app
+         if (window.AndroidPdfSaver) return true;
+         return !!(window.Capacitor
+             && typeof window.Capacitor.isNativePlatform === 'function'
+             && window.Capacitor.isNativePlatform());
+     }
+
+     async function savePdfViaAndroidBridge(buf, fileName) {
+         if (!window.AndroidPdfSaver) throw new Error('AndroidPdfSaver missing — rebuild app');
+         window.AndroidPdfSaver.begin(fileName);
+         const bytes = new Uint8Array(buf);
+         const chunkSize = 256 * 1024;
+         for (let i = 0; i < bytes.length; i += chunkSize) {
+             const slice = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+             let binary = '';
+             for (let j = 0; j < slice.length; j++) binary += String.fromCharCode(slice[j]);
+             window.AndroidPdfSaver.appendChunk(btoa(binary));
+         }
+         window.AndroidPdfSaver.finish();
+     }
+
      if (pdfFile) {
          const downloadBtn = document.getElementById('downloadBtn');
 
@@ -680,8 +702,6 @@
 
              try {
                  const buf = await fetchSecurePdfBytes('download');
-                 const blob = new Blob([buf], { type: 'application/pdf' });
-                 const blobUrl = URL.createObjectURL(blob);
 
                  let baseName = "Premium_Notes";
                  if (customTitle) {
@@ -690,17 +710,25 @@
                      const extractedName = pdfFile.substring(pdfFile.lastIndexOf('/') + 1);
                      if (extractedName) baseName = extractedName.replace(/\.pdf$/i, "");
                  }
+                 const fileName = `${baseName}_PREMium_Mind.pdf`;
 
-                 const a = document.createElement('a');
-                 a.href = blobUrl;
-                 a.download = `${baseName}_PREMium_Mind.pdf`;
-                 document.body.appendChild(a);
-                 a.click();
-                 document.body.removeChild(a);
-                 URL.revokeObjectURL(blobUrl);
+                 if (isNativeApp()) {
+                     await savePdfViaAndroidBridge(buf, fileName);
+                 } else {
+                     const blob = new Blob([buf], { type: 'application/pdf' });
+                     const blobUrl = URL.createObjectURL(blob);
+                     const a = document.createElement('a');
+                     a.href = blobUrl;
+                     a.download = fileName;
+                     document.body.appendChild(a);
+                     a.click();
+                     document.body.removeChild(a);
+                     URL.revokeObjectURL(blobUrl);
+                 }
                  downloadBtn.innerHTML = "✅ Done";
              } catch (error) {
-                 alert("Download Failed: Connection secure layer active.");
+                 console.error(error);
+                 alert("Download Failed: " + (error && error.message ? error.message : "secure layer"));
                  downloadBtn.innerHTML = "❌ Failed";
              }
 
