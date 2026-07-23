@@ -2020,6 +2020,14 @@
             mode: "production",
         });
 
+        function getCashfreeRedirectTarget() {
+            const isNativeApp = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+            // App: full Cashfree page + native UPI bridge (GPay / PhonePe icons)
+            if (isNativeApp) return '_self';
+            // Website: modal keeps payment verification callback working
+            return '_modal';
+        }
+
         // 🔥 VIDEO PLAY LOGIC 🔥
         document.getElementById('watchVideoBtn').onclick = function () {
             const videoContainer = document.getElementById('videoContainer');
@@ -2142,7 +2150,7 @@
                 if (data.payment_session_id) {
                     let checkoutOptions = {
                         paymentSessionId: data.payment_session_id,
-                        redirectTarget: "_modal",
+                        redirectTarget: getCashfreeRedirectTarget(),
                     };
 
                     cashfree.checkout(checkoutOptions).then((result) => {
@@ -2180,6 +2188,30 @@
                 alert("Connection issue. Please try again.");
             }
         }
+
+        // App full-page Cashfree checkout returns here after payment
+        (function handleAppPaymentReturn() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('pmPayment') !== '1') return;
+            const orderId = params.get('order_id');
+            const courseId = params.get('course_id');
+            const email = params.get('email') || getStoredEmail();
+            if (!orderId || !courseId || !email) return;
+            history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+            fetch('https://premind.diplomawallah.in/verify_payment.php?order_id=' + encodeURIComponent(orderId) + '&course_id=' + encodeURIComponent(courseId) + '&email=' + encodeURIComponent(email))
+                .then(function (res) { return res.json(); })
+                .then(function (verifyData) {
+                    if (verifyData.status === 'success') {
+                        alert('🎉 Payment Successful! Course is now added to your account.');
+                        if (typeof window.loadCourses === 'function') window.loadCourses(email);
+                    } else {
+                        alert('Payment verification failed. Contact support if amount was deducted.');
+                    }
+                })
+                .catch(function () {
+                    if (typeof window.loadCourses === 'function') window.loadCourses(email);
+                });
+        })();
 
         let globalLoadedCourses = [];
         let currentActiveCategory = 'all';
