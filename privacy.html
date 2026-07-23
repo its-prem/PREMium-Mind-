@@ -31,10 +31,10 @@
     /* ===== Navbar ===== */
     .navbar {
       background-color: #ffffff;
-      padding: 0.5rem 1rem;
+      padding: 12px 20px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      gap: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       position: sticky;
       top: 0;
@@ -44,11 +44,18 @@
     .logo-container {
       display: flex;
       align-items: center;
-      gap: 10px;
+      flex-shrink: 0;
+      min-width: 0;
+    }
+
+    .logo-container a {
+      display: block;
+      line-height: 0;
     }
 
     .logo-image {
       width: 266px;
+      max-width: 100%;
       height: auto;
     }
 
@@ -62,6 +69,10 @@
       list-style: none;
       display: flex;
       gap: 1.8rem;
+      align-items: center;
+      margin-left: auto;
+      margin-right: 0;
+      padding: 0;
     }
 
     .nav-links a {

@@ -18,8 +18,8 @@ body {
   background-color: #ffffff;
   padding: 12px 20px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
@@ -29,11 +29,18 @@ body {
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 10px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.logo-container a {
+  display: block;
+  line-height: 0;
 }
 
 .logo-image {
   width: 266px;
+  max-width: 100%;
   height: auto;
   display: block;
 }
@@ -42,6 +49,10 @@ body {
   list-style: none;
   display: flex;
   gap: 1.8rem;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 0;
+  padding: 0;
 }
 
 .nav-links a {
@@ -58,10 +69,15 @@ body {
 /* Mobile Menu Button */
 .menu-btn {
   display: none;
-  font-size: 1.6rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  font-size: 1.4rem;
   font-weight: bold;
   cursor: pointer;
-  padding: 8px 14px;
+  padding: 0;
   border-radius: 8px;
   background: #000;
   color: #fff;
@@ -247,9 +263,10 @@ body {
 }
 
 @media (max-width: 768px) {
-  .navbar { padding-left: 10px !important; padding-right: 10px !important; }
+  .navbar { padding-left: 10px !important; padding-right: 10px !important; gap: 10px; }
   .nav-links { display: none; }
-  .menu-btn { display: block; }
+  .menu-btn { display: flex; }
+  .logo-container { flex: 1; min-width: 0; }
   .footer-container { padding-left: 10px !important; padding-right: 10px !important; }
   .footer-form form { width: 100%; }
   .footer-form input, .footer-form textarea, .footer-form button { font-size: 14px; }
