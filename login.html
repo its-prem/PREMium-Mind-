@@ -280,6 +280,56 @@
   </div>
 </div>
 
+<script>
+  // Auth API — must load before Google module (modules cannot see classic script const)
+  (function () {
+    const HOSTINGER_API = 'https://premind.diplomawallah.in';
+    const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    const apiBase = isLocal ? HOSTINGER_API : '/api-proxy';
+
+    function setSessionCookie(name, value, days = 30) {
+      const expires = new Date(Date.now() + days * 86400000).toUTCString();
+      const secure = location.protocol === 'https:' ? '; Secure' : '';
+      document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax' + secure;
+    }
+
+    function saveLoginSession(email, name, phone) {
+      localStorage.setItem('customUserEmail', email);
+      localStorage.setItem('customUserName', name || 'User');
+      localStorage.setItem('customUserPhone', phone || '0000000000');
+      setSessionCookie('customUserEmail', email);
+      setSessionCookie('customUserName', name || 'User');
+      setSessionCookie('customUserPhone', phone || '0000000000');
+    }
+
+    async function apiPost(path, formData) {
+      const urls = isLocal ? [apiBase] : [apiBase, HOSTINGER_API];
+      let lastError = null;
+
+      for (const base of urls) {
+        try {
+          const res = await fetch(base + path, { method: 'POST', body: formData });
+          const text = await res.text();
+          try {
+            return JSON.parse(text);
+          } catch (e) {
+            lastError = new Error('Invalid server response. Try again.');
+          }
+        } catch (err) {
+          lastError = err;
+        }
+      }
+
+      throw lastError || new Error('Network error. Try again.');
+    }
+
+    window.PM_API_BASE = apiBase;
+    window.PM_HOSTINGER_API = HOSTINGER_API;
+    window.saveLoginSession = saveLoginSession;
+    window.pmApiPost = apiPost;
+  })();
+</script>
+
 <script type="module">
   import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -355,13 +405,19 @@
         const fd = new FormData();
         fd.append('email', user.email);
 
-        const checkRes = await fetch('https://premind.diplomawallah.in/check_user.php', { method: 'POST', body: fd });
+        const apiBase = window.PM_API_BASE || 'https://premind.diplomawallah.in';
+        const fallback = window.PM_HOSTINGER_API || 'https://premind.diplomawallah.in';
+        let checkRes;
+        try {
+          checkRes = await fetch(`${apiBase}/check_user.php`, { method: 'POST', body: fd });
+          if (!checkRes.ok) throw new Error('proxy failed');
+        } catch (e) {
+          checkRes = await fetch(`${fallback}/check_user.php`, { method: 'POST', body: fd });
+        }
         const checkData = await checkRes.json();
 
         if (checkData.exists) {
-          localStorage.setItem('customUserEmail', user.email);
-          localStorage.setItem('customUserName',  user.displayName || 'User');
-          localStorage.setItem('customUserPhone', checkData.phone || '0000000000');
+          window.saveLoginSession(user.email, user.displayName || checkData.name || 'User', checkData.phone);
           window.location.href = 'index.html';
         } else {
           await auth.signOut();
@@ -384,8 +440,11 @@
 </script>
 
 <script>
-  const BASE_URL    = 'https://premind.diplomawallah.in';
+  const API_BASE = window.PM_API_BASE || 'https://premind.diplomawallah.in';
+  const BASE_URL = API_BASE;
   let   pendingEmail = '';
+  const saveLoginSession = window.saveLoginSession;
+  const apiPost = window.pmApiPost;
 
   // ── Screen switcher with Smooth Animation ──
   window.showScreen = function(screenId) {
@@ -444,8 +503,7 @@
     formData.append('password', document.getElementById('regPassword').value);
 
     try {
-      const res  = await fetch(`${BASE_URL}/register_api.php`, { method: 'POST', body: formData });
-      const data = await res.json();
+      const data = await apiPost('/register_api.php', formData);
 
       if (data.status === 'success') {
         pendingEmail = document.getElementById('regEmail').value;
@@ -456,7 +514,7 @@
       } else {
         showMessage('regMsg', data.message, true);
       }
-    } catch { showMessage('regMsg', 'Network error.', true); }
+    } catch (err) { showMessage('regMsg', err.message || 'Network error.', true); }
 
     btn.textContent = 'Create Account'; btn.disabled = false;
   });
@@ -470,8 +528,7 @@
     formData.append('email', document.getElementById('otpEmail').value);
     formData.append('otp',   document.getElementById('otpInput').value);
 
-    fetch(`${BASE_URL}/verify_otp.php`, { method: 'POST', body: formData })
-      .then(r => r.json())
+    apiPost('/verify_otp.php', formData)
       .then(data => {
         if (data.status === 'success') {
           alert('✅ Account created successfully! Please login now.');
@@ -496,18 +553,15 @@
     formData.append('password', document.getElementById('loginPassword').value);
 
     try {
-      const res  = await fetch(`${BASE_URL}/login_api.php`, { method: 'POST', body: formData });
-      const data = await res.json();
+      const data = await apiPost('/login_api.php', formData);
 
       if (data.status === 'success') {
-        localStorage.setItem('customUserEmail', data.email);
-        localStorage.setItem('customUserName',  data.name);
-        localStorage.setItem('customUserPhone', data.phone || '0000000000');
+        saveLoginSession(data.email, data.name, data.phone);
         window.location.href = 'index.html';
       } else {
-        showMessage('loginMsg', data.message, true);
+        showMessage('loginMsg', data.message || 'Login failed.', true);
       }
-    } catch { showMessage('loginMsg', 'Network error.', true); }
+    } catch (err) { showMessage('loginMsg', err.message || 'Network error.', true); }
 
     btn.textContent = 'Login to Continue'; btn.disabled = false;
   });
@@ -523,14 +577,13 @@
     formData.append('email', pendingEmail);
 
     try {
-      const res  = await fetch(`${BASE_URL}/forgot_password.php`, { method: 'POST', body: formData });
-      const data = await res.json();
+      const data = await apiPost('/forgot_password.php', formData);
 
       if (data.status === 'success') {
         showMessage('forgotMsg', '✅ OTP sent! Check your email.', false);
         setTimeout(() => { showScreen('resetScreen'); }, 1500);
       } else { showMessage('forgotMsg', data.message, true); }
-    } catch { showMessage('forgotMsg', 'Network error.', true); }
+    } catch (err) { showMessage('forgotMsg', err.message || 'Network error.', true); }
 
     btn.textContent = 'Send Reset OTP'; btn.disabled = false;
   });
@@ -547,14 +600,13 @@
     formData.append('new_password', document.getElementById('newPassword').value);
 
     try {
-      const res  = await fetch(`${BASE_URL}/reset_password.php`, { method: 'POST', body: formData });
-      const data = await res.json();
+      const data = await apiPost('/reset_password.php', formData);
 
       if (data.status === 'success') {
         showMessage('resetMsg', '✅ Password reset! Redirecting to login...', false);
         setTimeout(() => { showScreen('mainScreen'); switchTab('login'); }, 1500);
       } else { showMessage('resetMsg', data.message, true); }
-    } catch { showMessage('resetMsg', 'Network error.', true); }
+    } catch (err) { showMessage('resetMsg', err.message || 'Network error.', true); }
 
     btn.textContent = 'Update Password'; btn.disabled = false;
   });

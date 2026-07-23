@@ -1870,6 +1870,10 @@
             return val;
         }
 
+        window.getStoredEmail = getStoredEmail;
+        window.getStoredName = getStoredName;
+        window.getStoredPhone = getStoredPhone;
+
         function clearStoredSession() {
             localStorage.removeItem('customUserEmail');
             localStorage.removeItem('customUserName');

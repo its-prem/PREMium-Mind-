@@ -1,0 +1,6 @@
+# Proxy Hostinger PHP APIs through Netlify (same-origin) — fixes login CORS in app + website
+[[redirects]]
+  from = "/api-proxy/*"
+  to = "https://premind.diplomawallah.in/:splat"
+  status = 200
+  force = true
