@@ -22,7 +22,7 @@ html {
 /* ========== NAVBAR ========== */
 .navbar {
   background-color: #ffffff;
-  padding: 1rem 2rem;
+  padding: 12px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -30,7 +30,6 @@ html {
   position: sticky;
   top: 0;
   z-index: 100;
-  height: 70px;
 }
 
 .logo-container {
@@ -40,10 +39,8 @@ html {
 }
 
 .logo-image {
-  width: auto;
-  height: 46px;
-  max-width: 180px;
-  object-fit: contain;
+  width: 266px;
+  height: auto;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
@@ -785,18 +782,7 @@ html {
   }
 
   .navbar {
-    padding: 0.8rem 1rem;
-    height: 65px;
-  }
-
-  .logo-text {
-    font-size: 1.2rem;
-  }
-
-  .logo-image {
-    height: 46px;
-    max-width: 155px;
-    width: auto;
+    padding: 12px 10px;
   }
 
   .menu-toggle-btn {
@@ -835,18 +821,11 @@ html {
   }
 
   .navbar {
-    height: 107px;
-    padding: 0.6rem 1rem;
+    padding: 12px 10px;
   }
 
   .logo-text {
     font-size: 25px;
-  }
-
-  .logo-image {
-    height: 46px;
-    max-width: 155px;
-    width: auto;
   }
 
   .main-title {

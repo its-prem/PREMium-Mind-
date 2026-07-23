@@ -16,7 +16,7 @@ body {
 /* ===== Navbar ===== */
 .navbar {
   background-color: #ffffff;
-  padding: 0.5rem 1rem;
+  padding: 12px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -33,18 +33,9 @@ body {
 }
 
 .logo-image {
-  width: auto;
-  height: 46px;
-  max-width: 180px;
-  object-fit: contain;
+  width: 266px;
+  height: auto;
   display: block;
-}
-
-@media (max-width: 768px) {
-  .logo-image {
-    height: 46px;
-    max-width: 155px;
-  }
 }
 
 .logo-text {
@@ -615,6 +606,14 @@ body {
     font-size: 14px;
   }
 }
+
+@media screen and (max-width: 600px) {
+  .navbar {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
 .disabled-btn {
   pointer-events: none;
   opacity: 0.5;
