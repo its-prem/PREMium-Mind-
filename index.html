@@ -2108,7 +2108,7 @@
                 btn.disabled = true;
 
                 const phoneToUse = getCheckoutCustomerPhone();
-                const nameToUse = (typeof getStoredName === 'function' ? getStoredName() : null) || localStorage.getItem('customUserName') || 'Student';
+                const nameToUse = (window.getStoredName && window.getStoredName()) || localStorage.getItem('customUserName') || 'Student';
                 const redirectTarget = getCashfreeRedirectTarget();
                 const returnUrl = 'https://premind.netlify.app/index.html'
                     + '?pmPayment=1'
