@@ -1980,12 +1980,16 @@
 
         // Modal/iframe hides GPay-PhonePe. Full-page checkout on phone/app shows UPI app icons (Cashfree dashboard style).
         function isNativeAppCheckout() {
-            return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform());
+            if (window.__PM_NATIVE_APP__) return true;
+            if (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) return true;
+            const ua = navigator.userAgent || '';
+            return /Android/.test(ua) && (/; wv\)/.test(ua) || /Capacitor/i.test(ua));
         }
         function isMobileCheckout() {
             return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') || window.matchMedia('(max-width: 900px)').matches;
         }
         function getCashfreeRedirectTarget() {
+            // App + phone: full-page so GPay/PhonePe show; desktop keeps modal
             return (isNativeAppCheckout() || isMobileCheckout()) ? '_self' : '_modal';
         }
         function getCheckoutCustomerPhone() {
