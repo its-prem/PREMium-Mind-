@@ -1,6 +1,10 @@
 /**
  * App-only course gate + deep link helpers for website.
  * DB flag: app_only / only_app_access = 1
+ *
+ * Open in App:
+ *  - App installed  → premiummind:// deep link / Android intent opens app
+ *  - App missing    → app-download.html
  */
 (function () {
   var APP_PACKAGE = 'com.premiummind.app';
@@ -26,35 +30,92 @@
     return list.find(function (c) { return String(c.id) === String(courseId); }) || null;
   }
 
+  function normalizePath(pathAndQuery) {
+    return String(pathAndQuery || 'home').replace(/^\//, '');
+  }
+
   function buildDeepLink(pathAndQuery) {
-    // pathAndQuery example: "buy?id=58" or "open?id=58"
-    return APP_SCHEME + '://' + pathAndQuery.replace(/^\//, '');
+    return APP_SCHEME + '://' + normalizePath(pathAndQuery);
+  }
+
+  function getDownloadUrl(pathAndQuery) {
+    var q = '?from=gate&next=' + encodeURIComponent(normalizePath(pathAndQuery));
+    try {
+      return new URL(DOWNLOAD_PAGE + q, window.location.href).href;
+    } catch (e) {
+      return DOWNLOAD_PAGE + q;
+    }
   }
 
   function buildIntentUrl(pathAndQuery, fallbackUrl) {
-    var hostPath = pathAndQuery.replace(/^\//, '');
-    var fallback = fallbackUrl || (location.origin + '/' + DOWNLOAD_PAGE);
+    var hostPath = normalizePath(pathAndQuery);
     return 'intent://' + hostPath
       + '#Intent;scheme=' + APP_SCHEME
       + ';package=' + APP_PACKAGE
-      + ';S.browser_fallback_url=' + encodeURIComponent(fallback)
+      + ';action=android.intent.action.VIEW'
+      + ';category=android.intent.category.BROWSABLE'
+      + ';S.browser_fallback_url=' + encodeURIComponent(fallbackUrl)
       + ';end';
   }
 
+  /**
+   * Try open native app. If app not installed / open fails → app-download.html
+   */
   function tryOpenApp(pathAndQuery) {
-    var fallback = location.origin.replace(/\/$/, '') + '/' + DOWNLOAD_PAGE
-      + '?from=gate&next=' + encodeURIComponent(pathAndQuery);
-    var intentUrl = buildIntentUrl(pathAndQuery, fallback);
-    var schemeUrl = buildDeepLink(pathAndQuery);
+    if (isNativeApp()) return;
 
-    // Android Chrome prefers intent://
-    if (/Android/i.test(navigator.userAgent || '')) {
-      window.location.href = intentUrl;
+    pathAndQuery = normalizePath(pathAndQuery);
+    var fallback = getDownloadUrl(pathAndQuery);
+    var ua = navigator.userAgent || '';
+    var isAndroid = /Android/i.test(ua);
+
+    // Desktop / iOS: no reliable install detect → download page
+    if (!isAndroid) {
+      window.location.href = fallback;
       return;
     }
 
-    // Desktop / iOS: show download page (no reliable install detect)
-    window.location.href = fallback;
+    var leftPage = false;
+    function markLeft() { leftPage = true; }
+
+    var onVis = function () {
+      if (document.hidden) markLeft();
+    };
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('pagehide', markLeft);
+    window.addEventListener('blur', markLeft);
+
+    // 1) Custom scheme via hidden iframe (Samsung / some WebViews)
+    try {
+      var iframe = document.createElement('iframe');
+      iframe.setAttribute('aria-hidden', 'true');
+      iframe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;border:0;opacity:0;pointer-events:none;';
+      iframe.src = buildDeepLink(pathAndQuery);
+      document.body.appendChild(iframe);
+      setTimeout(function () {
+        try { iframe.remove(); } catch (e) {}
+      }, 2500);
+    } catch (e) {}
+
+    // 2) Android Chrome Intent (opens app OR browser_fallback_url)
+    var intentUrl = buildIntentUrl(pathAndQuery, fallback);
+    setTimeout(function () {
+      try {
+        window.location.href = intentUrl;
+      } catch (e) {
+        window.location.href = fallback;
+      }
+    }, 200);
+
+    // 3) Hard fallback if still on this page (app not installed)
+    setTimeout(function () {
+      document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('pagehide', markLeft);
+      window.removeEventListener('blur', markLeft);
+      if (!leftPage && !document.hidden) {
+        window.location.replace(fallback);
+      }
+    }, 1800);
   }
 
   function showAppOnlyModal(courseId, action) {
@@ -63,6 +124,8 @@
     if (existing) existing.remove();
 
     var path = (action === 'open' ? 'open' : 'buy') + '?id=' + encodeURIComponent(String(courseId));
+    var downloadHref = DOWNLOAD_PAGE + '?from=gate&next=' + encodeURIComponent(path);
+
     var modal = document.createElement('div');
     modal.id = 'pmAppOnlyModal';
     modal.innerHTML = ''
@@ -72,7 +135,7 @@
       + '  <h3>App Exclusive Course</h3>'
       + '  <p>Yeh course sirf <b>PREMium Mind App</b> me buy / open ho sakta hai.</p>'
       + '  <button type="button" class="pm-app-btn primary" id="pmOpenAppBtn">Open in App</button>'
-      + '  <a class="pm-app-btn secondary" href="' + DOWNLOAD_PAGE + '?from=gate&next=' + encodeURIComponent(path) + '">Download / Update App</a>'
+      + '  <a class="pm-app-btn secondary" href="' + downloadHref + '">Download / Update App</a>'
       + '  <button type="button" class="pm-app-link" data-close="1">Not now</button>'
       + '</div>';
 
@@ -101,12 +164,6 @@
     });
     document.getElementById('pmOpenAppBtn').addEventListener('click', function () {
       tryOpenApp(path);
-      setTimeout(function () {
-        // If still on page after 1.8s, user likely has no app
-        if (!document.hidden) {
-          window.location.href = DOWNLOAD_PAGE + '?from=gate&next=' + encodeURIComponent(path);
-        }
-      }, 1800);
     });
   }
 
@@ -119,10 +176,7 @@
     var course = (courseOrId && typeof courseOrId === 'object')
       ? courseOrId
       : findCourseById(courseOrId);
-    if (!course) {
-      // Unknown course object — if id passed and we later know, still allow server to block
-      return false;
-    }
+    if (!course) return false;
     if (!isAppOnlyCourse(course)) return false;
     showAppOnlyModal(course.id, action || 'buy');
     return true;
@@ -133,4 +187,5 @@
   window.pmGateAppOnly = gateAppOnly;
   window.pmTryOpenApp = tryOpenApp;
   window.pmShowAppOnlyModal = showAppOnlyModal;
+  window.pmGetAppDownloadUrl = getDownloadUrl;
 })();
