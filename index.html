@@ -2028,11 +2028,14 @@
         }
 
         let currentPurchaseInfo = {};
+        let globalLoadedCourses = [];
+        let currentActiveCategory = 'all';
 
         function resolveCoursePrice(courseId, fallbackPrice) {
+            const list = window.globalLoadedCourses || globalLoadedCourses;
             let p = parseFloat(String(fallbackPrice == null ? '' : fallbackPrice).replace(/[^0-9.]/g, ''));
-            if (!(isFinite(p) && p > 0) && Array.isArray(globalLoadedCourses)) {
-                const found = globalLoadedCourses.find(function (c) {
+            if (!(isFinite(p) && p > 0) && Array.isArray(list)) {
+                const found = list.find(function (c) {
                     return String(c.id) === String(courseId);
                 });
                 if (found && found.price != null) {
@@ -2248,9 +2251,6 @@
                 });
         })();
 
-        let globalLoadedCourses = [];
-        let currentActiveCategory = 'all';
-
         window.loadCourses = async function (userEmail = '') {
             try {
                 const container = document.getElementById('dynamic-products-container');
@@ -2267,6 +2267,7 @@
                     const isDeleted = deletedVal == 1 || deletedVal === '1' || deletedVal === true;
                     return !isDeleted;
                 }) : [];
+                window.globalLoadedCourses = globalLoadedCourses;
 
                 renderStoreGrid();
             } catch (error) {
