@@ -1,0 +1,18 @@
+{
+  "appName": "PREMium Mind",
+  "packageId": "com.premiummind.app",
+  "latestVersion": "1.0.0",
+  "versionCode": 1,
+  "releaseDate": "2026-07-24",
+  "minAndroid": "8.0+",
+  "apkFileName": "PREMium-Mind.apk",
+  "apkUrl": "https://premind.diplomawallah.in/downloads/PREMium-Mind.apk",
+  "changelog": [
+    "Login + Google Sign-In",
+    "Cashfree UPI (GPay / PhonePe)",
+    "Secure PDF reader",
+    "App-only courses support"
+  ],
+  "forceUpdate": false,
+  "deepLinkScheme": "premiummind"
+}

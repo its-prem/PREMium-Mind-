@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>App Download - PREMium Mind</title>
+  <link rel="icon" type="image/png" href="small-logo.png">
+  <link rel="stylesheet" href="pm-navbar.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <style>
+    :root {
+      --ink: #111;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --bg: #f8fafc;
+      --amber: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 500px at 10% -10%, rgba(245,158,11,.18), transparent 55%),
+        radial-gradient(900px 400px at 100% 0%, rgba(15,23,42,.08), transparent 50%),
+        var(--bg);
+      min-height: 100vh;
+    }
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+    .hero-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 32px 24px;
+      box-shadow: 0 20px 50px rgba(15,23,42,.08);
+      text-align: center;
+    }
+    .app-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #111;
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: .8rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .hero-card img.logo {
+      width: 88px;
+      height: 88px;
+      object-fit: contain;
+      margin: 8px auto 14px;
+      display: block;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,.12));
+    }
+    .hero-card h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(1.6rem, 4vw, 2rem);
+      margin: 0 0 8px;
+      font-weight: 800;
+    }
+    .hero-card .sub {
+      color: var(--muted);
+      margin: 0 0 22px;
+      line-height: 1.6;
+    }
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 22px;
+    }
+    .meta-chip {
+      background: #f1f5f9;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: .85rem;
+      font-weight: 600;
+    }
+    .meta-chip span { color: var(--muted); font-weight: 500; }
+    .dl-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 360px;
+      padding: 16px 20px;
+      background: linear-gradient(135deg, #111 0%, #334155 100%);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(15,23,42,.25);
+    }
+    .dl-btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+    .hint {
+      margin-top: 14px;
+      font-size: .85rem;
+      color: var(--muted);
+    }
+    .section {
+      margin-top: 22px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 22px;
+    }
+    .section h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .section ul {
+      margin: 0;
+      padding-left: 18px;
+      color: #334155;
+      line-height: 1.7;
+    }
+    .steps {
+      display: grid;
+      gap: 12px;
+    }
+    .step {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      text-align: left;
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+    }
+    .step b {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #111;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: .85rem;
+    }
+    .note {
+      margin-top: 16px;
+      font-size: .9rem;
+      color: #92400e;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 12px;
+      padding: 12px 14px;
+      text-align: left;
+    }
+    .open-app {
+      margin-top: 12px;
+      display: none;
+    }
+    .open-app.show { display: block; }
+    .open-app a {
+      color: #1d4ed8;
+      font-weight: 700;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo-container">
+      <a href="index.html"><img src="pm-logo.png" alt="PREMium Mind" class="logo-image" onerror="this.src='small-logo.png'"></a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="index.html#products" class="nav-link">Store</a></li>
+      <li><a href="app-download.html" class="nav-link" style="background:#111;color:#fff;">App Version</a></li>
+    </ul>
+    <div class="menu-btn" id="menu-btn">☰</div>
+  </nav>
+
+  <div class="overlay" id="overlay"></div>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-scroll">
+      <div class="sidebar-header">
+        <img src="PM-LOGO-TEXT.png" alt="PREMium Mind" class="sidebar-logo" onerror="this.src='small-logo.png'">
+        <button class="close-sidebar" onclick="closeSidebar()"><ion-icon name="close-outline"></ion-icon></button>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item"><a href="index.html" class="sidebar-link"><ion-icon name="home-outline"></ion-icon> Home</a></li>
+        <li class="sidebar-item"><a href="index.html#products" class="sidebar-link"><ion-icon name="bag-handle-outline"></ion-icon> Store</a></li>
+        <li class="sidebar-item"><a href="app-download.html" class="sidebar-link"><ion-icon name="phone-portrait-outline"></ion-icon> App Version</a></li>
+        <li class="sidebar-item"><a href="termcondition.html" class="sidebar-link"><ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <div class="hero-card">
+      <div class="app-badge"><ion-icon name="phone-portrait-outline"></ion-icon> Android App</div>
+      <img class="logo" src="small-logo.png" alt="PREMium Mind">
+      <h1>PREMium Mind App</h1>
+      <p class="sub">Latest APK yahan se download / update karo. App-only courses buy aur open ke liye app zaroori hai.</p>
+
+      <div class="meta-row">
+        <div class="meta-chip">Version: <span id="verName">—</span></div>
+        <div class="meta-chip">Code: <span id="verCode">—</span></div>
+        <div class="meta-chip">Updated: <span id="verDate">—</span></div>
+      </div>
+
+      <a class="dl-btn" id="downloadBtn" href="#" download>
+        <ion-icon name="download-outline" style="font-size:22px;"></ion-icon>
+        Download Latest APK
+      </a>
+      <p class="hint" id="fileHint">Loading version info…</p>
+      <div class="open-app" id="openAppBox">
+        <a href="#" id="openAppLink">App already installed? Open App →</a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>What's New</h2>
+      <ul id="changelogList"><li>Loading…</li></ul>
+    </div>
+
+    <div class="section">
+      <h2>Install steps (Android)</h2>
+      <div class="steps">
+        <div class="step"><b>1</b><div>APK download karo.</div></div>
+        <div class="step"><b>2</b><div>Phone Settings → Allow install from unknown sources / this browser.</div></div>
+        <div class="step"><b>3</b><div>Downloaded file open karke Install dabao.</div></div>
+        <div class="step"><b>4</b><div>App open karke login karo, phir course buy / open karo.</div></div>
+      </div>
+      <div class="note">
+        Hostinger pe APK path set karo: <code>public_html/premind/downloads/PREMium-Mind.apk</code><br>
+        Version update ke liye Netlify pe <code>app-version.json</code> edit karo.
+      </div>
+    </div>
+  </main>
+
+  <script src="pm-app-gate.js"></script>
+  <script>
+    function openSidebar(){ document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
+    function closeSidebar(){ document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
+    document.getElementById('menu-btn').addEventListener('click', openSidebar);
+    document.getElementById('overlay').addEventListener('click', closeSidebar);
+
+    (async function () {
+      var btn = document.getElementById('downloadBtn');
+      try {
+        var res = await fetch('app-version.json?t=' + Date.now());
+        var info = await res.json();
+        document.getElementById('verName').textContent = info.latestVersion || '—';
+        document.getElementById('verCode').textContent = info.versionCode || '—';
+        document.getElementById('verDate').textContent = info.releaseDate || '—';
+        document.getElementById('fileHint').textContent = (info.apkFileName || 'PREMium-Mind.apk') + (info.minAndroid ? (' · Android ' + info.minAndroid) : '');
+
+        var list = document.getElementById('changelogList');
+        list.innerHTML = '';
+        (info.changelog || []).forEach(function (line) {
+          var li = document.createElement('li');
+          li.textContent = line;
+          list.appendChild(li);
+        });
+        if (!(info.changelog || []).length) list.innerHTML = '<li>No changelog</li>';
+
+        if (info.apkUrl) {
+          btn.href = info.apkUrl;
+          btn.removeAttribute('disabled');
+        } else {
+          btn.removeAttribute('href');
+          btn.setAttribute('disabled', 'disabled');
+          document.getElementById('fileHint').textContent = 'APK URL missing in app-version.json';
+        }
+
+        var params = new URLSearchParams(location.search);
+        var next = params.get('next') || 'home';
+        var openBox = document.getElementById('openAppBox');
+        var openLink = document.getElementById('openAppLink');
+        openBox.classList.add('show');
+        openLink.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (window.pmTryOpenApp) window.pmTryOpenApp(next);
+          else location.href = 'premiummind://' + next;
+        });
+      } catch (e) {
+        document.getElementById('fileHint').textContent = 'Could not load version info. Check app-version.json';
+        btn.setAttribute('disabled', 'disabled');
+      }
+    })();
+  </script>
+  <script src="app-back.js"></script>
+</body>
+</html>

@@ -101,6 +101,7 @@
       </div>
     </li>
     <li><a href="lecture.html" class="nav-link active protected-route" id="coursesLinkNav"><ion-icon name="play-circle-outline"></ion-icon> My Courses</a></li>
+    <li><a href="app-download.html" class="nav-link"><ion-icon name="phone-portrait-outline"></ion-icon> App Version</a></li>
     <li><a href="index.html#help-form" class="nav-link"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us</a></li>
     <li id="desktopLoginBtnContainer"><a href="login.html" class="nav-link" style="background:#111;color:#fff;"><ion-icon name="person-circle-outline" style="color:#fff;"></ion-icon> Login</a></li>
     <li id="desktopUserPillContainer" style="display:none;">
@@ -152,6 +153,7 @@
         </div>
       </li>
       <li class="sidebar-item" style="--delay: 0.3s"><a href="lecture.html" class="sidebar-link active protected-route" id="coursesLink"><ion-icon name="play-circle-outline"></ion-icon> My Courses</a></li>
+      <li class="sidebar-item" style="--delay: 0.35s"><a href="app-download.html" class="sidebar-link"><ion-icon name="phone-portrait-outline"></ion-icon> App Version</a></li>
       <li class="sidebar-item" style="--delay: 0.4s"><a href="index.html#help-form" class="sidebar-link" onclick="closeSidebar()"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us</a></li>
       <li class="sidebar-item" style="--delay: 0.5s"><a href="termcondition.html" class="sidebar-link"><ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy</a></li>
     </ul>
@@ -172,6 +174,7 @@
 </div>
 
 <script src="pm-session.js"></script>
+<script src="pm-app-gate.js"></script>
 <script>
   function openSidebar(){ document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
   function closeSidebar(){ document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
@@ -233,14 +236,21 @@
           return '';
         }
         const pdfPath = pickPdfPath(course);
-        if (pdfPath) {
+        const appOnly = window.pmIsAppOnlyCourse && window.pmIsAppOnlyCourse(course);
+        const inApp = window.pmIsNativeApp && window.pmIsNativeApp();
+        let btnLabel = 'Continue Learning';
+        if (appOnly && !inApp) {
+          btnAction = "window.pmShowAppOnlyModal('" + course.id + "','open')";
+          btnLabel = 'Open in App';
+        } else if (pdfPath) {
           btnAction = "sessionStorage.setItem('pmWatchReturn','lecture.html'+window.location.search);window.location.href='watch.html?file=" + encodeURIComponent(pdfPath) + "&download=" + course.allow_download + "'";
         } else {
           btnAction = "alert('PDF abhi upload nahi hui. Admin panel me pdf_file column check karo (uploads/pdfs/...)')";
         }
         const title = course.title || 'Untitled Course';
         const image = course.image || 'small-logo.png';
-        container.innerHTML += '<div class="course-card"><div class="card-img-box"><span class="status-badge">Unlocked</span><img src="' + image + '" alt="' + title + '" onerror="this.src=\'small-logo.png\'"/></div><h2>' + title + '</h2><button class="btn-access" onclick="' + btnAction + '"><ion-icon name="play-circle-outline"></ion-icon> Continue Learning</button></div>';
+        const badge = (appOnly ? '<span class="status-badge" style="background:#111;left:auto;right:10px;">APP ONLY</span>' : '') + '<span class="status-badge">Unlocked</span>';
+        container.innerHTML += '<div class="course-card"><div class="card-img-box">' + badge + '<img src="' + image + '" alt="' + title + '" onerror="this.src=\'small-logo.png\'"/></div><h2>' + title + '</h2><button class="btn-access" onclick="' + btnAction + '"><ion-icon name="play-circle-outline"></ion-icon> ' + btnLabel + '</button></div>';
       });
     } catch (e) {
       console.error(e);

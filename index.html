@@ -1473,6 +1473,11 @@
                 </a>
             </li>
             <li>
+                <a href="app-download.html" class="nav-link">
+                    <ion-icon name="phone-portrait-outline"></ion-icon> App Version
+                </a>
+            </li>
+            <li>
                 <a href="#help-form" class="nav-link">
                     <ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us
                 </a>
@@ -1567,6 +1572,11 @@
                 <li class="sidebar-item" style="--delay: 0.3s">
                     <a href="lecture.html" class="sidebar-link protected-route" id="coursesLink">
                         <ion-icon name="play-circle-outline"></ion-icon> My Courses
+                    </a>
+                </li>
+                <li class="sidebar-item" style="--delay: 0.35s">
+                    <a href="app-download.html" class="sidebar-link">
+                        <ion-icon name="phone-portrait-outline"></ion-icon> App Version
                     </a>
                 </li>
                 <li class="sidebar-item" style="--delay: 0.4s">
@@ -1822,6 +1832,7 @@
     </footer>
 
     <script src="pm-session.js"></script>
+    <script src="pm-app-gate.js"></script>
     <script>
         // Cookie helpers for profile photos (session lives in pm-session.js)
         function setCookie(name, value, days = 30) {
@@ -2078,6 +2089,7 @@
                 alert('Course ID missing. Please refresh the page and try again.');
                 return;
             }
+            if (window.pmGateAppOnly && window.pmGateAppOnly(courseId, 'buy')) return;
             const email = (window.getStoredEmail && window.getStoredEmail()) || '';
             const loggedInUi = document.getElementById('userProfile') && document.getElementById('userProfile').style.display !== 'none';
             if (!email && !loggedInUi) {
@@ -2190,7 +2202,8 @@
                     price: safePrice > 0 ? safePrice : 1,
                     phone: phoneToUse || '',
                     name: nameToUse || 'Student',
-                    return_url: returnUrl
+                    return_url: returnUrl,
+                    from_app: !!(window.pmIsNativeApp && window.pmIsNativeApp())
                 };
 
                 const response = await fetch("https://premind.diplomawallah.in/create_order.php", {
@@ -2302,6 +2315,21 @@
                 window.globalLoadedCourses = globalLoadedCourses;
 
                 renderStoreGrid();
+                // Deep link from app: ?pm_buy=COURSE_ID
+                try {
+                    const buyId = new URLSearchParams(window.location.search).get('pm_buy');
+                    if (buyId && window.pmIsNativeApp && window.pmIsNativeApp() && typeof window.initiatePurchase === 'function') {
+                        history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+                        const course = globalLoadedCourses.find(c => String(c.id) === String(buyId));
+                        if (course && !(course.is_enrolled == 1 || course.is_enrolled == '1')) {
+                            setTimeout(function () {
+                                window.initiatePurchase(String(course.id), String(course.price), course.show_tnc || 0);
+                            }, 400);
+                        } else if (course) {
+                            window.location.href = 'lecture.html?id=' + encodeURIComponent(buyId);
+                        }
+                    }
+                } catch (e) {}
             } catch (error) {
                 document.getElementById('dynamic-products-container').innerHTML = '<p style="text-align:center; width:100%; color:red;">Database Connection Error.</p>';
             }
@@ -2352,6 +2380,9 @@
                 } else if (course.is_new == 1 || course.new_badge) {
                     badgeHTML = `<span class="new-badge">${course.new_badge || 'NEW'}</span>`;
                 }
+                if (window.pmIsAppOnlyCourse && window.pmIsAppOnlyCourse(course)) {
+                    badgeHTML += `<span class="new-badge" style="background:#111;left:auto;right:12px;">APP ONLY</span>`;
+                }
 
                 let oldPriceHTML = course.old_price ? `<span class="old-price">₹${course.old_price}</span>` : '';
 
@@ -2398,8 +2429,12 @@
 
                 // Main CTA Button
                 let btnHTML = '';
+                const appOnly = window.pmIsAppOnlyCourse && window.pmIsAppOnlyCourse(course);
+                const inApp = window.pmIsNativeApp && window.pmIsNativeApp();
                 if (course.is_enrolled == 1 || course.is_enrolled == "1") {
-                    if (cat === 'projects') {
+                    if (appOnly && !inApp) {
+                        btnHTML = `<button type="button" class="buy-course-btn" style="background: linear-gradient(135deg, #111 0%, #334155 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.pmShowAppOnlyModal('${course.id}','open')">Open in App 📱</button>`;
+                    } else if (cat === 'projects') {
                         const waText = encodeURIComponent(`Hello PREMium Mind! 👋\n\nI have purchased the project: *${course.title}*.\n\nPlease share the project source code/files.\nEmail: ${getStoredEmail()}`);
                         btnHTML = `<button class="buy-course-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.open('https://wa.me/919153950552?text=${waText}', '_blank')">Access Now 🎓</button>`;
                     } else {
@@ -2411,6 +2446,8 @@
                     btnHTML = `<button class="wa-unlock-btn" onclick="openWaModal('${course.id}')">🎁 Unlock Free via WhatsApp</button>`;
                 } else if (course.is_disabled == 1 || course.disabled == 1 || course.is_disabled == "1") {
                     btnHTML = `<button class="disabled-btn" disabled>Sold Out / Closed</button>`;
+                } else if (appOnly && !inApp) {
+                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.pmShowAppOnlyModal('${course.id}','buy')">Buy in App 📱</button>`;
                 } else {
                     btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${course.btn_text}</button>`;
                     

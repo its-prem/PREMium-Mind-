@@ -1,0 +1,83 @@
+PREMium Mind — App-Only Courses Setup
+=====================================
+
+GOAL
+----
+DB me jinka flag ON ho, woh courses website pe LIST dikhenge,
+lekin Buy / Open sirf Android App me hoga.
+
+
+1) DATABASE (phpMyAdmin → premind DB)
+-------------------------------------
+ALTER TABLE courses
+  ADD COLUMN app_only TINYINT(1) NOT NULL DEFAULT 0
+  COMMENT '1 = buy/open only in Android app';
+
+-- Optional alias column (same meaning; code supports both):
+-- ALTER TABLE courses ADD COLUMN only_app_access TINYINT(1) NOT NULL DEFAULT 0;
+
+-- Enable for a course (example course id 58):
+UPDATE courses SET app_only = 1 WHERE id = 58;
+
+-- Disable again:
+UPDATE courses SET app_only = 0 WHERE id = 58;
+
+
+2) API (Hostinger: public_html/premind/api.php)
+-----------------------------------------------
+Agar courses query `SELECT * FROM courses` use karti hai → kuch change nahi.
+Column auto JSON me aa jayega: "app_only": "1"
+
+Agar columns manually listed hain, list me `app_only` add karo.
+Website `pm-app-gate.js` in fields ko padhta hai:
+  - app_only
+  - only_app_access
+
+
+3) CREATE ORDER GATE (Hostinger upload REQUIRED)
+------------------------------------------------
+Local file: server/create_order.php
+Upload to: public_html/premind/create_order.php
+
+Yeh block karta hai:
+  app_only=1 AND request me from_app=false/missing → order reject
+App se buy pe website `from_app: true` bhejti hai.
+
+
+4) APK HOSTING (download page)
+------------------------------
+Path on Hostinger:
+  public_html/premind/downloads/PREMium-Mind.apk
+
+Public URL (already in app-version.json):
+  https://premind.diplomawallah.in/downloads/PREMium-Mind.apk
+
+Folder me .htaccess allow downloads if needed.
+
+
+5) WEBSITE FILES (Netlify / GitHub)
+-----------------------------------
+  app-download.html     → App Version page (menu se)
+  app-version.json      → latest version + apkUrl + changelog
+  pm-app-gate.js        → deep link + Buy in App modal
+  index.html            → APP ONLY badge + Buy/Open in App
+  lecture.html          → Open in App for enrolled app-only
+
+
+6) ANDROID APP REBUILD
+----------------------
+Manifest me deep link:
+  premiummind://buy?id=ID
+  premiummind://open?id=ID
+
+Naya APK build karke Hostinger downloads/ pe upload karo,
+phir app-version.json me version/changelog update karo.
+
+
+QUICK TEST
+----------
+1. DB: app_only=1 set karo kisi course pe
+2. Website store me "APP ONLY" badge + "Buy in App" dikhe
+3. Click → Open in App / Download page
+4. App me same course normal Buy chalega
+5. Website se create_order directly try → "App exclusive course" error
