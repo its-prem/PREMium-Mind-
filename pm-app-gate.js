@@ -12,10 +12,56 @@
   var DOWNLOAD_PAGE = 'app-download.html';
 
   function isNativeApp() {
-    if (window.__PM_NATIVE_APP__) return true;
-    if (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) return true;
+    if (window.__PM_NATIVE_APP__ === true || window.__PM_NATIVE_APP__ === 1 || window.__PM_NATIVE_APP__ === '1' || window.__PM_NATIVE_APP__ === 'true') {
+      markNativeApp();
+      return true;
+    }
+    try {
+      if (sessionStorage.getItem('pm_native_app') === '1' || localStorage.getItem('pm_native_app') === '1') {
+        window.__PM_NATIVE_APP__ = true;
+        return true;
+      }
+    } catch (e) {}
+
+    // Capacitor bridge (remote Netlify URL inside app)
+    try {
+      if (window.Capacitor) {
+        if (typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) {
+          markNativeApp();
+          return true;
+        }
+        if (typeof window.Capacitor.getPlatform === 'function' && window.Capacitor.getPlatform() === 'android') {
+          markNativeApp();
+          return true;
+        }
+      }
+    } catch (e) {}
+
+    // PREMium Mind Android JS bridges (Cashfree / PDF)
+    try {
+      if (typeof window.Android !== 'undefined' && window.Android !== null) {
+        markNativeApp();
+        return true;
+      }
+      if (typeof window.AndroidPdfSaver !== 'undefined' && window.AndroidPdfSaver !== null) {
+        markNativeApp();
+        return true;
+      }
+    } catch (e) {}
+
     var ua = navigator.userAgent || '';
-    return /Android/.test(ua) && (/; wv\)/.test(ua) || /Capacitor/i.test(ua));
+    // Android WebView / Capacitor UA
+    if (/Android/i.test(ua) && (/; wv\)/.test(ua) || /Capacitor/i.test(ua) || /premiummind/i.test(ua))) {
+      markNativeApp();
+      return true;
+    }
+    return false;
+  }
+
+  function markNativeApp() {
+    window.__PM_NATIVE_APP__ = true;
+    try { sessionStorage.setItem('pm_native_app', '1'); } catch (e) {}
+    try { localStorage.setItem('pm_native_app', '1'); } catch (e) {}
   }
 
   function isAppOnlyCourse(course) {
@@ -172,6 +218,7 @@
    * In native app, always returns false (allow).
    */
   function gateAppOnly(courseOrId, action) {
+    // Always re-check at click time (bridge may inject after first paint)
     if (isNativeApp()) return false;
     var course = (courseOrId && typeof courseOrId === 'object')
       ? courseOrId
@@ -182,7 +229,13 @@
     return true;
   }
 
+  // Early probe — bridges sometimes appear a moment after load
+  try { isNativeApp(); } catch (e) {}
+  setTimeout(function () { try { isNativeApp(); } catch (e) {} }, 300);
+  setTimeout(function () { try { isNativeApp(); } catch (e) {} }, 1200);
+
   window.pmIsNativeApp = isNativeApp;
+  window.pmMarkNativeApp = markNativeApp;
   window.pmIsAppOnlyCourse = isAppOnlyCourse;
   window.pmGateAppOnly = gateAppOnly;
   window.pmTryOpenApp = tryOpenApp;

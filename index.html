@@ -2010,8 +2010,10 @@
 
         // Modal/iframe hides GPay-PhonePe. Full-page checkout on phone/app shows UPI app icons (Cashfree dashboard style).
         function isNativeAppCheckout() {
+            if (window.pmIsNativeApp && window.pmIsNativeApp()) return true;
             if (window.__PM_NATIVE_APP__) return true;
             if (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) return true;
+            if (typeof window.Android !== 'undefined' || typeof window.AndroidPdfSaver !== 'undefined') return true;
             const ua = navigator.userAgent || '';
             return /Android/.test(ua) && (/; wv\)/.test(ua) || /Capacitor/i.test(ua));
         }
@@ -2428,12 +2430,14 @@
                 }
 
                 // Main CTA Button
+                // App-only: always use initiatePurchase / lecture click handlers so native
+                // detection runs at click-time (bridge may load after first render).
                 let btnHTML = '';
                 const appOnly = window.pmIsAppOnlyCourse && window.pmIsAppOnlyCourse(course);
                 const inApp = window.pmIsNativeApp && window.pmIsNativeApp();
                 if (course.is_enrolled == 1 || course.is_enrolled == "1") {
                     if (appOnly && !inApp) {
-                        btnHTML = `<button type="button" class="buy-course-btn" style="background: linear-gradient(135deg, #111 0%, #334155 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.pmShowAppOnlyModal('${course.id}','open')">Open in App 📱</button>`;
+                        btnHTML = `<button type="button" class="buy-course-btn" style="background: linear-gradient(135deg, #111 0%, #334155 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="if(window.pmGateAppOnly&&window.pmGateAppOnly('${course.id}','open'))return; window.location.href='lecture.html?id=${course.id}'">Open in App 📱</button>`;
                     } else if (cat === 'projects') {
                         const waText = encodeURIComponent(`Hello PREMium Mind! 👋\n\nI have purchased the project: *${course.title}*.\n\nPlease share the project source code/files.\nEmail: ${getStoredEmail()}`);
                         btnHTML = `<button class="buy-course-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.open('https://wa.me/919153950552?text=${waText}', '_blank')">Access Now 🎓</button>`;
@@ -2447,7 +2451,7 @@
                 } else if (course.is_disabled == 1 || course.disabled == 1 || course.is_disabled == "1") {
                     btnHTML = `<button class="disabled-btn" disabled>Sold Out / Closed</button>`;
                 } else if (appOnly && !inApp) {
-                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.pmShowAppOnlyModal('${course.id}','buy')">Buy in App 📱</button>`;
+                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">Buy in App 📱</button>`;
                 } else {
                     btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${course.btn_text}</button>`;
                     
