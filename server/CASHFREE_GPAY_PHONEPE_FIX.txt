@@ -1,0 +1,58 @@
+========================================================================
+HOSTINGER FIX — GPay / PhonePe icons on checkout (create_order.php)
+Upload/replace ONLY this logic in public_html/premind/create_order.php
+Does NOT affect login APIs.
+========================================================================
+
+PROBLEM:
+  Cashfree dashboard preview = full mobile page → GPay/PhonePe dikhte hain.
+  Website/app pe modal/iframe → Cashfree UPI apps chhupa deta hai.
+  Phone often hardcoded 9999999999 → screenshot me bhi yahi dikh raha tha.
+
+FRONTEND (already pushed):
+  Mobile/App ab full-page checkout (_self) use karta hai.
+  create_order ko phone, name, return_url bhejta hai.
+
+AAPKO HOSTINGER PE create_order.php ME YE ENSURE KARNA HAI:
+
+1) customer_phone — frontend se aaye to use karo, warna DB se user phone:
+   $phone = preg_replace('/\D/', '', $input['phone'] ?? '');
+   if (strlen($phone) < 10) { /* fallback from DB by email */ }
+   $phone = substr($phone, -10);
+   // 9999999999 hardcode MAT rakho
+
+2) order_meta.return_url — full-page checkout ke baad wapas aane ke liye:
+   $returnUrl = $input['return_url'] ?? 'https://premind.netlify.app/index.html?pmPayment=1&order_id={order_id}';
+   // Cashfree needs literal {order_id} in the URL string
+
+3) payment_methods — ya to HATA do (sab methods), ya ye rakho:
+   "cc,dc,upi,nb,app,emi,paylater"
+   Agar sirf "upi,nb" hai to cards/EMI hide ho sakte hain; UPI Intent
+   phir bhi mobile full-page pe aana chahiye.
+
+4) Cashfree order create body example (PHP array):
+
+$orderPayload = [
+  'order_amount'   => (float)$price,
+  'order_currency' => 'INR',
+  'order_id'       => $orderId,
+  'customer_details' => [
+    'customer_id'    => preg_replace('/[^a-zA-Z0-9_-]/', '_', $email),
+    'customer_name'  => $name,
+    'customer_email' => $email,
+    'customer_phone' => $phone,
+  ],
+  'order_meta' => [
+    'return_url'      => $returnUrl,
+    'payment_methods' => 'cc,dc,upi,nb,app,emi,paylater',
+  ],
+];
+
+APP:
+  Android me CashfreeBridge pehle se hai.
+  Android Studio se APK rebuild + install zaroori.
+
+AGAR APP ME AB BHI ICONS NA DIKHEIN:
+  Cashfree Support Form se "UPI Intent for JS SDK WebView" feature flag
+  enable karwao (merchant.cashfree.com → raise issue).
+========================================================================

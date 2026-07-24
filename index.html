@@ -1982,6 +1982,23 @@
             mode: "production",
         });
 
+        // Modal/iframe hides GPay-PhonePe. Full-page checkout on phone/app shows UPI app icons (Cashfree dashboard style).
+        function isNativeAppCheckout() {
+            return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform());
+        }
+        function isMobileCheckout() {
+            return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') || window.matchMedia('(max-width: 900px)').matches;
+        }
+        function getCashfreeRedirectTarget() {
+            return (isNativeAppCheckout() || isMobileCheckout()) ? '_self' : '_modal';
+        }
+        function getCheckoutCustomerPhone() {
+            const raw = (typeof getStoredPhone === 'function' ? getStoredPhone() : null) || localStorage.getItem('customUserPhone') || '';
+            const digits = String(raw).replace(/\D/g, '');
+            if (digits.length >= 10) return digits.slice(-10);
+            return '';
+        }
+
         // 🔥 VIDEO PLAY LOGIC 🔥
         document.getElementById('watchVideoBtn').onclick = function () {
             const videoContainer = document.getElementById('videoContainer');
@@ -2092,10 +2109,26 @@
                 btn.innerText = "Processing...";
                 btn.disabled = true;
 
+                const phoneToUse = getCheckoutCustomerPhone();
+                const nameToUse = (typeof getStoredName === 'function' ? getStoredName() : null) || localStorage.getItem('customUserName') || 'Student';
+                const redirectTarget = getCashfreeRedirectTarget();
+                const returnUrl = 'https://premind.netlify.app/index.html'
+                    + '?pmPayment=1'
+                    + '&order_id={order_id}'
+                    + '&course_id=' + encodeURIComponent(courseId)
+                    + '&email=' + encodeURIComponent(emailToUse);
+
                 const response = await fetch("https://premind.diplomawallah.in/create_order.php", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email: emailToUse, course_id: courseId, price: price })
+                    body: JSON.stringify({
+                        email: emailToUse,
+                        course_id: courseId,
+                        price: price,
+                        phone: phoneToUse,
+                        name: nameToUse,
+                        return_url: returnUrl
+                    })
                 });
 
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -2104,7 +2137,7 @@
                 if (data.payment_session_id) {
                     let checkoutOptions = {
                         paymentSessionId: data.payment_session_id,
-                        redirectTarget: "_modal",
+                        redirectTarget: redirectTarget,
                     };
 
                     cashfree.checkout(checkoutOptions).then((result) => {
@@ -2130,6 +2163,10 @@
                                 .catch(err => {
                                     window.loadCourses(emailToUse);
                                 });
+                        } else if (redirectTarget === '_self') {
+                            // Full-page checkout — user leaves this page; return handler verifies payment
+                            btn.innerText = originalText;
+                            btn.disabled = false;
                         }
                     });
                 } else {
@@ -2142,6 +2179,30 @@
                 alert("Connection issue. Please try again.");
             }
         }
+
+        // Full-page Cashfree return (mobile/app) — verifies payment without touching login
+        (function handleCashfreePaymentReturn() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('pmPayment') !== '1') return;
+            const orderId = params.get('order_id');
+            const courseId = params.get('course_id');
+            const email = params.get('email') || (typeof getStoredEmail === 'function' ? getStoredEmail() : null);
+            history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+            if (!orderId || !courseId || !email) return;
+            fetch('https://premind.diplomawallah.in/verify_payment.php?order_id=' + encodeURIComponent(orderId) + '&course_id=' + encodeURIComponent(courseId) + '&email=' + encodeURIComponent(email))
+                .then(function (res) { return res.json(); })
+                .then(function (verifyData) {
+                    if (verifyData.status === 'success') {
+                        alert('🎉 Payment Successful! Course is now added to your account.');
+                    } else {
+                        alert('Payment received. If course is not unlocked, contact support with Order ID: ' + orderId);
+                    }
+                    if (typeof window.loadCourses === 'function') window.loadCourses(email);
+                })
+                .catch(function () {
+                    if (typeof window.loadCourses === 'function') window.loadCourses(email);
+                });
+        })();
 
         let globalLoadedCourses = [];
         let currentActiveCategory = 'all';
