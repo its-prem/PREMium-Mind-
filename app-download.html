@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
   <style>
     :root {
       --ink: #111;
@@ -28,6 +29,12 @@
         radial-gradient(900px 400px at 100% 0%, rgba(15,23,42,.08), transparent 50%),
         var(--bg);
       min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .navbar {
+      position: sticky;
+      top: 0;
+      width: 100%;
     }
     .wrap {
       max-width: 720px;
@@ -185,29 +192,158 @@
 <body>
   <nav class="navbar">
     <div class="logo-container">
-      <a href="index.html"><img src="pm-logo.png" alt="PREMium Mind" class="logo-image" onerror="this.src='small-logo.png'"></a>
+      <a href="index.html">
+        <img src="PM-LOGO-TEXT.png" alt="PM Logo" class="logo-image" onerror="this.onerror=null;this.src='small-logo.png';" />
+      </a>
     </div>
+
     <ul class="nav-links">
-      <li><a href="index.html" class="nav-link">Home</a></li>
-      <li><a href="index.html#products" class="nav-link">Store</a></li>
-      <li><a href="app-download.html" class="nav-link" style="background:#111;color:#fff;">App Version</a></li>
+      <li>
+        <a href="index.html" class="nav-link">
+          <ion-icon name="home-outline"></ion-icon> Home
+        </a>
+      </li>
+
+      <li class="nav-dropdown">
+        <a href="index.html#products" class="nav-link store-trigger dropdown-toggle" id="store-dropdown-btn">
+          <ion-icon name="bag-handle-outline"></ion-icon> PREMium Store
+          <ion-icon name="chevron-down-outline" class="dropdown-arrow"></ion-icon>
+        </a>
+        <div class="dropdown-menu">
+          <div class="dropdown-header">Explore Categories</div>
+          <a href="index.html#notes" class="dropdown-item">
+            <div class="dropdown-icon icon-blue"><ion-icon name="document-text-outline"></ion-icon></div>
+            <div class="dropdown-text">
+              <span class="item-title">Notes</span>
+              <span class="item-desc">Handwritten &amp; exam notes</span>
+            </div>
+          </a>
+          <a href="index.html#ebooks" class="dropdown-item">
+            <div class="dropdown-icon icon-purple"><ion-icon name="book-outline"></ion-icon></div>
+            <div class="dropdown-text">
+              <span class="item-title">E-Books</span>
+              <span class="item-desc">Complete syllabus guides</span>
+            </div>
+          </a>
+          <a href="index.html#resume" class="dropdown-item">
+            <div class="dropdown-icon icon-green"><ion-icon name="briefcase-outline"></ion-icon></div>
+            <div class="dropdown-text">
+              <span class="item-title">Resume</span>
+              <span class="item-desc">ATS-ready professional formats</span>
+            </div>
+          </a>
+          <a href="index.html#report-writing" class="dropdown-item">
+            <div class="dropdown-icon icon-amber"><ion-icon name="bar-chart-outline"></ion-icon></div>
+            <div class="dropdown-text">
+              <span class="item-title">Report Writing</span>
+              <span class="item-desc">Industrial &amp; academic reports</span>
+            </div>
+          </a>
+          <a href="index.html#projects" class="dropdown-item">
+            <div class="dropdown-icon icon-rose"><ion-icon name="code-slash-outline"></ion-icon></div>
+            <div class="dropdown-text">
+              <span class="item-title">Project</span>
+              <span class="item-desc">Major &amp; minor project code</span>
+            </div>
+            <span class="dropdown-badge">Hot</span>
+          </a>
+        </div>
+      </li>
+
+      <li>
+        <a href="lecture.html" class="nav-link protected-route" id="coursesLinkNav">
+          <ion-icon name="play-circle-outline"></ion-icon> My Courses
+        </a>
+      </li>
+      <li>
+        <a href="app-download.html" class="nav-link active">
+          <ion-icon name="phone-portrait-outline"></ion-icon> App Version
+        </a>
+      </li>
+      <li>
+        <a href="index.html#help-form" class="nav-link">
+          <ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us
+        </a>
+      </li>
+      <li id="desktopLoginBtnContainer">
+        <a href="login.html" class="nav-link" style="background:#111;color:#fff;">
+          <ion-icon name="person-circle-outline" style="color:#fff;"></ion-icon> Login
+        </a>
+      </li>
+      <li id="desktopUserPillContainer" style="display:none;">
+        <div class="nav-user-pill" onclick="openSidebar()">
+          <img src="" id="navAvatarImg" alt="Profile" class="nav-avatar">
+          <span class="nav-user-name" id="navUserName">User</span>
+          <ion-icon name="chevron-down-outline" style="color:#2563eb;font-size:16px;margin-left:2px;"></ion-icon>
+        </div>
+      </li>
     </ul>
-    <div class="menu-btn" id="menu-btn">☰</div>
+    <button type="button" class="menu-btn" id="menu-btn" aria-label="Open menu">☰</button>
   </nav>
 
   <div class="overlay" id="overlay"></div>
   <div class="sidebar" id="sidebar">
     <div class="sidebar-scroll">
       <div class="sidebar-header">
-        <img src="PM-LOGO-TEXT.png" alt="PREMium Mind" class="sidebar-logo" onerror="this.src='small-logo.png'">
-        <button class="close-sidebar" onclick="closeSidebar()"><ion-icon name="close-outline"></ion-icon></button>
+        <img src="PM-LOGO-TEXT.png" alt="PREMium Mind" class="sidebar-logo" onerror="this.onerror=null;this.src='small-logo.png';">
+        <button class="close-sidebar" id="close-sidebar-btn" onclick="closeSidebar()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
       </div>
+
+      <div class="user-profile-compact" id="userProfile" style="display:none;">
+        <div class="profile-photo-container">
+          <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile" class="profile-photo" id="profilePhoto">
+        </div>
+        <div class="profile-info">
+          <div class="user-name" id="userName">User Name</div>
+          <div class="user-email-chip" id="userEmail">user@example.com</div>
+        </div>
+      </div>
+
+      <div class="login-prompt" id="loginPrompt" style="background:#f8fafc;padding:15px;border-radius:12px;margin-bottom:15px;text-align:center;border:1px solid #e2e8f0;">
+        <h3 style="margin:0 0 5px 0;font-size:15px;color:#111;">Welcome to PREMium Mind</h3>
+        <p style="margin:0 0 10px 0;font-size:12px;color:#666;">Access your courses and profile.</p>
+        <button onclick="window.location.href='login.html'" style="width:100%;padding:10px;border:none;background:#111;color:#fff;border-radius:8px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+          <ion-icon name="log-in-outline" style="font-size:18px;"></ion-icon> Login / Sign Up
+        </button>
+      </div>
+
       <ul class="sidebar-menu">
-        <li class="sidebar-item"><a href="index.html" class="sidebar-link"><ion-icon name="home-outline"></ion-icon> Home</a></li>
-        <li class="sidebar-item"><a href="index.html#products" class="sidebar-link"><ion-icon name="bag-handle-outline"></ion-icon> Store</a></li>
-        <li class="sidebar-item"><a href="app-download.html" class="sidebar-link"><ion-icon name="phone-portrait-outline"></ion-icon> App Version</a></li>
-        <li class="sidebar-item"><a href="termcondition.html" class="sidebar-link"><ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy</a></li>
+        <li class="sidebar-item" style="--delay: 0.1s">
+          <a href="index.html" class="sidebar-link"><ion-icon name="home-outline"></ion-icon> Home</a>
+        </li>
+        <li class="sidebar-item sidebar-dropdown" style="--delay: 0.2s">
+          <div class="sidebar-dropdown-toggle" onclick="this.parentElement.classList.toggle('open')">
+            <span class="sidebar-link-content"><ion-icon name="bag-handle-outline"></ion-icon> PREMium Store</span>
+            <ion-icon name="chevron-down-outline" class="mobile-dropdown-arrow"></ion-icon>
+          </div>
+          <div class="sidebar-submenu">
+            <a href="index.html#notes" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="document-text-outline"></ion-icon> Notes</a>
+            <a href="index.html#ebooks" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="book-outline"></ion-icon> E-Books</a>
+            <a href="index.html#resume" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="briefcase-outline"></ion-icon> Resume</a>
+            <a href="index.html#report-writing" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="bar-chart-outline"></ion-icon> Report Writing</a>
+            <a href="index.html#projects" class="sidebar-sublink" onclick="closeSidebar()"><ion-icon name="code-slash-outline"></ion-icon> Project</a>
+          </div>
+        </li>
+        <li class="sidebar-item" style="--delay: 0.3s">
+          <a href="lecture.html" class="sidebar-link protected-route" id="coursesLink"><ion-icon name="play-circle-outline"></ion-icon> My Courses</a>
+        </li>
+        <li class="sidebar-item" style="--delay: 0.35s">
+          <a href="app-download.html" class="sidebar-link active"><ion-icon name="phone-portrait-outline"></ion-icon> App Version</a>
+        </li>
+        <li class="sidebar-item" style="--delay: 0.4s">
+          <a href="index.html#help-form" class="sidebar-link" onclick="closeSidebar()"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us</a>
+        </li>
+        <li class="sidebar-item" style="--delay: 0.5s">
+          <a href="termcondition.html" class="sidebar-link"><ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy</a>
+        </li>
       </ul>
+    </div>
+    <div class="sidebar-footer" id="sidebarFooter">
+      <button id="sidebarLogoutBtn" onclick="handleLogout()" style="width:100%;padding:12px;background:#fff1f2;color:#e11d48;border:1px solid #ffe4e6;border-radius:10px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <ion-icon name="log-out-outline" style="font-size:18px;"></ion-icon> Logout Account
+      </button>
     </div>
   </div>
 
@@ -254,12 +390,54 @@
     </div>
   </main>
 
+  <script src="pm-session.js"></script>
   <script src="pm-app-gate.js"></script>
   <script>
-    function openSidebar(){ document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
-    function closeSidebar(){ document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
-    document.getElementById('menu-btn').addEventListener('click', openSidebar);
+    function openSidebar(){
+      document.getElementById('sidebar').classList.add('active');
+      document.getElementById('overlay').classList.add('active');
+      document.body.classList.add('sidebar-open');
+    }
+    function closeSidebar(){
+      document.getElementById('sidebar').classList.remove('active');
+      document.getElementById('overlay').classList.remove('active');
+      document.body.classList.remove('sidebar-open');
+    }
+    document.getElementById('menu-btn').addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      openSidebar();
+    });
     document.getElementById('overlay').addEventListener('click', closeSidebar);
+    document.querySelectorAll('.sidebar-link, .sidebar-sublink').forEach(function (link) {
+      link.addEventListener('click', closeSidebar);
+    });
+
+    window.handleLogout = function () {
+      if (window.clearStoredSession) clearStoredSession();
+      window.location.href = 'index.html';
+    };
+
+    function updateUI(name, email, photoSrc) {
+      var displayName = name || 'User';
+      var avatar = photoSrc || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(displayName) + '&background=000&color=fff&size=80');
+      document.getElementById('userProfile').style.display = 'flex';
+      document.getElementById('loginPrompt').style.display = 'none';
+      document.getElementById('sidebarFooter').classList.add('is-visible');
+      document.getElementById('desktopLoginBtnContainer').style.display = 'none';
+      document.getElementById('desktopUserPillContainer').style.display = 'block';
+      document.getElementById('userName').textContent = displayName;
+      document.getElementById('userEmail').textContent = email || '';
+      document.getElementById('profilePhoto').src = avatar;
+      document.getElementById('navAvatarImg').src = avatar;
+      document.getElementById('navUserName').textContent = displayName.toString().split(' ')[0];
+    }
+
+    (function () {
+      var email = window.getStoredEmail && window.getStoredEmail();
+      var name = window.getStoredName && window.getStoredName();
+      if (email) updateUI(name, email, localStorage.getItem('profilePhoto_custom'));
+    })();
 
     (async function () {
       var btn = document.getElementById('downloadBtn');

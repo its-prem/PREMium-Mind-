@@ -576,16 +576,29 @@
 
 @media (max-width: 768px) {
   .nav-links {
-    display: none;
+    display: none !important;
   }
 
   .menu-btn {
-    display: flex;
+    display: flex !important;
+    position: relative;
+    z-index: 1002;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
   .logo-container {
     flex: 1;
     min-width: 0;
+    overflow: hidden;
+  }
+
+  .logo-image {
+    width: auto;
+    max-width: min(220px, calc(100vw - 80px));
+    height: 36px;
+    object-fit: contain;
+    object-position: left center;
   }
 }
 
@@ -595,4 +608,9 @@
     padding-right: 10px;
     gap: 10px;
   }
+}
+
+body.sidebar-open {
+  overflow: hidden;
+  touch-action: none;
 }
