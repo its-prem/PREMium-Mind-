@@ -234,29 +234,6 @@
       padding: 8px 4px;
       -webkit-tap-highlight-color: transparent;
     }
-    body.is-native-app .open-app,
-    body.is-native-app .note-admin {
-      display: none !important;
-    }
-    body.is-native-app .dl-btn {
-      display: none;
-    }
-    body.is-native-app .native-msg {
-      display: block;
-    }
-    .native-msg {
-      display: none;
-      margin: 0 auto;
-      max-width: 400px;
-      padding: 14px 16px;
-      border-radius: 14px;
-      background: #ecfdf5;
-      border: 1px solid #a7f3d0;
-      color: #065f46;
-      font-weight: 600;
-      font-size: .95rem;
-      line-height: 1.45;
-    }
 
     /* Phones */
     @media (max-width: 640px) {
@@ -477,7 +454,7 @@
       <div class="app-badge"><ion-icon name="phone-portrait-outline"></ion-icon> Android App</div>
       <img class="logo" src="small-logo.png" alt="PREMium Mind">
       <h1>PREMium Mind App</h1>
-      <p class="sub">Latest APK yahan se download / update karo. App-only courses buy aur open ke liye app zaroori hai.</p>
+      <p class="sub">Download or update the latest Android APK. App-only courses require the PREMium Mind app to buy and open.</p>
 
       <div class="meta-row">
         <div class="meta-chip">Version <span id="verName">—</span></div>
@@ -489,9 +466,6 @@
         <ion-icon name="download-outline" style="font-size:22px;"></ion-icon>
         Download Latest APK
       </a>
-      <div class="native-msg" id="nativeMsg">
-        Aap already PREMium Mind App me ho. Latest version check ke liye neeche changelog dekho.
-      </div>
       <p class="hint" id="fileHint">Loading version info…</p>
       <div class="open-app" id="openAppBox">
         <a href="#" id="openAppLink">App already installed? Open App →</a>
@@ -506,15 +480,10 @@
     <div class="section">
       <h2>Install steps (Android)</h2>
       <div class="steps">
-        <div class="step"><b>1</b><div>APK download karo.</div></div>
+        <div class="step"><b>1</b><div>Download the APK.</div></div>
         <div class="step"><b>2</b><div>Phone Settings → Allow install from unknown sources / this browser.</div></div>
-        <div class="step"><b>3</b><div>Downloaded file open karke Install dabao.</div></div>
-        <div class="step"><b>4</b><div>App open karke login karo, phir course buy / open karo.</div></div>
-      </div>
-      <div class="note note-admin">
-        Latest APK Hostinger pe upload hona chahiye:<br>
-        <code>premind/downloads/PREMium-Mind.apk</code><br>
-        Version update ke liye <code>app-version.json</code> edit karo.
+        <div class="step"><b>3</b><div>Open the downloaded file and tap Install.</div></div>
+        <div class="step"><b>4</b><div>Open the app, log in, then buy / open your course.</div></div>
       </div>
     </div>
   </main>
@@ -568,15 +537,25 @@
       if (email) updateUI(name, email, localStorage.getItem('profilePhoto_custom'));
     })();
 
-    if (window.pmIsNativeApp && window.pmIsNativeApp()) {
-      document.body.classList.add('is-native-app');
-    }
-
     (async function () {
       var btn = document.getElementById('downloadBtn');
+      async function loadVersion() {
+        var urls = [
+          'https://premind.diplomawallah.in/get_app_version.php?t=' + Date.now(),
+          'app-version.json?t=' + Date.now()
+        ];
+        var lastErr = null;
+        for (var i = 0; i < urls.length; i++) {
+          try {
+            var res = await fetch(urls[i], { cache: 'no-store' });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return await res.json();
+          } catch (e) { lastErr = e; }
+        }
+        throw lastErr || new Error('Failed to load version');
+      }
       try {
-        var res = await fetch('app-version.json?t=' + Date.now());
-        var info = await res.json();
+        var info = await loadVersion();
         document.getElementById('verName').textContent = info.latestVersion || '—';
         document.getElementById('verCode').textContent = info.versionCode || '—';
         document.getElementById('verDate').textContent = info.releaseDate || '—';
@@ -599,23 +578,21 @@
           btn.removeAttribute('href');
           btn.setAttribute('disabled', 'disabled');
           btn.classList.add('is-disabled');
-          document.getElementById('fileHint').textContent = 'APK URL missing in app-version.json';
+          document.getElementById('fileHint').textContent = 'APK URL missing';
         }
 
         var params = new URLSearchParams(location.search);
         var next = params.get('next') || 'home';
         var openBox = document.getElementById('openAppBox');
         var openLink = document.getElementById('openAppLink');
-        if (!(window.pmIsNativeApp && window.pmIsNativeApp())) {
-          openBox.classList.add('show');
-          openLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (window.pmTryOpenApp) window.pmTryOpenApp(next);
-            else location.href = 'premiummind://' + next;
-          });
-        }
+        openBox.classList.add('show');
+        openLink.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (window.pmTryOpenApp) window.pmTryOpenApp(next);
+          else location.href = 'premiummind://' + next;
+        });
       } catch (e) {
-        document.getElementById('fileHint').textContent = 'Could not load version info. Check app-version.json';
+        document.getElementById('fileHint').textContent = 'Could not load version info. Please try again later.';
         btn.setAttribute('disabled', 'disabled');
         btn.classList.add('is-disabled');
       }
