@@ -2132,10 +2132,16 @@
                     + '&course_id=' + encodeURIComponent(safeCourseId)
                     + '&email=' + encodeURIComponent(emailToUse);
 
+                const parsedPrice = parseFloat(String(price).replace(/[^0-9.]/g, ''));
+                const safePrice = (isFinite(parsedPrice) && parsedPrice > 0) ? Math.round(parsedPrice * 100) / 100 : 0;
+                if (safePrice < 1) {
+                    throw new Error('Invalid course price. Please refresh the page.');
+                }
+
                 const payload = {
                     email: emailToUse,
                     course_id: safeCourseId,
-                    price: Number(price) || 0,
+                    price: safePrice,
                     phone: phoneToUse || '',
                     name: nameToUse || 'Student',
                     return_url: returnUrl
@@ -2360,7 +2366,7 @@
                 } else if (course.is_disabled == 1 || course.disabled == 1 || course.is_disabled == "1") {
                     btnHTML = `<button class="disabled-btn" disabled>Sold Out / Closed</button>`;
                 } else {
-                    btnHTML = `<button class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase(${course.id}, ${course.price}, '${course.show_tnc || 0}')">${course.btn_text}</button>`;
+                    btnHTML = `<button class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase('${String(course.id).replace(/'/g, '')}', ${Number(course.price) || 0}, '${course.show_tnc || 0}')">${course.btn_text}</button>`;
                     
                     let courseName = course.title.toLowerCase();
                     if ((courseName.includes('professional') || courseName.includes('skill')) && !courseName.includes('important questions')) {
