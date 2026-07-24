@@ -2029,6 +2029,20 @@
 
         let currentPurchaseInfo = {};
 
+        function resolveCoursePrice(courseId, fallbackPrice) {
+            let p = parseFloat(String(fallbackPrice == null ? '' : fallbackPrice).replace(/[^0-9.]/g, ''));
+            if (!(isFinite(p) && p > 0) && Array.isArray(globalLoadedCourses)) {
+                const found = globalLoadedCourses.find(function (c) {
+                    return String(c.id) === String(courseId);
+                });
+                if (found && found.price != null) {
+                    p = parseFloat(String(found.price).replace(/[^0-9.]/g, ''));
+                }
+            }
+            if (isFinite(p) && p > 0) return Math.round(p * 100) / 100;
+            return 0;
+        }
+
         window.initiatePurchase = function (cid, price, showTnc) {
             const courseId = (cid === 0 || cid) ? String(cid).trim() : '';
             if (!courseId || courseId === 'null' || courseId === 'undefined') {
@@ -2043,8 +2057,10 @@
                 return;
             }
 
+            const resolvedPrice = resolveCoursePrice(courseId, price);
+
             if (showTnc === '1' || showTnc === 1) {
-                currentPurchaseInfo = { cid: courseId, price: price };
+                currentPurchaseInfo = { cid: courseId, price: resolvedPrice };
 
                 // Modal khulte hi sab kuch purani (lock) state me daalo
                 document.getElementById('tnc_agree').checked = false;
@@ -2070,7 +2086,7 @@
 
                 document.getElementById('tncModal').style.display = 'flex';
             } else {
-                window.enrollCourse(courseId, price);
+                window.enrollCourse(courseId, resolvedPrice);
             }
         }
 
@@ -2132,16 +2148,13 @@
                     + '&course_id=' + encodeURIComponent(safeCourseId)
                     + '&email=' + encodeURIComponent(emailToUse);
 
-                const parsedPrice = parseFloat(String(price).replace(/[^0-9.]/g, ''));
-                const safePrice = (isFinite(parsedPrice) && parsedPrice > 0) ? Math.round(parsedPrice * 100) / 100 : 0;
-                if (safePrice < 1) {
-                    throw new Error('Invalid course price. Please refresh the page.');
-                }
+                // Price: loaded courses list se resolve; server DB se bhi fix karega
+                const safePrice = resolveCoursePrice(safeCourseId, price);
 
                 const payload = {
                     email: emailToUse,
                     course_id: safeCourseId,
-                    price: safePrice,
+                    price: safePrice > 0 ? safePrice : 1,
                     phone: phoneToUse || '',
                     name: nameToUse || 'Student',
                     return_url: returnUrl
@@ -2366,7 +2379,7 @@
                 } else if (course.is_disabled == 1 || course.disabled == 1 || course.is_disabled == "1") {
                     btnHTML = `<button class="disabled-btn" disabled>Sold Out / Closed</button>`;
                 } else {
-                    btnHTML = `<button class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" onclick="window.initiatePurchase('${String(course.id).replace(/'/g, '')}', ${Number(course.price) || 0}, '${course.show_tnc || 0}')">${course.btn_text}</button>`;
+                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${course.btn_text}</button>`;
                     
                     let courseName = course.title.toLowerCase();
                     if ((courseName.includes('professional') || courseName.includes('skill')) && !courseName.includes('important questions')) {
