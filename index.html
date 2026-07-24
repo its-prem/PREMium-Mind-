@@ -2030,6 +2030,11 @@
         let currentPurchaseInfo = {};
 
         window.initiatePurchase = function (cid, price, showTnc) {
+            const courseId = (cid === 0 || cid) ? String(cid).trim() : '';
+            if (!courseId || courseId === 'null' || courseId === 'undefined') {
+                alert('Course ID missing. Please refresh the page and try again.');
+                return;
+            }
             const email = (window.getStoredEmail && window.getStoredEmail()) || '';
             const loggedInUi = document.getElementById('userProfile') && document.getElementById('userProfile').style.display !== 'none';
             if (!email && !loggedInUi) {
@@ -2039,7 +2044,7 @@
             }
 
             if (showTnc === '1' || showTnc === 1) {
-                currentPurchaseInfo = { cid, price };
+                currentPurchaseInfo = { cid: courseId, price: price };
 
                 // Modal khulte hi sab kuch purani (lock) state me daalo
                 document.getElementById('tnc_agree').checked = false;
@@ -2065,7 +2070,7 @@
 
                 document.getElementById('tncModal').style.display = 'flex';
             } else {
-                window.enrollCourse(cid, price);
+                window.enrollCourse(courseId, price);
             }
         }
 
@@ -2093,11 +2098,16 @@
                 return;
             }
 
-            const emailToUse = (window.getStoredEmail && window.getStoredEmail()) || (document.getElementById('userEmail') && document.getElementById('userEmail').textContent) || '';
+            const emailToUse = String((window.getStoredEmail && window.getStoredEmail()) || (document.getElementById('userEmail') && document.getElementById('userEmail').textContent) || '').trim();
+            const safeCourseId = String(courseId == null ? '' : courseId).trim();
 
             if (!emailToUse || emailToUse === 'null') {
                 alert("Please Login / Sign Up first to buy this course.");
                 window.location.href = 'login.html';
+                return;
+            }
+            if (!safeCourseId || safeCourseId === 'null' || safeCourseId === 'undefined') {
+                alert('Course ID missing. Please refresh and try again.');
                 return;
             }
 
@@ -2119,31 +2129,33 @@
                 const returnUrl = 'https://premind.netlify.app/index.html'
                     + '?pmPayment=1'
                     + '&order_id={order_id}'
-                    + '&course_id=' + encodeURIComponent(courseId)
+                    + '&course_id=' + encodeURIComponent(safeCourseId)
                     + '&email=' + encodeURIComponent(emailToUse);
+
+                const payload = {
+                    email: emailToUse,
+                    course_id: safeCourseId,
+                    price: Number(price) || 0,
+                    phone: phoneToUse || '',
+                    name: nameToUse || 'Student',
+                    return_url: returnUrl
+                };
 
                 const response = await fetch("https://premind.diplomawallah.in/create_order.php", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        email: emailToUse,
-                        course_id: courseId,
-                        price: price,
-                        phone: phoneToUse,
-                        name: nameToUse,
-                        return_url: returnUrl
-                    })
+                    body: JSON.stringify(payload)
                 });
 
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
 
                 if (data.error) {
-                    throw new Error(data.error);
+                    throw new Error(data.error + (data.hint ? (' (' + data.hint + ')') : ''));
                 }
 
                 if (data.payment_session_id) {
-                    if (typeof Cashfree === 'undefined' && typeof cashfree === 'undefined') {
+                    if (typeof cashfree === 'undefined') {
                         throw new Error('Payment SDK not loaded. Refresh the page.');
                     }
 
@@ -2159,7 +2171,7 @@
                         }
                         if (result.paymentDetails) {
                             if (btn) btn.innerText = "Verifying...";
-                            fetch(`https://premind.diplomawallah.in/verify_payment.php?order_id=${data.order_id}&course_id=${courseId}&email=${emailToUse}`)
+                            fetch(`https://premind.diplomawallah.in/verify_payment.php?order_id=${data.order_id}&course_id=${safeCourseId}&email=${encodeURIComponent(emailToUse)}`)
                                 .then(res => res.json())
                                 .then(verifyData => {
                                     if (verifyData.status === 'success') {
