@@ -1,0 +1,70 @@
+========================================================================
+LOGIN "Network Error" FIX  —  CORS on Hostinger PHP APIs
+========================================================================
+
+PROBLEM (confirmed by test):
+  Site "premind.netlify.app" se chalti hai, par login PHP APIs
+  "premind.diplomawallah.in" (Hostinger) pe hain = cross-origin.
+  login_api.php sirf "https://premind.diplomawallah.in" origin allow
+  karta hai, isliye netlify se (browser AND app dono me) fetch fail =
+  "Network error".
+  (check_user.php me "Access-Control-Allow-Origin: *" hai, isliye wo chalta.)
+
+------------------------------------------------------------------------
+IN FILES ME FIX KARNA HAI (Hostinger File Manager me kholo):
+  - login_api.php
+  - register_api.php
+  - verify_otp.php
+  - forgot_password.php
+  - reset_password.php
+  (check_user.php already theek hai — chhod do)
+
+------------------------------------------------------------------------
+KYA KARNA HAI:
+  1) Har file kholo.
+  2) Andar "Access-Control-Allow-Origin" wali koi bhi purani line ho
+     to use HATA do (ya comment kar do).
+  3) File ke bilkul SHURU me (<?php ke turant baad) ye block paste kar do:
+
+------------------------------------------------------------------------
+<?php
+$allowed_origins = [
+    'https://premind.diplomawallah.in',
+    'https://diplomawallah.in',
+    'https://www.diplomawallah.in',
+    'https://premind.netlify.app',
+];
+$__origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if ($__origin !== '') {
+    $__ok = in_array($__origin, $allowed_origins, true)
+        || preg_match('#^https://[a-z0-9-]+\.netlify\.app$#i', $__origin);
+    if ($__ok) {
+        header("Access-Control-Allow-Origin: $__origin");
+        header('Vary: Origin');
+        header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type');
+    }
+}
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+// ---- yahan se aage file ka baaki purana code waise hi rehne do ----
+------------------------------------------------------------------------
+
+NOTE:
+  - Agar file already "<?php" se shuru hoti hai, to DUBARA "<?php" mat likho.
+    Sirf $allowed_origins waala hissa "<?php" ke neeche paste karo.
+
+------------------------------------------------------------------------
+JALDI WALA (kam secure) ALTERNATIVE:
+  Har file me Access-Control-Allow-Origin line ko simply:
+      header("Access-Control-Allow-Origin: *");
+  kar do. (check_user.php ki tarah.) Kaam kar jayega, par koi bhi site
+  in APIs ko call kar sakegi. Upar wala allowlist zyada safe hai.
+
+------------------------------------------------------------------------
+FIX KE BAAD TEST:
+  Phone Chrome me kholo: https://premind.netlify.app/login.html
+  Email/password se login karo -> ab "Network error" nahi aana chahiye.
+  Jab browser me chal jaye, tab app me bhi chalega.
