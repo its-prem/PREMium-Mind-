@@ -1926,16 +1926,35 @@
         const customEmail = window.getStoredEmail ? window.getStoredEmail() : null;
         const customName = window.getStoredName ? window.getStoredName() : null;
 
+        async function syncProfilePhoneFromServer(email) {
+            if (!email) return '';
+            try {
+                const res = await fetch('https://premind.diplomawallah.in/get_user.php?email=' + encodeURIComponent(email));
+                const data = await res.json();
+                const phone = String((data && (data.phone || data.mobile)) || '').replace(/\D/g, '').slice(-10);
+                if (phone.length === 10 && phone !== '0000000000' && phone !== '9999999999') {
+                    const name = (data && data.name) || (window.getStoredName && window.getStoredName()) || 'User';
+                    if (window.saveLoginSession) window.saveLoginSession(email, name, phone);
+                    return phone;
+                }
+            } catch (e) { /* ignore */ }
+            return '';
+        }
+        window.syncProfilePhoneFromServer = syncProfilePhoneFromServer;
+
         if (customEmail) {
             updateUI(customName, customEmail, null);
+            syncProfilePhoneFromServer(customEmail);
         } else {
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || getCookie('profilePhoto_' + user.uid) || user.photoURL;
                     updateUI(user.displayName, user.email, photoURL);
-                    if (window.saveLoginSession) {
-                        window.saveLoginSession(user.email, user.displayName || 'User', (window.getStoredPhone && window.getStoredPhone()) || '0000000000');
-                    }
+                    syncProfilePhoneFromServer(user.email).then(function (phone) {
+                        if (window.saveLoginSession) {
+                            window.saveLoginSession(user.email, user.displayName || 'User', phone || ((window.getStoredPhone && window.getStoredPhone()) || ''));
+                        }
+                    });
                 } else {
                     showLoggedOut();
                 }
@@ -1995,7 +2014,10 @@
         function getCheckoutCustomerPhone() {
             const raw = (window.getStoredPhone && window.getStoredPhone()) || localStorage.getItem('customUserPhone') || '';
             const digits = String(raw).replace(/\D/g, '');
-            if (digits.length >= 10) return digits.slice(-10);
+            if (digits.length >= 10) {
+                const p = digits.slice(-10);
+                if (p !== '0000000000' && p !== '9999999999') return p;
+            }
             return '';
         }
 
@@ -2147,7 +2169,11 @@
                     btn.disabled = true;
                 }
 
-                const phoneToUse = getCheckoutCustomerPhone();
+                const phoneToUse = getCheckoutCustomerPhone()
+                    || (window.syncProfilePhoneFromServer ? await window.syncProfilePhoneFromServer(emailToUse) : '');
+                if (!phoneToUse) {
+                    throw new Error('Profile phone number missing. Please Sign Up with your mobile number, then login again.');
+                }
                 const nameToUse = (window.getStoredName && window.getStoredName()) || localStorage.getItem('customUserName') || 'Student';
                 const redirectTarget = getCashfreeRedirectTarget();
                 // Keep under Cashfree 500-char return_url limit

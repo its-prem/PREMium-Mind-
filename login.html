@@ -410,9 +410,17 @@
         }
 
         // Google login: DB me na ho to bhi session save — buy ke liye email kaafi
-        const phone = (checkData && checkData.phone) || '0000000000';
+        let phone = String((checkData && checkData.phone) || '').replace(/\D/g, '').slice(-10);
+        if (phone.length !== 10 || phone === '0000000000' || phone === '9999999999') {
+          try {
+            const uRes = await fetch('https://premind.diplomawallah.in/get_user.php?email=' + encodeURIComponent(user.email));
+            const uData = await uRes.json();
+            phone = String((uData && (uData.phone || uData.mobile)) || '').replace(/\D/g, '').slice(-10);
+          } catch (e) {}
+        }
+        if (phone.length !== 10 || phone === '0000000000' || phone === '9999999999') phone = '';
         const name = user.displayName || (checkData && checkData.name) || 'User';
-        if (!window.saveLoginSession(user.email, name, phone)) {
+        if (!window.saveLoginSession(user.email, name, phone || '0000000000')) {
           throw new Error('Could not save session. Allow cookies/storage.');
         }
         if (!checkData.exists) {
