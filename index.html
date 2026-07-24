@@ -2117,23 +2117,24 @@
                 return;
             }
 
+            // Must be a real course id number — never accept a Function (ASI bug guard)
+            const safeCourseId = String(typeof courseId === 'function' ? '' : (courseId == null ? '' : courseId)).trim();
+
             const emailToUse = String((window.getStoredEmail && window.getStoredEmail()) || (document.getElementById('userEmail') && document.getElementById('userEmail').textContent) || '').trim();
-            const safeCourseId = String(courseId == null ? '' : courseId).trim();
 
             if (!emailToUse || emailToUse === 'null') {
                 alert("Please Login / Sign Up first to buy this course.");
                 window.location.href = 'login.html';
                 return;
             }
-            if (!safeCourseId || safeCourseId === 'null' || safeCourseId === 'undefined') {
+            if (!/^\d+$/.test(safeCourseId)) {
                 alert('Course ID missing. Please refresh and try again.');
                 return;
             }
 
-            const btn = btnEl
-                || (typeof event !== 'undefined' && event && event.target)
-                || document.getElementById('tncProceedBtn')
-                || null;
+            const btn = (btnEl && typeof btnEl === 'object' && btnEl.tagName)
+                ? btnEl
+                : (document.getElementById('tncProceedBtn') || null);
             const originalText = btn ? (btn.innerText || btn.textContent || 'Buy') : 'Buy';
 
             try {
@@ -2145,11 +2146,10 @@
                 const phoneToUse = getCheckoutCustomerPhone();
                 const nameToUse = (window.getStoredName && window.getStoredName()) || localStorage.getItem('customUserName') || 'Student';
                 const redirectTarget = getCashfreeRedirectTarget();
+                // Keep under Cashfree 500-char return_url limit
                 const returnUrl = 'https://premind.netlify.app/index.html'
-                    + '?pmPayment=1'
-                    + '&order_id={order_id}'
-                    + '&course_id=' + encodeURIComponent(safeCourseId)
-                    + '&email=' + encodeURIComponent(emailToUse);
+                    + '?pm=1&oid={order_id}&cid=' + encodeURIComponent(safeCourseId)
+                    + '&e=' + encodeURIComponent(emailToUse);
 
                 // Price: loaded courses list se resolve; server DB se bhi fix karega
                 const safePrice = resolveCoursePrice(safeCourseId, price);
@@ -2225,15 +2225,17 @@
                 alert((error && error.message) ? error.message : "Connection issue. Please try again.");
                 if (btn) { btn.innerText = originalText; btn.disabled = false; }
             }
-        }
+        };
 
         // Full-page Cashfree return (mobile/app) — verifies payment without touching login
-        (function handleCashfreePaymentReturn() {
+        // Leading semicolon prevents ASI from treating this as enrollCourse(...)(IIFE)
+        ;(function () {
             const params = new URLSearchParams(window.location.search);
-            if (params.get('pmPayment') !== '1') return;
-            const orderId = params.get('order_id');
-            const courseId = params.get('course_id');
-            const email = params.get('email') || (typeof getStoredEmail === 'function' ? getStoredEmail() : null);
+            const orderId = params.get('oid') || params.get('order_id');
+            const courseId = params.get('cid') || params.get('course_id');
+            const email = params.get('e') || params.get('email') || (window.getStoredEmail && window.getStoredEmail());
+            const isPaymentReturn = params.get('pm') === '1' || params.get('pmPayment') === '1';
+            if (!isPaymentReturn) return;
             history.replaceState({}, document.title, window.location.pathname + window.location.hash);
             if (!orderId || !courseId || !email) return;
             fetch('https://premind.diplomawallah.in/verify_payment.php?order_id=' + encodeURIComponent(orderId) + '&course_id=' + encodeURIComponent(courseId) + '&email=' + encodeURIComponent(email))
