@@ -2086,7 +2086,7 @@
         }
 
 
-        window.enrollCourse = async function (courseId, price) {
+        window.enrollCourse = async function (courseId, price, btnEl) {
             // 🔥 FIX: CASHFREE LOCALHOST BLOCKER ALERT 🔥
             if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
                 alert("⚠️ WARNING: Cashfree Payments strictly block localhost/127.0.0.1 for security reasons.\n\nTo test payments, please deploy/upload this HTML file to your live server (Netlify or Hostinger).");
@@ -2101,11 +2101,17 @@
                 return;
             }
 
+            const btn = btnEl
+                || (typeof event !== 'undefined' && event && event.target)
+                || document.getElementById('tncProceedBtn')
+                || null;
+            const originalText = btn ? (btn.innerText || btn.textContent || 'Buy') : 'Buy';
+
             try {
-                const btn = event.target;
-                const originalText = btn.innerText;
-                btn.innerText = "Processing...";
-                btn.disabled = true;
+                if (btn) {
+                    btn.innerText = "Processing...";
+                    btn.disabled = true;
+                }
 
                 const phoneToUse = getCheckoutCustomerPhone();
                 const nameToUse = (window.getStoredName && window.getStoredName()) || localStorage.getItem('customUserName') || 'Student';
@@ -2132,7 +2138,15 @@
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
 
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
                 if (data.payment_session_id) {
+                    if (typeof Cashfree === 'undefined' && typeof cashfree === 'undefined') {
+                        throw new Error('Payment SDK not loaded. Refresh the page.');
+                    }
+
                     let checkoutOptions = {
                         paymentSessionId: data.payment_session_id,
                         redirectTarget: redirectTarget,
@@ -2141,11 +2155,10 @@
                     cashfree.checkout(checkoutOptions).then((result) => {
                         if (result.error) {
                             alert("Payment Failed: " + result.error.message);
-                            btn.innerText = originalText;
-                            btn.disabled = false;
+                            if (btn) { btn.innerText = originalText; btn.disabled = false; }
                         }
                         if (result.paymentDetails) {
-                            btn.innerText = "Verifying...";
+                            if (btn) btn.innerText = "Verifying...";
                             fetch(`https://premind.diplomawallah.in/verify_payment.php?order_id=${data.order_id}&course_id=${courseId}&email=${emailToUse}`)
                                 .then(res => res.json())
                                 .then(verifyData => {
@@ -2154,27 +2167,29 @@
                                         window.loadCourses(emailToUse);
                                     } else {
                                         alert("Payment verification failed.");
-                                        btn.innerText = originalText;
-                                        btn.disabled = false;
+                                        if (btn) { btn.innerText = originalText; btn.disabled = false; }
                                     }
                                 })
                                 .catch(err => {
                                     window.loadCourses(emailToUse);
                                 });
                         } else if (redirectTarget === '_self') {
-                            // Full-page checkout — user leaves this page; return handler verifies payment
-                            btn.innerText = originalText;
-                            btn.disabled = false;
+                            if (btn) { btn.innerText = originalText; btn.disabled = false; }
                         }
+                    }).catch(function (err) {
+                        console.error('Cashfree checkout error:', err);
+                        alert((err && err.message) || 'Could not open payment. Try again.');
+                        if (btn) { btn.innerText = originalText; btn.disabled = false; }
                     });
                 } else {
-                    alert("Error initializing payment.");
-                    btn.innerText = originalText;
-                    btn.disabled = false;
+                    alert(data.message || "Error initializing payment.");
+                    if (btn) { btn.innerText = originalText; btn.disabled = false; }
                 }
 
             } catch (error) {
-                alert("Connection issue. Please try again.");
+                console.error('enrollCourse error:', error);
+                alert((error && error.message) ? error.message : "Connection issue. Please try again.");
+                if (btn) { btn.innerText = originalText; btn.disabled = false; }
             }
         }
 
