@@ -1913,23 +1913,18 @@
             if (desktopLoginBtn) desktopLoginBtn.style.display = 'block';
             if (desktopUserPill) desktopUserPill.style.display = 'none';
 
-            const handleLock = (e) => {
-                e.preventDefault();
-                alert('Please login to access PREMium Courses!');
-                window.location.href = 'login.html';
-            };
-
-            if (coursesLink) { coursesLink.classList.add('locked'); coursesLink.onclick = handleLock; }
-            if (coursesLinkNav) { coursesLinkNav.classList.add('locked'); coursesLinkNav.onclick = handleLock; }
+            // Index pe browsing free — My Courses pe click lecture.html khud login maangega
+            if (coursesLink) { coursesLink.classList.remove('locked'); coursesLink.onclick = null; }
+            if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
 
             if (typeof window.loadCourses === 'function') {
                 window.loadCourses('');
             }
         }
 
-        // Cookie-aware session check (falls back to cookie if localStorage is empty)
-        const customEmail = window.getStoredEmail();
-        const customName = window.getStoredName();
+        // Session check — index browse bina login; login sirf Buy pe chahiye
+        const customEmail = window.getStoredEmail ? window.getStoredEmail() : null;
+        const customName = window.getStoredName ? window.getStoredName() : null;
 
         if (customEmail) {
             updateUI(customName, customEmail, null);
@@ -1938,8 +1933,9 @@
                 if (user) {
                     const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || getCookie('profilePhoto_' + user.uid) || user.photoURL;
                     updateUI(user.displayName, user.email, photoURL);
-                    // Persist Firebase Google session into the same store email-password uses
-                    window.saveLoginSession(user.email, user.displayName || 'User', window.getStoredPhone() || '0000000000');
+                    if (window.saveLoginSession) {
+                        window.saveLoginSession(user.email, user.displayName || 'User', (window.getStoredPhone && window.getStoredPhone()) || '0000000000');
+                    }
                 } else {
                     showLoggedOut();
                 }
@@ -1993,7 +1989,7 @@
             return (isNativeAppCheckout() || isMobileCheckout()) ? '_self' : '_modal';
         }
         function getCheckoutCustomerPhone() {
-            const raw = (typeof getStoredPhone === 'function' ? getStoredPhone() : null) || localStorage.getItem('customUserPhone') || '';
+            const raw = (window.getStoredPhone && window.getStoredPhone()) || localStorage.getItem('customUserPhone') || '';
             const digits = String(raw).replace(/\D/g, '');
             if (digits.length >= 10) return digits.slice(-10);
             return '';
@@ -2034,7 +2030,9 @@
         let currentPurchaseInfo = {};
 
         window.initiatePurchase = function (cid, price, showTnc) {
-            if (!getStoredEmail() && document.getElementById('userProfile').style.display === 'none') {
+            const email = (window.getStoredEmail && window.getStoredEmail()) || '';
+            const loggedInUi = document.getElementById('userProfile') && document.getElementById('userProfile').style.display !== 'none';
+            if (!email && !loggedInUi) {
                 alert("Please Login / Sign Up first to buy this course.");
                 window.location.href = 'login.html';
                 return;
@@ -2095,9 +2093,9 @@
                 return;
             }
 
-            const emailToUse = getStoredEmail() || document.getElementById('userEmail').textContent;
+            const emailToUse = (window.getStoredEmail && window.getStoredEmail()) || (document.getElementById('userEmail') && document.getElementById('userEmail').textContent) || '';
 
-            if (!emailToUse || document.getElementById('userProfile').style.display === 'none') {
+            if (!emailToUse || emailToUse === 'null') {
                 alert("Please Login / Sign Up first to buy this course.");
                 window.location.href = 'login.html';
                 return;

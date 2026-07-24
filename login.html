@@ -289,26 +289,36 @@
     // Always hit Hostinger directly. CORS already allows premind.netlify.app.
     // Avoid Netlify proxy (can drop/empty POST body) and FormData reuse bugs.
     async function apiPost(path, fields) {
-      const body = fields instanceof FormData
-        ? fields
-        : new URLSearchParams(fields);
-
-      const res = await fetch(HOSTINGER_API + path, {
-        method: 'POST',
-        body: body,
-        mode: 'cors',
-        credentials: 'omit'
-      });
-
-      const text = await res.text();
-      let data;
-      try {
-        data = JSON.parse(text.trim());
-      } catch (e) {
-        console.error('Auth API non-JSON:', path, text.slice(0, 200));
-        throw new Error('Server error. Please try again.');
+      const attempts = [];
+      if (fields instanceof FormData) {
+        attempts.push(fields);
+      } else {
+        attempts.push(new URLSearchParams(fields));
+        const fd = new FormData();
+        Object.keys(fields).forEach(function (k) { fd.append(k, fields[k] == null ? '' : fields[k]); });
+        attempts.push(fd);
       }
-      return data;
+
+      let lastError = null;
+      for (let i = 0; i < attempts.length; i++) {
+        try {
+          const res = await fetch(HOSTINGER_API + path, {
+            method: 'POST',
+            body: attempts[i],
+            mode: 'cors',
+            credentials: 'omit'
+          });
+          const text = await res.text();
+          try {
+            return JSON.parse(text.trim());
+          } catch (e) {
+            lastError = new Error('Server error. Please try again.');
+          }
+        } catch (err) {
+          lastError = err;
+        }
+      }
+      throw lastError || new Error('Network error. Please try again.');
     }
 
     window.PM_API_BASE = HOSTINGER_API;
@@ -392,26 +402,28 @@
         const fd = new FormData();
         fd.append('email', user.email);
 
-        let checkData;
+        let checkData = { exists: false };
         try {
           checkData = await window.pmApiPost('/check_user.php', fd);
         } catch (e) {
-          throw new Error('Could not verify account. Check your internet and try again.');
+          console.warn('check_user failed, continuing with Google session', e);
         }
 
-        if (checkData.exists) {
-          if (!window.saveLoginSession(user.email, user.displayName || checkData.name || 'User', checkData.phone)) {
-            throw new Error('Could not save session. Allow cookies/storage.');
-          }
-          window.location.replace('index.html');
-        } else {
-          await auth.signOut();
-          alert('Account not found in our database. Please Sign Up first.');
-          googleBtn.innerHTML = originalBtnContent;
-          document.getElementById('regEmail').value = user.email;
-          document.getElementById('regName').value = user.displayName || '';
-          window.switchTab('register'); 
+        // Google login: DB me na ho to bhi session save — buy ke liye email kaafi
+        const phone = (checkData && checkData.phone) || '0000000000';
+        const name = user.displayName || (checkData && checkData.name) || 'User';
+        if (!window.saveLoginSession(user.email, name, phone)) {
+          throw new Error('Could not save session. Allow cookies/storage.');
         }
+        if (!checkData.exists) {
+          // Prefill signup for later, but let them browse/buy with Google email
+          try {
+            document.getElementById('regEmail').value = user.email;
+            document.getElementById('regName').value = user.displayName || '';
+          } catch (e) {}
+        }
+        window.location.replace('index.html');
+        return;
       } catch (error) {
         console.error('Google login error:', error);
         if (error.code !== 'auth/popup-closed-by-user') {
