@@ -590,15 +590,6 @@
   .logo-container {
     flex: 1;
     min-width: 0;
-    overflow: hidden;
-  }
-
-  .logo-image {
-    width: auto;
-    max-width: min(220px, calc(100vw - 80px));
-    height: 36px;
-    object-fit: contain;
-    object-position: left center;
   }
 }
 
