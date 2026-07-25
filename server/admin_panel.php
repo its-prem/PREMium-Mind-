@@ -3,6 +3,49 @@
 //  PREMium Mind — Professional Admin Dashboard
 // ════════════════════════════════════════════════
 
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+$PM_ADMIN_EMAILS = ['premku0237@gmail.com', 'ar0319515@gmail.com'];
+// Must match pm-session.js ADMIN_SSO_KEY (app → admin auto-login)
+$PM_ADMIN_SSO_KEY = 'pm_admin_sso_2026_premind';
+
+function pm_is_admin_email($email, $list) {
+    $email = strtolower(trim((string)$email));
+    foreach ($list as $allowed) {
+        if ($email === strtolower(trim((string)$allowed))) return true;
+    }
+    return false;
+}
+
+// Logout clears server session (used by Secure Logout)
+if (isset($_GET['logout'])) {
+    unset($_SESSION['pm_admin_email'], $_SESSION['pm_admin_name'], $_SESSION['pm_admin_via']);
+    header('Location: admin_panel.php');
+    exit;
+}
+
+// App already logged in → open admin without Google popup
+if (isset($_GET['from_app']) && (string)$_GET['from_app'] === '1') {
+    $ssoEmail = isset($_GET['email']) ? strtolower(trim((string)$_GET['email'])) : '';
+    $ssoName  = isset($_GET['name']) ? trim((string)$_GET['name']) : 'Admin';
+    $ssoKey   = isset($_GET['key']) ? (string)$_GET['key'] : '';
+
+    if ($ssoKey === $PM_ADMIN_SSO_KEY && pm_is_admin_email($ssoEmail, $PM_ADMIN_EMAILS)) {
+        if ($ssoName === '') $ssoName = 'Admin';
+        $_SESSION['pm_admin_email'] = $ssoEmail;
+        $_SESSION['pm_admin_name']  = $ssoName;
+        $_SESSION['pm_admin_via']   = 'app';
+        header('Location: admin_panel.php');
+        exit;
+    }
+}
+
+$pmAdminSessionOk = !empty($_SESSION['pm_admin_email']) && pm_is_admin_email($_SESSION['pm_admin_email'], $PM_ADMIN_EMAILS);
+$pmAdminSessionEmail = $pmAdminSessionOk ? (string)$_SESSION['pm_admin_email'] : '';
+$pmAdminSessionName  = $pmAdminSessionOk ? (string)($_SESSION['pm_admin_name'] ?? 'Admin') : '';
+
 // --- DB CONNECTION ---
 include 'db_connect.php'; 
 $conn->set_charset('utf8mb4');
@@ -879,7 +922,10 @@ input:checked + .slider:before { transform: translateX(20px); }
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        const AUTHORIZED_ADMIN_EMAILS = ["premku0237@gmail.com", "ar0319515@gmail.com"]; 
+        const AUTHORIZED_ADMIN_EMAILS = ["premku0237@gmail.com", "ar0319515@gmail.com"];
+        const SERVER_SESSION_OK = <?= $pmAdminSessionOk ? 'true' : 'false' ?>;
+        const SERVER_SESSION_EMAIL = <?= json_encode($pmAdminSessionEmail, JSON_UNESCAPED_SLASHES) ?>;
+        const SERVER_SESSION_NAME = <?= json_encode($pmAdminSessionName, JSON_UNESCAPED_SLASHES) ?>;
 
         const overlay = document.getElementById("adminAuthOverlay");
         const loading = document.getElementById("loading-screen");
@@ -888,37 +934,47 @@ input:checked + .slider:before { transform: translateX(20px); }
         const loginBtn = document.getElementById("adminGoogleLoginBtn");
         const logoutBtn = document.getElementById("adminLogoutBtn");
 
-        onAuthStateChanged(auth, (user) => {
+        function enterAdminUI(email, name) {
+            const displayName = name || 'Admin';
             loading.style.display = "none";
-            document.body.style.display = "block"; 
+            document.body.style.display = "block";
+            overlay.style.display = "none";
+            appWrapper.style.display = "flex";
 
-            if (user && AUTHORIZED_ADMIN_EMAILS.includes(user.email)) {
-                overlay.style.display = "none";
-                appWrapper.style.display = "flex";
-                
-                if(window.innerWidth > 768) {
-                    document.getElementById('admin-info-box').style.display = 'block';
-                }
-                document.getElementById('admin-name').innerText = user.displayName;
-                document.getElementById('admin-email').innerText = user.email;
-                document.getElementById('admin-avatar-letter').innerText = user.displayName.charAt(0).toUpperCase();
-
-                // Initial Data Load
-                loadCourses(); 
-                loadStudents();
-                loadReports(); 
-                
-            } else if (user) {
-                errorMsg.innerText = `Access Denied. ${user.email} is not authorized.`;
-                errorMsg.style.display = "block";
-                overlay.style.display = "flex";
-                appWrapper.style.display = "none";
-                signOut(auth); 
-            } else {
-                overlay.style.display = "flex";
-                appWrapper.style.display = "none";
+            if (window.innerWidth > 768) {
+                document.getElementById('admin-info-box').style.display = 'block';
             }
-        });
+            document.getElementById('admin-name').innerText = displayName;
+            document.getElementById('admin-email').innerText = email || '';
+            document.getElementById('admin-avatar-letter').innerText = displayName.charAt(0).toUpperCase();
+
+            loadCourses();
+            loadStudents();
+            loadReports();
+        }
+
+        // Already logged in via app SSO (PHP session) — no Google login needed
+        if (SERVER_SESSION_OK && SERVER_SESSION_EMAIL) {
+            enterAdminUI(SERVER_SESSION_EMAIL, SERVER_SESSION_NAME || 'Admin');
+        } else {
+            onAuthStateChanged(auth, (user) => {
+                loading.style.display = "none";
+                document.body.style.display = "block";
+
+                if (user && AUTHORIZED_ADMIN_EMAILS.includes(user.email)) {
+                    enterAdminUI(user.email, user.displayName || 'Admin');
+                } else if (user) {
+                    errorMsg.innerText = `Access Denied. ${user.email} is not authorized.`;
+                    errorMsg.style.display = "block";
+                    overlay.style.display = "flex";
+                    appWrapper.style.display = "none";
+                    signOut(auth);
+                } else {
+                    overlay.style.display = "flex";
+                    appWrapper.style.display = "none";
+                }
+            });
+        }
 
         loginBtn.addEventListener("click", () => {
             signInWithPopup(auth, provider).catch(error => {
@@ -928,7 +984,10 @@ input:checked + .slider:before { transform: translateX(20px); }
         });
 
         logoutBtn.addEventListener("click", () => {
-            signOut(auth).then(() => window.location.reload());
+            // Clear PHP app-SSO session + Firebase
+            signOut(auth).finally(() => {
+                window.location.href = 'admin_panel.php?logout=1';
+            });
         });
     </script>
 

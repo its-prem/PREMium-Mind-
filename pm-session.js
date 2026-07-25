@@ -40,10 +40,22 @@
 
   var ADMIN_MENU_EMAILS = ['premku0237@gmail.com'];
   var ADMIN_PANEL_URL = 'https://premind.diplomawallah.in/admin_panel.php';
+  // Must match server/admin_panel.php $PM_ADMIN_SSO_KEY
+  var ADMIN_SSO_KEY = 'pm_admin_sso_2026_premind';
 
   function isAdminAccount(email) {
     var e = String(email || '').trim().toLowerCase();
     return ADMIN_MENU_EMAILS.indexOf(e) !== -1;
+  }
+
+  function buildAdminPanelUrl(email, name) {
+    var e = String(email || '').trim();
+    var n = String(name || getStoredName() || 'Admin').trim() || 'Admin';
+    return ADMIN_PANEL_URL
+      + '?from_app=1'
+      + '&email=' + encodeURIComponent(e)
+      + '&name=' + encodeURIComponent(n)
+      + '&key=' + encodeURIComponent(ADMIN_SSO_KEY);
   }
 
   function resolveLoginEmail(preferred) {
@@ -73,7 +85,7 @@
     li.className = 'sidebar-item pm-admin-panel-link';
     li.style.setProperty('--delay', '0.37s');
     li.innerHTML =
-      '<a href="' + ADMIN_PANEL_URL + '" class="sidebar-link">' +
+      '<a href="' + ADMIN_PANEL_URL + '" class="sidebar-link pm-admin-panel-anchor">' +
       '<ion-icon name="settings-outline"></ion-icon> Admin Panel</a>';
 
     // Place right after "App Version" item
@@ -103,7 +115,22 @@
 
     menus.forEach(function (menu) {
       var existing = ensureAdminMenuItem(menu);
+      var anchor = existing.querySelector('a') || existing;
       if (show) {
+        var href = buildAdminPanelUrl(email, getStoredName());
+        if (anchor && anchor.tagName === 'A') {
+          anchor.setAttribute('href', href);
+          if (anchor.getAttribute('data-pm-sso-hook') !== '1') {
+            anchor.setAttribute('data-pm-sso-hook', '1');
+            anchor.addEventListener('click', function (ev) {
+              // Always rebuild with latest session so admin opens already logged-in
+              var latestEmail = resolveLoginEmail();
+              if (!isAdminAccount(latestEmail)) return;
+              ev.preventDefault();
+              window.location.href = buildAdminPanelUrl(latestEmail, getStoredName());
+            });
+          }
+        }
         existing.style.setProperty('display', 'list-item', 'important');
         existing.style.setProperty('opacity', '1', 'important');
         existing.style.setProperty('transform', 'none', 'important');
