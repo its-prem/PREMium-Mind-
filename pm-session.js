@@ -47,49 +47,69 @@
   }
 
   function resolveLoginEmail(preferred) {
-    var fromArg = preferred ? String(preferred).trim() : '';
-    if (fromArg) return fromArg;
-    var stored = getStoredEmail();
-    if (stored) return stored;
+    var candidates = [];
+    if (preferred) candidates.push(preferred);
+    try { candidates.push(getStoredEmail()); } catch (e1) {}
+    try {
+      candidates.push(localStorage.getItem('customUserEmail'));
+      candidates.push(localStorage.getItem('userEmail'));
+    } catch (e2) {}
     try {
       var el = document.getElementById('userEmail');
-      if (el && el.textContent) {
-        var t = String(el.textContent).trim();
-        if (t.indexOf('@') !== -1) return t;
-      }
-    } catch (e) { /* ignore */ }
+      if (el && el.textContent) candidates.push(el.textContent);
+    } catch (e3) {}
+    for (var i = 0; i < candidates.length; i++) {
+      var t = String(candidates[i] || '').trim();
+      if (t && t.indexOf('@') !== -1) return t;
+    }
     return null;
+  }
+
+  function ensureAdminMenuItem(menu) {
+    var existing = menu.querySelector('.pm-admin-panel-link');
+    if (existing) return existing;
+
+    var li = document.createElement('li');
+    li.className = 'sidebar-item pm-admin-panel-link';
+    li.style.setProperty('--delay', '0.37s');
+    li.innerHTML =
+      '<a href="' + ADMIN_PANEL_URL + '" class="sidebar-link">' +
+      '<ion-icon name="settings-outline"></ion-icon> Admin Panel</a>';
+
+    // Place right after "App Version" item
+    var items = menu.querySelectorAll(':scope > .sidebar-item, :scope > li');
+    var insertAfter = null;
+    for (var i = 0; i < items.length; i++) {
+      var text = (items[i].textContent || '').toLowerCase();
+      if (text.indexOf('app version') !== -1) {
+        insertAfter = items[i];
+        break;
+      }
+    }
+    if (insertAfter && insertAfter.parentNode === menu) {
+      if (insertAfter.nextSibling) menu.insertBefore(li, insertAfter.nextSibling);
+      else menu.appendChild(li);
+    } else {
+      menu.appendChild(li);
+    }
+    return li;
   }
 
   function updateAdminMenuLink(preferredEmail) {
     var email = resolveLoginEmail(preferredEmail);
     var show = isAdminAccount(email);
-    var menus = document.querySelectorAll('.sidebar-menu, ul.nav-links');
+    var menus = document.querySelectorAll('.sidebar-menu');
     if (!menus.length) return;
 
     menus.forEach(function (menu) {
-      var existing = menu.querySelector('.pm-admin-panel-link');
+      var existing = ensureAdminMenuItem(menu);
       if (show) {
-        if (!existing) {
-          var isSidebar = menu.classList.contains('sidebar-menu');
-          var li = document.createElement('li');
-          li.className = isSidebar ? 'sidebar-item pm-admin-panel-link' : 'pm-admin-panel-link';
-          if (isSidebar) {
-            li.style.setProperty('--delay', '0.55s');
-            li.innerHTML =
-              '<a href="' + ADMIN_PANEL_URL + '" class="sidebar-link">' +
-              '<ion-icon name="settings-outline"></ion-icon> Admin Panel</a>';
-          } else {
-            li.innerHTML =
-              '<a href="' + ADMIN_PANEL_URL + '" class="nav-link">' +
-              '<ion-icon name="settings-outline"></ion-icon> Admin Panel</a>';
-          }
-          menu.appendChild(li);
-        } else {
-          existing.style.display = '';
-        }
-      } else if (existing) {
-        existing.style.display = 'none';
+        existing.style.setProperty('display', 'list-item', 'important');
+        existing.style.setProperty('opacity', '1', 'important');
+        existing.style.setProperty('transform', 'none', 'important');
+        existing.removeAttribute('hidden');
+      } else {
+        existing.style.setProperty('display', 'none', 'important');
       }
     });
   }
@@ -172,12 +192,25 @@
 
   function hookMenuOpenRefresh() {
     var btn = document.getElementById('menu-btn');
-    if (!btn || btn.getAttribute('data-pm-admin-hook') === '1') return;
-    btn.setAttribute('data-pm-admin-hook', '1');
-    btn.addEventListener('click', function () {
-      setTimeout(bootAdminMenu, 0);
-      setTimeout(bootAdminMenu, 200);
-    }, true);
+    if (btn && btn.getAttribute('data-pm-admin-hook') !== '1') {
+      btn.setAttribute('data-pm-admin-hook', '1');
+      btn.addEventListener('click', function () {
+        bootAdminMenu();
+        setTimeout(bootAdminMenu, 50);
+        setTimeout(bootAdminMenu, 250);
+      }, true);
+    }
+
+    var sidebar = document.getElementById('sidebar');
+    if (sidebar && sidebar.getAttribute('data-pm-admin-obs') !== '1') {
+      sidebar.setAttribute('data-pm-admin-obs', '1');
+      try {
+        var obs = new MutationObserver(function () {
+          if (sidebar.classList.contains('active')) bootAdminMenu();
+        });
+        obs.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+      } catch (e) { /* ignore */ }
+    }
   }
 
   function startAdminMenuWatcher() {

@@ -345,6 +345,15 @@
   transition-delay: var(--delay, 0s);
 }
 
+/* Admin menu item (shown only for authorized email via JS) */
+.sidebar.active .sidebar-item.pm-admin-panel-link {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+.sidebar-item.pm-admin-panel-link .sidebar-link {
+  color: #1d4ed8;
+}
+
 .sidebar-link {
   text-decoration: none;
   color: #111;
