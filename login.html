@@ -343,6 +343,11 @@
   const app      = initializeApp(firebaseConfig);
   const auth     = getAuth(app);
   const provider = new GoogleAuthProvider();
+  window.pmGetIdToken = async function () {
+    const u = auth.currentUser;
+    if (!u) return null;
+    return await u.getIdToken(true);
+  };
 
   // App WebView me popup block hota hai — native Google sign-in use karo.
   function isNativeApp() {

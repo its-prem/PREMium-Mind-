@@ -283,6 +283,11 @@
   const auth = getAuth(app);
   const storage = getStorage(app);
   window.__firebaseSignOut = () => signOut(auth);
+  window.pmGetIdToken = async function () {
+    const u = auth.currentUser;
+    if (!u) return null;
+    return await u.getIdToken(true);
+  };
 
   window.handleLogout = async () => {
     window.clearStoredSession();

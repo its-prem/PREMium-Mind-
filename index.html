@@ -1874,6 +1874,12 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        // Used by Admin Panel SSO (Firebase ID token → Hostinger session)
+        window.pmGetIdToken = async function () {
+            const u = auth.currentUser;
+            if (!u) return null;
+            return await u.getIdToken(true);
+        };
         const storage = getStorage(app);
         const database = getDatabase(app);
 

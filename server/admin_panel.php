@@ -3,13 +3,20 @@
 //  PREMium Mind — Professional Admin Dashboard
 // ════════════════════════════════════════════════
 
+$PM_ADMIN_EMAILS = ['premku0237@gmail.com', 'ar0319515@gmail.com'];
+$PM_FIREBASE_PROJECT_ID = 'premium-mind-fcb16';
+
 if (session_status() !== PHP_SESSION_ACTIVE) {
+    $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'secure' => $secure,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
     session_start();
 }
-
-$PM_ADMIN_EMAILS = ['premku0237@gmail.com', 'ar0319515@gmail.com'];
-// Must match pm-session.js ADMIN_SSO_KEY (app → admin auto-login)
-$PM_ADMIN_SSO_KEY = 'pm_admin_sso_2026_premind';
 
 function pm_is_admin_email($email, $list) {
     $email = strtolower(trim((string)$email));
@@ -19,30 +26,133 @@ function pm_is_admin_email($email, $list) {
     return false;
 }
 
-// Logout clears server session (used by Secure Logout)
+function pm_http_get($url) {
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 12,
+            CURLOPT_FOLLOWLOCATION => true,
+        ]);
+        $body = curl_exec($ch);
+        $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($body === false || $code >= 400) return null;
+        return $body;
+    }
+    $ctx = stream_context_create(['http' => ['timeout' => 12, 'ignore_errors' => true]]);
+    $body = @file_get_contents($url, false, $ctx);
+    return ($body === false) ? null : $body;
+}
+
+/** Verify Firebase ID token via Google tokeninfo. Returns payload or null. */
+function pm_verify_firebase_id_token($idToken, $projectId) {
+    $idToken = trim((string)$idToken);
+    if ($idToken === '' || strlen($idToken) < 40) return null;
+
+    $url = 'https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($idToken);
+    $raw = pm_http_get($url);
+    if (!$raw) return null;
+
+    $data = json_decode($raw, true);
+    if (!is_array($data) || empty($data['email'])) return null;
+
+    $emailVerified = $data['email_verified'] ?? false;
+    if (!($emailVerified === true || $emailVerified === 'true' || $emailVerified === '1')) {
+        return null;
+    }
+
+    $aud = (string)($data['aud'] ?? '');
+    if ($aud !== $projectId) return null;
+
+    if (!empty($data['exp']) && time() >= (int)$data['exp']) return null;
+
+    return $data;
+}
+
+function pm_establish_admin_session($email, $name, $via = 'firebase') {
+    global $PM_ADMIN_EMAILS;
+    $email = strtolower(trim((string)$email));
+    if (!pm_is_admin_email($email, $PM_ADMIN_EMAILS)) return false;
+    session_regenerate_id(true);
+    $_SESSION['pm_admin_email'] = $email;
+    $_SESSION['pm_admin_name'] = trim((string)$name) !== '' ? trim((string)$name) : 'Admin';
+    $_SESSION['pm_admin_via'] = $via;
+    $_SESSION['pm_admin_login_at'] = time();
+    return true;
+}
+
+function pm_admin_session_ok() {
+    global $PM_ADMIN_EMAILS;
+    return !empty($_SESSION['pm_admin_email']) && pm_is_admin_email($_SESSION['pm_admin_email'], $PM_ADMIN_EMAILS);
+}
+
+function pm_require_admin($asJson = true) {
+    if (pm_admin_session_ok()) return;
+    http_response_code(403);
+    if ($asJson) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['status' => 'error', 'msg' => 'Unauthorized. Admin login required.']);
+    } else {
+        header('Content-Type: text/plain; charset=utf-8');
+        echo 'Unauthorized. Admin login required.';
+    }
+    exit;
+}
+
+// Logout
 if (isset($_GET['logout'])) {
-    unset($_SESSION['pm_admin_email'], $_SESSION['pm_admin_name'], $_SESSION['pm_admin_via']);
+    $_SESSION = [];
+    if (ini_get('session.use_cookies')) {
+        $p = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'] ?? '', $p['secure'], $p['httponly']);
+    }
+    session_destroy();
     header('Location: admin_panel.php');
     exit;
 }
 
-// App already logged in → open admin without Google popup
-if (isset($_GET['from_app']) && (string)$_GET['from_app'] === '1') {
-    $ssoEmail = isset($_GET['email']) ? strtolower(trim((string)$_GET['email'])) : '';
-    $ssoName  = isset($_GET['name']) ? trim((string)$_GET['name']) : 'Admin';
-    $ssoKey   = isset($_GET['key']) ? (string)$_GET['key'] : '';
-
-    if ($ssoKey === $PM_ADMIN_SSO_KEY && pm_is_admin_email($ssoEmail, $PM_ADMIN_EMAILS)) {
-        if ($ssoName === '') $ssoName = 'Admin';
-        $_SESSION['pm_admin_email'] = $ssoEmail;
-        $_SESSION['pm_admin_name']  = $ssoName;
-        $_SESSION['pm_admin_via']   = 'app';
-        header('Location: admin_panel.php');
+// Secure login: Firebase ID token (from admin Google login OR app SSO)
+if (isset($_POST['ajax_admin_login'])) {
+    header('Content-Type: application/json; charset=utf-8');
+    $idToken = isset($_POST['id_token']) ? (string)$_POST['id_token'] : '';
+    $payload = pm_verify_firebase_id_token($idToken, $PM_FIREBASE_PROJECT_ID);
+    if (!$payload) {
+        http_response_code(401);
+        echo json_encode(['status' => 'error', 'msg' => 'Invalid or expired login token.']);
         exit;
     }
+    $email = strtolower(trim((string)$payload['email']));
+    $name = trim((string)($_POST['name'] ?? ($payload['name'] ?? 'Admin')));
+    if (!pm_establish_admin_session($email, $name, 'firebase')) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'msg' => 'Access denied for ' . $email]);
+        exit;
+    }
+    echo json_encode([
+        'status' => 'success',
+        'email' => $_SESSION['pm_admin_email'],
+        'name' => $_SESSION['pm_admin_name'],
+    ]);
+    exit;
 }
 
-$pmAdminSessionOk = !empty($_SESSION['pm_admin_email']) && pm_is_admin_email($_SESSION['pm_admin_email'], $PM_ADMIN_EMAILS);
+// App / website → admin with Firebase ID token in query (one-time exchange)
+if (!empty($_GET['id_token'])) {
+    $payload = pm_verify_firebase_id_token((string)$_GET['id_token'], $PM_FIREBASE_PROJECT_ID);
+    if ($payload) {
+        $email = strtolower(trim((string)$payload['email']));
+        $name = trim((string)($payload['name'] ?? 'Admin'));
+        if (pm_establish_admin_session($email, $name, 'app_token')) {
+            header('Location: admin_panel.php');
+            exit;
+        }
+    }
+    header('Location: admin_panel.php?auth_error=1');
+    exit;
+}
+
+$pmAdminSessionOk = pm_admin_session_ok();
 $pmAdminSessionEmail = $pmAdminSessionOk ? (string)$_SESSION['pm_admin_email'] : '';
 $pmAdminSessionName  = $pmAdminSessionOk ? (string)($_SESSION['pm_admin_name'] ?? 'Admin') : '';
 
@@ -50,12 +160,19 @@ $pmAdminSessionName  = $pmAdminSessionOk ? (string)($_SESSION['pm_admin_name'] ?
 include 'db_connect.php'; 
 $conn->set_charset('utf8mb4');
 
+// Ensure app_only column exists (buy/access only in Android app)
+$colCheck = @$conn->query("SHOW COLUMNS FROM courses LIKE 'app_only'");
+if ($colCheck && $colCheck->num_rows === 0) {
+    @$conn->query("ALTER TABLE courses ADD COLUMN app_only TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = buy/open only in Android app'");
+}
+
 // ════════════════════════════════════════════════
-//  AJAX HANDLERS (API ENDPOINTS)
+//  AJAX HANDLERS (API ENDPOINTS) — auth required
 // ════════════════════════════════════════════════
 
 // 1. FETCH COURSES
 if (isset($_GET['fetch_table'])) {
+    pm_require_admin(false);
     $result = $conn->query("SELECT * FROM courses ORDER BY id DESC");
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
@@ -69,6 +186,11 @@ if (isset($_GET['fetch_table'])) {
             $dl_status = $row['allow_download'] 
                 ? "<span style='display:inline-flex; align-items:center; gap:4px; background:#eff6ff; color:#2563eb; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap;'><ion-icon name='download-outline'></ion-icon> Download: ON</span>" 
                 : "<span style='display:inline-flex; align-items:center; gap:4px; background:#f1f5f9; color:#64748b; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap;'><ion-icon name='close-outline'></ion-icon> Download: OFF</span>";
+
+            $app_only_on = !empty($row['app_only']) && (int)$row['app_only'] === 1;
+            $app_only_status = $app_only_on
+                ? "<span style='display:inline-flex; align-items:center; gap:4px; background:#111; color:#fff; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap; margin-top:6px;'><ion-icon name='phone-portrait-outline'></ion-icon> APP ONLY: ON</span>"
+                : "<span style='display:inline-flex; align-items:center; gap:4px; background:#f1f5f9; color:#64748b; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap; margin-top:6px;'><ion-icon name='globe-outline'></ion-icon> APP ONLY: OFF</span>";
 
             // Check if course is deleted
             $is_deleted = isset($row['is_deleted']) && $row['is_deleted'] == 1;
@@ -93,6 +215,7 @@ if (isset($_GET['fetch_table'])) {
                     <div style='display:flex; flex-direction:column; align-items:flex-start;'>
                         $pdf_status
                         $dl_status
+                        $app_only_status
                     </div>
                 </td>
                 <td>
@@ -118,6 +241,7 @@ if (isset($_GET['fetch_table'])) {
 
 // 2. FETCH STUDENTS
 if (isset($_GET['fetch_students'])) {
+    pm_require_admin(false);
     $search = isset($_GET['search']) ? $conn->real_escape_string(trim($_GET['search'])) : '';
     $where  = $search ? "WHERE u.name LIKE '%$search%' OR u.email LIKE '%$search%'" : '';
 
@@ -183,6 +307,7 @@ if (isset($_GET['fetch_students'])) {
 
 // 3. FETCH REPORTS
 if (isset($_GET['fetch_reports'])) {
+    pm_require_admin(false);
     $sql = "SELECT r.*, c.title as course_title, u.name as user_name, u.phone as user_phone
             FROM reports r 
             LEFT JOIN courses c ON r.course_id = c.id 
@@ -241,6 +366,7 @@ if (isset($_GET['fetch_reports'])) {
 
 // 4. ADD OR EDIT COURSE
 if (isset($_POST['ajax_add'])) {
+    pm_require_admin(true);
     $edit_id   = $conn->real_escape_string($_POST['edit_id']);
     $title     = $conn->real_escape_string($_POST['title']);
     $category  = $conn->real_escape_string($_POST['category']); 
@@ -257,6 +383,7 @@ if (isset($_POST['ajax_add'])) {
     $allow_dl  = isset($_POST['allow_download']) ? 1 : 0;
     $show_tnc  = isset($_POST['show_tnc']) ? 1 : 0;
     $show_report_btn = isset($_POST['show_report_btn']) ? 1 : 0;
+    $app_only  = isset($_POST['app_only']) ? 1 : 0;
 
     $image_path = $conn->real_escape_string($_POST['existing_image'] ?? 'small-logo.png');
     $pdf_path = $conn->real_escape_string($_POST['existing_pdf'] ?? '');
@@ -280,9 +407,9 @@ if (isset($_POST['ajax_add'])) {
     }
 
     if (!empty($edit_id)) {
-        $sql = "UPDATE courses SET title='$title', category='$category', image='$image_path',badge='$badge',desc1='$desc1',desc2='$desc2',price='$price',old_price='$old_price',link='$link',demo_link='$demo_link', website_link='$website_link', pdf_file='$pdf_path', allow_download='$allow_dl', btn_text='$btn_text',btn_type='$btn_type', show_tnc='$show_tnc', show_report_btn='$show_report_btn' WHERE id='$edit_id'";
+        $sql = "UPDATE courses SET title='$title', category='$category', image='$image_path',badge='$badge',desc1='$desc1',desc2='$desc2',price='$price',old_price='$old_price',link='$link',demo_link='$demo_link', website_link='$website_link', pdf_file='$pdf_path', allow_download='$allow_dl', btn_text='$btn_text',btn_type='$btn_type', show_tnc='$show_tnc', show_report_btn='$show_report_btn', app_only='$app_only' WHERE id='$edit_id'";
     } else {
-        $sql = "INSERT INTO courses (title,category,image,badge,desc1,desc2,price,old_price,link,demo_link,website_link,pdf_file,allow_download,btn_text,btn_type,show_tnc,show_report_btn) VALUES ('$title','$category','$image_path','$badge','$desc1','$desc2','$price','$old_price','$link','$demo_link','$website_link','$pdf_path','$allow_dl','$btn_text','$btn_type','$show_tnc','$show_report_btn')";
+        $sql = "INSERT INTO courses (title,category,image,badge,desc1,desc2,price,old_price,link,demo_link,website_link,pdf_file,allow_download,btn_text,btn_type,show_tnc,show_report_btn,app_only) VALUES ('$title','$category','$image_path','$badge','$desc1','$desc2','$price','$old_price','$link','$demo_link','$website_link','$pdf_path','$allow_dl','$btn_text','$btn_type','$show_tnc','$show_report_btn','$app_only')";
     }
     
     echo $conn->query($sql) ? json_encode(['status'=>'success']) : json_encode(['status'=>'error','msg'=>$conn->error]);
@@ -291,6 +418,7 @@ if (isset($_POST['ajax_add'])) {
 
 // 5. SOFT DELETE COURSE (Move to Trash)
 if (isset($_POST['ajax_delete'])) {
+    pm_require_admin(true);
     $id = $conn->real_escape_string($_POST['delete_id']);
     echo $conn->query("UPDATE courses SET is_deleted=1 WHERE id='$id'") ? json_encode(['status'=>'success']) : json_encode(['status'=>'error']);
     exit;
@@ -298,6 +426,7 @@ if (isset($_POST['ajax_delete'])) {
 
 // 5.5 RESTORE COURSE (Remove from Trash)
 if (isset($_POST['ajax_restore'])) {
+    pm_require_admin(true);
     $id = $conn->real_escape_string($_POST['restore_id']);
     echo $conn->query("UPDATE courses SET is_deleted=0 WHERE id='$id'") ? json_encode(['status'=>'success']) : json_encode(['status'=>'error']);
     exit;
@@ -305,6 +434,7 @@ if (isset($_POST['ajax_restore'])) {
 
 // 5.6 PERMANENT HARD DELETE
 if (isset($_POST['ajax_hard_delete'])) {
+    pm_require_admin(true);
     $id = $conn->real_escape_string($_POST['delete_id']);
     echo $conn->query("DELETE FROM courses WHERE id='$id'") ? json_encode(['status'=>'success']) : json_encode(['status'=>'error']);
     exit;
@@ -312,6 +442,7 @@ if (isset($_POST['ajax_hard_delete'])) {
 
 // 6. UPDATE ENROLLMENT
 if (isset($_POST['ajax_enrollment'])) {
+    pm_require_admin(true);
     $userEmail = $conn->real_escape_string($_POST['user_email']);
     $courses = json_decode($_POST['courses'], true);
 
@@ -331,18 +462,23 @@ if (isset($_POST['ajax_enrollment'])) {
 
 // 7. RESOLVE REPORT
 if (isset($_POST['ajax_resolve_report'])) {
+    pm_require_admin(true);
     $report_id = (int)$_POST['report_id'];
     echo $conn->query("UPDATE reports SET status='resolved' WHERE id=$report_id") ? json_encode(['status'=>'success']) : json_encode(['status'=>'error']);
     exit;
 }
 
-// --- STATS COMPILATION ---
-$totalStudents = $conn->query("SELECT COUNT(*) as c FROM users")->fetch_assoc()['c'];
-$totalCourses  = $conn->query("SELECT COUNT(*) as c FROM courses WHERE is_deleted=0")->fetch_assoc()['c']; // Only count active
-$trashedCourses = $conn->query("SELECT COUNT(*) as c FROM courses WHERE is_deleted=1")->fetch_assoc()['c'];
-$verifiedCount = $conn->query("SELECT COUNT(*) as c FROM users WHERE is_active=1")->fetch_assoc()['c'];
-$pendingReportsResult = $conn->query("SELECT COUNT(*) as c FROM reports WHERE status='pending'");
-$pendingReports = $pendingReportsResult ? $pendingReportsResult->fetch_assoc()['c'] : 0;
+// --- STATS (only when authenticated; hide numbers from public page view) ---
+if ($pmAdminSessionOk) {
+    $totalStudents = $conn->query("SELECT COUNT(*) as c FROM users")->fetch_assoc()['c'];
+    $totalCourses  = $conn->query("SELECT COUNT(*) as c FROM courses WHERE is_deleted=0")->fetch_assoc()['c'];
+    $trashedCourses = $conn->query("SELECT COUNT(*) as c FROM courses WHERE is_deleted=1")->fetch_assoc()['c'];
+    $verifiedCount = $conn->query("SELECT COUNT(*) as c FROM users WHERE is_active=1")->fetch_assoc()['c'];
+    $pendingReportsResult = $conn->query("SELECT COUNT(*) as c FROM reports WHERE status='pending'");
+    $pendingReports = $pendingReportsResult ? $pendingReportsResult->fetch_assoc()['c'] : 0;
+} else {
+    $totalStudents = $totalCourses = $trashedCourses = $verifiedCount = $pendingReports = 0;
+}
 ?>
 
 <!DOCTYPE html>
@@ -771,7 +907,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     <div id="pdf-error" class="upload-error-text"></div>
                                 </div>
 
-                                <div class="toggle-wrapper" style="background:#f0fdf4; border-color:#bbf7d0; margin-bottom: 25px;">
+                                <div class="toggle-wrapper" style="background:#f0fdf4; border-color:#bbf7d0; margin-bottom: 15px;">
                                     <label class="switch">
                                         <input type="checkbox" name="allow_download" id="inp_allow_download" value="1">
                                         <span class="slider"></span>
@@ -779,6 +915,17 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     <div class="toggle-info">
                                         <h4 style="color: #065f46;">Allow PDF Download</h4>
                                         <p style="color: #047857;">If OFF, students can only view it securely online.</p>
+                                    </div>
+                                </div>
+
+                                <div class="toggle-wrapper" style="background:#111; border-color:#334155; margin-bottom: 25px;">
+                                    <label class="switch">
+                                        <input type="checkbox" name="app_only" id="inp_app_only" value="1">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <div class="toggle-info">
+                                        <h4 style="color: #fff;">App Only (Buy &amp; Access)</h4>
+                                        <p style="color: #cbd5e1;">ON = website pe sirf list/badge; Buy aur Open sirf Android App me.</p>
                                     </div>
                                 </div>
 
@@ -953,38 +1100,82 @@ input:checked + .slider:before { transform: translateX(20px); }
             loadReports();
         }
 
-        // Already logged in via app SSO (PHP session) — no Google login needed
+        function showLoginScreen(msg) {
+            loading.style.display = "none";
+            document.body.style.display = "block";
+            overlay.style.display = "flex";
+            appWrapper.style.display = "none";
+            if (msg) {
+                errorMsg.innerText = msg;
+                errorMsg.style.display = "block";
+            }
+        }
+
+        async function establishServerSession(user) {
+            const idToken = await user.getIdToken(true);
+            const fd = new FormData();
+            fd.append('ajax_admin_login', '1');
+            fd.append('id_token', idToken);
+            fd.append('name', user.displayName || 'Admin');
+            const res = await fetch('admin_panel.php', { method: 'POST', body: fd, credentials: 'same-origin' });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || data.status !== 'success') {
+                throw new Error(data.msg || 'Server login failed');
+            }
+            return data;
+        }
+
+        // Already have verified PHP session (from app Firebase token or prior login)
         if (SERVER_SESSION_OK && SERVER_SESSION_EMAIL) {
             enterAdminUI(SERVER_SESSION_EMAIL, SERVER_SESSION_NAME || 'Admin');
         } else {
-            onAuthStateChanged(auth, (user) => {
-                loading.style.display = "none";
-                document.body.style.display = "block";
+            const params = new URLSearchParams(location.search);
+            if (params.get('auth_error') === '1') {
+                showLoginScreen('App login token invalid/expired. Please Sign in with Google.');
+            }
+
+            onAuthStateChanged(auth, async (user) => {
+                if (SERVER_SESSION_OK) return;
 
                 if (user && AUTHORIZED_ADMIN_EMAILS.includes(user.email)) {
-                    enterAdminUI(user.email, user.displayName || 'Admin');
+                    try {
+                        loading.style.display = "flex";
+                        document.body.style.display = "block";
+                        await establishServerSession(user);
+                        enterAdminUI(user.email, user.displayName || 'Admin');
+                    } catch (e) {
+                        showLoginScreen(e.message || 'Could not create secure admin session.');
+                        signOut(auth);
+                    }
                 } else if (user) {
-                    errorMsg.innerText = `Access Denied. ${user.email} is not authorized.`;
-                    errorMsg.style.display = "block";
-                    overlay.style.display = "flex";
-                    appWrapper.style.display = "none";
+                    showLoginScreen(`Access Denied. ${user.email} is not authorized.`);
                     signOut(auth);
-                } else {
-                    overlay.style.display = "flex";
-                    appWrapper.style.display = "none";
+                } else if (!params.get('auth_error')) {
+                    showLoginScreen();
                 }
             });
         }
 
-        loginBtn.addEventListener("click", () => {
-            signInWithPopup(auth, provider).catch(error => {
-                errorMsg.innerText = "Login Failed: " + error.message;
+        loginBtn.addEventListener("click", async () => {
+            try {
+                errorMsg.style.display = "none";
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                if (!user || !AUTHORIZED_ADMIN_EMAILS.includes(user.email)) {
+                    showLoginScreen(user ? `Access Denied. ${user.email} is not authorized.` : 'Login failed.');
+                    if (user) signOut(auth);
+                    return;
+                }
+                loading.style.display = "flex";
+                await establishServerSession(user);
+                enterAdminUI(user.email, user.displayName || 'Admin');
+            } catch (error) {
+                errorMsg.innerText = "Login Failed: " + (error.message || error);
                 errorMsg.style.display = "block";
-            });
+            }
         });
 
         logoutBtn.addEventListener("click", () => {
-            // Clear PHP app-SSO session + Firebase
             signOut(auth).finally(() => {
                 window.location.href = 'admin_panel.php?logout=1';
             });
@@ -1097,7 +1288,8 @@ input:checked + .slider:before { transform: translateX(20px); }
             const tbody = document.getElementById('table_body');
             tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;"><div class="shimmer" style="height: 50px; width: 100%;"></div></td></tr>';
             try {
-                const r = await fetch('?fetch_table=1');
+                const r = await fetch('?fetch_table=1', { credentials: 'same-origin' });
+                if (r.status === 403) { showToast('Session expired. Please login again.', 'error'); return; }
                 tbody.innerHTML = await r.text();
             } catch(e) { showToast("Failed to load courses", "error"); }
         }
@@ -1113,7 +1305,8 @@ input:checked + .slider:before { transform: translateX(20px); }
             const searchVal = document.getElementById('studentSearch').value;
             grid.innerHTML = '<div class="user-card"><div class="shimmer" style="height: 150px;"></div></div>';
             try {
-                const r = await fetch('?fetch_students=1&search=' + encodeURIComponent(searchVal));
+                const r = await fetch('?fetch_students=1&search=' + encodeURIComponent(searchVal), { credentials: 'same-origin' });
+                if (r.status === 403) { showToast('Session expired. Please login again.', 'error'); return; }
                 grid.innerHTML = await r.text();
             } catch(e) { showToast("Failed to load students", "error"); }
         }
@@ -1122,7 +1315,8 @@ input:checked + .slider:before { transform: translateX(20px); }
             const grid = document.getElementById('reports_body');
             grid.innerHTML = '<div class="user-card"><div class="shimmer" style="height: 150px;"></div></div>';
             try {
-                const r = await fetch('?fetch_reports=1');
+                const r = await fetch('?fetch_reports=1', { credentials: 'same-origin' });
+                if (r.status === 403) { showToast('Session expired. Please login again.', 'error'); return; }
                 grid.innerHTML = await r.text();
             } catch(e) { showToast("Failed to load reports", "error"); }
         }
@@ -1142,12 +1336,17 @@ input:checked + .slider:before { transform: translateX(20px); }
             fd.append('ajax_add', '1');
 
             try {
-                const res = await fetch(window.location.href, {method:'POST', body:fd});
+                const res = await fetch(window.location.href, {method:'POST', body:fd, credentials:'same-origin'});
 
                 // Read as text first: if PHP printed a warning/notice before the
                 // JSON, res.json() would throw with a vague error. Reading as
                 // text lets us surface the real problem to the admin instead.
                 const raw = await res.text();
+                if (res.status === 403) {
+                    showToast('Session expired. Please login again.', 'error');
+                    btn.innerHTML = originalText; btn.disabled = false;
+                    return;
+                }
                 let data;
                 try {
                     data = JSON.parse(raw);
@@ -1186,6 +1385,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             document.getElementById('inp_allow_download').checked = data.allow_download == 1;
             document.getElementById('inp_show_tnc').checked = data.show_tnc == 1;
             document.getElementById('inp_show_report_btn').checked = data.show_report_btn == 1;
+            document.getElementById('inp_app_only').checked = data.app_only == 1 || data.app_only === '1' || data.app_only === true;
 
             document.getElementById('edit_id').value = data.id;
             document.getElementById('form_title').innerHTML = '<ion-icon name="create"></ion-icon> Edit Course';
@@ -1205,6 +1405,8 @@ input:checked + .slider:before { transform: translateX(20px); }
             
             document.getElementById('inp_show_tnc').checked = false;
             document.getElementById('inp_show_report_btn').checked = false;
+            document.getElementById('inp_app_only').checked = false;
+            document.getElementById('inp_allow_download').checked = false;
 
             document.getElementById('form_title').innerHTML = '<ion-icon name="add-circle"></ion-icon> Create New Course';
             document.getElementById('submitBtn').innerHTML  = '<ion-icon name="cloud-upload"></ion-icon> Publish Course';
