@@ -48,11 +48,12 @@ App se buy pe website `from_app: true` bhejti hai.
 ------------------------------
 Path on Hostinger:
   public_html/premind/downloads/PREMium-Mind.apk
+  public_html/premind/download_apk.php   ← use this URL (direct .apk often 404/blocked)
 
-Public URL (already in app-version.json):
-  https://premind.diplomawallah.in/downloads/PREMium-Mind.apk
+Public URL (in app-version.json):
+  https://premind.diplomawallah.in/download_apk.php
 
-Folder me .htaccess allow downloads if needed.
+Also upload downloads/.htaccess if you want direct .apk access.
 
 
 5) WEBSITE FILES (Netlify / GitHub)

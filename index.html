@@ -1590,6 +1590,11 @@
                         <ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy
                     </a>
                 </li>
+                <li class="sidebar-item pm-admin-panel-link" id="pmAdminPanelLink" style="--delay: 0.55s; display:none;">
+                    <a href="https://premind.diplomawallah.in/admin_panel.php" class="sidebar-link">
+                        <ion-icon name="settings-outline"></ion-icon> Admin Panel
+                    </a>
+                </li>
             </ul>
         </div>
 
@@ -1905,6 +1910,7 @@
             if (typeof window.loadCourses === 'function') {
                 window.loadCourses(email);
             }
+            if (window.pmRefreshAdminMenu) window.pmRefreshAdminMenu(email);
         }
 
         function showLoggedOut() {
@@ -1927,6 +1933,7 @@
             // Index pe browsing free — My Courses pe click lecture.html khud login maangega
             if (coursesLink) { coursesLink.classList.remove('locked'); coursesLink.onclick = null; }
             if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
+            if (window.pmRefreshAdminMenu) window.pmRefreshAdminMenu();
 
             if (typeof window.loadCourses === 'function') {
                 window.loadCourses('');

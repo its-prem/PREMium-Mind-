@@ -1,0 +1,16 @@
+APP DOWNLOAD FIX — upload these to Hostinger
+
+Folder: public_html/premind/
+
+1) download_apk.php          (NEW — this is the download button URL)
+2) app-version.json          (apkUrl now points to download_apk.php)
+3) get_app_version.php       (optional update)
+4) downloads/.htaccess       (optional — helps direct .apk access)
+5) downloads/PREMium-Mind.apk  (already uploaded — keep it)
+
+Test in browser:
+  https://premind.diplomawallah.in/download_apk.php
+
+If that downloads the APK, the website Download button will work too
+(after Netlify/GitHub has the updated app-version.json, or once
+get_app_version.php + app-version.json are updated on Hostinger).

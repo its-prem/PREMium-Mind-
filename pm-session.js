@@ -38,6 +38,62 @@
     return false;
   }
 
+  var ADMIN_MENU_EMAILS = ['premku0237@gmail.com'];
+  var ADMIN_PANEL_URL = 'https://premind.diplomawallah.in/admin_panel.php';
+
+  function isAdminAccount(email) {
+    var e = String(email || '').trim().toLowerCase();
+    return ADMIN_MENU_EMAILS.indexOf(e) !== -1;
+  }
+
+  function resolveLoginEmail(preferred) {
+    var fromArg = preferred ? String(preferred).trim() : '';
+    if (fromArg) return fromArg;
+    var stored = getStoredEmail();
+    if (stored) return stored;
+    try {
+      var el = document.getElementById('userEmail');
+      if (el && el.textContent) {
+        var t = String(el.textContent).trim();
+        if (t.indexOf('@') !== -1) return t;
+      }
+    } catch (e) { /* ignore */ }
+    return null;
+  }
+
+  function updateAdminMenuLink(preferredEmail) {
+    var email = resolveLoginEmail(preferredEmail);
+    var show = isAdminAccount(email);
+    var menus = document.querySelectorAll('.sidebar-menu, ul.nav-links');
+    if (!menus.length) return;
+
+    menus.forEach(function (menu) {
+      var existing = menu.querySelector('.pm-admin-panel-link');
+      if (show) {
+        if (!existing) {
+          var isSidebar = menu.classList.contains('sidebar-menu');
+          var li = document.createElement('li');
+          li.className = isSidebar ? 'sidebar-item pm-admin-panel-link' : 'pm-admin-panel-link';
+          if (isSidebar) {
+            li.style.setProperty('--delay', '0.55s');
+            li.innerHTML =
+              '<a href="' + ADMIN_PANEL_URL + '" class="sidebar-link">' +
+              '<ion-icon name="settings-outline"></ion-icon> Admin Panel</a>';
+          } else {
+            li.innerHTML =
+              '<a href="' + ADMIN_PANEL_URL + '" class="nav-link">' +
+              '<ion-icon name="settings-outline"></ion-icon> Admin Panel</a>';
+          }
+          menu.appendChild(li);
+        } else {
+          existing.style.display = '';
+        }
+      } else if (existing) {
+        existing.style.display = 'none';
+      }
+    });
+  }
+
   function saveLoginSession(email, name, phone) {
     if (!email) return false;
     const e = String(email).trim();
@@ -51,6 +107,7 @@
       sessionStorage.setItem('customUserName', n);
       sessionStorage.setItem('customUserPhone', p);
     } catch (err) { /* ignore */ }
+    try { updateAdminMenuLink(e); } catch (err2) { /* ignore */ }
     return !!(localStorage.getItem('customUserEmail') || getCookie('customUserEmail') || sessionStorage.getItem('customUserEmail'));
   }
 
@@ -96,6 +153,7 @@
     deleteCookie('customUserEmail');
     deleteCookie('customUserName');
     deleteCookie('customUserPhone');
+    try { updateAdminMenuLink(); } catch (err) { /* ignore */ }
   }
 
   window.getStoredEmail = getStoredEmail;
@@ -105,4 +163,38 @@
   window.clearStoredSession = clearStoredSession;
   window.pmIsApiSuccess = isApiSuccess;
   window.pmGetCookie = getCookie;
+  window.pmIsAdminAccount = isAdminAccount;
+  window.pmRefreshAdminMenu = updateAdminMenuLink;
+
+  function bootAdminMenu() {
+    try { updateAdminMenuLink(); } catch (e) { /* ignore */ }
+  }
+
+  function hookMenuOpenRefresh() {
+    var btn = document.getElementById('menu-btn');
+    if (!btn || btn.getAttribute('data-pm-admin-hook') === '1') return;
+    btn.setAttribute('data-pm-admin-hook', '1');
+    btn.addEventListener('click', function () {
+      setTimeout(bootAdminMenu, 0);
+      setTimeout(bootAdminMenu, 200);
+    }, true);
+  }
+
+  function startAdminMenuWatcher() {
+    bootAdminMenu();
+    hookMenuOpenRefresh();
+    // Late Firebase / WebView session restore
+    [300, 800, 1500, 3000].forEach(function (ms) {
+      setTimeout(function () {
+        bootAdminMenu();
+        hookMenuOpenRefresh();
+      }, ms);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startAdminMenuWatcher);
+  } else {
+    startAdminMenuWatcher();
+  }
 })();

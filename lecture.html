@@ -156,6 +156,7 @@
       <li class="sidebar-item" style="--delay: 0.35s"><a href="app-download.html" class="sidebar-link"><ion-icon name="phone-portrait-outline"></ion-icon> App Version</a></li>
       <li class="sidebar-item" style="--delay: 0.4s"><a href="index.html#help-form" class="sidebar-link" onclick="closeSidebar()"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us</a></li>
       <li class="sidebar-item" style="--delay: 0.5s"><a href="termcondition.html" class="sidebar-link"><ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy</a></li>
+      <li class="sidebar-item pm-admin-panel-link" style="--delay: 0.55s; display:none;"><a href="https://premind.diplomawallah.in/admin_panel.php" class="sidebar-link"><ion-icon name="settings-outline"></ion-icon> Admin Panel</a></li>
     </ul>
   </div>
   <div class="sidebar-footer" id="sidebarFooter">
@@ -202,6 +203,7 @@
     document.getElementById('profilePhoto').src = avatar;
     document.getElementById('navAvatarImg').src = avatar;
     document.getElementById('navUserName').textContent = displayName.toString().split(' ')[0];
+    if (window.pmRefreshAdminMenu) window.pmRefreshAdminMenu(email);
   }
 
   window.loadMyCourses = async function(userEmail){

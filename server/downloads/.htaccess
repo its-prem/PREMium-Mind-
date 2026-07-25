@@ -1,0 +1,10 @@
+# Allow APK downloads from this folder
+<IfModule mod_mime.c>
+  AddType application/vnd.android.package-archive .apk
+</IfModule>
+
+<IfModule mod_authz_core.c>
+  Require all granted
+</IfModule>
+
+Options -Indexes

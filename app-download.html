@@ -440,6 +440,9 @@
         <li class="sidebar-item" style="--delay: 0.5s">
           <a href="termcondition.html" class="sidebar-link"><ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy</a>
         </li>
+        <li class="sidebar-item pm-admin-panel-link" style="--delay: 0.55s; display:none;">
+          <a href="https://premind.diplomawallah.in/admin_panel.php" class="sidebar-link"><ion-icon name="settings-outline"></ion-icon> Admin Panel</a>
+        </li>
       </ul>
     </div>
     <div class="sidebar-footer" id="sidebarFooter">
@@ -529,12 +532,14 @@
       document.getElementById('profilePhoto').src = avatar;
       document.getElementById('navAvatarImg').src = avatar;
       document.getElementById('navUserName').textContent = displayName.toString().split(' ')[0];
+      if (window.pmRefreshAdminMenu) window.pmRefreshAdminMenu(email);
     }
 
     (function () {
       var email = window.getStoredEmail && window.getStoredEmail();
       var name = window.getStoredName && window.getStoredName();
       if (email) updateUI(name, email, localStorage.getItem('profilePhoto_custom'));
+      else if (window.pmRefreshAdminMenu) window.pmRefreshAdminMenu();
     })();
 
     (async function () {
@@ -570,8 +575,14 @@
         });
         if (!(info.changelog || []).length) list.innerHTML = '<li>No changelog</li>';
 
-        if (info.apkUrl) {
-          btn.href = info.apkUrl;
+        // Prefer PHP download endpoint — Hostinger often blocks direct .apk URLs
+        var apkHref = info.apkUrl || '';
+        if (!apkHref || /\/downloads\/.+\.apk(\?|$)/i.test(apkHref)) {
+          apkHref = 'https://premind.diplomawallah.in/download_apk.php';
+        }
+        if (apkHref) {
+          btn.href = apkHref;
+          btn.setAttribute('download', info.apkFileName || 'PREMium-Mind.apk');
           btn.removeAttribute('disabled');
           btn.classList.remove('is-disabled');
         } else {

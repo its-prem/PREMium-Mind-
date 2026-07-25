@@ -100,6 +100,7 @@
       <li class="sidebar-item" style="--delay: 0.3s"><a href="lecture.html" class="sidebar-link protected-route" id="coursesLink"><ion-icon name="play-circle-outline"></ion-icon> My Courses</a></li>
       <li class="sidebar-item" style="--delay: 0.4s"><a href="index.html#help-form" class="sidebar-link" onclick="closeSidebar()"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us</a></li>
       <li class="sidebar-item" style="--delay: 0.5s"><a href="termcondition.html" class="sidebar-link active"><ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy</a></li>
+      <li class="sidebar-item pm-admin-panel-link" style="--delay: 0.55s; display:none;"><a href="https://premind.diplomawallah.in/admin_panel.php" class="sidebar-link"><ion-icon name="settings-outline"></ion-icon> Admin Panel</a></li>
     </ul>
   </div>
   <div class="sidebar-footer" id="sidebarFooter">
@@ -169,6 +170,7 @@
     document.getElementById('profilePhoto').src = avatar;
     document.getElementById('navAvatarImg').src = avatar;
     document.getElementById('navUserName').textContent = displayName.toString().split(' ')[0];
+    if (window.pmRefreshAdminMenu) window.pmRefreshAdminMenu(email);
     var coursesLinkNav = document.getElementById('coursesLinkNav');
     var coursesLink = document.getElementById('coursesLink');
     if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
