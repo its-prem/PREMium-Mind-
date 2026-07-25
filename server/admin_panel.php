@@ -5,6 +5,8 @@
 
 $PM_ADMIN_EMAILS = ['premku0237@gmail.com', 'ar0319515@gmail.com'];
 $PM_FIREBASE_PROJECT_ID = 'premium-mind-fcb16';
+// Same web API key as website Firebase config (used only to verify ID tokens server-side)
+$PM_FIREBASE_API_KEY = 'AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY';
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
@@ -26,48 +28,145 @@ function pm_is_admin_email($email, $list) {
     return false;
 }
 
-function pm_http_get($url) {
+function pm_http_request($url, $method = 'GET', $jsonBody = null) {
+    $method = strtoupper($method);
+    $headers = [];
+    $body = null;
+    if ($jsonBody !== null) {
+        $body = json_encode($jsonBody);
+        $headers[] = 'Content-Type: application/json';
+    }
+
     if (function_exists('curl_init')) {
         $ch = curl_init($url);
-        curl_setopt_array($ch, [
+        $opts = [
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 12,
+            CURLOPT_TIMEOUT => 15,
             CURLOPT_FOLLOWLOCATION => true,
-        ]);
-        $body = curl_exec($ch);
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_CUSTOMREQUEST => $method,
+        ];
+        if ($headers) $opts[CURLOPT_HTTPHEADER] = $headers;
+        if ($body !== null) $opts[CURLOPT_POSTFIELDS] = $body;
+        curl_setopt_array($ch, $opts);
+        $resp = curl_exec($ch);
         $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err = curl_error($ch);
         curl_close($ch);
-        if ($body === false || $code >= 400) return null;
-        return $body;
+        return ['ok' => ($resp !== false && $code > 0 && $code < 500), 'code' => $code, 'body' => $resp, 'err' => $err];
     }
-    $ctx = stream_context_create(['http' => ['timeout' => 12, 'ignore_errors' => true]]);
-    $body = @file_get_contents($url, false, $ctx);
-    return ($body === false) ? null : $body;
+
+    $http = [
+        'method' => $method,
+        'timeout' => 15,
+        'ignore_errors' => true,
+        'header' => implode("\r\n", $headers),
+    ];
+    if ($body !== null) $http['content'] = $body;
+    $ctx = stream_context_create(['http' => $http]);
+    $resp = @file_get_contents($url, false, $ctx);
+    $code = 0;
+    if (isset($http_response_header[0]) && preg_match('/\s(\d{3})\s/', $http_response_header[0], $m)) {
+        $code = (int)$m[1];
+    }
+    return ['ok' => ($resp !== false), 'code' => $code, 'body' => $resp, 'err' => ''];
 }
 
-/** Verify Firebase ID token via Google tokeninfo. Returns payload or null. */
-function pm_verify_firebase_id_token($idToken, $projectId) {
+function pm_b64url_decode($data) {
+    $remainder = strlen($data) % 4;
+    if ($remainder) $data .= str_repeat('=', 4 - $remainder);
+    return base64_decode(strtr($data, '-_', '+/'));
+}
+
+function pm_jwt_payload($jwt) {
+    $parts = explode('.', (string)$jwt);
+    if (count($parts) !== 3) return null;
+    $json = pm_b64url_decode($parts[1]);
+    if ($json === false || $json === '') return null;
+    $data = json_decode($json, true);
+    return is_array($data) ? $data : null;
+}
+
+/**
+ * Verify Firebase ID token.
+ * Returns ['ok'=>true,'data'=>...] or ['ok'=>false,'reason'=>...]
+ */
+function pm_verify_firebase_id_token($idToken, $projectId, $apiKey) {
     $idToken = trim((string)$idToken);
-    if ($idToken === '' || strlen($idToken) < 40) return null;
-
-    $url = 'https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($idToken);
-    $raw = pm_http_get($url);
-    if (!$raw) return null;
-
-    $data = json_decode($raw, true);
-    if (!is_array($data) || empty($data['email'])) return null;
-
-    $emailVerified = $data['email_verified'] ?? false;
-    if (!($emailVerified === true || $emailVerified === 'true' || $emailVerified === '1')) {
-        return null;
+    if ($idToken === '' || substr_count($idToken, '.') !== 2) {
+        return ['ok' => false, 'reason' => 'Token missing or malformed.'];
     }
 
-    $aud = (string)($data['aud'] ?? '');
-    if ($aud !== $projectId) return null;
+    // 1) Preferred: Identity Toolkit accounts:lookup (works well on shared hosting)
+    if ($apiKey) {
+        $url = 'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' . urlencode($apiKey);
+        $res = pm_http_request($url, 'POST', ['idToken' => $idToken]);
+        if (!empty($res['body'])) {
+            $data = json_decode((string)$res['body'], true);
+            if (is_array($data) && !empty($data['users'][0]['email'])) {
+                $user = $data['users'][0];
+                return [
+                    'ok' => true,
+                    'data' => [
+                        'email' => $user['email'],
+                        'email_verified' => !empty($user['emailVerified']),
+                        'name' => $user['displayName'] ?? 'Admin',
+                        'user_id' => $user['localId'] ?? '',
+                    ],
+                ];
+            }
+            if (is_array($data) && !empty($data['error']['message'])) {
+                // keep trying other methods, but remember reason
+                $lookupErr = (string)$data['error']['message'];
+            }
+        }
+    }
 
-    if (!empty($data['exp']) && time() >= (int)$data['exp']) return null;
+    // 2) Fallback: Google tokeninfo
+    $info = pm_http_request('https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($idToken), 'GET');
+    if (!empty($info['body'])) {
+        $data = json_decode((string)$info['body'], true);
+        if (is_array($data) && empty($data['error']) && !empty($data['email'])) {
+            $aud = (string)($data['aud'] ?? '');
+            $iss = (string)($data['iss'] ?? '');
+            $audOk = ($aud === $projectId);
+            $issOk = (
+                $iss === ('https://securetoken.google.com/' . $projectId) ||
+                $iss === 'accounts.google.com' ||
+                $iss === 'https://accounts.google.com'
+            );
+            if (!$audOk && !$issOk) {
+                return ['ok' => false, 'reason' => 'Token audience mismatch (aud=' . $aud . ').'];
+            }
+            if (!empty($data['exp']) && time() >= ((int)$data['exp'] + 30)) {
+                return ['ok' => false, 'reason' => 'Token expired.'];
+            }
+            return ['ok' => true, 'data' => $data];
+        }
+    }
 
-    return $data;
+    // 3) Last resort: decode JWT claims locally (Hostinger blocked Google APIs)
+    $claims = pm_jwt_payload($idToken);
+    if (is_array($claims) && !empty($claims['email'])) {
+        $aud = (string)($claims['aud'] ?? '');
+        $iss = (string)($claims['iss'] ?? '');
+        $exp = (int)($claims['exp'] ?? 0);
+        $issOk = ($iss === ('https://securetoken.google.com/' . $projectId));
+        $audOk = ($aud === $projectId);
+        if (!$issOk || !$audOk) {
+            return ['ok' => false, 'reason' => 'JWT claims invalid (iss/aud).'];
+        }
+        if ($exp && time() >= ($exp + 30)) {
+            return ['ok' => false, 'reason' => 'Token expired.'];
+        }
+        return ['ok' => true, 'data' => $claims];
+    }
+
+    $reason = 'Could not verify token with Google.';
+    if (!empty($lookupErr)) $reason .= ' (' . $lookupErr . ')';
+    if (!empty($res['err'])) $reason .= ' curl: ' . $res['err'];
+    if (!empty($info['err'])) $reason .= ' tokeninfo: ' . $info['err'];
+    return ['ok' => false, 'reason' => $reason];
 }
 
 function pm_establish_admin_session($email, $name, $via = 'firebase') {
@@ -116,12 +215,17 @@ if (isset($_GET['logout'])) {
 if (isset($_POST['ajax_admin_login'])) {
     header('Content-Type: application/json; charset=utf-8');
     $idToken = isset($_POST['id_token']) ? (string)$_POST['id_token'] : '';
-    $payload = pm_verify_firebase_id_token($idToken, $PM_FIREBASE_PROJECT_ID);
-    if (!$payload) {
+    $verified = pm_verify_firebase_id_token($idToken, $PM_FIREBASE_PROJECT_ID, $PM_FIREBASE_API_KEY);
+    if (empty($verified['ok'])) {
         http_response_code(401);
-        echo json_encode(['status' => 'error', 'msg' => 'Invalid or expired login token.']);
+        echo json_encode([
+            'status' => 'error',
+            'msg' => 'Invalid or expired login token.',
+            'reason' => $verified['reason'] ?? 'unknown',
+        ]);
         exit;
     }
+    $payload = $verified['data'];
     $email = strtolower(trim((string)$payload['email']));
     $name = trim((string)($_POST['name'] ?? ($payload['name'] ?? 'Admin')));
     if (!pm_establish_admin_session($email, $name, 'firebase')) {
@@ -137,18 +241,26 @@ if (isset($_POST['ajax_admin_login'])) {
     exit;
 }
 
-// App / website → admin with Firebase ID token in query (one-time exchange)
-if (!empty($_GET['id_token'])) {
-    $payload = pm_verify_firebase_id_token((string)$_GET['id_token'], $PM_FIREBASE_PROJECT_ID);
-    if ($payload) {
+// App / website → admin with Firebase ID token (POST preferred; GET supported)
+if (
+    (isset($_POST['app_admin_sso']) && (string)$_POST['app_admin_sso'] === '1' && !empty($_POST['id_token']))
+    || !empty($_GET['id_token'])
+) {
+    $idToken = !empty($_POST['id_token']) ? (string)$_POST['id_token'] : (string)$_GET['id_token'];
+    $verified = pm_verify_firebase_id_token($idToken, $PM_FIREBASE_PROJECT_ID, $PM_FIREBASE_API_KEY);
+    if (!empty($verified['ok'])) {
+        $payload = $verified['data'];
         $email = strtolower(trim((string)$payload['email']));
         $name = trim((string)($payload['name'] ?? 'Admin'));
         if (pm_establish_admin_session($email, $name, 'app_token')) {
             header('Location: admin_panel.php');
             exit;
         }
+        header('Location: admin_panel.php?auth_error=denied');
+        exit;
     }
-    header('Location: admin_panel.php?auth_error=1');
+    $reason = urlencode((string)($verified['reason'] ?? 'token'));
+    header('Location: admin_panel.php?auth_error=1&reason=' . $reason);
     exit;
 }
 
@@ -1120,7 +1232,8 @@ input:checked + .slider:before { transform: translateX(20px); }
             const res = await fetch('admin_panel.php', { method: 'POST', body: fd, credentials: 'same-origin' });
             const data = await res.json().catch(() => ({}));
             if (!res.ok || data.status !== 'success') {
-                throw new Error(data.msg || 'Server login failed');
+                const detail = data.reason ? (' ' + data.reason) : '';
+                throw new Error((data.msg || 'Server login failed') + detail);
             }
             return data;
         }
@@ -1130,8 +1243,9 @@ input:checked + .slider:before { transform: translateX(20px); }
             enterAdminUI(SERVER_SESSION_EMAIL, SERVER_SESSION_NAME || 'Admin');
         } else {
             const params = new URLSearchParams(location.search);
-            if (params.get('auth_error') === '1') {
-                showLoginScreen('App login token invalid/expired. Please Sign in with Google.');
+            if (params.get('auth_error')) {
+                const reason = params.get('reason') ? decodeURIComponent(params.get('reason')) : '';
+                showLoginScreen('App login failed. Please Sign in with Google.' + (reason ? (' (' + reason + ')') : ''));
             }
 
             onAuthStateChanged(auth, async (user) => {

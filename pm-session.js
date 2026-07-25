@@ -47,12 +47,23 @@
   }
 
   async function openAdminPanelSecure() {
-    // Prefer Firebase ID token (verified server-side). No shared secret in JS.
+    // Prefer Firebase ID token via POST (GET URLs can truncate long JWTs).
     try {
       if (typeof window.pmGetIdToken === 'function') {
         var token = await window.pmGetIdToken();
         if (token) {
-          window.location.href = ADMIN_PANEL_URL + '?id_token=' + encodeURIComponent(token);
+          var form = document.createElement('form');
+          form.method = 'POST';
+          form.action = ADMIN_PANEL_URL;
+          form.style.display = 'none';
+          var f1 = document.createElement('input');
+          f1.type = 'hidden'; f1.name = 'app_admin_sso'; f1.value = '1';
+          var f2 = document.createElement('input');
+          f2.type = 'hidden'; f2.name = 'id_token'; f2.value = token;
+          form.appendChild(f1);
+          form.appendChild(f2);
+          document.body.appendChild(form);
+          form.submit();
           return;
         }
       }
