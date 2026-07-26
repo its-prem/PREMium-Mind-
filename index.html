@@ -2579,24 +2579,22 @@
                     .replace(/\\/g, '\\\\')
                     .replace(/'/g, "\\'")
                     .replace(/"/g, '&quot;');
-                const previewBadgeHTML = showPdfPreview
-                    ? `<button type="button" class="preview-badge-btn" onclick="window.openPdfPreview(${Number(course.id)}, '${safePreviewTitle}')"><ion-icon name="eye-outline"></ion-icon> Preview</button>`
-                    : '';
-                const previewLinkHTML = showPdfPreview
-                    ? `<div style="text-align: left; margin-top: 8px; margin-bottom: -10px; padding: 0 5px;">
-                          <span style="color: #dc2626; text-decoration: underline; font-weight: bold; cursor: pointer; font-size: 13.5px;" onclick="window.openPdfPreview(${Number(course.id)}, '${safePreviewTitle}')">Preview</span>
-                       </div>`
-                    : ((course.btn_type === 'preview_buy' && course.demo_link && course.demo_link.trim() !== '' && course.demo_link.startsWith('http'))
-                        ? `<div style="text-align: left; margin-top: 8px; margin-bottom: -10px; padding: 0 5px;">
-                              <span style="color: #dc2626; text-decoration: underline; font-weight: bold; cursor: pointer; font-size: 13.5px;" onclick="window.open('${course.demo_link}', '_blank')">Preview</span>
-                           </div>`
-                        : '');
+                // Simple left text under photo — no badge/button design
+                let previewLinkHTML = '';
+                if (showPdfPreview) {
+                    previewLinkHTML = `<div style="text-align:left;margin-top:8px;margin-bottom:-10px;padding:0 5px;">
+                        <span style="color:#dc2626;text-decoration:underline;font-weight:bold;cursor:pointer;font-size:13.5px;" onclick="window.openPdfPreview(${Number(course.id)}, '${safePreviewTitle}')">Preview</span>
+                    </div>`;
+                } else if (course.btn_type === 'preview_buy' && course.demo_link && course.demo_link.trim() !== '' && course.demo_link.startsWith('http')) {
+                    previewLinkHTML = `<div style="text-align:left;margin-top:8px;margin-bottom:-10px;padding:0 5px;">
+                        <span style="color:#dc2626;text-decoration:underline;font-weight:bold;cursor:pointer;font-size:13.5px;" onclick="window.open('${course.demo_link}', '_blank')">Preview</span>
+                    </div>`;
+                }
 
                 const cardHTML = `
           <div class="course-card">
               <div class="card-img-wrapper">
                   ${badgeHTML}
-                  ${previewBadgeHTML}
                   <img src="${course.image || 'small-logo.png'}" alt="${course.title}" onerror="this.src='small-logo.png'">
               </div>
               
