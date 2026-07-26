@@ -278,6 +278,12 @@ if ($colCheck && $colCheck->num_rows === 0) {
     @$conn->query("ALTER TABLE courses ADD COLUMN app_only TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = buy/open only in Android app'");
 }
 
+// Ensure show_preview column exists (1-page PDF preview on store card)
+$colPrev = @$conn->query("SHOW COLUMNS FROM courses LIKE 'show_preview'");
+if ($colPrev && $colPrev->num_rows === 0) {
+    @$conn->query("ALTER TABLE courses ADD COLUMN show_preview TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = show 1-page PDF preview on store card'");
+}
+
 // ════════════════════════════════════════════════
 //  AJAX HANDLERS (API ENDPOINTS) — auth required
 // ════════════════════════════════════════════════
@@ -304,6 +310,11 @@ if (isset($_GET['fetch_table'])) {
                 ? "<span style='display:inline-flex; align-items:center; gap:4px; background:#111; color:#fff; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap; margin-top:6px;'><ion-icon name='phone-portrait-outline'></ion-icon> APP ONLY: ON</span>"
                 : "<span style='display:inline-flex; align-items:center; gap:4px; background:#f1f5f9; color:#64748b; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap; margin-top:6px;'><ion-icon name='globe-outline'></ion-icon> APP ONLY: OFF</span>";
 
+            $preview_on = !empty($row['show_preview']) && (int)$row['show_preview'] === 1;
+            $preview_status = $preview_on
+                ? "<span style='display:inline-flex; align-items:center; gap:4px; background:#eff6ff; color:#1d4ed8; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap; margin-top:6px;'><ion-icon name='eye-outline'></ion-icon> PREVIEW: ON</span>"
+                : "<span style='display:inline-flex; align-items:center; gap:4px; background:#f1f5f9; color:#64748b; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap; margin-top:6px;'><ion-icon name='eye-off-outline'></ion-icon> PREVIEW: OFF</span>";
+
             // Check if course is deleted
             $is_deleted = isset($row['is_deleted']) && $row['is_deleted'] == 1;
             $row_style = $is_deleted ? "opacity: 0.6; background: #fef2f2;" : "";
@@ -328,6 +339,7 @@ if (isset($_GET['fetch_table'])) {
                         $pdf_status
                         $dl_status
                         $app_only_status
+                        $preview_status
                     </div>
                 </td>
                 <td>
@@ -496,6 +508,7 @@ if (isset($_POST['ajax_add'])) {
     $show_tnc  = isset($_POST['show_tnc']) ? 1 : 0;
     $show_report_btn = isset($_POST['show_report_btn']) ? 1 : 0;
     $app_only  = isset($_POST['app_only']) ? 1 : 0;
+    $show_preview = isset($_POST['show_preview']) ? 1 : 0;
 
     $image_path = $conn->real_escape_string($_POST['existing_image'] ?? 'small-logo.png');
     $pdf_path = $conn->real_escape_string($_POST['existing_pdf'] ?? '');
@@ -519,9 +532,9 @@ if (isset($_POST['ajax_add'])) {
     }
 
     if (!empty($edit_id)) {
-        $sql = "UPDATE courses SET title='$title', category='$category', image='$image_path',badge='$badge',desc1='$desc1',desc2='$desc2',price='$price',old_price='$old_price',link='$link',demo_link='$demo_link', website_link='$website_link', pdf_file='$pdf_path', allow_download='$allow_dl', btn_text='$btn_text',btn_type='$btn_type', show_tnc='$show_tnc', show_report_btn='$show_report_btn', app_only='$app_only' WHERE id='$edit_id'";
+        $sql = "UPDATE courses SET title='$title', category='$category', image='$image_path',badge='$badge',desc1='$desc1',desc2='$desc2',price='$price',old_price='$old_price',link='$link',demo_link='$demo_link', website_link='$website_link', pdf_file='$pdf_path', allow_download='$allow_dl', btn_text='$btn_text',btn_type='$btn_type', show_tnc='$show_tnc', show_report_btn='$show_report_btn', app_only='$app_only', show_preview='$show_preview' WHERE id='$edit_id'";
     } else {
-        $sql = "INSERT INTO courses (title,category,image,badge,desc1,desc2,price,old_price,link,demo_link,website_link,pdf_file,allow_download,btn_text,btn_type,show_tnc,show_report_btn,app_only) VALUES ('$title','$category','$image_path','$badge','$desc1','$desc2','$price','$old_price','$link','$demo_link','$website_link','$pdf_path','$allow_dl','$btn_text','$btn_type','$show_tnc','$show_report_btn','$app_only')";
+        $sql = "INSERT INTO courses (title,category,image,badge,desc1,desc2,price,old_price,link,demo_link,website_link,pdf_file,allow_download,btn_text,btn_type,show_tnc,show_report_btn,app_only,show_preview) VALUES ('$title','$category','$image_path','$badge','$desc1','$desc2','$price','$old_price','$link','$demo_link','$website_link','$pdf_path','$allow_dl','$btn_text','$btn_type','$show_tnc','$show_report_btn','$app_only','$show_preview')";
     }
     
     echo $conn->query($sql) ? json_encode(['status'=>'success']) : json_encode(['status'=>'error','msg'=>$conn->error]);
@@ -1030,7 +1043,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     </div>
                                 </div>
 
-                                <div class="toggle-wrapper" style="background:#111; border-color:#334155; margin-bottom: 25px;">
+                                <div class="toggle-wrapper" style="background:#111; border-color:#334155; margin-bottom: 15px;">
                                     <label class="switch">
                                         <input type="checkbox" name="app_only" id="inp_app_only" value="1">
                                         <span class="slider"></span>
@@ -1038,6 +1051,17 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     <div class="toggle-info">
                                         <h4 style="color: #fff;">App Only (Buy &amp; Access)</h4>
                                         <p style="color: #cbd5e1;">ON = website pe sirf list/badge; Buy aur Open sirf Android App me.</p>
+                                    </div>
+                                </div>
+
+                                <div class="toggle-wrapper" style="background:#eff6ff; border-color:#bfdbfe; margin-bottom: 25px;">
+                                    <label class="switch">
+                                        <input type="checkbox" name="show_preview" id="inp_show_preview" value="1">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <div class="toggle-info">
+                                        <h4 style="color: #1e3a8a;">Show Preview Card</h4>
+                                        <p style="color: #1d4ed8;">ON = store card pe Preview dikhega — PDF ka sirf 1st page.</p>
                                     </div>
                                 </div>
 
@@ -1500,6 +1524,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             document.getElementById('inp_show_tnc').checked = data.show_tnc == 1;
             document.getElementById('inp_show_report_btn').checked = data.show_report_btn == 1;
             document.getElementById('inp_app_only').checked = data.app_only == 1 || data.app_only === '1' || data.app_only === true;
+            document.getElementById('inp_show_preview').checked = data.show_preview == 1 || data.show_preview === '1' || data.show_preview === true;
 
             document.getElementById('edit_id').value = data.id;
             document.getElementById('form_title').innerHTML = '<ion-icon name="create"></ion-icon> Edit Course';
@@ -1520,6 +1545,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             document.getElementById('inp_show_tnc').checked = false;
             document.getElementById('inp_show_report_btn').checked = false;
             document.getElementById('inp_app_only').checked = false;
+            document.getElementById('inp_show_preview').checked = false;
             document.getElementById('inp_allow_download').checked = false;
 
             document.getElementById('form_title').innerHTML = '<ion-icon name="add-circle"></ion-icon> Create New Course';

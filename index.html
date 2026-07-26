@@ -1394,9 +1394,92 @@
             border-radius: 12px;
             margin-bottom: -15px;
         }
+
+        /* PDF Preview modal (1 page only) */
+        .pdf-preview-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            background: rgba(15, 23, 42, 0.72);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .pdf-preview-modal.show { display: flex; }
+        .pdf-preview-box {
+            width: min(560px, 100%);
+            max-height: min(92vh, 900px);
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 24px 60px rgba(0,0,0,.35);
+        }
+        .pdf-preview-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        .pdf-preview-head h3 {
+            margin: 0;
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.3;
+        }
+        .pdf-preview-head .pdf-preview-sub {
+            margin: 2px 0 0;
+            font-size: 0.72rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .pdf-preview-close {
+            border: none;
+            background: #fee2e2;
+            color: #b91c1c;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            font-size: 22px;
+            cursor: pointer;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .pdf-preview-body {
+            padding: 12px;
+            overflow: auto;
+            background: #e2e8f0;
+            text-align: center;
+            min-height: 220px;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .pdf-preview-body canvas,
+        .pdf-preview-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(15,23,42,.18);
+            background: #fff;
+        }
+        .pdf-preview-status {
+            color: #475569;
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 40px 12px;
+        }
+        .pdf-preview-status.error { color: #b91c1c; }
     </style>
 
     <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 </head>
 
 <body>
@@ -1718,6 +1801,21 @@
                 <button type="submit" id="reportSubmit" class="wa-submit-btn" style="background: #be123c;">Submit
                     Report</button>
             </form>
+        </div>
+    </div>
+
+    <div id="pdfPreviewModal" class="pdf-preview-modal" role="dialog" aria-modal="true" aria-labelledby="pdfPreviewTitle">
+        <div class="pdf-preview-box">
+            <div class="pdf-preview-head">
+                <div>
+                    <h3 id="pdfPreviewTitle">PDF Preview</h3>
+                    <p class="pdf-preview-sub">Only page 1 · Buy to unlock full PDF</p>
+                </div>
+                <button type="button" class="pdf-preview-close" onclick="window.closePdfPreview()" aria-label="Close">&times;</button>
+            </div>
+            <div class="pdf-preview-body" id="pdfPreviewBody">
+                <div class="pdf-preview-status">Loading preview…</div>
+            </div>
         </div>
     </div>
 
@@ -2476,19 +2574,33 @@
                     }
                 }
 
+                const showPdfPreview = course.show_preview == 1 || course.show_preview === '1' || course.show_preview === true;
+                const safePreviewTitle = String(course.title || 'PDF Preview')
+                    .replace(/\\/g, '\\\\')
+                    .replace(/'/g, "\\'")
+                    .replace(/"/g, '&quot;');
+                const previewBadgeHTML = showPdfPreview
+                    ? `<button type="button" class="preview-badge-btn" onclick="window.openPdfPreview(${Number(course.id)}, '${safePreviewTitle}')"><ion-icon name="eye-outline"></ion-icon> Preview</button>`
+                    : '';
+                const previewLinkHTML = showPdfPreview
+                    ? `<div style="text-align: left; margin-top: 8px; margin-bottom: -10px; padding: 0 5px;">
+                          <span style="color: #dc2626; text-decoration: underline; font-weight: bold; cursor: pointer; font-size: 13.5px;" onclick="window.openPdfPreview(${Number(course.id)}, '${safePreviewTitle}')">Preview</span>
+                       </div>`
+                    : ((course.btn_type === 'preview_buy' && course.demo_link && course.demo_link.trim() !== '' && course.demo_link.startsWith('http'))
+                        ? `<div style="text-align: left; margin-top: 8px; margin-bottom: -10px; padding: 0 5px;">
+                              <span style="color: #dc2626; text-decoration: underline; font-weight: bold; cursor: pointer; font-size: 13.5px;" onclick="window.open('${course.demo_link}', '_blank')">Preview</span>
+                           </div>`
+                        : '');
+
                 const cardHTML = `
           <div class="course-card">
               <div class="card-img-wrapper">
                   ${badgeHTML}
+                  ${previewBadgeHTML}
                   <img src="${course.image || 'small-logo.png'}" alt="${course.title}" onerror="this.src='small-logo.png'">
               </div>
               
-              <!-- 👁️ Preview Link right under the photo 👁️ -->
-              ${(course.btn_type === 'preview_buy' && course.demo_link && course.demo_link.trim() !== '' && course.demo_link.startsWith('http')) ? `
-                  <div style="text-align: left; margin-top: 8px; margin-bottom: -10px; padding: 0 5px;">
-                      <span style="color: #dc2626; text-decoration: underline; font-weight: bold; cursor: pointer; font-size: 13.5px;" onclick="window.open('${course.demo_link}', '_blank')">Preview</span>
-                  </div>
-              ` : ''}
+              ${previewLinkHTML}
               
               ${reportBtnContainerHTML}
               <h2>${course.title}</h2>
@@ -2511,6 +2623,109 @@
                 container.insertAdjacentHTML('beforeend', cardHTML);
             });
         }
+
+        // 👁️ PDF Preview — only page 1 when admin Show Preview is ON
+        (function setupPdfPreview() {
+            const PREVIEW_API = 'https://premind.diplomawallah.in/preview_pdf.php';
+            let previewBusy = false;
+
+            window.closePdfPreview = function () {
+                const modal = document.getElementById('pdfPreviewModal');
+                const body = document.getElementById('pdfPreviewBody');
+                if (modal) modal.classList.remove('show');
+                if (body) body.innerHTML = '<div class="pdf-preview-status">Loading preview…</div>';
+                previewBusy = false;
+            };
+
+            window.openPdfPreview = async function (courseId, title) {
+                const modal = document.getElementById('pdfPreviewModal');
+                const body = document.getElementById('pdfPreviewBody');
+                const titleEl = document.getElementById('pdfPreviewTitle');
+                if (!modal || !body) return;
+                if (previewBusy) return;
+                previewBusy = true;
+
+                if (titleEl) titleEl.textContent = title || 'PDF Preview';
+                body.innerHTML = '<div class="pdf-preview-status">Loading page 1…</div>';
+                modal.classList.add('show');
+
+                const id = Number(courseId);
+                if (!id) {
+                    body.innerHTML = '<div class="pdf-preview-status error">Invalid course.</div>';
+                    previewBusy = false;
+                    return;
+                }
+
+                try {
+                    // Prefer server-rendered page-1 image (Imagick) when available
+                    const imgUrl = PREVIEW_API + '?course_id=' + id + '&as=image&t=' + Date.now();
+                    const imgProbe = await fetch(imgUrl, { cache: 'no-store' });
+                    const imgType = (imgProbe.headers.get('content-type') || '').toLowerCase();
+                    if (imgProbe.ok && imgType.indexOf('image/') === 0) {
+                        const blob = await imgProbe.blob();
+                        const url = URL.createObjectURL(blob);
+                        body.innerHTML = '';
+                        const img = document.createElement('img');
+                        img.alt = 'Page 1 preview';
+                        img.src = url;
+                        img.onload = function () { try { URL.revokeObjectURL(url); } catch (e) {} };
+                        img.oncontextmenu = function (e) { e.preventDefault(); return false; };
+                        body.appendChild(img);
+                        previewBusy = false;
+                        return;
+                    }
+
+                    // Fallback: PDF.js render only page 1
+                    if (typeof pdfjsLib === 'undefined') {
+                        throw new Error('Preview engine missing');
+                    }
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+                    const pdfUrl = PREVIEW_API + '?course_id=' + id + '&t=' + Date.now();
+                    const res = await fetch(pdfUrl, { cache: 'no-store' });
+                    if (!res.ok) {
+                        let msg = 'Preview unavailable';
+                        try {
+                            const err = await res.json();
+                            if (err && err.message) msg = err.message;
+                        } catch (eJ) {}
+                        throw new Error(msg);
+                    }
+                    const buf = await res.arrayBuffer();
+                    const pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
+                    const page = await pdfDoc.getPage(1);
+                    const baseViewport = page.getViewport({ scale: 1 });
+                    const maxW = Math.min(520, (body.clientWidth || 320) - 8);
+                    const scale = Math.min(1.6, maxW / baseViewport.width);
+                    const viewport = page.getViewport({ scale: scale });
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    canvas.oncontextmenu = function (e) { e.preventDefault(); return false; };
+                    body.innerHTML = '';
+                    body.appendChild(canvas);
+                    await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+                } catch (err) {
+                    console.error(err);
+                    body.innerHTML = '<div class="pdf-preview-status error">'
+                        + (err && err.message ? err.message : 'Could not load preview')
+                        + '</div>';
+                } finally {
+                    previewBusy = false;
+                }
+            };
+
+            var previewModalEl = document.getElementById('pdfPreviewModal');
+            if (previewModalEl) {
+                previewModalEl.addEventListener('click', function (e) {
+                    if (e.target === previewModalEl) window.closePdfPreview();
+                });
+            }
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') window.closePdfPreview();
+            });
+        })();
 
     </script>
 
