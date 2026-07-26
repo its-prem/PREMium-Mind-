@@ -393,8 +393,42 @@
       pointer-events: auto;
     }
 
+    /* App only — compact top bar (website keeps normal height) */
+    html.pm-native {
+      --header-h: 46px;
+    }
+    html.pm-native .header {
+      column-gap: 8px;
+    }
+    html.pm-native .brand-sub { display: none; }
+    html.pm-native .brand-title { font-size: 0.84rem; }
+    html.pm-native .back-btn {
+      min-height: 34px;
+      padding: 0 8px 0 4px;
+      gap: 5px;
+      font-size: 0.7rem;
+    }
+    html.pm-native .back-btn .back-icon {
+      width: 26px;
+      height: 26px;
+    }
+    html.pm-native .back-btn .back-icon svg {
+      width: 13px;
+      height: 13px;
+    }
+    html.pm-native .back-btn .back-label { font-size: 0.68rem; }
+    html.pm-native .download-btn {
+      min-height: 34px;
+      min-width: 34px;
+      padding: 0 9px;
+      font-size: 0.7rem;
+      border-radius: 9px;
+    }
+    html.pm-native .download-btn svg { width: 14px; height: 14px; }
+
     @media (max-width: 700px) {
       :root { --header-h: 58px; }
+      html.pm-native { --header-h: 44px; }
 
       .header {
         column-gap: 10px;
@@ -404,6 +438,7 @@
 
       .brand-sub { display: none; }
       .brand-title { font-size: 0.92rem; }
+      html.pm-native .brand-title { font-size: 0.8rem; }
 
       .back-btn {
         min-height: 38px;
@@ -453,10 +488,12 @@
 
     @media (max-width: 420px) {
       :root { --header-h: 54px; }
+      html.pm-native { --header-h: 42px; }
 
       .header { column-gap: 8px; }
 
       .brand-title { font-size: 0.86rem; }
+      html.pm-native .brand-title { font-size: 0.76rem; }
 
       .download-btn {
         padding: 0 9px;

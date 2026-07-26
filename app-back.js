@@ -47,9 +47,11 @@
   function applyNativeSafeInsets() {
     try {
       document.documentElement.classList.add('pm-native');
-      // Typical Android status bar ~24–32dp; keep existing env() if larger
-      document.documentElement.style.setProperty('--pm-safe-top', '32px');
-      document.documentElement.style.setProperty('--pm-safe-bottom', '16px');
+      var path = (window.location.pathname || window.location.href || '').toLowerCase();
+      // watch: keep status clearance but don't make header feel huge
+      var topPad = /watch\.html/.test(path) ? '22px' : '32px';
+      document.documentElement.style.setProperty('--pm-safe-top', topPad);
+      document.documentElement.style.setProperty('--pm-safe-bottom', '12px');
     } catch (e) { /* ignore */ }
   }
 
