@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>App Download - PREMium Mind</title>
   <link rel="icon" type="image/png" href="small-logo.png">
   <link rel="stylesheet" href="pm-navbar.css">
@@ -11,14 +11,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+  <script src="app-back.js"></script>
   <style>
     :root {
       --ink: #111;
       --muted: #64748b;
       --line: #e2e8f0;
       --bg: #f8fafc;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: max(env(safe-area-inset-top, 0px), var(--pm-safe-top, 0px));
+      --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--pm-safe-bottom, 0px));
       --safe-left: env(safe-area-inset-left, 0px);
       --safe-right: env(safe-area-inset-right, 0px);
     }
@@ -48,6 +49,9 @@
       max-width: 760px;
       margin: 0 auto;
       padding: 20px max(16px, var(--safe-right)) calc(40px + var(--safe-bottom)) max(16px, var(--safe-left));
+    }
+    html.pm-native .wrap {
+      padding-top: 16px;
     }
     .hero-card,
     .section {
@@ -465,7 +469,7 @@
         <div class="meta-chip">Updated <span id="verDate">—</span></div>
       </div>
 
-      <a class="dl-btn" id="downloadBtn" href="#" download>
+      <a class="dl-btn" id="downloadBtn" href="https://premind.diplomawallah.in/download_apk.php" role="button">
         <ion-icon name="download-outline" style="font-size:22px;"></ion-icon>
         Download Latest APK
       </a>
@@ -493,6 +497,7 @@
 
   <script src="pm-session.js"></script>
   <script src="pm-app-gate.js"></script>
+  <!-- app-back.js already loaded in <head> for safe-area + external download -->
   <script>
     function openSidebar(){
       document.getElementById('sidebar').classList.add('active');
@@ -544,6 +549,26 @@
 
     (async function () {
       var btn = document.getElementById('downloadBtn');
+      var apkHref = 'https://premind.diplomawallah.in/download_apk.php';
+
+      function wireDownloadClick() {
+        if (!btn || btn.getAttribute('data-dl-hook') === '1') return;
+        btn.setAttribute('data-dl-hook', '1');
+        btn.addEventListener('click', function (e) {
+          var url = btn.getAttribute('href') || apkHref;
+          if (!url || url === '#') return;
+          var inApp = (window.pmIsNativeApp && window.pmIsNativeApp())
+            || document.documentElement.classList.contains('pm-native')
+            || /; wv\)|Capacitor|premiummind/i.test(navigator.userAgent || '');
+          if (inApp) {
+            e.preventDefault();
+            if (window.pmOpenExternalUrl) window.pmOpenExternalUrl(url);
+            else window.location.href = url;
+          }
+        });
+      }
+      wireDownloadClick();
+
       async function loadVersion() {
         var urls = [
           'https://premind.diplomawallah.in/get_app_version.php?t=' + Date.now(),
@@ -576,13 +601,13 @@
         if (!(info.changelog || []).length) list.innerHTML = '<li>No changelog</li>';
 
         // Prefer PHP download endpoint — Hostinger often blocks direct .apk URLs
-        var apkHref = info.apkUrl || '';
+        apkHref = info.apkUrl || '';
         if (!apkHref || /\/downloads\/.+\.apk(\?|$)/i.test(apkHref)) {
           apkHref = 'https://premind.diplomawallah.in/download_apk.php';
         }
         if (apkHref) {
           btn.href = apkHref;
-          btn.setAttribute('download', info.apkFileName || 'PREMium-Mind.apk');
+          btn.removeAttribute('download'); // WebView me download attr break karta hai
           btn.removeAttribute('disabled');
           btn.classList.remove('is-disabled');
         } else {
@@ -591,6 +616,7 @@
           btn.classList.add('is-disabled');
           document.getElementById('fileHint').textContent = 'APK URL missing';
         }
+        wireDownloadClick();
 
         var params = new URLSearchParams(location.search);
         var next = params.get('next') || 'home';
@@ -609,6 +635,5 @@
       }
     })();
   </script>
-  <script src="app-back.js"></script>
 </body>
 </html>

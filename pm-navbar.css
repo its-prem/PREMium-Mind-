@@ -8,11 +8,15 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  padding: calc(12px + env(safe-area-inset-top, 0px)) 20px 12px;
+  /* max(env, --pm-safe-top): Capacitor WebView often reports env=0 */
+  padding: calc(12px + max(env(safe-area-inset-top, 0px), var(--pm-safe-top, 0px))) 20px 12px;
   display: flex;
   align-items: center;
   gap: 12px;
 }
+
+/* Only pages that need native inset set --pm-safe-top via app-back.js.
+   Index keeps --pm-safe-top unset (0) so layout stays as before. */
 
 .logo-container {
   flex-shrink: 0;

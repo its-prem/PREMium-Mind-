@@ -44,8 +44,10 @@
       font-size:0.7rem; font-weight:700; padding:4px 10px; border-radius:6px; text-transform:uppercase;
     }
     .course-card h2 {
-      font-size:1.08rem; margin-bottom:12px; color:#000; line-height:1.3; font-weight:700;
-      display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+      font-size:0.88rem; margin:0 2px 12px; color:#111; line-height:1.35; font-weight:650;
+      letter-spacing:-0.01em; min-height:2.7em;
+      display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical;
+      overflow:hidden; text-overflow:ellipsis; word-break:break-word; overflow-wrap:anywhere;
     }
     .btn-access {
       width:100%; padding:12px; border-radius:10px; border:none; font-weight:700; cursor:pointer;
@@ -75,6 +77,9 @@
       .dashboard-header { padding:40px 15px; }
       .card-container { grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:16px; padding:0 14px 40px; }
       .card-img-box { height:130px; }
+      .course-card h2 {
+        font-size:0.78rem; line-height:1.3; min-height:2.6em; font-weight:600;
+      }
     }
   </style>
 </head>
