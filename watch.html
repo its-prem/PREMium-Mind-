@@ -820,6 +820,20 @@
          } catch (e) {}
      }
 
+     async function notifyDownloadDone(fileName) {
+         try {
+             if (window.pmNotifyDownload) {
+                 await window.pmNotifyDownload(
+                     'Download complete',
+                     fileName + ' saved to Downloads',
+                     fileName
+                 );
+                 return;
+             }
+         } catch (e) {}
+         toastNative('PDF saved: ' + fileName);
+     }
+
      let downloadBusy = false;
 
      window.handleDownloadPdf = async function (ev) {
@@ -846,12 +860,12 @@
 
          downloadBusy = true;
          const originalHtml = downloadBtn.innerHTML;
-         downloadBtn.innerHTML = "⏳ Wait...";
+         downloadBtn.innerHTML = "Downloading…";
          downloadBtn.disabled = true;
-         toastNative("Download started...");
+         toastNative("Downloading…");
 
          try {
-             downloadBtn.innerHTML = "⏬ Fetching...";
+             downloadBtn.innerHTML = "Downloading…";
              const buf = await fetchSecurePdfBytesWithTimeout('download', 90000);
 
              let baseName = "Premium_Notes";
@@ -867,7 +881,7 @@
                  if (!window.AndroidPdfSaver) {
                      throw new Error('App rebuild required — PDF saver missing. Run from Android Studio.');
                  }
-                 downloadBtn.innerHTML = "💾 Saving...";
+                 downloadBtn.innerHTML = "Saving…";
                  await savePdfViaAndroidBridge(buf, fileName);
              } else {
                  const blob = new Blob([buf], { type: 'application/pdf' });
@@ -880,14 +894,14 @@
                  document.body.removeChild(a);
                  URL.revokeObjectURL(blobUrl);
              }
-             downloadBtn.innerHTML = "✅ Done";
-             toastNative("PDF saved!");
+             downloadBtn.innerHTML = "Done";
+             await notifyDownloadDone(fileName);
          } catch (error) {
              console.error(error);
              const msg = (error && error.message) ? error.message : "secure layer";
              alert("Download Failed: " + msg);
              toastNative("Failed: " + msg);
-             downloadBtn.innerHTML = "❌ Failed";
+             downloadBtn.innerHTML = "Failed";
          }
 
          setTimeout(() => {

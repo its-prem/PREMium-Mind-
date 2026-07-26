@@ -127,6 +127,124 @@
     });
   }
 
+  function bytesToBase64(bytes) {
+    var CHUNK = 0x8000;
+    var binary = '';
+    for (var i = 0; i < bytes.length; i += CHUNK) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + CHUNK, bytes.length)));
+    }
+    return btoa(binary);
+  }
+
+  function ensureNotifyStyles() {
+    if (document.getElementById('pm-dl-notify-style')) return;
+    var style = document.createElement('style');
+    style.id = 'pm-dl-notify-style';
+    style.textContent =
+      '#pmDlNotify{position:fixed;left:12px;right:12px;top:calc(10px + max(env(safe-area-inset-top,0px),var(--pm-safe-top,0px)));'
+      + 'z-index:99999;display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;'
+      + 'background:#111;color:#fff;box-shadow:0 12px 32px rgba(0,0,0,.28);transform:translateY(-120%);opacity:0;'
+      + 'transition:transform .28s ease,opacity .28s ease;font-family:Poppins,system-ui,sans-serif;}'
+      + '#pmDlNotify.show{transform:translateY(0);opacity:1;}'
+      + '#pmDlNotify .pm-dl-ico{width:36px;height:36px;border-radius:10px;background:#22c55e;display:flex;'
+      + 'align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}'
+      + '#pmDlNotify .pm-dl-title{font-weight:700;font-size:.92rem;line-height:1.25;margin:0 0 2px;}'
+      + '#pmDlNotify .pm-dl-body{font-size:.78rem;color:#cbd5e1;line-height:1.35;margin:0;}';
+    document.head.appendChild(style);
+  }
+
+  /** Show download notification (native if available + in-app banner) */
+  window.pmNotifyDownload = async function (title, body, fileName) {
+    title = title || 'Download complete';
+    body = body || ((fileName || 'File') + ' saved to Downloads');
+    fileName = fileName || '';
+
+    // Native Android bridges
+    try {
+      var saver = window.AndroidPdfSaver;
+      if (saver) {
+        if (typeof saver.showNotification === 'function') {
+          saver.showNotification(title, body, fileName);
+        } else if (typeof saver.notify === 'function') {
+          saver.notify(title, body);
+        } else if (typeof saver.notifyDownload === 'function') {
+          saver.notifyDownload(title, body, fileName);
+        } else if (typeof saver.showToast === 'function') {
+          saver.showToast(title + ': ' + body);
+        }
+      }
+    } catch (e1) { /* continue */ }
+
+    try {
+      if (window.Android && typeof window.Android.showNotification === 'function') {
+        window.Android.showNotification(title, body);
+      } else if (window.Android && typeof window.Android.notify === 'function') {
+        window.Android.notify(title, body);
+      }
+    } catch (e2) { /* continue */ }
+
+    // Capacitor Local Notifications
+    try {
+      var LN = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
+      if (LN && typeof LN.schedule === 'function') {
+        try {
+          if (typeof LN.requestPermissions === 'function') await LN.requestPermissions();
+        } catch (ePerm) { /* ignore */ }
+        await LN.schedule({
+          notifications: [{
+            id: Math.floor(Date.now() % 100000) + 1,
+            title: title,
+            body: body,
+            schedule: { at: new Date(Date.now() + 300) },
+            smallIcon: 'ic_stat_icon_config_sample',
+            sound: undefined
+          }]
+        });
+      }
+    } catch (e3) { /* continue */ }
+
+    // Always show in-app notification banner too
+    try {
+      ensureNotifyStyles();
+      var el = document.getElementById('pmDlNotify');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'pmDlNotify';
+        el.innerHTML = '<div class="pm-dl-ico">✓</div><div><p class="pm-dl-title"></p><p class="pm-dl-body"></p></div>';
+        document.body.appendChild(el);
+      }
+      el.querySelector('.pm-dl-title').textContent = title;
+      el.querySelector('.pm-dl-body').textContent = body;
+      el.classList.add('show');
+      clearTimeout(window.__pmDlNotifyTimer);
+      window.__pmDlNotifyTimer = setTimeout(function () {
+        el.classList.remove('show');
+      }, 4200);
+    } catch (e4) { /* ignore */ }
+
+    return true;
+  };
+
+  async function saveBlobViaAndroidBridge(blob, fileName) {
+    if (!window.AndroidPdfSaver || typeof window.AndroidPdfSaver.begin !== 'function') return false;
+    var buf = await blob.arrayBuffer();
+    var bytes = new Uint8Array(buf);
+    if (window.AndroidPdfSaver.showToast) {
+      try { window.AndroidPdfSaver.showToast('Downloading ' + fileName + '...'); } catch (e) {}
+    }
+    window.AndroidPdfSaver.begin(fileName);
+    var chunkSize = 128 * 1024;
+    for (var i = 0; i < bytes.length; i += chunkSize) {
+      var slice = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+      window.AndroidPdfSaver.appendChunk(bytesToBase64(slice));
+      if (i > 0 && i % (chunkSize * 4) === 0) {
+        await new Promise(function (r) { setTimeout(r, 0); });
+      }
+    }
+    window.AndroidPdfSaver.finish();
+    return true;
+  }
+
   /**
    * Download APK inside app WebView with progress-friendly flow.
    * Returns: 'saved' | 'started' | 'external'
@@ -135,14 +253,16 @@
     fileName = fileName || 'PREMium-Mind.apk';
     if (!url) throw new Error('Missing download URL');
 
-    // Native bridge download (if app exposes it)
+    // Native bridge download URL (system DownloadManager → notification)
     try {
       if (window.Android && typeof window.Android.downloadUrl === 'function') {
         window.Android.downloadUrl(url, fileName);
+        await window.pmNotifyDownload('Downloading…', fileName + ' — check notification shade', fileName);
         return 'started';
       }
       if (window.AndroidPdfSaver && typeof window.AndroidPdfSaver.downloadUrl === 'function') {
         window.AndroidPdfSaver.downloadUrl(url, fileName);
+        await window.pmNotifyDownload('Downloading…', fileName + ' — check notification shade', fileName);
         return 'started';
       }
     } catch (e0) { /* continue */ }
@@ -153,6 +273,14 @@
     var blob = await res.blob();
     if (!blob || blob.size < 1000) throw new Error('Download file empty');
 
+    // Prefer same Downloads bridge used for course PDFs
+    try {
+      if (await saveBlobViaAndroidBridge(blob, fileName)) {
+        await window.pmNotifyDownload('Download complete', fileName + ' saved to Downloads', fileName);
+        return 'saved';
+      }
+    } catch (eBridge) { /* continue */ }
+
     // Capacitor Filesystem (if installed)
     try {
       var FS = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem;
@@ -160,6 +288,7 @@
         var b64 = await blobToBase64(blob);
         var dir = (FS.Directory && FS.Directory.Documents) || 'DOCUMENTS';
         await FS.writeFile({ path: fileName, data: b64, directory: dir });
+        await window.pmNotifyDownload('Download complete', fileName + ' saved', fileName);
         try {
           var Share = window.Capacitor.Plugins.Share;
           if (Share && typeof Share.share === 'function') {
@@ -186,11 +315,13 @@
         try { URL.revokeObjectURL(objectUrl); } catch (e) {}
         try { a.remove(); } catch (e2) {}
       }, 2500);
+      await window.pmNotifyDownload('Download started', fileName + ' — check Downloads / notifications', fileName);
       return 'started';
     } catch (eBlob) { /* continue */ }
 
     // Last resort: open externally
     await window.pmOpenExternalUrl(url);
+    await window.pmNotifyDownload('Opening download', 'Complete install from the browser download', fileName);
     return 'external';
   };
 
