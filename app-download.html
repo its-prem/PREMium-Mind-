@@ -148,12 +148,26 @@
       touch-action: manipulation;
     }
     .dl-btn[disabled],
-    .dl-btn.is-disabled {
-      opacity: .55;
+    .dl-btn.is-disabled,
+    .dl-btn.is-downloading {
+      opacity: .85;
       pointer-events: none;
-      cursor: not-allowed;
+      cursor: wait;
       box-shadow: none;
     }
+    .dl-btn.is-downloading {
+      background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+    }
+    .dl-btn .dl-spinner {
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255,255,255,.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: dlspin .7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes dlspin { to { transform: rotate(360deg); } }
     .hint {
       margin-top: 12px;
       font-size: .82rem;
@@ -471,7 +485,7 @@
 
       <a class="dl-btn" id="downloadBtn" href="https://premind.diplomawallah.in/download_apk.php" role="button">
         <ion-icon name="download-outline" style="font-size:22px;"></ion-icon>
-        Download Latest APK
+        <span id="downloadBtnLabel">Download Latest APK</span>
       </a>
       <p class="hint" id="fileHint">Loading version info…</p>
       <div class="open-app" id="openAppBox">
@@ -549,23 +563,83 @@
 
     (async function () {
       var btn = document.getElementById('downloadBtn');
+      var btnLabel = document.getElementById('downloadBtnLabel');
+      var fileHint = document.getElementById('fileHint');
       var apkHref = 'https://premind.diplomawallah.in/download_apk.php';
+      var apkName = 'PREMium-Mind.apk';
+      var downloading = false;
+
+      function setDownloadingUI(on) {
+        downloading = !!on;
+        if (!btn) return;
+        if (on) {
+          btn.classList.add('is-downloading');
+          btn.setAttribute('aria-busy', 'true');
+          btn.innerHTML = '<span class="dl-spinner" aria-hidden="true"></span><span id="downloadBtnLabel">Downloading…</span>';
+          btnLabel = document.getElementById('downloadBtnLabel');
+          if (fileHint) fileHint.textContent = 'Please wait — APK download in progress…';
+        } else {
+          btn.classList.remove('is-downloading');
+          btn.removeAttribute('aria-busy');
+          btn.innerHTML = '<ion-icon name="download-outline" style="font-size:22px;"></ion-icon><span id="downloadBtnLabel">Download Latest APK</span>';
+          btnLabel = document.getElementById('downloadBtnLabel');
+        }
+      }
+
+      function isInApp() {
+        return (window.pmIsNativeApp && window.pmIsNativeApp())
+          || document.documentElement.classList.contains('pm-native')
+          || /; wv\)|Capacitor|premiummind/i.test(navigator.userAgent || '');
+      }
+
+      async function startDownload(e) {
+        if (e) e.preventDefault();
+        if (downloading) return;
+        var url = (btn && btn.getAttribute('href')) || apkHref;
+        if (!url || url === '#') return;
+
+        setDownloadingUI(true);
+        try {
+          if (isInApp() && typeof window.pmDownloadApk === 'function') {
+            var result = await window.pmDownloadApk(url, apkName);
+            if (fileHint) {
+              if (result === 'saved') fileHint.textContent = 'Downloaded! Check Files / Documents for ' + apkName;
+              else if (result === 'external') fileHint.textContent = 'Opened download in browser. Check notification shade.';
+              else fileHint.textContent = 'Downloading… check notification / Downloads folder.';
+            }
+            if (btnLabel) btnLabel.textContent = 'Download Started';
+            setTimeout(function () { setDownloadingUI(false); }, 2200);
+            return;
+          }
+
+          // Website / normal browser
+          var a = document.createElement('a');
+          a.href = url;
+          a.setAttribute('download', apkName);
+          a.style.display = 'none';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          if (fileHint) fileHint.textContent = 'Download started — check your Downloads folder.';
+          if (btnLabel) btnLabel.textContent = 'Download Started';
+          setTimeout(function () { setDownloadingUI(false); }, 1800);
+        } catch (err) {
+          console.error(err);
+          if (fileHint) fileHint.textContent = 'Download failed. Trying browser…';
+          try {
+            if (window.pmOpenExternalUrl) await window.pmOpenExternalUrl(url);
+            else window.location.href = url;
+          } catch (e2) {
+            window.location.href = url;
+          }
+          setTimeout(function () { setDownloadingUI(false); }, 1500);
+        }
+      }
 
       function wireDownloadClick() {
         if (!btn || btn.getAttribute('data-dl-hook') === '1') return;
         btn.setAttribute('data-dl-hook', '1');
-        btn.addEventListener('click', function (e) {
-          var url = btn.getAttribute('href') || apkHref;
-          if (!url || url === '#') return;
-          var inApp = (window.pmIsNativeApp && window.pmIsNativeApp())
-            || document.documentElement.classList.contains('pm-native')
-            || /; wv\)|Capacitor|premiummind/i.test(navigator.userAgent || '');
-          if (inApp) {
-            e.preventDefault();
-            if (window.pmOpenExternalUrl) window.pmOpenExternalUrl(url);
-            else window.location.href = url;
-          }
-        });
+        btn.addEventListener('click', startDownload);
       }
       wireDownloadClick();
 
@@ -589,7 +663,10 @@
         document.getElementById('verName').textContent = info.latestVersion || '—';
         document.getElementById('verCode').textContent = info.versionCode || '—';
         document.getElementById('verDate').textContent = info.releaseDate || '—';
-        document.getElementById('fileHint').textContent = (info.apkFileName || 'PREMium-Mind.apk') + (info.minAndroid ? (' · Android ' + info.minAndroid) : '');
+        apkName = info.apkFileName || 'PREMium-Mind.apk';
+        if (fileHint) {
+          fileHint.textContent = apkName + (info.minAndroid ? (' · Android ' + info.minAndroid) : '');
+        }
 
         var list = document.getElementById('changelogList');
         list.innerHTML = '';
@@ -607,14 +684,14 @@
         }
         if (apkHref) {
           btn.href = apkHref;
-          btn.removeAttribute('download'); // WebView me download attr break karta hai
+          btn.removeAttribute('download');
           btn.removeAttribute('disabled');
           btn.classList.remove('is-disabled');
         } else {
           btn.removeAttribute('href');
           btn.setAttribute('disabled', 'disabled');
           btn.classList.add('is-disabled');
-          document.getElementById('fileHint').textContent = 'APK URL missing';
+          if (fileHint) fileHint.textContent = 'APK URL missing';
         }
         wireDownloadClick();
 
@@ -629,9 +706,11 @@
           else location.href = 'premiummind://' + next;
         });
       } catch (e) {
-        document.getElementById('fileHint').textContent = 'Could not load version info. Please try again later.';
-        btn.setAttribute('disabled', 'disabled');
-        btn.classList.add('is-disabled');
+        if (fileHint) fileHint.textContent = 'Could not load version info. Please try again later.';
+        // Keep download button working with default APK URL
+        btn.removeAttribute('disabled');
+        btn.classList.remove('is-disabled');
+        wireDownloadClick();
       }
     })();
   </script>

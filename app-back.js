@@ -77,6 +77,10 @@
         window.Android.openExternal(url);
         return true;
       }
+      if (window.Android && typeof window.Android.downloadUrl === 'function') {
+        window.Android.downloadUrl(url);
+        return true;
+      }
     } catch (e2) { /* continue */ }
 
     try {
@@ -108,6 +112,86 @@
 
     window.location.href = url;
     return true;
+  };
+
+  function blobToBase64(blob) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onloadend = function () {
+        var result = String(reader.result || '');
+        var base64 = result.indexOf(',') >= 0 ? result.split(',')[1] : result;
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  /**
+   * Download APK inside app WebView with progress-friendly flow.
+   * Returns: 'saved' | 'started' | 'external'
+   */
+  window.pmDownloadApk = async function (url, fileName) {
+    fileName = fileName || 'PREMium-Mind.apk';
+    if (!url) throw new Error('Missing download URL');
+
+    // Native bridge download (if app exposes it)
+    try {
+      if (window.Android && typeof window.Android.downloadUrl === 'function') {
+        window.Android.downloadUrl(url, fileName);
+        return 'started';
+      }
+      if (window.AndroidPdfSaver && typeof window.AndroidPdfSaver.downloadUrl === 'function') {
+        window.AndroidPdfSaver.downloadUrl(url, fileName);
+        return 'started';
+      }
+    } catch (e0) { /* continue */ }
+
+    // Fetch APK (CORS enabled on download_apk.php) then save/trigger
+    var res = await fetch(url, { cache: 'no-store', credentials: 'omit' });
+    if (!res.ok) throw new Error('Download failed (HTTP ' + res.status + ')');
+    var blob = await res.blob();
+    if (!blob || blob.size < 1000) throw new Error('Download file empty');
+
+    // Capacitor Filesystem (if installed)
+    try {
+      var FS = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem;
+      if (FS && typeof FS.writeFile === 'function') {
+        var b64 = await blobToBase64(blob);
+        var dir = (FS.Directory && FS.Directory.Documents) || 'DOCUMENTS';
+        await FS.writeFile({ path: fileName, data: b64, directory: dir });
+        try {
+          var Share = window.Capacitor.Plugins.Share;
+          if (Share && typeof Share.share === 'function') {
+            var uri = await FS.getUri({ path: fileName, directory: dir });
+            if (uri && uri.uri) {
+              await Share.share({ title: fileName, url: uri.uri });
+            }
+          }
+        } catch (eShare) { /* saved anyway */ }
+        return 'saved';
+      }
+    } catch (eFs) { /* continue */ }
+
+    // Blob + <a download> (works in many WebViews / Chrome)
+    try {
+      var objectUrl = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = fileName;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function () {
+        try { URL.revokeObjectURL(objectUrl); } catch (e) {}
+        try { a.remove(); } catch (e2) {}
+      }, 2500);
+      return 'started';
+    } catch (eBlob) { /* continue */ }
+
+    // Last resort: open externally
+    await window.pmOpenExternalUrl(url);
+    return 'external';
   };
 
   if (!isNativeApp()) return;
