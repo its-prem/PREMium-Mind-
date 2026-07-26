@@ -600,32 +600,26 @@
 
         setDownloadingUI(true);
         try {
-          if (isInApp() && typeof window.pmDownloadApk === 'function') {
+          // Always go through pmDownloadApk (handles app WebView + website)
+          if (typeof window.pmDownloadApk === 'function') {
             var result = await window.pmDownloadApk(url, apkName);
             if (fileHint) {
-              if (result === 'saved') fileHint.textContent = 'Downloaded! ' + apkName + ' — see notification.';
-              else if (result === 'external') fileHint.textContent = 'Opened in browser. Check notification shade.';
-              else fileHint.textContent = 'Download started — check notification / Downloads.';
+              if (result === 'external') {
+                fileHint.textContent = 'Browser open hua — ' + apkName + ' download/notification check karo.';
+              } else if (result === 'saved') {
+                fileHint.textContent = 'Downloaded: ' + apkName;
+              } else {
+                fileHint.textContent = 'Downloading ' + apkName + ' — notification shade / Downloads check karo.';
+              }
             }
-            if (btnLabel) btnLabel.textContent = result === 'saved' ? 'Downloaded' : 'Downloading…';
-            // Extra notify if bridge didn't already (pmDownloadApk also notifies)
-            if (result === 'saved' && window.pmNotifyDownload) {
-              try { await window.pmNotifyDownload('Download complete', apkName + ' saved to Downloads', apkName); } catch (eN) {}
-            }
-            setTimeout(function () { setDownloadingUI(false); }, 2200);
+            if (btnLabel) btnLabel.textContent = 'Downloading…';
+            setTimeout(function () { setDownloadingUI(false); }, 2500);
             return;
           }
 
-          // Website / normal browser
-          var a = document.createElement('a');
-          a.href = url;
-          a.setAttribute('download', apkName);
-          a.style.display = 'none';
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          if (fileHint) fileHint.textContent = 'Download started — check your Downloads folder.';
-          if (btnLabel) btnLabel.textContent = 'Download Started';
+          // Fallback
+          window.location.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'filename=' + encodeURIComponent(apkName);
+          if (fileHint) fileHint.textContent = 'Download started — check Downloads.';
           setTimeout(function () { setDownloadingUI(false); }, 1800);
         } catch (err) {
           console.error(err);

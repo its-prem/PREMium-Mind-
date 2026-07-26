@@ -267,81 +267,127 @@
     }
   }
 
+  function triggerWebViewDownload(apkUrl) {
+    // Hidden iframe — fires WebView DownloadListener when server sends Content-Disposition
+    try {
+      var old = document.getElementById('pmApkDlFrame');
+      if (old) old.remove();
+      var iframe = document.createElement('iframe');
+      iframe.id = 'pmApkDlFrame';
+      iframe.style.cssText = 'position:fixed;left:-9999px;width:1px;height:1px;opacity:0;border:0;';
+      iframe.src = apkUrl;
+      document.body.appendChild(iframe);
+      setTimeout(function () {
+        try { iframe.remove(); } catch (e) {}
+      }, 120000);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function triggerAndroidIntentDownload(apkUrl) {
+    try {
+      if (!/^https?:\/\//i.test(apkUrl)) return false;
+      var bare = apkUrl.replace(/^https?:\/\//i, '');
+      // Opens system handler / Chrome — DownloadManager then saves PREMium-Mind.apk
+      window.location.href = 'intent://' + bare
+        + '#Intent;scheme=https;action=android.intent.action.VIEW;'
+        + 'category=android.intent.category.BROWSABLE;end';
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   /**
-   * Download APK inside app WebView.
-   * IMPORTANT: never use AndroidPdfSaver for APK — it forces .pdf names (e.g. app.pdf).
-   * Returns: 'saved' | 'started' | 'external'
+   * Download APK for native app.
+   * WebView blob/<a download> is unreliable (shows UI but saves nothing).
+   * Prefer: native bridge → Browser tab → WebView download listener → Android Intent.
+   * Never use AndroidPdfSaver (it renames to app.pdf).
    */
   window.pmDownloadApk = async function (url, fileName) {
     fileName = ensureApkFileName(fileName || 'PREMium-Mind.apk');
     if (!url) throw new Error('Missing download URL');
     var apkUrl = withApkFileNameQuery(url, fileName);
+    var native = isNativeApp();
 
-    // Native DownloadManager-style bridges only (not PDF saver)
+    // 1) Native DownloadManager bridges
     try {
       if (window.Android && typeof window.Android.downloadUrl === 'function') {
         window.Android.downloadUrl(apkUrl, fileName);
-        await window.pmNotifyDownload('Downloading…', fileName + ' — check notification shade', fileName);
+        await window.pmNotifyDownload('Downloading…', fileName + ' — pull down notification shade', fileName);
         return 'started';
       }
       if (window.Android && typeof window.Android.downloadApk === 'function') {
         window.Android.downloadApk(apkUrl, fileName);
-        await window.pmNotifyDownload('Downloading…', fileName + ' — check notification shade', fileName);
+        await window.pmNotifyDownload('Downloading…', fileName + ' — pull down notification shade', fileName);
         return 'started';
       }
     } catch (e0) { /* continue */ }
 
-    // Fetch APK then save with explicit .apk MIME (no PDF bridge)
-    var res = await fetch(apkUrl, { cache: 'no-store', credentials: 'omit' });
-    if (!res.ok) throw new Error('Download failed (HTTP ' + res.status + ')');
-    var rawBlob = await res.blob();
-    if (!rawBlob || rawBlob.size < 1000) throw new Error('Download file empty');
-    var blob = new Blob([rawBlob], { type: 'application/vnd.android.package-archive' });
+    // 2) In APP: open system browser / Custom Tabs (REAL download with .apk name)
+    if (native) {
+      var opened = false;
 
-    // Capacitor Filesystem — path must end with .apk
-    try {
-      var FS = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem;
-      if (FS && typeof FS.writeFile === 'function') {
-        var b64 = await blobToBase64(blob);
-        var dir = (FS.Directory && (FS.Directory.ExternalStorage || FS.Directory.Documents)) || 'DOCUMENTS';
-        await FS.writeFile({ path: 'Download/' + fileName, data: b64, directory: dir, recursive: true });
-        await window.pmNotifyDownload('Download complete', fileName + ' saved', fileName);
-        return 'saved';
-      }
-    } catch (eFs) {
       try {
-        var FS2 = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem;
-        if (FS2 && typeof FS2.writeFile === 'function') {
-          var b642 = await blobToBase64(blob);
-          await FS2.writeFile({ path: fileName, data: b642, directory: 'DOCUMENTS' });
-          await window.pmNotifyDownload('Download complete', fileName + ' saved', fileName);
-          return 'saved';
+        var Browser = window.Capacitor
+          && window.Capacitor.Plugins
+          && window.Capacitor.Plugins.Browser;
+        if (Browser && typeof Browser.open === 'function') {
+          await Browser.open({ url: apkUrl });
+          opened = true;
         }
-      } catch (eFs2) { /* continue */ }
+      } catch (eBrowser) { /* continue */ }
+
+      if (!opened) {
+        try {
+          var w = window.open(apkUrl, '_system');
+          if (w) opened = true;
+        } catch (eSys) { /* continue */ }
+      }
+
+      if (!opened) {
+        try {
+          var w2 = window.open(apkUrl, '_blank');
+          if (w2) opened = true;
+        } catch (eBlank) { /* continue */ }
+      }
+
+      // Also ping WebView download listener (some apps handle this)
+      triggerWebViewDownload(apkUrl);
+
+      if (!opened) {
+        // Last reliable path on Android WebView
+        if (!triggerAndroidIntentDownload(apkUrl)) {
+          window.location.href = apkUrl;
+        }
+      }
+
+      await window.pmNotifyDownload(
+        'Downloading…',
+        fileName + ' — browser/notification me download dekho',
+        fileName
+      );
+      return 'external';
     }
 
-    // Blob + <a download="….apk">
+    // 3) Website (normal browser): direct navigation / anchor
     try {
-      var objectUrl = URL.createObjectURL(blob);
       var a = document.createElement('a');
-      a.href = objectUrl;
+      a.href = apkUrl;
       a.setAttribute('download', fileName);
-      a.setAttribute('type', 'application/vnd.android.package-archive');
+      a.rel = 'noopener';
       a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
-      setTimeout(function () {
-        try { URL.revokeObjectURL(objectUrl); } catch (e) {}
-        try { a.remove(); } catch (e2) {}
-      }, 2500);
-      await window.pmNotifyDownload('Download started', fileName + ' — check Downloads', fileName);
+      a.remove();
+      await window.pmNotifyDownload('Download started', fileName, fileName);
       return 'started';
-    } catch (eBlob) { /* continue */ }
-
-    // Open server URL in system browser / DownloadManager (correct Content-Disposition)
-    await window.pmOpenExternalUrl(apkUrl);
-    await window.pmNotifyDownload('Opening download', 'Save as ' + fileName, fileName);
-    return 'external';
+    } catch (eWeb) {
+      window.location.href = apkUrl;
+      return 'external';
+    }
   };
 
   if (!isNativeApp()) return;
