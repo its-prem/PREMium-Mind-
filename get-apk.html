@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download PREMium Mind APK</title>
+  <link rel="icon" type="image/png" href="small-logo.png">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Poppins, system-ui, sans-serif;
+      background: #f8fafc;
+      color: #111;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    .box {
+      max-width: 420px;
+      width: 100%;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 28px 22px;
+      text-align: center;
+      box-shadow: 0 12px 36px rgba(15,23,42,.08);
+    }
+    h1 { margin: 0 0 8px; font-size: 1.25rem; }
+    p { margin: 0 0 18px; color: #64748b; font-size: .9rem; line-height: 1.45; }
+    a.btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #111;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      padding: 14px 20px;
+      border-radius: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .hint { margin-top: 14px; font-size: .78rem; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Downloading APK…</h1>
+    <p id="msg">PREMium-Mind.apk download start ho raha hai. Agar auto start na ho to neeche button dabao.</p>
+    <a class="btn" id="dl" href="https://premind.diplomawallah.in/download_apk.php?filename=PREMium-Mind.apk">Download PREMium-Mind.apk</a>
+    <p class="hint">File Downloads folder me <strong>PREMium-Mind.apk</strong> naam se aani chahiye (PDF nahi).</p>
+  </div>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var name = params.get('filename') || 'PREMium-Mind.apk';
+      if (!/\.apk$/i.test(name)) name = 'PREMium-Mind.apk';
+      var url = 'https://premind.diplomawallah.in/download_apk.php?filename=' + encodeURIComponent(name);
+      var a = document.getElementById('dl');
+      a.href = url;
+      a.setAttribute('download', name);
+      // Auto-start in real browser / Chrome
+      setTimeout(function () {
+        window.location.href = url;
+      }, 400);
+    })();
+  </script>
+</body>
+</html>

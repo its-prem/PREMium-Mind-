@@ -55,19 +55,23 @@
     } catch (e) { /* ignore */ }
   }
 
-  /** Open APK / external URL outside WebView (in-app <a download> often fails) */
-  window.pmOpenExternalUrl = async function (url) {
+  /** Force open URL in Chrome / system browser (WebView cannot save APK) */
+  window.pmOpenInChrome = function (url) {
     if (!url) return false;
+    var opened = false;
+
+    // Capacitor Browser (Custom Tabs)
     try {
       var Browser = window.Capacitor
         && window.Capacitor.Plugins
         && window.Capacitor.Plugins.Browser;
       if (Browser && typeof Browser.open === 'function') {
-        await Browser.open({ url: url });
-        return true;
+        Browser.open({ url: url });
+        opened = true;
       }
-    } catch (e1) { /* continue */ }
+    } catch (e0) { /* continue */ }
 
+    // Native bridges
     try {
       if (window.Android && typeof window.Android.openUrl === 'function') {
         window.Android.openUrl(url);
@@ -77,16 +81,31 @@
         window.Android.openExternal(url);
         return true;
       }
-      if (window.Android && typeof window.Android.downloadUrl === 'function') {
-        window.Android.downloadUrl(url);
-        return true;
-      }
+    } catch (e1) { /* continue */ }
+
+    if (opened) return true;
+
+    try {
+      // Force Google Chrome on Android
+      window.location.href = 'googlechrome://navigate?url=' + encodeURIComponent(url);
+      return true;
     } catch (e2) { /* continue */ }
 
     try {
-      var w = window.open(url, '_blank');
-      if (w) return true;
+      if (/^https?:\/\//i.test(url)) {
+        var bare = url.replace(/^https?:\/\//i, '');
+        window.location.href =
+          'intent://' + bare
+          + '#Intent;scheme=https;package=com.android.chrome;'
+          + 'S.browser_fallback_url=' + encodeURIComponent(url) + ';end';
+        return true;
+      }
     } catch (e3) { /* continue */ }
+
+    try {
+      var w = window.open(url, '_system');
+      if (w) return true;
+    } catch (e4) { /* continue */ }
 
     try {
       var a = document.createElement('a');
@@ -97,19 +116,18 @@
       a.click();
       a.remove();
       return true;
-    } catch (e4) { /* continue */ }
-
-    // Android: hand off to system browser / download manager
-    try {
-      var ua = navigator.userAgent || '';
-      if (/Android/i.test(ua) && /^https?:\/\//i.test(url)) {
-        var bare = url.replace(/^https?:\/\//i, '');
-        window.location.href = 'intent://' + bare
-          + '#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end';
-        return true;
-      }
     } catch (e5) { /* continue */ }
 
+    window.location.href = url;
+    return true;
+  };
+
+  /** Open APK / external URL outside WebView (in-app <a download> often fails) */
+  window.pmOpenExternalUrl = async function (url) {
+    if (!url) return false;
+    try {
+      if (window.pmOpenInChrome(url)) return true;
+    } catch (e) { /* continue */ }
     window.location.href = url;
     return true;
   };
@@ -158,11 +176,12 @@
     title = title || 'Download complete';
     body = body || ((fileName || 'File') + ' saved to Downloads');
     fileName = fileName || '';
+    var isApk = /\.apk$/i.test(fileName) || /apk/i.test(title + ' ' + body);
 
-    // Native Android bridges
+    // Native Android bridges — skip AndroidPdfSaver for APK (it toasts "PDF saved")
     try {
       var saver = window.AndroidPdfSaver;
-      if (saver) {
+      if (saver && !isApk) {
         if (typeof saver.showNotification === 'function') {
           saver.showNotification(title, body, fileName);
         } else if (typeof saver.notify === 'function') {
@@ -302,80 +321,35 @@
 
   /**
    * Download APK.
-   * Website: normal browser download works.
-   * App WebView: <a download>/Browser/intent usually blocked — use same AndroidPdfSaver
-   * path that already saves course PDFs (only proven file writer in this app).
+   * NEVER use AndroidPdfSaver here — it always saves as PDF ("PDF saved to Downloads").
+   * App WebView cannot install APK via blob; use DownloadManager bridge or Chrome.
    */
   window.pmDownloadApk = async function (url, fileName) {
     fileName = ensureApkFileName(fileName || 'PREMium-Mind.apk');
     if (!url) throw new Error('Missing download URL');
     var apkUrl = withApkFileNameQuery(url, fileName);
     var native = isNativeApp();
-    var apkMime = 'application/vnd.android.package-archive';
 
-    // 1) Native DownloadManager bridges (best if present in Android app)
+    // Landing page that auto-starts APK download inside real Chrome/browser
+    var chromeLanding = 'https://premind.netlify.app/get-apk.html?filename='
+      + encodeURIComponent(fileName)
+      + '&t=' + Date.now();
+
+    // 1) Real DownloadManager bridge (from PmDownloadBridge.java) — only path that saves .apk in-app
     try {
       if (window.Android && typeof window.Android.downloadUrl === 'function') {
         window.Android.downloadUrl(apkUrl, fileName);
-        await window.pmNotifyDownload('Downloading…', fileName + ' — notification shade check karo', fileName);
+        await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification shade check karo', fileName);
         return 'started';
       }
       if (window.Android && typeof window.Android.downloadApk === 'function') {
         window.Android.downloadApk(apkUrl, fileName);
-        await window.pmNotifyDownload('Downloading…', fileName + ' — notification shade check karo', fileName);
-        return 'started';
-      }
-      if (window.AndroidPdfSaver && typeof window.AndroidPdfSaver.downloadUrl === 'function') {
-        window.AndroidPdfSaver.downloadUrl(apkUrl, fileName);
-        await window.pmNotifyDownload('Downloading…', fileName + ' — notification shade check karo', fileName);
+        await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification shade check karo', fileName);
         return 'started';
       }
     } catch (e0) { /* continue */ }
 
-    // 2) APP: fetch bytes + AndroidPdfSaver (same as working PDF download)
-    if (native && window.AndroidPdfSaver && typeof window.AndroidPdfSaver.begin === 'function') {
-      var res = await fetch(apkUrl, { cache: 'no-store', credentials: 'omit' });
-      if (!res.ok) throw new Error('Download failed (HTTP ' + res.status + ')');
-      var rawBlob = await res.blob();
-      if (!rawBlob || rawBlob.size < 1000) throw new Error('Download file empty');
-      var blob = new Blob([rawBlob], { type: apkMime });
-
-      var saved = await saveBlobViaAndroidBridge(blob, fileName, apkMime);
-      if (saved) {
-        await window.pmNotifyDownload(
-          'Download complete',
-          fileName + ' Downloads folder me save ho gaya',
-          fileName
-        );
-        return 'saved';
-      }
-    }
-
-    // 3) Capacitor Filesystem (if plugin installed)
-    if (native) {
-      try {
-        var resFs = await fetch(apkUrl, { cache: 'no-store', credentials: 'omit' });
-        if (resFs.ok) {
-          var blobFs = await resFs.blob();
-          if (blobFs && blobFs.size >= 1000) {
-            var FS = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem;
-            if (FS && typeof FS.writeFile === 'function') {
-              var b64 = await blobToBase64(new Blob([blobFs], { type: apkMime }));
-              var dir = (FS.Directory && (FS.Directory.ExternalStorage || FS.Directory.Documents)) || 'DOCUMENTS';
-              try {
-                await FS.writeFile({ path: 'Download/' + fileName, data: b64, directory: dir, recursive: true });
-              } catch (eDir) {
-                await FS.writeFile({ path: fileName, data: b64, directory: 'DOCUMENTS' });
-              }
-              await window.pmNotifyDownload('Download complete', fileName + ' saved', fileName);
-              return 'saved';
-            }
-          }
-        }
-      } catch (eFs) { /* continue */ }
-    }
-
-    // 4) Website / last fallback — open download URL
+    // 2) Website (normal browser) — direct download works
     if (!native) {
       try {
         var a = document.createElement('a');
@@ -393,8 +367,21 @@
       }
     }
 
-    await window.pmOpenExternalUrl(apkUrl);
-    await window.pmNotifyDownload('Opening download', fileName + ' — browser me complete karo', fileName);
+    // 3) APP: open Chrome / system browser (website download works there)
+    // Do NOT call AndroidPdfSaver — that creates fake "PDF saved" toast.
+    try {
+      window.pmOpenInChrome(chromeLanding);
+    } catch (eChrome) {
+      try { window.pmOpenInChrome(apkUrl); } catch (e2) {
+        window.location.href = apkUrl;
+      }
+    }
+
+    await window.pmNotifyDownload(
+      'Chrome me open karo',
+      'App ke andar APK save nahi hota. Chrome me ' + fileName + ' download hoga.',
+      fileName
+    );
     return 'external';
   };
 
