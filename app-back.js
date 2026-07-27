@@ -324,19 +324,13 @@
 
   /**
    * Download APK.
-   * Website: normal browser download.
-   * App: WebView cannot open chrome:// (Webpage not available) and cannot blob-download.
-   * Working options in app:
-   *  1) Android.downloadUrl bridge (if added)
-   *  2) System Share sheet → user picks Chrome (download starts)
-   *  3) AndroidPdfSaver saves file to Downloads (may show .pdf name — rename to .apk)
+   * App with PmDownloadBridge / CashfreeBridge.downloadUrl → real .apk via DownloadManager.
    */
   window.pmDownloadApk = async function (url, fileName) {
     fileName = ensureApkFileName(fileName || 'PREMium-Mind.apk');
     if (!url) throw new Error('Missing download URL');
     var apkUrl = withApkFileNameQuery(url, fileName);
     var native = isNativeApp();
-    var apkMime = 'application/vnd.android.package-archive';
 
     // Website — direct download works
     if (!native) {
@@ -356,64 +350,43 @@
       }
     }
 
-    // --- APP PATHS ---
-
-    // 1) Native DownloadManager (PmDownloadBridge.java)
+    // APP: native DownloadManager (CashfreeBridge now has downloadUrl)
     try {
       if (window.Android && typeof window.Android.downloadUrl === 'function') {
         window.Android.downloadUrl(apkUrl, fileName);
-        await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification check karo', fileName);
+        await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification shade check karo', fileName);
         return 'started';
       }
       if (window.Android && typeof window.Android.downloadApk === 'function') {
         window.Android.downloadApk(apkUrl, fileName);
-        await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification check karo', fileName);
+        await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification shade check karo', fileName);
         return 'started';
       }
     } catch (e0) { /* continue */ }
 
-    // 2) System Share → user opens in Chrome (most reliable without app rebuild)
+    // Fallback: open URL via native openUrl (external browser)
+    try {
+      if (window.Android && typeof window.Android.openUrl === 'function') {
+        window.Android.openUrl(apkUrl);
+        await window.pmNotifyDownload('Opening download', fileName + ' — browser me complete karo', fileName);
+        return 'external';
+      }
+    } catch (e1) { /* continue */ }
+
+    // Last: Share sheet
     try {
       if (navigator.share) {
         await navigator.share({
           title: 'PREMium Mind APK',
-          text: 'PREMium Mind app download: ' + fileName,
+          text: 'PREMium Mind app download',
           url: apkUrl
         });
-        await window.pmNotifyDownload(
-          'Share sheet open',
-          'Chrome choose karo — download start ho jayega',
-          fileName
-        );
         return 'shared';
       }
     } catch (eShare) {
-      // user cancelled share — continue to other methods
-      if (eShare && (eShare.name === 'AbortError' || /abort|cancel/i.test(String(eShare.message || '')))) {
-        return 'cancelled';
-      }
+      if (eShare && eShare.name === 'AbortError') return 'cancelled';
     }
 
-    // 3) AndroidPdfSaver — ONLY bridge that actually writes files in this app
-    //    (native may force .pdf name; content is still APK — rename if needed)
-    if (window.AndroidPdfSaver && typeof window.AndroidPdfSaver.begin === 'function') {
-      var res = await fetch(apkUrl, { cache: 'no-store', credentials: 'omit' });
-      if (!res.ok) throw new Error('Download failed (HTTP ' + res.status + ')');
-      var rawBlob = await res.blob();
-      if (!rawBlob || rawBlob.size < 1000) throw new Error('Download file empty');
-      var blob = new Blob([rawBlob], { type: apkMime });
-      var saved = await saveBlobViaAndroidBridge(blob, fileName, apkMime);
-      if (saved) {
-        await window.pmNotifyDownload(
-          'File saved',
-          'Downloads folder check karo. Agar .pdf dikhe to rename → ' + fileName,
-          fileName
-        );
-        return 'saved';
-      }
-    }
-
-    // 4) Could not auto-download — caller should show copy/share UI
     return 'need_help';
   };
 
