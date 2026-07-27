@@ -55,23 +55,29 @@
     } catch (e) { /* ignore */ }
   }
 
-  /** Force open URL in Chrome / system browser (WebView cannot save APK) */
+  /** Force open URL in Chrome so APK download can start (WebView cannot save APK) */
   window.pmOpenInChrome = function (url) {
     if (!url) return false;
-    var opened = false;
 
-    // Capacitor Browser (Custom Tabs)
+    // 1) Force Google Chrome first (not in-app Custom Tab)
     try {
-      var Browser = window.Capacitor
-        && window.Capacitor.Plugins
-        && window.Capacitor.Plugins.Browser;
-      if (Browser && typeof Browser.open === 'function') {
-        Browser.open({ url: url });
-        opened = true;
-      }
+      window.location.href = 'googlechrome://navigate?url=' + encodeURIComponent(url);
+      return true;
     } catch (e0) { /* continue */ }
 
-    // Native bridges
+    // 2) Chrome Intent
+    try {
+      if (/^https?:\/\//i.test(url)) {
+        var bare = url.replace(/^https?:\/\//i, '');
+        window.location.href =
+          'intent://' + bare
+          + '#Intent;scheme=https;package=com.android.chrome;'
+          + 'S.browser_fallback_url=' + encodeURIComponent(url) + ';end';
+        return true;
+      }
+    } catch (e1) { /* continue */ }
+
+    // 3) Native openUrl bridge
     try {
       if (window.Android && typeof window.Android.openUrl === 'function') {
         window.Android.openUrl(url);
@@ -81,23 +87,15 @@
         window.Android.openExternal(url);
         return true;
       }
-    } catch (e1) { /* continue */ }
-
-    if (opened) return true;
-
-    try {
-      // Force Google Chrome on Android
-      window.location.href = 'googlechrome://navigate?url=' + encodeURIComponent(url);
-      return true;
     } catch (e2) { /* continue */ }
 
+    // 4) Capacitor Browser (Custom Tabs) — last resort
     try {
-      if (/^https?:\/\//i.test(url)) {
-        var bare = url.replace(/^https?:\/\//i, '');
-        window.location.href =
-          'intent://' + bare
-          + '#Intent;scheme=https;package=com.android.chrome;'
-          + 'S.browser_fallback_url=' + encodeURIComponent(url) + ';end';
+      var Browser = window.Capacitor
+        && window.Capacitor.Plugins
+        && window.Capacitor.Plugins.Browser;
+      if (Browser && typeof Browser.open === 'function') {
+        Browser.open({ url: url });
         return true;
       }
     } catch (e3) { /* continue */ }
@@ -122,7 +120,7 @@
     return true;
   };
 
-  /** Open APK / external URL outside WebView (in-app <a download> often fails) */
+  /** Open APK / external URL outside WebView */
   window.pmOpenExternalUrl = async function (url) {
     if (!url) return false;
     try {
@@ -321,8 +319,8 @@
 
   /**
    * Download APK.
-   * NEVER use AndroidPdfSaver here — it always saves as PDF ("PDF saved to Downloads").
-   * App WebView cannot install APK via blob; use DownloadManager bridge or Chrome.
+   * App: redirect to Chrome with direct download URL so download starts immediately.
+   * Never use AndroidPdfSaver (saves as PDF).
    */
   window.pmDownloadApk = async function (url, fileName) {
     fileName = ensureApkFileName(fileName || 'PREMium-Mind.apk');
@@ -330,26 +328,7 @@
     var apkUrl = withApkFileNameQuery(url, fileName);
     var native = isNativeApp();
 
-    // Landing page that auto-starts APK download inside real Chrome/browser
-    var chromeLanding = 'https://premind.netlify.app/get-apk.html?filename='
-      + encodeURIComponent(fileName)
-      + '&t=' + Date.now();
-
-    // 1) Real DownloadManager bridge (from PmDownloadBridge.java) — only path that saves .apk in-app
-    try {
-      if (window.Android && typeof window.Android.downloadUrl === 'function') {
-        window.Android.downloadUrl(apkUrl, fileName);
-        await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification shade check karo', fileName);
-        return 'started';
-      }
-      if (window.Android && typeof window.Android.downloadApk === 'function') {
-        window.Android.downloadApk(apkUrl, fileName);
-        await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification shade check karo', fileName);
-        return 'started';
-      }
-    } catch (e0) { /* continue */ }
-
-    // 2) Website (normal browser) — direct download works
+    // Website (normal browser) — direct download
     if (!native) {
       try {
         var a = document.createElement('a');
@@ -367,19 +346,32 @@
       }
     }
 
-    // 3) APP: open Chrome / system browser (website download works there)
-    // Do NOT call AndroidPdfSaver — that creates fake "PDF saved" toast.
+    // APP: always open Chrome with direct APK URL → download starts in Chrome
+    // (Optional native DownloadManager if you added PmDownloadBridge.java)
     try {
-      window.pmOpenInChrome(chromeLanding);
-    } catch (eChrome) {
-      try { window.pmOpenInChrome(apkUrl); } catch (e2) {
-        window.location.href = apkUrl;
+      if (window.Android && typeof window.Android.downloadUrl === 'function') {
+        window.Android.downloadUrl(apkUrl, fileName);
+        await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification shade check karo', fileName);
+        return 'started';
       }
-    }
+    } catch (e0) { /* continue to Chrome */ }
+
+    window.pmOpenInChrome(apkUrl);
+
+    // Backup after short delay if Chrome scheme was blocked
+    setTimeout(function () {
+      try {
+        var bare = apkUrl.replace(/^https?:\/\//i, '');
+        window.location.href =
+          'intent://' + bare
+          + '#Intent;scheme=https;package=com.android.chrome;'
+          + 'S.browser_fallback_url=' + encodeURIComponent(apkUrl) + ';end';
+      } catch (eBackup) { /* ignore */ }
+    }, 700);
 
     await window.pmNotifyDownload(
-      'Chrome me open karo',
-      'App ke andar APK save nahi hota. Chrome me ' + fileName + ' download hoga.',
+      'Chrome open ho raha hai',
+      fileName + ' download Chrome me start hoga',
       fileName
     );
     return 'external';
