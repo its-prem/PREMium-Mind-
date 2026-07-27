@@ -324,21 +324,21 @@
 
   /**
    * Download APK.
-   * App: open HTTPS get-apk / download URL in external browser (no chrome:// schemes).
-   * Never use AndroidPdfSaver (saves as PDF).
+   * Website: normal browser download.
+   * App: WebView cannot open chrome:// (Webpage not available) and cannot blob-download.
+   * Working options in app:
+   *  1) Android.downloadUrl bridge (if added)
+   *  2) System Share sheet → user picks Chrome (download starts)
+   *  3) AndroidPdfSaver saves file to Downloads (may show .pdf name — rename to .apk)
    */
   window.pmDownloadApk = async function (url, fileName) {
     fileName = ensureApkFileName(fileName || 'PREMium-Mind.apk');
     if (!url) throw new Error('Missing download URL');
     var apkUrl = withApkFileNameQuery(url, fileName);
     var native = isNativeApp();
+    var apkMime = 'application/vnd.android.package-archive';
 
-    // Real HTTPS landing page — auto-starts APK download in browser
-    var landingUrl = 'https://premind.netlify.app/get-apk.html?filename='
-      + encodeURIComponent(fileName)
-      + '&t=' + Date.now();
-
-    // Website (normal browser) — direct download
+    // Website — direct download works
     if (!native) {
       try {
         var a = document.createElement('a');
@@ -356,53 +356,87 @@
       }
     }
 
-    // Optional native DownloadManager
+    // --- APP PATHS ---
+
+    // 1) Native DownloadManager (PmDownloadBridge.java)
     try {
       if (window.Android && typeof window.Android.downloadUrl === 'function') {
         window.Android.downloadUrl(apkUrl, fileName);
-        await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification shade check karo', fileName);
+        await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification check karo', fileName);
+        return 'started';
+      }
+      if (window.Android && typeof window.Android.downloadApk === 'function') {
+        window.Android.downloadApk(apkUrl, fileName);
+        await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification check karo', fileName);
         return 'started';
       }
     } catch (e0) { /* continue */ }
 
-    // Open HTTPS page in external browser / Custom Tabs (safe — no Webpage not available)
-    var opened = false;
+    // 2) System Share → user opens in Chrome (most reliable without app rebuild)
     try {
-      opened = await window.pmOpenInChrome(landingUrl);
-    } catch (e1) { opened = false; }
-
-    if (!opened) {
-      try {
-        opened = await window.pmOpenInChrome(apkUrl);
-      } catch (e2) { opened = false; }
+      if (navigator.share) {
+        await navigator.share({
+          title: 'PREMium Mind APK',
+          text: 'PREMium Mind app download: ' + fileName,
+          url: apkUrl
+        });
+        await window.pmNotifyDownload(
+          'Share sheet open',
+          'Chrome choose karo — download start ho jayega',
+          fileName
+        );
+        return 'shared';
+      }
+    } catch (eShare) {
+      // user cancelled share — continue to other methods
+      if (eShare && (eShare.name === 'AbortError' || /abort|cancel/i.test(String(eShare.message || '')))) {
+        return 'cancelled';
+      }
     }
 
-    // If still not opened externally, show in-page fallback (do NOT navigate to chrome://)
-    if (!opened) {
-      try {
-        var box = document.getElementById('apkChromeFallback');
-        if (!box) {
-          box = document.createElement('div');
-          box.id = 'apkChromeFallback';
-          box.style.cssText = 'margin:14px 0 0;padding:14px;border:1px solid #fecaca;background:#fef2f2;border-radius:12px;text-align:center;';
-          var hint = document.getElementById('fileHint');
-          if (hint && hint.parentNode) hint.parentNode.insertBefore(box, hint.nextSibling);
-          else document.body.appendChild(box);
-        }
-        box.innerHTML =
-          '<p style="margin:0 0 10px;font-size:.85rem;color:#991b1b;font-weight:600;">Browser me open nahi hua. Neeche link dabao:</p>'
-          + '<a href="' + landingUrl + '" target="_blank" rel="noopener" '
-          + 'style="display:inline-block;background:#111;color:#fff;padding:12px 16px;border-radius:10px;font-weight:700;text-decoration:none;">'
-          + 'Open Download in Browser</a>';
-      } catch (e3) { /* ignore */ }
+    // 3) AndroidPdfSaver — ONLY bridge that actually writes files in this app
+    //    (native may force .pdf name; content is still APK — rename if needed)
+    if (window.AndroidPdfSaver && typeof window.AndroidPdfSaver.begin === 'function') {
+      var res = await fetch(apkUrl, { cache: 'no-store', credentials: 'omit' });
+      if (!res.ok) throw new Error('Download failed (HTTP ' + res.status + ')');
+      var rawBlob = await res.blob();
+      if (!rawBlob || rawBlob.size < 1000) throw new Error('Download file empty');
+      var blob = new Blob([rawBlob], { type: apkMime });
+      var saved = await saveBlobViaAndroidBridge(blob, fileName, apkMime);
+      if (saved) {
+        await window.pmNotifyDownload(
+          'File saved',
+          'Downloads folder check karo. Agar .pdf dikhe to rename → ' + fileName,
+          fileName
+        );
+        return 'saved';
+      }
     }
 
-    await window.pmNotifyDownload(
-      opened ? 'Browser open ho raha hai' : 'Browser link use karo',
-      fileName + ' download browser me start hoga',
-      fileName
-    );
-    return 'external';
+    // 4) Could not auto-download — caller should show copy/share UI
+    return 'need_help';
+  };
+
+  window.pmCopyText = async function (text) {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (e) { /* continue */ }
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.remove();
+      return !!ok;
+    } catch (e2) {
+      return false;
+    }
   };
 
   if (!isNativeApp()) return;

@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-  <script src="app-back.js?v=20260727fix1"></script>
+  <script src="app-back.js?v=20260727share1"></script>
   <style>
     :root {
       --ink: #111;
@@ -488,6 +488,27 @@
         <span id="downloadBtnLabel">Download Latest APK</span>
       </a>
       <p class="hint" id="fileHint">Loading version info…</p>
+
+      <!-- Always shown in APP — Share / Copy works when Chrome redirect fails -->
+      <div id="inAppDlHelp" style="display:none; margin-top:14px; text-align:left;">
+        <p style="margin:0 0 10px; font-size:.82rem; color:#334155; line-height:1.45; font-weight:600;">
+          App ke andar Chrome redirect block ho sakta hai. Ye use karo:
+        </p>
+        <button type="button" id="shareApkBtn" class="dl-btn" style="width:100%; margin:0 0 10px; background:#2563eb;">
+          Share → Chrome me open karo
+        </button>
+        <button type="button" id="copyApkBtn" class="dl-btn" style="width:100%; margin:0 0 10px; background:#fff; color:#111; border:1px solid #cbd5e1;">
+          Copy Download Link
+        </button>
+        <a id="waApkBtn" class="dl-btn" href="#" target="_blank" rel="noopener"
+           style="width:100%; margin:0; background:#16a34a; box-sizing:border-box; text-decoration:none;">
+          WhatsApp pe link bhejo
+        </a>
+        <p id="inAppDlNote" style="margin:10px 0 0; font-size:.75rem; color:#64748b; line-height:1.4;">
+          Share dabao → Chrome select karo → APK download start hoga.
+        </p>
+      </div>
+
       <div class="open-app" id="openAppBox">
         <a href="#" id="openAppLink">App already installed? Open App →</a>
       </div>
@@ -565,9 +586,36 @@
       var btn = document.getElementById('downloadBtn');
       var btnLabel = document.getElementById('downloadBtnLabel');
       var fileHint = document.getElementById('fileHint');
+      var helpBox = document.getElementById('inAppDlHelp');
+      var shareBtn = document.getElementById('shareApkBtn');
+      var copyBtn = document.getElementById('copyApkBtn');
+      var waBtn = document.getElementById('waApkBtn');
       var apkHref = 'https://premind.diplomawallah.in/download_apk.php';
       var apkName = 'PREMium-Mind.apk';
       var downloading = false;
+
+      function isInApp() {
+        return (window.pmIsNativeApp && window.pmIsNativeApp())
+          || document.documentElement.classList.contains('pm-native')
+          || /; wv\)|Capacitor|premiummind/i.test(navigator.userAgent || '')
+          || !!window.AndroidPdfSaver;
+      }
+
+      function fullApkUrl() {
+        var u = apkHref || 'https://premind.diplomawallah.in/download_apk.php';
+        var join = u.indexOf('?') >= 0 ? '&' : '?';
+        return u + join + 'filename=' + encodeURIComponent(apkName);
+      }
+
+      function showInAppHelp() {
+        if (!isInApp() || !helpBox) return;
+        helpBox.style.display = 'block';
+        if (waBtn) {
+          waBtn.href = 'https://wa.me/?text=' + encodeURIComponent(
+            'PREMium Mind APK download:\n' + fullApkUrl()
+          );
+        }
+      }
 
       function setDownloadingUI(on) {
         downloading = !!on;
@@ -577,7 +625,7 @@
           btn.setAttribute('aria-busy', 'true');
           btn.innerHTML = '<span class="dl-spinner" aria-hidden="true"></span><span id="downloadBtnLabel">Downloading…</span>';
           btnLabel = document.getElementById('downloadBtnLabel');
-          if (fileHint) fileHint.textContent = 'Please wait — APK download in progress…';
+          if (fileHint) fileHint.textContent = 'Please wait…';
         } else {
           btn.classList.remove('is-downloading');
           btn.removeAttribute('aria-busy');
@@ -586,11 +634,43 @@
         }
       }
 
-      function isInApp() {
-        return (window.pmIsNativeApp && window.pmIsNativeApp())
-          || document.documentElement.classList.contains('pm-native')
-          || /; wv\)|Capacitor|premiummind/i.test(navigator.userAgent || '');
+      async function doShare() {
+        var url = fullApkUrl();
+        try {
+          if (navigator.share) {
+            await navigator.share({
+              title: 'PREMium Mind APK',
+              text: 'PREMium Mind app download',
+              url: url
+            });
+            if (fileHint) fileHint.textContent = 'Chrome choose karo → download start hoga.';
+            return;
+          }
+        } catch (e) {
+          if (e && e.name === 'AbortError') return;
+        }
+        if (window.pmCopyText && await window.pmCopyText(url)) {
+          if (fileHint) fileHint.textContent = 'Link copy ho gaya — Chrome me paste karke open karo.';
+          alert('Link copy ho gaya!\n\nChrome kholo → address bar me paste → APK download ho jayega.');
+        } else {
+          prompt('Ye link Chrome me open karo:', url);
+        }
       }
+
+      if (shareBtn) shareBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        doShare();
+      });
+      if (copyBtn) copyBtn.addEventListener('click', async function (e) {
+        e.preventDefault();
+        var url = fullApkUrl();
+        if (window.pmCopyText && await window.pmCopyText(url)) {
+          if (fileHint) fileHint.textContent = 'Link copied! Chrome me paste karke open karo.';
+          alert('Link copy ho gaya!\n\n1) Chrome kholo\n2) Address bar me paste karo\n3) APK download start hoga');
+        } else {
+          prompt('Copy this link and open in Chrome:', url);
+        }
+      });
 
       async function startDownload(e) {
         if (e) e.preventDefault();
@@ -598,41 +678,55 @@
         var url = (btn && btn.getAttribute('href')) || apkHref;
         if (!url || url === '#') return;
 
+        if (isInApp()) {
+          showInAppHelp();
+          setDownloadingUI(true);
+          try {
+            if (navigator.share) {
+              await doShare();
+              setDownloadingUI(false);
+              return;
+            }
+            if (typeof window.pmDownloadApk === 'function') {
+              var result = await window.pmDownloadApk(url, apkName);
+              if (result === 'cancelled') {
+                if (fileHint) fileHint.textContent = 'Share cancel hua. Neeche Copy / WhatsApp try karo.';
+              } else if (result === 'shared') {
+                if (fileHint) fileHint.textContent = 'Chrome choose karo — download start hoga.';
+              } else if (result === 'saved') {
+                if (fileHint) {
+                  fileHint.textContent = 'Downloads check karo. Agar PDF dikhe to rename → ' + apkName;
+                }
+                alert('File Downloads me save ho gayi.\n\nAgar naam .pdf hai to rename karke "' + apkName + '" karo, phir install karo.');
+              } else if (result === 'started') {
+                if (fileHint) fileHint.textContent = 'Downloading ' + apkName + '…';
+              } else {
+                if (fileHint) fileHint.textContent = 'Neeche Share / Copy / WhatsApp use karo.';
+              }
+            } else {
+              await doShare();
+            }
+          } catch (err) {
+            console.error(err);
+            if (fileHint) fileHint.textContent = 'Fail. Neeche Share ya Copy Link use karo.';
+          }
+          setTimeout(function () { setDownloadingUI(false); }, 1500);
+          return;
+        }
+
         setDownloadingUI(true);
         try {
           if (typeof window.pmDownloadApk === 'function') {
-            var result = await window.pmDownloadApk(url, apkName);
-            if (fileHint) {
-              if (result === 'external') {
-                fileHint.textContent = 'Browser open ho raha hai — ' + apkName + ' download start hoga.';
-              } else if (result === 'saved') {
-                fileHint.textContent = 'Saved: ' + apkName + ' — Downloads folder check karo.';
-              } else {
-                fileHint.textContent = 'Downloading ' + apkName + ' — notification / Downloads check karo.';
-              }
-            }
-            if (btnLabel) {
-              btnLabel.textContent = result === 'external' ? 'Opening browser…' : (result === 'saved' ? 'Downloaded' : 'Downloading…');
-            }
-            setTimeout(function () { setDownloadingUI(false); }, 2800);
-            return;
+            await window.pmDownloadApk(url, apkName);
+            if (fileHint) fileHint.textContent = 'Download started — Downloads folder check karo.';
+          } else {
+            window.location.href = fullApkUrl();
           }
-
-          // Fallback
-          window.location.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'filename=' + encodeURIComponent(apkName);
-          if (fileHint) fileHint.textContent = 'Download started — check Downloads.';
-          setTimeout(function () { setDownloadingUI(false); }, 1800);
         } catch (err) {
           console.error(err);
-          if (fileHint) fileHint.textContent = 'Download failed. Trying browser…';
-          try {
-            if (window.pmOpenExternalUrl) await window.pmOpenExternalUrl(url);
-            else window.location.href = url;
-          } catch (e2) {
-            window.location.href = url;
-          }
-          setTimeout(function () { setDownloadingUI(false); }, 1500);
+          window.location.href = fullApkUrl();
         }
+        setTimeout(function () { setDownloadingUI(false); }, 1800);
       }
 
       function wireDownloadClick() {
@@ -641,6 +735,7 @@
         btn.addEventListener('click', startDownload);
       }
       wireDownloadClick();
+      showInAppHelp();
 
       async function loadVersion() {
         var urls = [
@@ -676,7 +771,6 @@
         });
         if (!(info.changelog || []).length) list.innerHTML = '<li>No changelog</li>';
 
-        // Prefer PHP download endpoint — Hostinger often blocks direct .apk URLs
         apkHref = info.apkUrl || '';
         if (!apkHref || /\/downloads\/.+\.apk(\?|$)/i.test(apkHref)) {
           apkHref = 'https://premind.diplomawallah.in/download_apk.php';
@@ -693,6 +787,7 @@
           if (fileHint) fileHint.textContent = 'APK URL missing';
         }
         wireDownloadClick();
+        showInAppHelp();
 
         var params = new URLSearchParams(location.search);
         var next = params.get('next') || 'home';
@@ -706,10 +801,10 @@
         });
       } catch (e) {
         if (fileHint) fileHint.textContent = 'Could not load version info. Please try again later.';
-        // Keep download button working with default APK URL
         btn.removeAttribute('disabled');
         btn.classList.remove('is-disabled');
         wireDownloadClick();
+        showInAppHelp();
       }
     })();
   </script>
