@@ -55,29 +55,16 @@
     } catch (e) { /* ignore */ }
   }
 
-  /** Force open URL in Chrome so APK download can start (WebView cannot save APK) */
-  window.pmOpenInChrome = function (url) {
+  /**
+   * Open an HTTPS URL outside the WebView (browser / Custom Tabs).
+   * NEVER navigate to googlechrome:// or intent:// — WebView shows "Webpage not available".
+   */
+  window.pmOpenInChrome = async function (url) {
     if (!url) return false;
+    // Only allow http(s) — weird schemes break the in-app WebView
+    if (!/^https?:\/\//i.test(url)) return false;
 
-    // 1) Force Google Chrome first (not in-app Custom Tab)
-    try {
-      window.location.href = 'googlechrome://navigate?url=' + encodeURIComponent(url);
-      return true;
-    } catch (e0) { /* continue */ }
-
-    // 2) Chrome Intent
-    try {
-      if (/^https?:\/\//i.test(url)) {
-        var bare = url.replace(/^https?:\/\//i, '');
-        window.location.href =
-          'intent://' + bare
-          + '#Intent;scheme=https;package=com.android.chrome;'
-          + 'S.browser_fallback_url=' + encodeURIComponent(url) + ';end';
-        return true;
-      }
-    } catch (e1) { /* continue */ }
-
-    // 3) Native openUrl bridge
+    // 1) Native bridge
     try {
       if (window.Android && typeof window.Android.openUrl === 'function') {
         window.Android.openUrl(url);
@@ -87,47 +74,65 @@
         window.Android.openExternal(url);
         return true;
       }
-    } catch (e2) { /* continue */ }
+    } catch (e0) { /* continue */ }
 
-    // 4) Capacitor Browser (Custom Tabs) — last resort
+    // 2) Capacitor Browser → opens system browser / Custom Tabs (HTTPS works)
     try {
       var Browser = window.Capacitor
         && window.Capacitor.Plugins
         && window.Capacitor.Plugins.Browser;
       if (Browser && typeof Browser.open === 'function') {
-        Browser.open({ url: url });
+        await Browser.open({ url: url });
         return true;
       }
-    } catch (e3) { /* continue */ }
+    } catch (e1) { /* continue */ }
 
+    // 3) Cordova InAppBrowser _system
+    try {
+      if (window.cordova && window.cordova.InAppBrowser && typeof window.cordova.InAppBrowser.open === 'function') {
+        window.cordova.InAppBrowser.open(url, '_system');
+        return true;
+      }
+    } catch (e2) { /* continue */ }
+
+    // 4) _system / _blank
     try {
       var w = window.open(url, '_system');
       if (w) return true;
+    } catch (e3) { /* continue */ }
+    try {
+      var w2 = window.open(url, '_blank');
+      if (w2) return true;
     } catch (e4) { /* continue */ }
 
+    // 5) Visible user gesture link (best chance without plugins)
     try {
       var a = document.createElement('a');
       a.href = url;
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
+      a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
-      a.remove();
+      setTimeout(function () { try { a.remove(); } catch (e) {} }, 500);
       return true;
     } catch (e5) { /* continue */ }
 
-    window.location.href = url;
-    return true;
+    return false;
   };
 
-  /** Open APK / external URL outside WebView */
+  /** Open external HTTPS URL (safe for WebView) */
   window.pmOpenExternalUrl = async function (url) {
     if (!url) return false;
     try {
-      if (window.pmOpenInChrome(url)) return true;
+      if (await window.pmOpenInChrome(url)) return true;
     } catch (e) { /* continue */ }
-    window.location.href = url;
-    return true;
+    // Last resort: stay on HTTPS page only (never chrome:// schemes)
+    if (/^https?:\/\//i.test(url)) {
+      window.location.href = url;
+      return true;
+    }
+    return false;
   };
 
   function blobToBase64(blob) {
@@ -319,7 +324,7 @@
 
   /**
    * Download APK.
-   * App: redirect to Chrome with direct download URL so download starts immediately.
+   * App: open HTTPS get-apk / download URL in external browser (no chrome:// schemes).
    * Never use AndroidPdfSaver (saves as PDF).
    */
   window.pmDownloadApk = async function (url, fileName) {
@@ -327,6 +332,11 @@
     if (!url) throw new Error('Missing download URL');
     var apkUrl = withApkFileNameQuery(url, fileName);
     var native = isNativeApp();
+
+    // Real HTTPS landing page — auto-starts APK download in browser
+    var landingUrl = 'https://premind.netlify.app/get-apk.html?filename='
+      + encodeURIComponent(fileName)
+      + '&t=' + Date.now();
 
     // Website (normal browser) — direct download
     if (!native) {
@@ -346,32 +356,50 @@
       }
     }
 
-    // APP: always open Chrome with direct APK URL → download starts in Chrome
-    // (Optional native DownloadManager if you added PmDownloadBridge.java)
+    // Optional native DownloadManager
     try {
       if (window.Android && typeof window.Android.downloadUrl === 'function') {
         window.Android.downloadUrl(apkUrl, fileName);
         await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification shade check karo', fileName);
         return 'started';
       }
-    } catch (e0) { /* continue to Chrome */ }
+    } catch (e0) { /* continue */ }
 
-    window.pmOpenInChrome(apkUrl);
+    // Open HTTPS page in external browser / Custom Tabs (safe — no Webpage not available)
+    var opened = false;
+    try {
+      opened = await window.pmOpenInChrome(landingUrl);
+    } catch (e1) { opened = false; }
 
-    // Backup after short delay if Chrome scheme was blocked
-    setTimeout(function () {
+    if (!opened) {
       try {
-        var bare = apkUrl.replace(/^https?:\/\//i, '');
-        window.location.href =
-          'intent://' + bare
-          + '#Intent;scheme=https;package=com.android.chrome;'
-          + 'S.browser_fallback_url=' + encodeURIComponent(apkUrl) + ';end';
-      } catch (eBackup) { /* ignore */ }
-    }, 700);
+        opened = await window.pmOpenInChrome(apkUrl);
+      } catch (e2) { opened = false; }
+    }
+
+    // If still not opened externally, show in-page fallback (do NOT navigate to chrome://)
+    if (!opened) {
+      try {
+        var box = document.getElementById('apkChromeFallback');
+        if (!box) {
+          box = document.createElement('div');
+          box.id = 'apkChromeFallback';
+          box.style.cssText = 'margin:14px 0 0;padding:14px;border:1px solid #fecaca;background:#fef2f2;border-radius:12px;text-align:center;';
+          var hint = document.getElementById('fileHint');
+          if (hint && hint.parentNode) hint.parentNode.insertBefore(box, hint.nextSibling);
+          else document.body.appendChild(box);
+        }
+        box.innerHTML =
+          '<p style="margin:0 0 10px;font-size:.85rem;color:#991b1b;font-weight:600;">Browser me open nahi hua. Neeche link dabao:</p>'
+          + '<a href="' + landingUrl + '" target="_blank" rel="noopener" '
+          + 'style="display:inline-block;background:#111;color:#fff;padding:12px 16px;border-radius:10px;font-weight:700;text-decoration:none;">'
+          + 'Open Download in Browser</a>';
+      } catch (e3) { /* ignore */ }
+    }
 
     await window.pmNotifyDownload(
-      'Chrome open ho raha hai',
-      fileName + ' download Chrome me start hoga',
+      opened ? 'Browser open ho raha hai' : 'Browser link use karo',
+      fileName + ' download browser me start hoga',
       fileName
     );
     return 'external';

@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-  <script src="app-back.js?v=20260727chrome1"></script>
+  <script src="app-back.js?v=20260727fix1"></script>
   <style>
     :root {
       --ink: #111;
@@ -604,7 +604,7 @@
             var result = await window.pmDownloadApk(url, apkName);
             if (fileHint) {
               if (result === 'external') {
-                fileHint.textContent = 'Chrome open ho raha hai — ' + apkName + ' download start hoga.';
+                fileHint.textContent = 'Browser open ho raha hai — ' + apkName + ' download start hoga.';
               } else if (result === 'saved') {
                 fileHint.textContent = 'Saved: ' + apkName + ' — Downloads folder check karo.';
               } else {
@@ -612,7 +612,7 @@
               }
             }
             if (btnLabel) {
-              btnLabel.textContent = result === 'external' ? 'Opening Chrome…' : (result === 'saved' ? 'Downloaded' : 'Downloading…');
+              btnLabel.textContent = result === 'external' ? 'Opening browser…' : (result === 'saved' ? 'Downloaded' : 'Downloading…');
             }
             setTimeout(function () { setDownloadingUI(false); }, 2800);
             return;
