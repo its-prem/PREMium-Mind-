@@ -414,7 +414,7 @@ if (isset($_GET['fetch_students'])) {
                 <div class='user-header'>
                     <div class='u-avatar'>".strtoupper(substr($row['name'], 0, 1))."</div>
                     <div class='u-details'>
-                        <div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;'>
+                        <div class='u-name-row'>
                             <h4>".$row['name']."</h4>
                             $verified
                         </div>
@@ -423,7 +423,7 @@ if (isset($_GET['fetch_students'])) {
                     </div>
                 </div>
                 
-                <div style='background:#f8fafc; padding:10px 15px; border-radius:10px; margin-bottom:15px; font-size:0.85rem; font-weight:600; display:flex; justify-content:space-between;'>
+                <div class='user-enroll-meta'>
                     <span>Enrolled Courses:</span> <span style='color:var(--success); font-size:1rem;'>$enrolledCount</span>
                 </div>
 
@@ -775,19 +775,25 @@ input:checked + .slider:before { transform: translateX(20px); }
 .search-box ion-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--dark-muted); font-size: 1.2rem; }
 .search-box input { width: 100%; padding: 14px 20px 14px 50px; border-radius: 50px; background: white; margin: 0; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-border); }
 
-.grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
-.user-card { background: white; border: 1px solid var(--gray-border); border-radius: 20px; padding: 24px; box-shadow: var(--shadow-sm); transition: var(--smooth); display: flex; flex-direction: column; }
+.grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 24px; width: 100%; }
+.user-card { background: white; border: 1px solid var(--gray-border); border-radius: 20px; padding: 24px; box-shadow: var(--shadow-sm); transition: var(--smooth); display: flex; flex-direction: column; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; overflow: hidden; }
 .user-card:hover { border-color: #cbd5e1; box-shadow: var(--shadow-md); transform: translateY(-4px); }
-.user-header { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed var(--gray-border); padding-bottom: 15px; }
+.user-header { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 15px; border-bottom: 1px dashed var(--gray-border); padding-bottom: 15px; min-width: 0; }
 .u-avatar { width: 55px; height: 55px; border-radius: 50%; background: var(--dark); color: white; display: flex; justify-content: center; align-items: center; font-size: 1.4rem; font-weight: 800; flex-shrink: 0; }
-.u-details { min-width: 0; flex: 1; }
-.u-details h4 { font-size: 1.1rem; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
-.u-details p { font-size: 0.85rem; color: var(--dark-muted); display: flex; align-items: center; gap: 6px; margin-bottom: 2px; word-break: break-all;}
+.u-details { min-width: 0; flex: 1; overflow: hidden; }
+.u-details .u-name-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
+.u-details h4 { font-size: 1.1rem; font-weight: 800; color: var(--dark); margin: 0; line-height: 1.3; word-break: break-word; overflow-wrap: anywhere; flex: 1; min-width: 0; }
+.u-details p { font-size: 0.85rem; color: var(--dark-muted); display: flex; align-items: flex-start; gap: 6px; margin-bottom: 2px; word-break: break-word; overflow-wrap: anywhere; }
+.u-details p ion-icon { flex-shrink: 0; margin-top: 2px; }
+.user-enroll-meta { background:#f8fafc; padding:10px 15px; border-radius:10px; margin-bottom:15px; font-size:0.85rem; font-weight:600; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
 
-.course-toggle-list { background: var(--gray-soft); border-radius: 12px; padding: 15px; margin-top: 15px; display: none; max-height: 250px; overflow-y: auto; border: 1px solid var(--gray-border); }
-.ct-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #cbd5e1; gap: 10px; }
+.course-toggle-list { background: var(--gray-soft); border-radius: 12px; padding: 15px; margin-top: 15px; display: none; max-height: 250px; overflow-y: auto; border: 1px solid var(--gray-border); width: 100%; box-sizing: border-box; }
+.ct-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #cbd5e1; gap: 12px; min-width: 0; }
 .ct-item:last-child { border-bottom: none; }
-.ct-name { font-size: 0.9rem; font-weight: 700; color: var(--dark); width: 75%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ct-name { font-size: 0.9rem; font-weight: 700; color: var(--dark); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.form-actions-row { display: flex; gap: 14px; margin-top: 20px; align-items: stretch; }
+.form-actions-row .btn-submit { width: auto; flex: 1; min-width: 0; }
 
 /* Shimmer & Overlay */
 .shimmer { background: #f6f7f8; background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%); background-repeat: no-repeat; background-size: 800px 100%; animation: shimmer 1.5s linear infinite; border-radius: 10px; }
@@ -823,6 +829,8 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 @media (max-width: 768px) {
     .row { flex-direction: column; gap: 0; }
+    .form-actions-row { flex-direction: column; gap: 12px; }
+    .form-actions-row .btn-submit { width: 100%; }
     .top-header { padding: 12px 16px; }
     .top-header h2 { font-size: 1.05rem; }
     .tab-panel { padding: 18px 14px; }
@@ -832,11 +840,16 @@ input:checked + .slider:before { transform: translateX(20px); }
     .form-section { padding: 20px; border-radius: 16px; }
     .user-info #admin-info-box { display: none !important; }
     .grid-cards { grid-template-columns: 1fr; gap: 16px; }
+    .user-card { padding: 16px; border-radius: 16px; }
+    .user-card:hover { transform: none; }
+    .u-details h4 { font-size: 1rem; }
+    .u-details p { font-size: 0.8rem; }
+    .ct-name { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
     .stats-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
     .stat-card { padding: 15px; gap: 12px; border-radius: 16px; }
     .stat-icon { width: 46px; height: 46px; font-size: 1.4rem; border-radius: 12px; }
     .stat-info h3 { font-size: 1.4rem; }
-    .action-buttons { flex-wrap: wrap; }
+    .action-buttons { flex-wrap: wrap; gap: 10px; }
     #toast { left: 15px; right: 15px; bottom: 15px; max-width: none; }
 }
 
@@ -846,10 +859,13 @@ input:checked + .slider:before { transform: translateX(20px); }
     .tab-panel { padding: 14px 10px; }
     .section-title { font-size: 1.15rem; margin-bottom: 18px; }
     .form-section { padding: 15px; }
+    .form-actions-row { gap: 14px; }
     .file-upload-box { padding: 18px 12px; }
     .stats-grid { grid-template-columns: 1fr 1fr; }
     .auth-box { padding: 25px 20px; }
     .u-avatar { width: 44px; height: 44px; font-size: 1.1rem; }
+    .user-card { padding: 14px; }
+    .badge-success, .badge-warning, .badge-danger { font-size: 0.7rem; padding: 3px 8px; }
 }
 </style>
 </head>
@@ -891,6 +907,11 @@ input:checked + .slider:before { transform: translateX(20px); }
             </div>
 
             <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="https://premind.netlify.app/" target="_blank" rel="noopener" class="nav-link">
+                        <ion-icon name="home-outline"></ion-icon> Home Page
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a href="javascript:void(0)" class="nav-link active" onclick="switchTab('dashboard', this)">
                         <ion-icon name="grid-outline"></ion-icon> Dashboard Overview
@@ -1158,7 +1179,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     </div>
                                 </div>
                                 
-                                <div class="row" style="margin-top:20px;">
+                                <div class="form-actions-row">
                                     <button type="submit" id="submitBtn" class="btn-submit"><ion-icon name="cloud-upload"></ion-icon> Publish Course</button>
                                     <button type="button" id="cancelBtn" class="btn-submit btn-cancel" onclick="cancelEdit()"><ion-icon name="close-circle"></ion-icon> Cancel Edit</button>
                                 </div>
