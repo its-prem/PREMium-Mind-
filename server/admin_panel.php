@@ -296,6 +296,22 @@ if ($colDlMsg && $colDlMsg->num_rows === 0) {
     @$conn->query("ALTER TABLE courses ADD COLUMN download_msg TEXT NULL COMMENT 'Custom text shown when Download is clicked (esp. if locked)'");
 }
 
+// Index store ranking (lower number = higher on homepage)
+$colSort = @$conn->query("SHOW COLUMNS FROM courses LIKE 'sort_order'");
+if ($colSort && $colSort->num_rows === 0) {
+    @$conn->query("ALTER TABLE courses ADD COLUMN sort_order INT NOT NULL DEFAULT 0 COMMENT 'Homepage display rank; lower = higher'");
+    // Keep current homepage order (was newest id first)
+    $initSort = @$conn->query("SELECT id FROM courses ORDER BY id DESC");
+    if ($initSort) {
+        $rank = 1;
+        while ($sr = $initSort->fetch_assoc()) {
+            $sid = (int)$sr['id'];
+            @$conn->query("UPDATE courses SET sort_order=$rank WHERE id=$sid");
+            $rank++;
+        }
+    }
+}
+
 // ════════════════════════════════════════════════
 //  AJAX HANDLERS (API ENDPOINTS) — auth required
 // ════════════════════════════════════════════════
@@ -303,7 +319,7 @@ if ($colDlMsg && $colDlMsg->num_rows === 0) {
 // 1. FETCH COURSES
 if (isset($_GET['fetch_table'])) {
     pm_require_admin(false);
-    $result = $conn->query("SELECT * FROM courses ORDER BY id DESC");
+    $result = $conn->query("SELECT * FROM courses ORDER BY sort_order ASC, id DESC");
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $json = htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8');
@@ -333,7 +349,10 @@ if (isset($_GET['fetch_table'])) {
             $status_badge = $is_deleted ? "<div style='margin-top:6px;'><span class='badge-danger' style='white-space:nowrap;'>🗑️ Trashed</span></div>" : "<div style='margin-top:6px;'><span class='badge-success' style='white-space:nowrap;'>🟢 Active</span></div>";
 
             echo "<tr style='$row_style' class='fade-in'>
-                <td style='font-weight:700;'>#".$row['id']."</td>
+                <td style='font-weight:700;'>
+                    <div style='font-size:0.75rem;color:var(--dark-muted);'>ID #".$row['id']."</div>
+                    <div style='margin-top:4px;background:#eef2ff;color:#3730a3;display:inline-block;padding:3px 8px;border-radius:8px;font-size:0.8rem;font-weight:800;'>Rank ".(int)($row['sort_order'] ?? 0)."</div>
+                </td>
                 <td class='course-info-td'>
                     <img src='".$row['image']."' onerror='this.src=\"small-logo.png\"'>
                     <div>
@@ -372,6 +391,43 @@ if (isset($_GET['fetch_table'])) {
     } else {
         echo "<tr><td colspan='5' style='text-align:center;padding:30px;color:var(--gray-dark);'>No courses in database yet.</td></tr>";
     }
+    exit;
+}
+
+// 1b. FETCH RANKING LIST (active courses only — homepage order)
+if (isset($_GET['fetch_ranking'])) {
+    pm_require_admin(false);
+    header('Content-Type: application/json; charset=utf-8');
+    $result = $conn->query("SELECT id, title, category, image, price, sort_order FROM courses WHERE is_deleted=0 ORDER BY sort_order ASC, id DESC");
+    $rows = [];
+    if ($result) {
+        while ($row = $result->fetch_assoc()) $rows[] = $row;
+    }
+    echo json_encode(['status' => 'success', 'courses' => $rows]);
+    exit;
+}
+
+// 1c. SAVE HOMEPAGE RANKING ORDER
+if (isset($_POST['ajax_save_ranking'])) {
+    pm_require_admin(true);
+    $raw = $_POST['order_ids'] ?? '[]';
+    $ids = json_decode($raw, true);
+    if (!is_array($ids) || count($ids) === 0) {
+        echo json_encode(['status' => 'error', 'msg' => 'Invalid order list']);
+        exit;
+    }
+    $rank = 1;
+    $ok = true;
+    foreach ($ids as $cid) {
+        $cid = (int)$cid;
+        if ($cid <= 0) continue;
+        if (!$conn->query("UPDATE courses SET sort_order=$rank WHERE id=$cid AND is_deleted=0")) {
+            $ok = false;
+            break;
+        }
+        $rank++;
+    }
+    echo $ok ? json_encode(['status' => 'success']) : json_encode(['status' => 'error', 'msg' => $conn->error]);
     exit;
 }
 
@@ -548,7 +604,9 @@ if (isset($_POST['ajax_add'])) {
     if (!empty($edit_id)) {
         $sql = "UPDATE courses SET title='$title', category='$category', image='$image_path',badge='$badge',desc1='$desc1',desc2='$desc2',price='$price',old_price='$old_price',link='$link',demo_link='$demo_link', website_link='$website_link', pdf_file='$pdf_path', allow_download='$allow_dl', btn_text='$btn_text',btn_type='$btn_type', show_tnc='$show_tnc', show_report_btn='$show_report_btn', app_only='$app_only', show_preview='$show_preview', tnc_text='$tnc_text', download_msg='$download_msg' WHERE id='$edit_id'";
     } else {
-        $sql = "INSERT INTO courses (title,category,image,badge,desc1,desc2,price,old_price,link,demo_link,website_link,pdf_file,allow_download,btn_text,btn_type,show_tnc,show_report_btn,app_only,show_preview,tnc_text,download_msg) VALUES ('$title','$category','$image_path','$badge','$desc1','$desc2','$price','$old_price','$link','$demo_link','$website_link','$pdf_path','$allow_dl','$btn_text','$btn_type','$show_tnc','$show_report_btn','$app_only','$show_preview','$tnc_text','$download_msg')";
+        // New card → homepage pe pehle dikhe (rank 1), baaki shift
+        @$conn->query("UPDATE courses SET sort_order = sort_order + 1");
+        $sql = "INSERT INTO courses (title,category,image,badge,desc1,desc2,price,old_price,link,demo_link,website_link,pdf_file,allow_download,btn_text,btn_type,show_tnc,show_report_btn,app_only,show_preview,tnc_text,download_msg,sort_order) VALUES ('$title','$category','$image_path','$badge','$desc1','$desc2','$price','$old_price','$link','$demo_link','$website_link','$pdf_path','$allow_dl','$btn_text','$btn_type','$show_tnc','$show_report_btn','$app_only','$show_preview','$tnc_text','$download_msg',1)";
     }
     
     echo $conn->query($sql) ? json_encode(['status'=>'success']) : json_encode(['status'=>'error','msg'=>$conn->error]);
@@ -795,6 +853,33 @@ input:checked + .slider:before { transform: translateX(20px); }
 .form-actions-row { display: flex; gap: 14px; margin-top: 20px; align-items: stretch; }
 .form-actions-row .btn-submit { width: auto; flex: 1; min-width: 0; }
 
+/* Store Ranking */
+.rank-list { display: flex; flex-direction: column; gap: 10px; max-width: 820px; }
+.rank-item {
+    display: flex; align-items: center; gap: 12px; background: white; border: 1px solid var(--gray-border);
+    border-radius: 14px; padding: 12px 14px; box-shadow: var(--shadow-sm); transition: var(--smooth);
+}
+.rank-item:hover { border-color: #a5b4fc; box-shadow: var(--shadow-md); }
+.rank-num {
+    width: 42px; height: 42px; border-radius: 12px; background: #eef2ff; color: #3730a3;
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0;
+}
+.rank-thumb { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; flex-shrink: 0; background: #f1f5f9; }
+.rank-meta { flex: 1; min-width: 0; }
+.rank-meta h4 { margin: 0 0 4px; font-size: 0.98rem; font-weight: 800; color: var(--dark); line-height: 1.25; word-break: break-word; }
+.rank-meta p { margin: 0; font-size: 0.78rem; color: var(--dark-muted); font-weight: 600; }
+.rank-moves { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.rank-moves button {
+    width: 36px; height: 32px; border: none; border-radius: 8px; cursor: pointer; display: flex;
+    align-items: center; justify-content: center; background: #f1f5f9; color: #0f172a; font-size: 1.1rem;
+}
+.rank-moves button:hover { background: #4f46e5; color: #fff; }
+.rank-moves button:disabled { opacity: 0.35; cursor: not-allowed; }
+.rank-pos-input {
+    width: 58px; padding: 8px 6px !important; margin: 0 !important; text-align: center; font-weight: 800;
+    border-radius: 10px !important; border: 1.5px solid #c7d2fe !important; background: #fff !important;
+}
+
 /* Shimmer & Overlay */
 .shimmer { background: #f6f7f8; background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%); background-repeat: no-repeat; background-size: 800px 100%; animation: shimmer 1.5s linear infinite; border-radius: 10px; }
 @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
@@ -920,6 +1005,11 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <li class="nav-item">
                     <a href="javascript:void(0)" class="nav-link" onclick="switchTab('courses', this)">
                         <ion-icon name="cube-outline"></ion-icon> Course Manager
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="javascript:void(0)" class="nav-link" onclick="switchTab('ranking', this)">
+                        <ion-icon name="swap-vertical-outline"></ion-icon> Store Ranking
                     </a>
                 </li>
                 <li class="nav-item">
@@ -1205,7 +1295,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                             <table class="custom-table">
                                 <thead>
                                     <tr>
-                                        <th style="width: 80px;">ID</th>
+                                        <th style="width: 100px;">ID / Rank</th>
                                         <th>Course Information</th>
                                         <th>Pricing</th>
                                         <th>Assets Status</th>
@@ -1217,6 +1307,27 @@ input:checked + .slider:before { transform: translateX(20px); }
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+
+                <div id="tab-ranking" class="tab-panel">
+                    <div class="toolbar">
+                        <div>
+                            <h2 class="section-title" style="margin-bottom: 5px;"><ion-icon name="swap-vertical-outline"></ion-icon> Store Ranking</h2>
+                            <p style="font-size: 0.9rem; color: var(--dark-muted); font-weight: 500;">Index / Home pe cards kis order me dikhenge — Rank 1 sabse upar. ↑↓ se arrange karo, phir Save dabao.</p>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button type="button" onclick="loadRanking()" class="btn-submit" style="width:auto; background:#64748b;"><ion-icon name="refresh"></ion-icon> Refresh</button>
+                            <button type="button" id="btnSaveRanking" onclick="saveRanking()" class="btn-submit" style="width:auto; background:#4f46e5;"><ion-icon name="save"></ion-icon> Save Ranking</button>
+                        </div>
+                    </div>
+
+                    <div class="rank-help" style="background:#eef2ff; border:1px solid #c7d2fe; border-radius:14px; padding:14px 16px; margin-bottom:18px; font-size:0.88rem; color:#312e81; font-weight:600;">
+                        Tip: Top pe jo card chahiye usko ↑ se upar lao. Save ke baad homepage pe naya order dikhega.
+                    </div>
+
+                    <div id="ranking_list" class="rank-list">
+                        <div class="shimmer" style="height: 80px; border-radius: 14px;"></div>
                     </div>
                 </div>
 
@@ -1432,6 +1543,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
             if(tabId === 'courses') loadCourses();
+            if(tabId === 'ranking') loadRanking();
             if(tabId === 'students') loadStudents();
             if(tabId === 'reports') loadReports();
         }
@@ -1502,6 +1614,103 @@ input:checked + .slider:before { transform: translateX(20px); }
                 refreshCopySelect();
             } catch(e) { showToast("Failed to load courses", "error"); }
         }
+
+        // Homepage / Index ranking (client list + save)
+        window.pmRankOrder = [];
+
+        function renderRankingList() {
+            const box = document.getElementById('ranking_list');
+            if (!box) return;
+            const list = window.pmRankOrder || [];
+            if (!list.length) {
+                box.innerHTML = '<div style="padding:30px;text-align:center;color:var(--dark-muted);background:#fff;border-radius:14px;border:1px dashed #cbd5e1;">No active courses to rank.</div>';
+                return;
+            }
+            box.innerHTML = list.map(function (c, i) {
+                const img = (c.image || 'small-logo.png').replace(/'/g, "&#39;");
+                const title = String(c.title || 'Untitled').replace(/</g, '&lt;');
+                const cat = String(c.category || '').toUpperCase();
+                const isFirst = i === 0;
+                const isLast = i === list.length - 1;
+                return (
+                    '<div class="rank-item" data-id="' + c.id + '">' +
+                      '<div class="rank-num">' + (i + 1) + '</div>' +
+                      '<img class="rank-thumb" src="' + img + '" alt="" onerror="this.src=\'small-logo.png\'">' +
+                      '<div class="rank-meta">' +
+                        '<h4>' + title + '</h4>' +
+                        '<p>#' + c.id + ' · ' + cat + ' · ₹' + (c.price || 0) + '</p>' +
+                      '</div>' +
+                      '<input class="rank-pos-input" type="number" min="1" max="' + list.length + '" value="' + (i + 1) + '" ' +
+                        'onchange="jumpRank(' + i + ', this.value)" title="Jump to position">' +
+                      '<div class="rank-moves">' +
+                        '<button type="button" ' + (isFirst ? 'disabled' : '') + ' onclick="moveRank(' + i + ',-1)" title="Move up"><ion-icon name="chevron-up"></ion-icon></button>' +
+                        '<button type="button" ' + (isLast ? 'disabled' : '') + ' onclick="moveRank(' + i + ',1)" title="Move down"><ion-icon name="chevron-down"></ion-icon></button>' +
+                      '</div>' +
+                    '</div>'
+                );
+            }).join('');
+        }
+
+        window.moveRank = function (index, dir) {
+            const list = window.pmRankOrder;
+            const j = index + dir;
+            if (!list || j < 0 || j >= list.length) return;
+            const tmp = list[index];
+            list[index] = list[j];
+            list[j] = tmp;
+            renderRankingList();
+        };
+
+        window.jumpRank = function (fromIndex, rawPos) {
+            const list = window.pmRankOrder;
+            if (!list || !list.length) return;
+            let to = parseInt(rawPos, 10);
+            if (!isFinite(to)) { renderRankingList(); return; }
+            to = Math.max(1, Math.min(list.length, to)) - 1;
+            if (to === fromIndex) { renderRankingList(); return; }
+            const item = list.splice(fromIndex, 1)[0];
+            list.splice(to, 0, item);
+            renderRankingList();
+        };
+
+        window.loadRanking = async function () {
+            const box = document.getElementById('ranking_list');
+            if (box) box.innerHTML = '<div class="shimmer" style="height:80px;border-radius:14px;"></div>';
+            try {
+                const r = await fetch('?fetch_ranking=1', { credentials: 'same-origin' });
+                if (r.status === 403) { showToast('Session expired. Please login again.', 'error'); return; }
+                const data = await r.json();
+                window.pmRankOrder = Array.isArray(data.courses) ? data.courses : [];
+                renderRankingList();
+            } catch (e) {
+                showToast('Failed to load ranking', 'error');
+            }
+        };
+
+        window.saveRanking = async function () {
+            const btn = document.getElementById('btnSaveRanking');
+            const ids = (window.pmRankOrder || []).map(function (c) { return c.id; });
+            if (!ids.length) { showToast('Nothing to save', 'error'); return; }
+            const original = btn ? btn.innerHTML : '';
+            if (btn) { btn.disabled = true; btn.innerHTML = '<ion-icon name="sync" class="spinner"></ion-icon> Saving...'; }
+            const fd = new FormData();
+            fd.append('ajax_save_ranking', '1');
+            fd.append('order_ids', JSON.stringify(ids));
+            try {
+                const res = await fetch(window.location.href, { method: 'POST', body: fd, credentials: 'same-origin' });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    showToast('Store ranking saved! Homepage order updated.');
+                    loadRanking();
+                    if (document.getElementById('table_body')) loadCourses();
+                } else {
+                    showToast('Save failed: ' + (data.msg || 'error'), 'error');
+                }
+            } catch (e) {
+                showToast('Save failed', 'error');
+            }
+            if (btn) { btn.disabled = false; btn.innerHTML = original; }
+        };
 
         let searchTimer;
         function debounceSearch() {

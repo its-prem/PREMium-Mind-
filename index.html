@@ -2395,6 +2395,14 @@
             const filtered = globalLoadedCourses.filter(course => {
                 const cat = (course.category || 'projects').toLowerCase();
                 return currentActiveCategory === 'all' || cat === currentActiveCategory;
+            }).sort(function (a, b) {
+                // Admin Store Ranking: lower sort_order = higher on page
+                const sa = parseInt(a.sort_order, 10);
+                const sb = parseInt(b.sort_order, 10);
+                const na = isFinite(sa) ? sa : 999999;
+                const nb = isFinite(sb) ? sb : 999999;
+                if (na !== nb) return na - nb;
+                return Number(b.id) - Number(a.id);
             });
 
             if (filtered.length === 0) {
