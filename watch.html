@@ -676,7 +676,10 @@
      const urlParams = new URLSearchParams(window.location.search);
      let pdfFile = urlParams.get('file');
      let legacyPdf = urlParams.get('pdf');
-     let allowDownload = urlParams.get('download') === 'true' || urlParams.get('download') === '1';
+     let allowDownload = urlParams.get('download') === 'true'
+         || urlParams.get('download') === '1'
+         || urlParams.get('download') === 'yes'
+         || urlParams.get('allow_download') === '1';
      let customTitle = urlParams.get('title');
 
      (function initWatchReturnUrl() {
@@ -853,8 +856,8 @@
          }
 
          if (!allowDownload) {
-             alert("⚠️ Download available day of exam at 6:00 AM only.");
-             toastNative("Download locked until exam day");
+             alert("⚠️ Download is disabled for this course by admin.");
+             toastNative("Download disabled");
              return;
          }
 
@@ -915,15 +918,27 @@
          const downloadBtn = document.getElementById('downloadBtn');
          if (!downloadBtn) return;
 
+         // Admin "Show Download Button" OFF → hide completely (per course)
          if (!allowDownload) {
-             downloadBtn.classList.add('locked');
-             const dlText = document.getElementById('dl-text');
-             if (dlText) dlText.innerText = "Locked";
-             downloadBtn.setAttribute('aria-label', 'Download locked until exam day');
+             downloadBtn.style.display = 'none';
+             downloadBtn.setAttribute('aria-hidden', 'true');
+             return;
          }
 
+         downloadBtn.style.display = '';
+         downloadBtn.classList.remove('locked');
+         const dlText = document.getElementById('dl-text');
+         if (dlText) dlText.innerText = 'Save PDF';
+         downloadBtn.setAttribute('aria-label', 'Download PDF');
          downloadBtn.addEventListener('click', window.handleDownloadPdf, { passive: false });
          downloadBtn.addEventListener('touchend', window.handleDownloadPdf, { passive: false });
+
+         // Optional: open watch with ?autodl=1 to start download immediately
+         if (urlParams.get('autodl') === '1') {
+             setTimeout(function () {
+                 try { window.handleDownloadPdf(); } catch (e) {}
+             }, 1200);
+         }
      })();
 
      if (pdfFile) {

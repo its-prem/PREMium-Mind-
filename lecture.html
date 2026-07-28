@@ -56,6 +56,13 @@
       background:linear-gradient(135deg,#000 0%,#434343 100%); color:#fff;
     }
     .btn-access:hover { transform:translateY(-2px); box-shadow:0 6px 15px rgba(0,0,0,0.2); }
+    .btn-download-card {
+      width:100%; margin-top:8px; padding:10px; border-radius:10px; border:1.5px solid #111;
+      background:#fff; color:#111; font-weight:700; font-size:0.85rem; font-family:inherit;
+      cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;
+    }
+    .btn-download-card:hover { background:#f8fafc; }
+    .card-actions-col { display:flex; flex-direction:column; width:100%; margin-top:auto; }
     .empty-state {
       grid-column:1/-1; text-align:center; padding:60px 20px; background:#fff; border-radius:15px;
       box-shadow:0 4px 15px rgba(0,0,0,0.05); max-width:600px; margin:0 auto; width:100%;
@@ -245,19 +252,26 @@
         const pdfPath = pickPdfPath(course);
         const appOnly = window.pmIsAppOnlyCourse && window.pmIsAppOnlyCourse(course);
         const inApp = window.pmIsNativeApp && window.pmIsNativeApp();
+        const canDownload = course.allow_download == 1 || course.allow_download === '1' || course.allow_download === true;
         let btnLabel = 'Continue Learning';
         if (appOnly && !inApp) {
           btnAction = "window.pmShowAppOnlyModal('" + course.id + "','open')";
           btnLabel = 'Open in App';
         } else if (pdfPath) {
-          btnAction = "sessionStorage.setItem('pmWatchReturn','lecture.html'+window.location.search);window.location.href='watch.html?file=" + encodeURIComponent(pdfPath) + "&download=" + course.allow_download + "'";
+          btnAction = "sessionStorage.setItem('pmWatchReturn','lecture.html'+window.location.search);window.location.href='watch.html?file=" + encodeURIComponent(pdfPath) + "&download=" + (canDownload ? '1' : '0') + "&title=" + encodeURIComponent(course.title || '') + "'";
         } else {
           btnAction = "alert('PDF abhi upload nahi hui. Admin panel me pdf_file column check karo (uploads/pdfs/...)')";
         }
         const title = course.title || 'Untitled Course';
         const image = course.image || 'small-logo.png';
         const badge = (appOnly ? '<span class="status-badge" style="background:#111;left:auto;right:10px;">APP ONLY</span>' : '') + '<span class="status-badge">Unlocked</span>';
-        container.innerHTML += '<div class="course-card"><div class="card-img-box">' + badge + '<img src="' + image + '" alt="' + title + '" onerror="this.src=\'small-logo.png\'"/></div><h2>' + title + '</h2><button class="btn-access" onclick="' + btnAction + '"><ion-icon name="play-circle-outline"></ion-icon> ' + btnLabel + '</button></div>';
+        // Download button only when admin enabled for THIS card
+        let dlBtnHtml = '';
+        if (canDownload && pdfPath && !(appOnly && !inApp)) {
+          const dlAction = "sessionStorage.setItem('pmWatchReturn','lecture.html'+window.location.search);window.location.href='watch.html?file=" + encodeURIComponent(pdfPath) + "&download=1&autodl=1&title=" + encodeURIComponent(course.title || '') + "'";
+          dlBtnHtml = '<button type="button" class="btn-download-card" onclick="' + dlAction + '"><ion-icon name="download-outline"></ion-icon> Download PDF</button>';
+        }
+        container.innerHTML += '<div class="course-card"><div class="card-img-box">' + badge + '<img src="' + image + '" alt="' + title + '" onerror="this.src=\'small-logo.png\'"/></div><h2>' + title + '</h2><div class="card-actions-col"><button class="btn-access" onclick="' + btnAction + '"><ion-icon name="play-circle-outline"></ion-icon> ' + btnLabel + '</button>' + dlBtnHtml + '</div></div>';
       });
     } catch (e) {
       console.error(e);

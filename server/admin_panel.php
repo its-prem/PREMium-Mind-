@@ -301,9 +301,9 @@ if (isset($_GET['fetch_table'])) {
                 ? "<span class='badge-success' style='display:inline-flex; align-items:center; gap:4px; margin-bottom:6px; white-space:nowrap;'>📄 PDF Uploaded</span>" 
                 : "<span class='badge-danger' style='display:inline-flex; align-items:center; gap:4px; margin-bottom:6px; white-space:nowrap;'>No PDF</span>";
             
-            $dl_status = $row['allow_download'] 
-                ? "<span style='display:inline-flex; align-items:center; gap:4px; background:#eff6ff; color:#2563eb; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap;'><ion-icon name='download-outline'></ion-icon> Download: ON</span>" 
-                : "<span style='display:inline-flex; align-items:center; gap:4px; background:#f1f5f9; color:#64748b; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap;'><ion-icon name='close-outline'></ion-icon> Download: OFF</span>";
+            $dl_status = (!empty($row['allow_download']) && (int)$row['allow_download'] === 1)
+                ? "<span style='display:inline-flex; align-items:center; gap:4px; background:#eff6ff; color:#2563eb; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap;'><ion-icon name='download-outline'></ion-icon> DOWNLOAD BTN: ON</span>"
+                : "<span style='display:inline-flex; align-items:center; gap:4px; background:#f1f5f9; color:#64748b; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap;'><ion-icon name='close-outline'></ion-icon> DOWNLOAD BTN: OFF</span>";
 
             $app_only_on = !empty($row['app_only']) && (int)$row['app_only'] === 1;
             $app_only_status = $app_only_on
@@ -1038,8 +1038,8 @@ input:checked + .slider:before { transform: translateX(20px); }
                                         <span class="slider"></span>
                                     </label>
                                     <div class="toggle-info">
-                                        <h4 style="color: #065f46;">Allow PDF Download</h4>
-                                        <p style="color: #047857;">If OFF, students can only view it securely online.</p>
+                                        <h4 style="color: #065f46;">Show Download Button</h4>
+                                        <p style="color: #047857;">ON = is course/card pe Download (Save PDF) button dikhega. Har card ka alag control.</p>
                                     </div>
                                 </div>
 
@@ -1520,7 +1520,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             document.getElementById('inp_existing_pdf').value = data.pdf_file || '';
             document.getElementById('file-name').innerHTML = data.pdf_file ? "Current PDF Attached" : "";
             
-            document.getElementById('inp_allow_download').checked = data.allow_download == 1;
+            document.getElementById('inp_allow_download').checked = data.allow_download == 1 || data.allow_download === '1' || data.allow_download === true;
             document.getElementById('inp_show_tnc').checked = data.show_tnc == 1;
             document.getElementById('inp_show_report_btn').checked = data.show_report_btn == 1;
             document.getElementById('inp_app_only').checked = data.app_only == 1 || data.app_only === '1' || data.app_only === true;
