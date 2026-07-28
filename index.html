@@ -543,7 +543,22 @@
             border-radius: 8px;
             color: #fff;
             font-size: 16px;
-            cursor: pointer;
+            cursor: not-allowed;
+            font-weight: bold;
+            opacity: 0.95;
+        }
+
+        .coming-soon-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: not-allowed;
+            letter-spacing: 0.3px;
         }
 
         .new-badge {
@@ -2477,6 +2492,12 @@
                     }
                 } else if (course.req_status === 'pending') {
                     btnHTML = `<button class="btn-reviewing" disabled>Reviewing... ⏳</button>`;
+                } else if (course.btn_type === 'coming_soon') {
+                    btnHTML = `<button type="button" class="coming-soon-btn" disabled>${course.btn_text || 'Coming Soon'}</button>`;
+                } else if (course.btn_type === 'disabled_look') {
+                    btnHTML = `<button type="button" class="disabled-btn" disabled>${course.btn_text || 'Coming Soon'}</button>`;
+                } else if (course.btn_type === 'disabled') {
+                    btnHTML = `<button type="button" class="disabled-btn" disabled>${course.btn_text || 'Unavailable'}</button>`;
                 } else if (course.is_free == 1 || course.price == 0) {
                     btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="0" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${course.btn_text || 'Get Free Access'}</button>`;
                 } else if (course.is_disabled == 1 || course.disabled == 1 || course.is_disabled == "1") {

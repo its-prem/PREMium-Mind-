@@ -1003,6 +1003,17 @@ input:checked + .slider:before { transform: translateX(20px); }
                             
                             <form id="courseForm" enctype="multipart/form-data">
                                 <input type="hidden" name="edit_id" id="edit_id" value="">
+
+                                <div id="copyFromBox" style="background:#eef2ff; border:1px solid #c7d2fe; border-radius:14px; padding:14px 16px; margin-bottom:22px;">
+                                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                                        <ion-icon name="copy-outline" style="font-size:20px; color:#4338ca;"></ion-icon>
+                                        <label style="margin:0; color:#312e81; font-weight:800;">Copy from existing card</label>
+                                    </div>
+                                    <select id="copyFromSelect" style="width:100%; margin-bottom:0; background:#fff; border:1.5px solid #a5b4fc;">
+                                        <option value="">— Select a card to copy —</option>
+                                    </select>
+                                    <div class="file-hint" style="margin-top:8px; color:#4338ca;">Select karo → saara data form me aa jayega. Phir edit karke <strong>Publish</strong> dabao → naya card banega (purana same rahega).</div>
+                                </div>
                                 
                                 <div class="form-group">
                                     <label>Course Title</label>
@@ -1172,6 +1183,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                         <label>Button Style</label>
                                         <select name="btn_type" id="inp_btn_type">
                                             <option value="normal">Normal (Black clickable)</option>
+                                            <option value="coming_soon">Coming Soon (Unclickable)</option>
                                             <option value="disabled_look">Disabled Look (Orange Unclickable)</option>
                                             <option value="preview_buy">Preview (Demo) + Buy</option>
                                             <option value="disabled">Completely Disabled (Unclickable)</option>
@@ -1487,6 +1499,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 const r = await fetch('?fetch_table=1', { credentials: 'same-origin' });
                 if (r.status === 403) { showToast('Session expired. Please login again.', 'error'); return; }
                 tbody.innerHTML = await r.text();
+                refreshCopySelect();
             } catch(e) { showToast("Failed to load courses", "error"); }
         }
 
@@ -1596,34 +1609,102 @@ input:checked + .slider:before { transform: translateX(20px); }
         if (inpShowTnc) inpShowTnc.addEventListener('change', syncConditionalBoxes);
         syncConditionalBoxes();
 
-        window.editCard = function(btn) {
-            const data = JSON.parse(btn.getAttribute('data-course'));
-            
-            ['title','category','badge','desc1','desc2','price','old_price','link','demo_link','website_link','btn_text','btn_type'].forEach(k => {
-                if(document.getElementById('inp_'+k)) document.getElementById('inp_'+k).value = data[k] || '';
+        window.pmCourseCache = {};
+
+        function refreshCopySelect() {
+            const sel = document.getElementById('copyFromSelect');
+            if (!sel) return;
+            const prev = sel.value;
+            window.pmCourseCache = {};
+            sel.innerHTML = '<option value="">— Select a card to copy —</option>';
+            document.querySelectorAll('#table_body button[data-course]').forEach(function (btn) {
+                try {
+                    const data = JSON.parse(btn.getAttribute('data-course'));
+                    if (!data || !data.id) return;
+                    if (data.is_deleted == 1 || data.is_deleted === '1') return;
+                    window.pmCourseCache[String(data.id)] = data;
+                    const opt = document.createElement('option');
+                    opt.value = String(data.id);
+                    opt.textContent = '#' + data.id + ' — ' + (data.title || 'Untitled');
+                    sel.appendChild(opt);
+                } catch (e) {}
             });
-            
-            document.getElementById('inp_existing_image').value = data.image || '';
-            if(data.image) {
-                document.getElementById('img-name').innerText = "Current: " + data.image;
+            if (prev && window.pmCourseCache[prev]) sel.value = prev;
+        }
+
+        function setCopyBoxVisible(show) {
+            const box = document.getElementById('copyFromBox');
+            if (box) box.style.display = show ? 'block' : 'none';
+            if (show) {
+                const sel = document.getElementById('copyFromSelect');
+                if (sel) sel.value = '';
+            }
+        }
+
+        function fillCourseForm(data, opts) {
+            opts = opts || {};
+            const isCopy = !!opts.isCopy;
+
+            ['title','category','badge','desc1','desc2','price','old_price','link','demo_link','website_link','btn_text','btn_type'].forEach(function (k) {
+                if (document.getElementById('inp_' + k)) document.getElementById('inp_' + k).value = data[k] || '';
+            });
+
+            if (isCopy) {
+                const t = (data.title || '').trim();
+                document.getElementById('inp_title').value = t ? (t + ' (Copy)') : '';
             }
 
+            document.getElementById('inp_existing_image').value = data.image || '';
+            document.getElementById('img-name').innerText = data.image ? ('Using: ' + data.image) : '';
+            document.getElementById('inp_image_file').value = '';
+
             document.getElementById('inp_existing_pdf').value = data.pdf_file || '';
-            document.getElementById('file-name').innerHTML = data.pdf_file ? "Current PDF Attached" : "";
-            
+            document.getElementById('file-name').innerHTML = data.pdf_file ? 'Using existing PDF (same file OK for new card)' : '';
+            document.getElementById('inp_pdf_file').value = '';
+            const pdfErr = document.getElementById('pdf-error');
+            if (pdfErr) { pdfErr.style.display = 'none'; pdfErr.innerText = ''; }
+
             document.getElementById('inp_allow_download').checked = data.allow_download == 1 || data.allow_download === '1' || data.allow_download === true;
-            document.getElementById('inp_show_tnc').checked = data.show_tnc == 1;
-            document.getElementById('inp_show_report_btn').checked = data.show_report_btn == 1;
+            document.getElementById('inp_show_tnc').checked = data.show_tnc == 1 || data.show_tnc === '1';
+            document.getElementById('inp_show_report_btn').checked = data.show_report_btn == 1 || data.show_report_btn === '1';
             document.getElementById('inp_app_only').checked = data.app_only == 1 || data.app_only === '1' || data.app_only === true;
             document.getElementById('inp_show_preview').checked = data.show_preview == 1 || data.show_preview === '1' || data.show_preview === true;
             document.getElementById('inp_tnc_text').value = data.tnc_text || '';
             document.getElementById('inp_download_msg').value = data.download_msg || '';
             syncConditionalBoxes();
+        }
+
+        const copyFromSelect = document.getElementById('copyFromSelect');
+        if (copyFromSelect) {
+            copyFromSelect.addEventListener('change', function () {
+                const id = this.value;
+                if (!id) return;
+                const data = window.pmCourseCache[id];
+                if (!data) {
+                    showToast('Card data not found — refresh page', 'error');
+                    return;
+                }
+                // IMPORTANT: edit_id blank rahe → Publish = NEW card (INSERT), purana update nahi
+                document.getElementById('edit_id').value = '';
+                fillCourseForm(data, { isCopy: true });
+                document.getElementById('form_title').innerHTML = '<ion-icon name="copy"></ion-icon> New Course (Copied)';
+                document.getElementById('submitBtn').innerHTML = '<ion-icon name="cloud-upload"></ion-icon> Publish New Card';
+                document.getElementById('cancelBtn').style.display = 'inline-flex';
+                setCopyBoxVisible(true);
+                showToast('Copied from #' + id + ' — edit karke Publish karo', 'success');
+                document.getElementById('inp_title').focus();
+            });
+        }
+
+        window.editCard = function(btn) {
+            const data = JSON.parse(btn.getAttribute('data-course'));
+            fillCourseForm(data, { isCopy: false });
 
             document.getElementById('edit_id').value = data.id;
             document.getElementById('form_title').innerHTML = '<ion-icon name="create"></ion-icon> Edit Course';
             document.getElementById('submitBtn').innerHTML  = '<ion-icon name="save"></ion-icon> Save Updates';
             document.getElementById('cancelBtn').style.display = 'inline-flex';
+            setCopyBoxVisible(false);
             
             document.querySelector('.form-section').scrollIntoView({behavior:'smooth'});
         }
@@ -1648,6 +1729,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             document.getElementById('form_title').innerHTML = '<ion-icon name="add-circle"></ion-icon> Create New Course';
             document.getElementById('submitBtn').innerHTML  = '<ion-icon name="cloud-upload"></ion-icon> Publish Course';
             document.getElementById('cancelBtn').style.display = 'none';
+            setCopyBoxVisible(true);
         }
 
         // SOFT DELETE (MOVE TO TRASH)
