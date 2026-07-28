@@ -551,14 +551,22 @@
         .coming-soon-btn {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             border: none;
             border-radius: 8px;
             color: #fff;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 15px;
+            font-weight: 800;
             cursor: not-allowed;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            opacity: 1 !important;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+        }
+        .coming-soon-btn:disabled {
+            opacity: 1 !important;
+            color: #fff;
         }
 
         .new-badge {
@@ -1027,6 +1035,7 @@
             }
 
             .disabled-btn,
+            .coming-soon-btn,
             .enroll-btn,
             .buy-course-btn {
                 font-size: 14px;
@@ -2489,6 +2498,13 @@
                 let btnHTML = '';
                 const appOnly = window.pmIsAppOnlyCourse && window.pmIsAppOnlyCourse(course);
                 const inApp = window.pmIsNativeApp && window.pmIsNativeApp();
+                const btnType = String(course.btn_type || '').trim().toLowerCase();
+                const rawBtnText = String(course.btn_text || '').trim();
+                // Coming Soon: always show clear label (ignore default "Buy Now")
+                const comingSoonLabel = (!rawBtnText || /^buy\s*now$/i.test(rawBtnText))
+                    ? 'Coming Soon'
+                    : rawBtnText;
+
                 if (course.is_enrolled == 1 || course.is_enrolled == "1") {
                     if (appOnly && !inApp) {
                         btnHTML = `<button type="button" class="buy-course-btn" style="background: linear-gradient(135deg, #111 0%, #334155 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="if(window.pmGateAppOnly&&window.pmGateAppOnly('${course.id}','open'))return; window.location.href='lecture.html?id=${course.id}'">Open in App 📱</button>`;
@@ -2500,20 +2516,20 @@
                     }
                 } else if (course.req_status === 'pending') {
                     btnHTML = `<button class="btn-reviewing" disabled>Reviewing... ⏳</button>`;
-                } else if (course.btn_type === 'coming_soon') {
-                    btnHTML = `<button type="button" class="coming-soon-btn" disabled>${course.btn_text || 'Coming Soon'}</button>`;
-                } else if (course.btn_type === 'disabled_look') {
-                    btnHTML = `<button type="button" class="disabled-btn" disabled>${course.btn_text || 'Coming Soon'}</button>`;
-                } else if (course.btn_type === 'disabled') {
-                    btnHTML = `<button type="button" class="disabled-btn" disabled>${course.btn_text || 'Unavailable'}</button>`;
+                } else if (btnType === 'coming_soon' || btnType === 'comingsoon' || btnType === 'coming soon') {
+                    btnHTML = `<button type="button" class="coming-soon-btn" disabled aria-disabled="true">${comingSoonLabel}</button>`;
+                } else if (btnType === 'disabled_look') {
+                    btnHTML = `<button type="button" class="disabled-btn" disabled>${rawBtnText || 'Coming Soon'}</button>`;
+                } else if (btnType === 'disabled') {
+                    btnHTML = `<button type="button" class="disabled-btn" disabled>${rawBtnText || 'Unavailable'}</button>`;
                 } else if (course.is_free == 1 || course.price == 0) {
-                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="0" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${course.btn_text || 'Get Free Access'}</button>`;
+                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="0" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${rawBtnText || 'Get Free Access'}</button>`;
                 } else if (course.is_disabled == 1 || course.disabled == 1 || course.is_disabled == "1") {
                     btnHTML = `<button class="disabled-btn" disabled>Sold Out / Closed</button>`;
                 } else if (appOnly && !inApp) {
                     btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">Buy in App 📱</button>`;
                 } else {
-                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${course.btn_text}</button>`;
+                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${rawBtnText || 'Buy Now'}</button>`;
                 }
 
                 const showPdfPreview = course.show_preview == 1 || course.show_preview === '1' || course.show_preview === true;
@@ -2527,7 +2543,7 @@
                     previewLinkHTML = `<div style="text-align:left;margin-top:8px;margin-bottom:-10px;padding:0 5px;">
                         <span style="color:#dc2626;text-decoration:underline;font-weight:bold;cursor:pointer;font-size:13.5px;" onclick="window.openPdfPreview(${Number(course.id)}, '${safePreviewTitle}')">Preview</span>
                     </div>`;
-                } else if (course.btn_type === 'preview_buy' && course.demo_link && course.demo_link.trim() !== '' && course.demo_link.startsWith('http')) {
+                } else if (btnType === 'preview_buy' && course.demo_link && course.demo_link.trim() !== '' && course.demo_link.startsWith('http')) {
                     previewLinkHTML = `<div style="text-align:left;margin-top:8px;margin-bottom:-10px;padding:0 5px;">
                         <span style="color:#dc2626;text-decoration:underline;font-weight:bold;cursor:pointer;font-size:13.5px;" onclick="window.open('${course.demo_link}', '_blank')">Preview</span>
                     </div>`;
