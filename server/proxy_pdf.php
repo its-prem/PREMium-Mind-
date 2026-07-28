@@ -45,7 +45,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit('Error: Method not allowed');
 }
 
-$SECRET = 'PREM_MIND_SECURE_2026';
+require_once __DIR__ . '/pm_load_secrets.php';
+$SECRET = pm_pdf_hmac_secret();
+if ($SECRET === '') {
+    http_response_code(500);
+    exit('Error: PDF secrets not configured (upload pm_secrets.php)');
+}
 
 function is_allowed_site_request(): bool {
     global $allowed_origins;

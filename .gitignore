@@ -1,4 +1,5 @@
 # Secrets / local Hostinger copies — do not push API keys
 server/create_order.php
+server/pm_secrets.php
 .env
 .env.*

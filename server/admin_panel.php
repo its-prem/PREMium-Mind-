@@ -853,31 +853,50 @@ input:checked + .slider:before { transform: translateX(20px); }
 .form-actions-row { display: flex; gap: 14px; margin-top: 20px; align-items: stretch; }
 .form-actions-row .btn-submit { width: auto; flex: 1; min-width: 0; }
 
-/* Store Ranking */
-.rank-list { display: flex; flex-direction: column; gap: 10px; max-width: 820px; }
+/* Store Ranking — drag to reorder */
+.rank-list { display: flex; flex-direction: column; gap: 10px; max-width: 720px; width: 100%; }
 .rank-item {
-    display: flex; align-items: center; gap: 12px; background: white; border: 1px solid var(--gray-border);
-    border-radius: 14px; padding: 12px 14px; box-shadow: var(--shadow-sm); transition: var(--smooth);
+    display: flex; align-items: center; gap: 10px; background: white; border: 1px solid var(--gray-border);
+    border-radius: 14px; padding: 12px; box-shadow: var(--shadow-sm); user-select: none; -webkit-user-select: none;
+    touch-action: none; width: 100%; box-sizing: border-box; min-width: 0;
 }
-.rank-item:hover { border-color: #a5b4fc; box-shadow: var(--shadow-md); }
+.rank-item.rank-chosen { border-color: #818cf8; background: #f8fafc; }
+.rank-item.rank-ghost { opacity: 0.35; background: #e0e7ff; border-style: dashed; }
+.rank-item.rank-drag { opacity: 0.95; box-shadow: 0 12px 30px rgba(15,23,42,0.18); transform: scale(1.02); }
+.rank-handle {
+    width: 40px; height: 40px; border-radius: 10px; background: #f1f5f9; color: #64748b;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: grab;
+    font-size: 1.35rem; border: 1px solid #e2e8f0;
+}
+.rank-handle:active { cursor: grabbing; background: #e0e7ff; color: #4338ca; }
 .rank-num {
-    width: 42px; height: 42px; border-radius: 12px; background: #eef2ff; color: #3730a3;
-    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0;
+    width: 36px; height: 36px; border-radius: 10px; background: #eef2ff; color: #3730a3;
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; flex-shrink: 0;
 }
-.rank-thumb { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; flex-shrink: 0; background: #f1f5f9; }
-.rank-meta { flex: 1; min-width: 0; }
-.rank-meta h4 { margin: 0 0 4px; font-size: 0.98rem; font-weight: 800; color: var(--dark); line-height: 1.25; word-break: break-word; }
-.rank-meta p { margin: 0; font-size: 0.78rem; color: var(--dark-muted); font-weight: 600; }
-.rank-moves { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.rank-thumb { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; flex-shrink: 0; background: #f1f5f9; }
+.rank-meta { flex: 1; min-width: 0; overflow: hidden; }
+.rank-meta h4 {
+    margin: 0 0 3px; font-size: 0.92rem; font-weight: 800; color: var(--dark); line-height: 1.25;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rank-meta p { margin: 0; font-size: 0.75rem; color: var(--dark-muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-moves { display: flex; flex-direction: row; gap: 6px; flex-shrink: 0; }
 .rank-moves button {
-    width: 36px; height: 32px; border: none; border-radius: 8px; cursor: pointer; display: flex;
-    align-items: center; justify-content: center; background: #f1f5f9; color: #0f172a; font-size: 1.1rem;
+    width: 36px; height: 36px; border: none; border-radius: 10px; cursor: pointer; display: flex;
+    align-items: center; justify-content: center; background: #f1f5f9; color: #0f172a; font-size: 1.05rem;
 }
 .rank-moves button:hover { background: #4f46e5; color: #fff; }
-.rank-moves button:disabled { opacity: 0.35; cursor: not-allowed; }
-.rank-pos-input {
-    width: 58px; padding: 8px 6px !important; margin: 0 !important; text-align: center; font-weight: 800;
-    border-radius: 10px !important; border: 1.5px solid #c7d2fe !important; background: #fff !important;
+.rank-moves button:disabled { opacity: 0.3; cursor: not-allowed; }
+.rank-save-bar {
+    position: sticky; bottom: 12px; z-index: 20; margin-top: 16px; max-width: 720px;
+    display: flex; gap: 10px; padding: 12px; background: rgba(255,255,255,0.95);
+    border: 1px solid #c7d2fe; border-radius: 14px; box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+    backdrop-filter: blur(8px);
+}
+.rank-save-bar .btn-submit { flex: 1; margin: 0; }
+.rank-help {
+    background:#eef2ff; border:1px solid #c7d2fe; border-radius:14px; padding:12px 14px;
+    margin-bottom:16px; font-size:0.88rem; color:#312e81; font-weight:600; max-width:720px;
 }
 
 /* Shimmer & Overlay */
@@ -935,6 +954,11 @@ input:checked + .slider:before { transform: translateX(20px); }
     .stat-icon { width: 46px; height: 46px; font-size: 1.4rem; border-radius: 12px; }
     .stat-info h3 { font-size: 1.4rem; }
     .action-buttons { flex-wrap: wrap; gap: 10px; }
+    .rank-list { max-width: 100%; }
+    .rank-item { padding: 10px; gap: 8px; }
+    .rank-thumb { width: 42px; height: 42px; }
+    .rank-meta h4 { font-size: 0.85rem; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .rank-save-bar { bottom: 8px; left: 0; right: 0; }
     #toast { left: 15px; right: 15px; bottom: 15px; max-width: none; }
 }
 
@@ -951,6 +975,9 @@ input:checked + .slider:before { transform: translateX(20px); }
     .u-avatar { width: 44px; height: 44px; font-size: 1.1rem; }
     .user-card { padding: 14px; }
     .badge-success, .badge-warning, .badge-danger { font-size: 0.7rem; padding: 3px 8px; }
+    .rank-handle { width: 36px; height: 36px; }
+    .rank-num { width: 30px; height: 30px; font-size: 0.8rem; }
+    .rank-moves button { width: 34px; height: 34px; }
 }
 </style>
 </head>
@@ -1314,20 +1341,21 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <div class="toolbar">
                         <div>
                             <h2 class="section-title" style="margin-bottom: 5px;"><ion-icon name="swap-vertical-outline"></ion-icon> Store Ranking</h2>
-                            <p style="font-size: 0.9rem; color: var(--dark-muted); font-weight: 500;">Index / Home pe cards kis order me dikhenge — Rank 1 sabse upar. ↑↓ se arrange karo, phir Save dabao.</p>
-                        </div>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button type="button" onclick="loadRanking()" class="btn-submit" style="width:auto; background:#64748b;"><ion-icon name="refresh"></ion-icon> Refresh</button>
-                            <button type="button" id="btnSaveRanking" onclick="saveRanking()" class="btn-submit" style="width:auto; background:#4f46e5;"><ion-icon name="save"></ion-icon> Save Ranking</button>
+                            <p style="font-size: 0.9rem; color: var(--dark-muted); font-weight: 500;">Card ko slide / drag karke upar-neeche lao. Rank 1 = homepage pe pehle.</p>
                         </div>
                     </div>
 
-                    <div class="rank-help" style="background:#eef2ff; border:1px solid #c7d2fe; border-radius:14px; padding:14px 16px; margin-bottom:18px; font-size:0.88rem; color:#312e81; font-weight:600;">
-                        Tip: Top pe jo card chahiye usko ↑ se upar lao. Save ke baad homepage pe naya order dikhega.
+                    <div class="rank-help">
+                        ☰ left side se pakdo aur slide karo (phone pe bhi). Order set hone ke baad neeche <strong>Save Ranking</strong> dabao.
                     </div>
 
                     <div id="ranking_list" class="rank-list">
                         <div class="shimmer" style="height: 80px; border-radius: 14px;"></div>
+                    </div>
+
+                    <div class="rank-save-bar">
+                        <button type="button" onclick="loadRanking()" class="btn-submit" style="background:#64748b; flex:0.7;"><ion-icon name="refresh"></ion-icon> Refresh</button>
+                        <button type="button" id="btnSaveRanking" onclick="saveRanking()" class="btn-submit" style="background:#4f46e5;"><ion-icon name="save"></ion-icon> Save Ranking</button>
                     </div>
                 </div>
 
@@ -1368,6 +1396,11 @@ input:checked + .slider:before { transform: translateX(20px); }
     </div>
 
     <div id="toast"><ion-icon name="checkmark-circle"></ion-icon> <span id="toast-msg">Success</span></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"
+        integrity="sha384-BSxuMLxX+FCbTdYec3TbXlnMGEEM2QXTFdtDaveen71o+jswm2J36+xFqp8k4VHM"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -1615,8 +1648,52 @@ input:checked + .slider:before { transform: translateX(20px); }
             } catch(e) { showToast("Failed to load courses", "error"); }
         }
 
-        // Homepage / Index ranking (client list + save)
+        // Homepage / Index ranking — drag / slide to reorder
         window.pmRankOrder = [];
+        window.pmRankSortable = null;
+
+        function syncRankOrderFromDom() {
+            const box = document.getElementById('ranking_list');
+            if (!box) return;
+            const ids = Array.from(box.querySelectorAll('.rank-item')).map(function (el) { return el.getAttribute('data-id'); });
+            const byId = {};
+            (window.pmRankOrder || []).forEach(function (c) { byId[String(c.id)] = c; });
+            window.pmRankOrder = ids.map(function (id) { return byId[String(id)]; }).filter(Boolean);
+            box.querySelectorAll('.rank-item').forEach(function (el, i) {
+                const num = el.querySelector('.rank-num');
+                if (num) num.textContent = String(i + 1);
+                const up = el.querySelector('[data-dir="-1"]');
+                const down = el.querySelector('[data-dir="1"]');
+                if (up) up.disabled = i === 0;
+                if (down) down.disabled = i === ids.length - 1;
+            });
+        }
+
+        function bindRankSortable() {
+            const box = document.getElementById('ranking_list');
+            if (!box || typeof Sortable === 'undefined') return;
+            if (window.pmRankSortable) {
+                try { window.pmRankSortable.destroy(); } catch (e) {}
+                window.pmRankSortable = null;
+            }
+            window.pmRankSortable = Sortable.create(box, {
+                animation: 160,
+                handle: '.rank-handle',
+                draggable: '.rank-item',
+                ghostClass: 'rank-ghost',
+                chosenClass: 'rank-chosen',
+                dragClass: 'rank-drag',
+                forceFallback: true,
+                fallbackOnBody: true,
+                fallbackTolerance: 4,
+                touchStartThreshold: 4,
+                delayOnTouchOnly: true,
+                delay: 120,
+                onEnd: function () {
+                    syncRankOrderFromDom();
+                }
+            });
+        }
 
         function renderRankingList() {
             const box = document.getElementById('ranking_list');
@@ -1627,49 +1704,39 @@ input:checked + .slider:before { transform: translateX(20px); }
                 return;
             }
             box.innerHTML = list.map(function (c, i) {
-                const img = (c.image || 'small-logo.png').replace(/'/g, "&#39;");
+                const img = String(c.image || 'small-logo.png').replace(/"/g, '&quot;');
                 const title = String(c.title || 'Untitled').replace(/</g, '&lt;');
                 const cat = String(c.category || '').toUpperCase();
                 const isFirst = i === 0;
                 const isLast = i === list.length - 1;
                 return (
                     '<div class="rank-item" data-id="' + c.id + '">' +
+                      '<div class="rank-handle" title="Drag to move"><ion-icon name="menu-outline"></ion-icon></div>' +
                       '<div class="rank-num">' + (i + 1) + '</div>' +
                       '<img class="rank-thumb" src="' + img + '" alt="" onerror="this.src=\'small-logo.png\'">' +
                       '<div class="rank-meta">' +
                         '<h4>' + title + '</h4>' +
                         '<p>#' + c.id + ' · ' + cat + ' · ₹' + (c.price || 0) + '</p>' +
                       '</div>' +
-                      '<input class="rank-pos-input" type="number" min="1" max="' + list.length + '" value="' + (i + 1) + '" ' +
-                        'onchange="jumpRank(' + i + ', this.value)" title="Jump to position">' +
                       '<div class="rank-moves">' +
-                        '<button type="button" ' + (isFirst ? 'disabled' : '') + ' onclick="moveRank(' + i + ',-1)" title="Move up"><ion-icon name="chevron-up"></ion-icon></button>' +
-                        '<button type="button" ' + (isLast ? 'disabled' : '') + ' onclick="moveRank(' + i + ',1)" title="Move down"><ion-icon name="chevron-down"></ion-icon></button>' +
+                        '<button type="button" data-dir="-1" ' + (isFirst ? 'disabled' : '') + ' onclick="moveRankById(\'' + c.id + '\',-1)" title="Up"><ion-icon name="chevron-up"></ion-icon></button>' +
+                        '<button type="button" data-dir="1" ' + (isLast ? 'disabled' : '') + ' onclick="moveRankById(\'' + c.id + '\',1)" title="Down"><ion-icon name="chevron-down"></ion-icon></button>' +
                       '</div>' +
                     '</div>'
                 );
             }).join('');
+            bindRankSortable();
         }
 
-        window.moveRank = function (index, dir) {
-            const list = window.pmRankOrder;
+        window.moveRankById = function (id, dir) {
+            const list = window.pmRankOrder || [];
+            const index = list.findIndex(function (c) { return String(c.id) === String(id); });
+            if (index < 0) return;
             const j = index + dir;
-            if (!list || j < 0 || j >= list.length) return;
+            if (j < 0 || j >= list.length) return;
             const tmp = list[index];
             list[index] = list[j];
             list[j] = tmp;
-            renderRankingList();
-        };
-
-        window.jumpRank = function (fromIndex, rawPos) {
-            const list = window.pmRankOrder;
-            if (!list || !list.length) return;
-            let to = parseInt(rawPos, 10);
-            if (!isFinite(to)) { renderRankingList(); return; }
-            to = Math.max(1, Math.min(list.length, to)) - 1;
-            if (to === fromIndex) { renderRankingList(); return; }
-            const item = list.splice(fromIndex, 1)[0];
-            list.splice(to, 0, item);
             renderRankingList();
         };
 
@@ -1688,6 +1755,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         };
 
         window.saveRanking = async function () {
+            syncRankOrderFromDom();
             const btn = document.getElementById('btnSaveRanking');
             const ids = (window.pmRankOrder || []).map(function (c) { return c.id; });
             if (!ids.length) { showToast('Nothing to save', 'error'); return; }
@@ -1700,7 +1768,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 const res = await fetch(window.location.href, { method: 'POST', body: fd, credentials: 'same-origin' });
                 const data = await res.json();
                 if (data.status === 'success') {
-                    showToast('Store ranking saved! Homepage order updated.');
+                    showToast('Ranking saved! Homepage updated.');
                     loadRanking();
                     if (document.getElementById('table_body')) loadCourses();
                 } else {

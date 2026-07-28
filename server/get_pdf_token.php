@@ -47,7 +47,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$SECRET = 'PREM_MIND_SECURE_2026';
+require_once __DIR__ . '/pm_load_secrets.php';
+$SECRET = pm_pdf_hmac_secret();
+if ($SECRET === '') {
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'PDF secrets not configured (upload pm_secrets.php)']);
+    exit;
+}
 $TOKEN_TTL = 90;
 
 function is_allowed_site_request(): bool {
