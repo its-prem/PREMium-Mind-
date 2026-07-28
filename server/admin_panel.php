@@ -1046,21 +1046,24 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     <div id="pdf-error" class="upload-error-text"></div>
                                 </div>
 
-                                <div class="toggle-wrapper" style="background:#f0fdf4; border-color:#bbf7d0; margin-bottom: 15px;">
+                                <div class="toggle-wrapper" style="background:#f0fdf4; border-color:#bbf7d0; margin-bottom: 12px;">
                                     <label class="switch">
                                         <input type="checkbox" name="allow_download" id="inp_allow_download" value="1">
                                         <span class="slider"></span>
                                     </label>
                                     <div class="toggle-info">
                                         <h4 style="color: #065f46;">Show Download Button</h4>
-                                        <p style="color: #047857;">ON = Download chalegi. OFF = button pe click pe neeche wala custom message dikhega.</p>
+                                        <p style="color: #047857;">ON = Download chalegi. OFF = neeche message box khulega (click pe student ko dikhega).</p>
                                     </div>
                                 </div>
 
-                                <div class="form-group" style="margin-bottom: 18px;">
-                                    <label style="color:#065f46;">Download Click Message (per card)</label>
-                                    <textarea name="download_msg" id="inp_download_msg" rows="3" placeholder="Example: Download exam se 1 din pehle subah 6 baje unlock hoga."></textarea>
-                                    <div class="file-hint" style="margin-top:6px;">Download OFF hone par student click kare to ye text dikhega. Khali chhodo to default message.</div>
+                                <div id="downloadMsgBox" class="pm-cond-box" style="display:none; background:#fff7ed; border:1px solid #fed7aa; border-radius:14px; padding:16px 18px; margin-bottom:18px;">
+                                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                                        <ion-icon name="lock-closed-outline" style="font-size:20px; color:#c2410c;"></ion-icon>
+                                        <label style="margin:0; color:#9a3412; font-weight:800;">Download Locked Message</label>
+                                    </div>
+                                    <textarea name="download_msg" id="inp_download_msg" rows="3" placeholder="Example: Download exam se 1 din pehle subah 6 baje unlock hoga." style="width:100%; border:1px solid #fdba74; border-radius:10px; padding:12px; font-size:13px; line-height:1.5; resize:vertical; background:#fff;"></textarea>
+                                    <div class="file-hint" style="margin-top:8px; color:#9a3412;">Download OFF hai — student Download pe click kare to ye message dikhega. Khali = default text.</div>
                                 </div>
 
                                 <div class="toggle-wrapper" style="background:#111; border-color:#334155; margin-bottom: 15px;">
@@ -1095,7 +1098,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                         </label>
                                         <div class="toggle-info">
                                             <h4>Show T&amp;C Checkbox</h4>
-                                            <p>Require accept before pay</p>
+                                            <p>ON = pehle T&amp;C, phir pay — neeche text box khulega</p>
                                         </div>
                                     </div>
                                     <div class="toggle-wrapper">
@@ -1110,13 +1113,18 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     </div>
                                 </div>
 
-                                <div class="form-group" style="margin-top: 18px; margin-bottom: 20px;">
-                                    <label>Custom Terms &amp; Conditions (optional — is course only)</label>
-                                    <textarea name="tnc_text" id="inp_tnc_text" rows="10" placeholder="Khali chhodo = default sample T&amp;C sab courses pe. Yahan likho to SIRF is course pe ye text dikhega."></textarea>
-                                    <div class="file-hint" style="margin-top:6px;">Blank = website ka default sample. Edit karo to is card pe custom T&amp;C.</div>
-                                    <button type="button" id="btnLoadDefaultTnc" class="btn-icon btn-edit" style="margin-top:8px; width:auto; padding:8px 12px; gap:6px;">
-                                        <ion-icon name="document-text-outline"></ion-icon> Load Default Sample Text
-                                    </button>
+                                <div id="tncTextBox" class="pm-cond-box" style="display:none; background:#f8fafc; border:1px solid #cbd5e1; border-radius:14px; padding:16px 18px; margin:4px 0 22px;">
+                                    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <ion-icon name="document-text-outline" style="font-size:20px; color:#334155;"></ion-icon>
+                                            <label style="margin:0; color:#0f172a; font-weight:800;">Custom Terms &amp; Conditions</label>
+                                        </div>
+                                        <button type="button" id="btnLoadDefaultTnc" class="btn-icon btn-edit" style="width:auto; padding:8px 12px; gap:6px; margin:0;">
+                                            <ion-icon name="document-text-outline"></ion-icon> Load Default Sample
+                                        </button>
+                                    </div>
+                                    <textarea name="tnc_text" id="inp_tnc_text" rows="10" placeholder="Har line: 1. Title: rest of text&#10;Title bold dikhega, baaki normal. Khali = default sample sab courses pe." style="width:100%; border:1px solid #94a3b8; border-radius:10px; padding:12px; font-size:13px; line-height:1.55; resize:vertical; background:#fff; font-family:inherit;"></textarea>
+                                    <div class="file-hint" style="margin-top:8px;">Format: <code>1. Non-Refundable: All sales are final...</code> — colon se pehle bold. Blank = website default sample.</div>
                                 </div>
 
                                 <h4 style="font-size: 1.1rem; font-weight: 800; border-bottom: 1px solid var(--gray-border); padding-bottom: 10px; margin-top: 10px; margin-bottom: 15px;">Buttons & External Links</h4>
@@ -1544,6 +1552,15 @@ input:checked + .slider:before { transform: translateX(20px); }
 6. Important Notice: This content is based on analysis and predictions; exact exam questions are not guaranteed.
 7. Agreement: By proceeding, you agree to PREMium Mind's standard terms of service.`;
 
+        function syncConditionalBoxes() {
+            const dlOn = !!(document.getElementById('inp_allow_download') || {}).checked;
+            const tncOn = !!(document.getElementById('inp_show_tnc') || {}).checked;
+            const dlBox = document.getElementById('downloadMsgBox');
+            const tncBox = document.getElementById('tncTextBox');
+            if (dlBox) dlBox.style.display = dlOn ? 'none' : 'block';
+            if (tncBox) tncBox.style.display = tncOn ? 'block' : 'none';
+        }
+
         const btnLoadDefaultTnc = document.getElementById('btnLoadDefaultTnc');
         if (btnLoadDefaultTnc) {
             btnLoadDefaultTnc.addEventListener('click', function () {
@@ -1551,6 +1568,12 @@ input:checked + .slider:before { transform: translateX(20px); }
                 showToast('Default T&C sample loaded — edit karke Save karo', 'success');
             });
         }
+
+        const inpAllowDl = document.getElementById('inp_allow_download');
+        const inpShowTnc = document.getElementById('inp_show_tnc');
+        if (inpAllowDl) inpAllowDl.addEventListener('change', syncConditionalBoxes);
+        if (inpShowTnc) inpShowTnc.addEventListener('change', syncConditionalBoxes);
+        syncConditionalBoxes();
 
         window.editCard = function(btn) {
             const data = JSON.parse(btn.getAttribute('data-course'));
@@ -1574,6 +1597,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             document.getElementById('inp_show_preview').checked = data.show_preview == 1 || data.show_preview === '1' || data.show_preview === true;
             document.getElementById('inp_tnc_text').value = data.tnc_text || '';
             document.getElementById('inp_download_msg').value = data.download_msg || '';
+            syncConditionalBoxes();
 
             document.getElementById('edit_id').value = data.id;
             document.getElementById('form_title').innerHTML = '<ion-icon name="create"></ion-icon> Edit Course';
@@ -1598,6 +1622,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             document.getElementById('inp_allow_download').checked = false;
             document.getElementById('inp_tnc_text').value = '';
             document.getElementById('inp_download_msg').value = '';
+            syncConditionalBoxes();
 
             document.getElementById('form_title').innerHTML = '<ion-icon name="add-circle"></ion-icon> Create New Course';
             document.getElementById('submitBtn').innerHTML  = '<ion-icon name="cloud-upload"></ion-icon> Publish Course';

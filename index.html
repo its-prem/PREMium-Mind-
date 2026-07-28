@@ -1789,14 +1789,14 @@
     </div>
 
     <div id="tncModal" class="wa-modal">
-        <div class="wa-content" style="max-height:92vh; overflow-y:auto;">
+        <div class="wa-content">
             <span onclick="closeTncModal()"
                 style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
             <h3 style="margin-bottom:8px; font-size:1.4rem;">Terms & Conditions 📜</h3>
             <p style="font-size:13px; color:#666; margin-bottom:15px;">Please read terms before payment.</p>
 
             <div id="tncTextBody"
-                style="background:#f9fafb; padding:15px; border-radius:8px; font-size:12px; color:#444; margin-bottom:15px; border:1px solid #eee; line-height: 1.7; white-space: pre-wrap; word-break: break-word;">
+                style="background:#f9fafb; padding:15px; border-radius:8px; font-size:11px; color:#444; margin-bottom:15px; border:1px solid #eee; line-height: 1.6; height: 120px; overflow-y: auto;">
             </div>
 
             <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
@@ -2079,6 +2079,7 @@
         }
 
         // Default T&C sample — used when course has no custom tnc_text
+        // Format: "N. Title: body" → Title bold, body normal (same look as before)
         const PM_DEFAULT_TNC =
 `1. Non-Refundable: All sales are final. No refunds will be provided once the course access is granted.
 2. No Sharing: Sharing your account details with others is strictly prohibited and will lead to an instant permanent ban without refund.
@@ -2094,12 +2095,36 @@
             return list.find(function (c) { return String(c.id) === String(courseId); }) || null;
         }
 
+        function escapeTncHtml(s) {
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function formatTncHtml(raw) {
+            const text = String(raw || '').trim();
+            if (!text) return '';
+            // Admin pasted HTML (strong/br) — use as-is
+            if (/<\s*(strong|b|br|p|em|div)\b/i.test(text)) return text;
+            return text.split(/\n+/).map(function (line) {
+                line = line.trim();
+                if (!line) return '';
+                const m = line.match(/^(\d+\.\s*[^:]+:)\s*(.*)$/);
+                if (m) {
+                    return '<strong>' + escapeTncHtml(m[1]) + '</strong> ' + escapeTncHtml(m[2]);
+                }
+                return escapeTncHtml(line);
+            }).filter(Boolean).join('<br>');
+        }
+
         function fillTncModalText(courseId) {
             const body = document.getElementById('tncTextBody');
             if (!body) return;
             const course = resolveCourseById(courseId);
             const custom = course && course.tnc_text ? String(course.tnc_text).trim() : '';
-            body.textContent = custom || PM_DEFAULT_TNC;
+            body.innerHTML = formatTncHtml(custom || PM_DEFAULT_TNC);
         }
 
         let currentPurchaseInfo = {};
