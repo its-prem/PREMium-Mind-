@@ -14,6 +14,10 @@ $allowed_origins = [
     'https://diplomawallah.in',
     'https://www.diplomawallah.in',
     'https://premind.netlify.app',
+    'https://localhost',
+    'http://localhost',
+    'capacitor://localhost',
+    'ionic://localhost',
 ];
 
 function origin_allowed(string $origin): bool {
@@ -47,9 +51,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 require_once __DIR__ . '/pm_load_secrets.php';
 $SECRET = pm_pdf_hmac_secret();
-if ($SECRET === '') {
+$SECRETS = pm_pdf_hmac_secrets();
+if ($SECRET === '' || !$SECRETS) {
     http_response_code(500);
-    exit('Error: PDF secrets not configured (upload pm_secrets.php)');
+    exit('Error: PDF secrets not configured');
 }
 
 function is_allowed_site_request(): bool {
@@ -171,8 +176,15 @@ if (count($parts) !== 2) {
 }
 
 [$payload_b64, $sig] = $parts;
-$expected = hash_hmac('sha256', $payload_b64, $SECRET);
-if (!hash_equals($expected, $sig)) {
+$sigOk = false;
+foreach ($SECRETS as $trySecret) {
+    $expected = hash_hmac('sha256', $payload_b64, $trySecret);
+    if (hash_equals($expected, $sig)) {
+        $sigOk = true;
+        break;
+    }
+}
+if (!$sigOk) {
     http_response_code(403);
     exit('Error: Unauthorized Access (Invalid Token)');
 }

@@ -1118,7 +1118,8 @@
          })
          .catch(err => {
              loadingState.classList.add('is-error');
-             loadingState.innerHTML = "<p class='loader-text'>Access Denied. Secure Connection Failed.</p>";
+             const msg = (err && err.message) ? String(err.message) : 'Secure Connection Failed';
+             loadingState.innerHTML = "<p class='loader-text'>Access Denied. " + msg.replace(/[<>&]/g, '') + "</p>";
              console.error(err);
          });
      } else {

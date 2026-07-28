@@ -13,6 +13,10 @@ $allowed_origins = [
     'https://diplomawallah.in',
     'https://www.diplomawallah.in',
     'https://premind.netlify.app',
+    'https://localhost',
+    'http://localhost',
+    'capacitor://localhost',
+    'ionic://localhost',
 ];
 
 function origin_allowed(string $origin): bool {
@@ -51,7 +55,7 @@ require_once __DIR__ . '/pm_load_secrets.php';
 $SECRET = pm_pdf_hmac_secret();
 if ($SECRET === '') {
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => 'PDF secrets not configured (upload pm_secrets.php)']);
+    echo json_encode(['status' => 'error', 'message' => 'PDF secrets not configured']);
     exit;
 }
 $TOKEN_TTL = 90;
