@@ -1741,37 +1741,6 @@
         </div>
     </section>
 
-    <div id="waModal" class="wa-modal">
-        <div class="wa-content">
-            <span onclick="document.getElementById('waModal').style.display='none'"
-                style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
-            <h3 style="margin-bottom:8px; font-size:1.4rem;">Unlock for Free 🎁</h3>
-            <p style="font-size:13px; color:#666; margin-bottom:20px;">Share only in your college batchmates’ WhatsApp
-                group and upload the screenshot.
-                Screenshots from other groups or personal chats will be rejected.</p>
-            <form id="waForm">
-                <input type="hidden" id="wa_cid">
-                <label style="font-size:12px; font-weight:600;">College Name*</label>
-                <input type="text" id="wa_college" class="wa-input" placeholder="e.g. Govt Polytechnic" required>
-                <label style="font-size:12px; font-weight:600;">Branch*</label>
-                <input type="text" id="wa_branch" class="wa-input" placeholder="e.g. Mechanical" required>
-                <div
-                    style="background:#e8f5e9; padding:15px; border-radius:12px; text-align:center; margin-bottom:20px; border: 1px dashed #22c55e;">
-                    <p style="font-size:11px; color:#15803d; margin-bottom:8px; font-weight:600;">STEP 1: Share Link to
-                        WhatsApp Group</p>
-                    <a href="https://wa.me/?text=%F0%9F%8E%93%20DIPLOMA%20WALLAH%20%E2%80%93%20Biggest%20Platform%20for%20Diploma%20Students%0A%0A%F0%9F%93%9A%20Yahan%20aapko%20milega%3A%0A%E2%80%A2%20Latest%20information%20without%20any%20delay%0A%E2%80%A2%20Proper%20guidance%20throughout%20your%20diploma%20journey%0A%E2%80%A2%20Complete%20notes%20for%20subjects%0A%E2%80%A2%20PYQ%20%28Previous%20Year%20Questions%29%0A%E2%80%A2%20Exam%20important%20questions%0A%E2%80%A2%20Helpful%20resources%20for%20better%20preparation%0A%0A%F0%9F%92%A1%20Agar%20aap%20diploma%20kar%20rahe%20hain%2C%20to%20ye%20group%20aapki%20study%20aur%20preparation%20me%20bahut%20help%20karega.%0A%0A%F0%9F%9A%80%20Abhi%20join%20karein%20aur%20hamari%20family%20ka%20hissa%20banei%21%0A%0A%F0%9F%94%97%20Group%20Link%3A%0Ahttps%3A%2F%2Fchat.whatsapp.com%2FKpGfetOB0oiHvlgfKhPOUd%3Fmode%3Dhq1tcla"
-                        target="_blank"
-                        style="text-decoration:none; background:#22c55e; color:white; padding:8px 15px; border-radius:8px; font-weight:700; font-size:13px; display:inline-block;">📱
-                        Click to Share</a>
-                </div>
-                <label style="font-size:12px; font-weight:600;">STEP 2: Upload Share Screenshot*</label>
-                <input type="file" id="wa_file" accept="image/*" required
-                    style="margin-bottom:20px; font-size:12px; width: 100%;">
-                <button type="submit" id="waSubmit" class="wa-submit-btn">Submit for Review →</button>
-            </form>
-        </div>
-    </div>
-
     <div id="reportModal" class="wa-modal">
         <div class="wa-content">
             <span onclick="document.getElementById('reportModal').style.display='none'"
@@ -2472,23 +2441,13 @@
                 } else if (course.req_status === 'pending') {
                     btnHTML = `<button class="btn-reviewing" disabled>Reviewing... ⏳</button>`;
                 } else if (course.is_free == 1 || course.price == 0) {
-                    btnHTML = `<button class="wa-unlock-btn" onclick="openWaModal('${course.id}')">🎁 Unlock Free via WhatsApp</button>`;
+                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="0" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${course.btn_text || 'Get Free Access'}</button>`;
                 } else if (course.is_disabled == 1 || course.disabled == 1 || course.is_disabled == "1") {
                     btnHTML = `<button class="disabled-btn" disabled>Sold Out / Closed</button>`;
                 } else if (appOnly && !inApp) {
                     btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">Buy in App 📱</button>`;
                 } else {
                     btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${course.btn_text}</button>`;
-                    
-                    let courseName = course.title.toLowerCase();
-                    if ((courseName.includes('professional') || courseName.includes('skill')) && !courseName.includes('important questions')) {
-                        let waBtn = `
-                            <button class="wa-unlock-btn" onclick="openWaModal(${course.id})" style="margin-bottom: 10px; width: 100%;">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:18px !important; height:18px !important; margin-bottom:0 !important; display:inline-block; border-radius:0 !important;"> Unlock via WhatsApp
-                            </button>
-                        `;
-                        btnHTML = waBtn + btnHTML;
-                    }
                 }
 
                 const showPdfPreview = course.show_preview == 1 || course.show_preview === '1' || course.show_preview === true;
@@ -2645,45 +2604,6 @@
     </script>
 
     <script>
-        // 💥 WHATSAPP MODAL LOGIC 💥
-        function openWaModal(cid) {
-            if (!getStoredEmail()) {
-                alert("Please login first to unlock via WhatsApp!");
-                window.location.href = 'login.html';
-                return;
-            }
-            document.getElementById('wa_cid').value = cid;
-            document.getElementById('waModal').style.display = 'flex';
-        }
-
-        document.getElementById('waForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('waSubmit');
-            btn.innerText = "Processing..."; btn.disabled = true;
-
-            const fd = new FormData();
-            fd.append('email', getStoredEmail());
-            fd.append('phone', getStoredPhone() || '0000000000');
-            fd.append('course_id', document.getElementById('wa_cid').value);
-            fd.append('college', document.getElementById('wa_college').value);
-            fd.append('branch', document.getElementById('wa_branch').value);
-            fd.append('screenshot', document.getElementById('wa_file').files[0]);
-
-            try {
-                const res = await fetch('https://premind.diplomawallah.in/submit_review.php', { method: 'POST', body: fd });
-                const data = await res.json();
-                if (data.status === 'success') {
-                    alert("✅ Submitted Successfully! Please wait 2-4 hours for review.");
-                    window.location.reload();
-                } else {
-                    alert("Error: " + data.message);
-                }
-            } catch (error) {
-                alert("Server Error. Please try again later.");
-            }
-            btn.innerText = "Submit for Review →"; btn.disabled = false;
-        };
-
         // 🚩 REPORT ISSUE MODAL LOGIC 🚩
         window.openReportModal = function (cid) {
             if (!getStoredEmail()) {
@@ -2816,9 +2736,3 @@
 </body>
 
 </html>
-
-
-
-<!-- git add .
-git commit -m "Fixed WhatsApp button"
-git push origin main -->
