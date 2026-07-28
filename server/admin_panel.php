@@ -284,6 +284,18 @@ if ($colPrev && $colPrev->num_rows === 0) {
     @$conn->query("ALTER TABLE courses ADD COLUMN show_preview TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = show 1-page PDF preview on store card'");
 }
 
+// Custom T&C text per course (empty = use default sample on website)
+$colTnc = @$conn->query("SHOW COLUMNS FROM courses LIKE 'tnc_text'");
+if ($colTnc && $colTnc->num_rows === 0) {
+    @$conn->query("ALTER TABLE courses ADD COLUMN tnc_text TEXT NULL COMMENT 'Custom T&C for this course; empty = default sample'");
+}
+
+// Custom message when student clicks Download (locked / info)
+$colDlMsg = @$conn->query("SHOW COLUMNS FROM courses LIKE 'download_msg'");
+if ($colDlMsg && $colDlMsg->num_rows === 0) {
+    @$conn->query("ALTER TABLE courses ADD COLUMN download_msg TEXT NULL COMMENT 'Custom text shown when Download is clicked (esp. if locked)'");
+}
+
 // ════════════════════════════════════════════════
 //  AJAX HANDLERS (API ENDPOINTS) — auth required
 // ════════════════════════════════════════════════
@@ -509,6 +521,8 @@ if (isset($_POST['ajax_add'])) {
     $show_report_btn = isset($_POST['show_report_btn']) ? 1 : 0;
     $app_only  = isset($_POST['app_only']) ? 1 : 0;
     $show_preview = isset($_POST['show_preview']) ? 1 : 0;
+    $tnc_text = $conn->real_escape_string(trim((string)($_POST['tnc_text'] ?? '')));
+    $download_msg = $conn->real_escape_string(trim((string)($_POST['download_msg'] ?? '')));
 
     $image_path = $conn->real_escape_string($_POST['existing_image'] ?? 'small-logo.png');
     $pdf_path = $conn->real_escape_string($_POST['existing_pdf'] ?? '');
@@ -532,9 +546,9 @@ if (isset($_POST['ajax_add'])) {
     }
 
     if (!empty($edit_id)) {
-        $sql = "UPDATE courses SET title='$title', category='$category', image='$image_path',badge='$badge',desc1='$desc1',desc2='$desc2',price='$price',old_price='$old_price',link='$link',demo_link='$demo_link', website_link='$website_link', pdf_file='$pdf_path', allow_download='$allow_dl', btn_text='$btn_text',btn_type='$btn_type', show_tnc='$show_tnc', show_report_btn='$show_report_btn', app_only='$app_only', show_preview='$show_preview' WHERE id='$edit_id'";
+        $sql = "UPDATE courses SET title='$title', category='$category', image='$image_path',badge='$badge',desc1='$desc1',desc2='$desc2',price='$price',old_price='$old_price',link='$link',demo_link='$demo_link', website_link='$website_link', pdf_file='$pdf_path', allow_download='$allow_dl', btn_text='$btn_text',btn_type='$btn_type', show_tnc='$show_tnc', show_report_btn='$show_report_btn', app_only='$app_only', show_preview='$show_preview', tnc_text='$tnc_text', download_msg='$download_msg' WHERE id='$edit_id'";
     } else {
-        $sql = "INSERT INTO courses (title,category,image,badge,desc1,desc2,price,old_price,link,demo_link,website_link,pdf_file,allow_download,btn_text,btn_type,show_tnc,show_report_btn,app_only,show_preview) VALUES ('$title','$category','$image_path','$badge','$desc1','$desc2','$price','$old_price','$link','$demo_link','$website_link','$pdf_path','$allow_dl','$btn_text','$btn_type','$show_tnc','$show_report_btn','$app_only','$show_preview')";
+        $sql = "INSERT INTO courses (title,category,image,badge,desc1,desc2,price,old_price,link,demo_link,website_link,pdf_file,allow_download,btn_text,btn_type,show_tnc,show_report_btn,app_only,show_preview,tnc_text,download_msg) VALUES ('$title','$category','$image_path','$badge','$desc1','$desc2','$price','$old_price','$link','$demo_link','$website_link','$pdf_path','$allow_dl','$btn_text','$btn_type','$show_tnc','$show_report_btn','$app_only','$show_preview','$tnc_text','$download_msg')";
     }
     
     echo $conn->query($sql) ? json_encode(['status'=>'success']) : json_encode(['status'=>'error','msg'=>$conn->error]);
@@ -1039,8 +1053,14 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     </label>
                                     <div class="toggle-info">
                                         <h4 style="color: #065f46;">Show Download Button</h4>
-                                        <p style="color: #047857;">ON = is course/card pe Download (Save PDF) button dikhega. Har card ka alag control.</p>
+                                        <p style="color: #047857;">ON = Download chalegi. OFF = button pe click pe neeche wala custom message dikhega.</p>
                                     </div>
+                                </div>
+
+                                <div class="form-group" style="margin-bottom: 18px;">
+                                    <label style="color:#065f46;">Download Click Message (per card)</label>
+                                    <textarea name="download_msg" id="inp_download_msg" rows="3" placeholder="Example: Download exam se 1 din pehle subah 6 baje unlock hoga."></textarea>
+                                    <div class="file-hint" style="margin-top:6px;">Download OFF hone par student click kare to ye text dikhega. Khali chhodo to default message.</div>
                                 </div>
 
                                 <div class="toggle-wrapper" style="background:#111; border-color:#334155; margin-bottom: 15px;">
@@ -1074,7 +1094,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                             <span class="slider"></span>
                                         </label>
                                         <div class="toggle-info">
-                                            <h4>Show T&C Checkbox</h4>
+                                            <h4>Show T&amp;C Checkbox</h4>
                                             <p>Require accept before pay</p>
                                         </div>
                                     </div>
@@ -1088,6 +1108,15 @@ input:checked + .slider:before { transform: translateX(20px); }
                                             <p>Allow users to report issues</p>
                                         </div>
                                     </div>
+                                </div>
+
+                                <div class="form-group" style="margin-top: 18px; margin-bottom: 20px;">
+                                    <label>Custom Terms &amp; Conditions (optional — is course only)</label>
+                                    <textarea name="tnc_text" id="inp_tnc_text" rows="10" placeholder="Khali chhodo = default sample T&amp;C sab courses pe. Yahan likho to SIRF is course pe ye text dikhega."></textarea>
+                                    <div class="file-hint" style="margin-top:6px;">Blank = website ka default sample. Edit karo to is card pe custom T&amp;C.</div>
+                                    <button type="button" id="btnLoadDefaultTnc" class="btn-icon btn-edit" style="margin-top:8px; width:auto; padding:8px 12px; gap:6px;">
+                                        <ion-icon name="document-text-outline"></ion-icon> Load Default Sample Text
+                                    </button>
                                 </div>
 
                                 <h4 style="font-size: 1.1rem; font-weight: 800; border-bottom: 1px solid var(--gray-border); padding-bottom: 10px; margin-top: 10px; margin-bottom: 15px;">Buttons & External Links</h4>
@@ -1505,6 +1534,24 @@ input:checked + .slider:before { transform: translateX(20px); }
             btn.innerHTML = originalText; btn.disabled = false;
         });
 
+        // Default T&C sample (same as website — used when course tnc_text is empty)
+        const PM_DEFAULT_TNC =
+`1. Non-Refundable: All sales are final. No refunds will be provided once the course access is granted.
+2. No Sharing: Sharing your account details with others is strictly prohibited and will lead to an instant permanent ban without refund.
+3. Personal Use: The study material is for your personal use only. Distribution or piracy will invite legal actions.
+4. Download Policy: You can download the content only one day before the exam at 6:00 PM when the download button unlocks.
+5. Payment Instruction: After successful payment, please wait for 10 seconds on the same page. Then check your profile for access to the purchased content.
+6. Important Notice: This content is based on analysis and predictions; exact exam questions are not guaranteed.
+7. Agreement: By proceeding, you agree to PREMium Mind's standard terms of service.`;
+
+        const btnLoadDefaultTnc = document.getElementById('btnLoadDefaultTnc');
+        if (btnLoadDefaultTnc) {
+            btnLoadDefaultTnc.addEventListener('click', function () {
+                document.getElementById('inp_tnc_text').value = PM_DEFAULT_TNC;
+                showToast('Default T&C sample loaded — edit karke Save karo', 'success');
+            });
+        }
+
         window.editCard = function(btn) {
             const data = JSON.parse(btn.getAttribute('data-course'));
             
@@ -1525,6 +1572,8 @@ input:checked + .slider:before { transform: translateX(20px); }
             document.getElementById('inp_show_report_btn').checked = data.show_report_btn == 1;
             document.getElementById('inp_app_only').checked = data.app_only == 1 || data.app_only === '1' || data.app_only === true;
             document.getElementById('inp_show_preview').checked = data.show_preview == 1 || data.show_preview === '1' || data.show_preview === true;
+            document.getElementById('inp_tnc_text').value = data.tnc_text || '';
+            document.getElementById('inp_download_msg').value = data.download_msg || '';
 
             document.getElementById('edit_id').value = data.id;
             document.getElementById('form_title').innerHTML = '<ion-icon name="create"></ion-icon> Edit Course';
@@ -1547,6 +1596,8 @@ input:checked + .slider:before { transform: translateX(20px); }
             document.getElementById('inp_app_only').checked = false;
             document.getElementById('inp_show_preview').checked = false;
             document.getElementById('inp_allow_download').checked = false;
+            document.getElementById('inp_tnc_text').value = '';
+            document.getElementById('inp_download_msg').value = '';
 
             document.getElementById('form_title').innerHTML = '<ion-icon name="add-circle"></ion-icon> Create New Course';
             document.getElementById('submitBtn').innerHTML  = '<ion-icon name="cloud-upload"></ion-icon> Publish Course';

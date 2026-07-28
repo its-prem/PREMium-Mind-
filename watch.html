@@ -681,6 +681,11 @@
          || urlParams.get('download') === 'yes'
          || urlParams.get('allow_download') === '1';
      let customTitle = urlParams.get('title');
+     let downloadMsg = urlParams.get('dlmsg') || urlParams.get('download_msg') || '';
+     try { downloadMsg = downloadMsg ? decodeURIComponent(downloadMsg) : ''; } catch (e) {}
+     if (!downloadMsg) {
+         downloadMsg = 'Download abhi available nahi hai. Exam se 1 din pehle unlock hoga.';
+     }
 
      (function initWatchReturnUrl() {
          try {
@@ -856,8 +861,8 @@
          }
 
          if (!allowDownload) {
-             alert("⚠️ Download is disabled for this course by admin.");
-             toastNative("Download disabled");
+             alert(downloadMsg);
+             toastNative(downloadMsg);
              return;
          }
 
@@ -918,22 +923,31 @@
          const downloadBtn = document.getElementById('downloadBtn');
          if (!downloadBtn) return;
 
-         // Admin "Show Download Button" OFF → hide completely (per course)
+         // Always show button: allowed = download; locked = show admin custom message
+         downloadBtn.style.display = '';
+         const dlText = document.getElementById('dl-text');
          if (!allowDownload) {
-             downloadBtn.style.display = 'none';
-             downloadBtn.setAttribute('aria-hidden', 'true');
+             downloadBtn.classList.add('locked');
+             if (dlText) dlText.innerText = 'Locked';
+             downloadBtn.setAttribute('aria-label', 'Download locked');
+             downloadBtn.addEventListener('click', function (ev) {
+                 if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+                 alert(downloadMsg);
+                 toastNative(downloadMsg);
+             }, { passive: false });
+             downloadBtn.addEventListener('touchend', function (ev) {
+                 if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+                 alert(downloadMsg);
+             }, { passive: false });
              return;
          }
 
-         downloadBtn.style.display = '';
          downloadBtn.classList.remove('locked');
-         const dlText = document.getElementById('dl-text');
          if (dlText) dlText.innerText = 'Save PDF';
          downloadBtn.setAttribute('aria-label', 'Download PDF');
          downloadBtn.addEventListener('click', window.handleDownloadPdf, { passive: false });
          downloadBtn.addEventListener('touchend', window.handleDownloadPdf, { passive: false });
 
-         // Optional: open watch with ?autodl=1 to start download immediately
          if (urlParams.get('autodl') === '1') {
              setTimeout(function () {
                  try { window.handleDownloadPdf(); } catch (e) {}
