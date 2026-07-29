@@ -171,109 +171,23 @@
       <h2>PREMium Mind</h2>
     </div>
 
-    <div id="mainScreen" class="animate-enter">
-      <div class="tabs" id="authTabs" data-active="login">
-        <div class="tab-slider"></div>
-        <div class="tab active" id="loginTab" onclick="switchTab('login')">Login</div>
-        <div class="tab" id="registerTab" onclick="switchTab('register')">Sign Up</div>
-      </div>
+    <div id="mainScreen" class="animate-enter" style="text-align:center;">
+      <h3 style="font-size:1.35rem; font-weight:800; color:#111; margin-bottom:8px;">Login / Sign Up</h3>
+      <p style="font-size:0.9rem; color:#64748b; margin-bottom:28px; line-height:1.5;">
+        Sirf Google account se login / sign up hota hai.<br>
+        Naya ho ya purana — ek hi button.
+      </p>
 
-      <form id="loginForm" class="animate-enter">
-        <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" id="loginEmail" required placeholder="you@example.com">
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="loginPassword" required placeholder="Enter password">
-        </div>
-        <div class="forgot-link"><a onclick="showScreen('forgotScreen')">Forgot Password?</a></div>
-        
-        <button type="submit" class="auth-btn" id="loginBtn">Login to Continue</button>
+      <button type="button" class="google-login-btn" id="googleLoginBtn" style="border-width:2px; border-color:#111; padding:16px; font-size:1rem;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+        Continue with Google
+      </button>
 
-        <div class="divider"><span>OR</span></div>
+      <div id="loginMsg" class="message"></div>
 
-        <button type="button" class="google-login-btn" id="googleLoginBtn">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
-          Continue with Google
-        </button>
-
-        <div id="loginMsg" class="message"></div>
-      </form>
-
-      <form id="registerForm">
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="regName" required placeholder="John Doe">
-        </div>
-        <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" id="regEmail" required placeholder="john@example.com">
-        </div>
-        <div class="form-group">
-          <label>Phone Number</label>
-          <input type="tel" id="regPhone" required placeholder="10-digit mobile number" pattern="[0-9]{10}">
-        </div>
-        <div class="form-group">
-          <label>Create Password</label>
-          <input type="password" id="regPassword" required placeholder="Min 6 characters">
-        </div>
-        
-        <button type="submit" class="auth-btn" id="regBtn">Create Account</button>
-        <div id="regMsg" class="message"></div>
-      </form>
-    </div>
-
-    <div id="otpForm">
-      <div class="screen-header">
-        <span class="icon">✉️</span>
-        <h3>Verify Email</h3>
-        <p>We've sent a 6-digit OTP to <br><b id="displayOtpEmail" style="color:#111;"></b></p>
-      </div>
-      <div class="form-group">
-        <input type="text" id="otpInput" required placeholder="123456" maxlength="6" style="text-align:center; font-size:1.8rem; letter-spacing:10px; font-weight:800; padding:15px;">
-      </div>
-      <input type="hidden" id="otpEmail">
-      <button type="button" class="auth-btn" id="otpBtn" onclick="submitOTP()">Verify & Save Data</button>
-      <div id="otpMsg" class="message"></div>
-      <a class="back-btn" onclick="showScreen('mainScreen')" style="cursor:pointer;">← Change Email</a>
-    </div>
-
-    <div id="forgotScreen">
-      <div class="screen-header">
-        <span class="icon">🔑</span>
-        <h3>Forgot Password</h3>
-        <p>Enter your registered email address.</p>
-      </div>
-      <form id="forgotForm">
-        <div class="form-group">
-          <input type="email" id="forgotEmail" required placeholder="you@example.com">
-        </div>
-        <button type="submit" class="auth-btn" id="forgotBtn">Send Reset OTP</button>
-        <div id="forgotMsg" class="message"></div>
-      </form>
-      <a class="back-btn" onclick="showScreen('mainScreen')" style="cursor:pointer;">← Back to Login</a>
-    </div>
-
-    <div id="resetScreen">
-      <div class="screen-header">
-        <span class="icon">🔐</span>
-        <h3>Reset Password</h3>
-        <p>Check your email for the OTP code.</p>
-      </div>
-      <form id="resetForm">
-        <div class="form-group">
-          <label>OTP Code</label>
-          <input type="text" id="resetOtp" required maxlength="6" placeholder="123456" style="text-align:center; font-size:1.5rem; letter-spacing:8px; font-weight:800;">
-        </div>
-        <div class="form-group">
-          <label>New Password</label>
-          <input type="password" id="newPassword" required placeholder="Min 6 characters">
-        </div>
-        <button type="submit" class="auth-btn" id="resetBtn">Update Password</button>
-        <div id="resetMsg" class="message"></div>
-      </form>
-      <a class="back-btn" onclick="showScreen('mainScreen')" style="cursor:pointer;">← Back to Login</a>
+      <p style="margin-top:22px; font-size:0.78rem; color:#94a3b8; line-height:1.5;">
+        Email/password login band hai. Google se continue karo.
+      </p>
     </div>
 
     <a href="index.html" class="back-btn" style="margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px;">← Back to Home</a>
@@ -282,12 +196,8 @@
 
 <script src="pm-session.js"></script>
 <script>
-  // Auth API helpers — load before Google module
   (function () {
     const HOSTINGER_API = 'https://premind.diplomawallah.in';
-
-    // Always hit Hostinger directly. CORS already allows premind.netlify.app.
-    // Avoid Netlify proxy (can drop/empty POST body) and FormData reuse bugs.
     async function apiPost(path, fields) {
       const attempts = [];
       if (fields instanceof FormData) {
@@ -298,7 +208,6 @@
         Object.keys(fields).forEach(function (k) { fd.append(k, fields[k] == null ? '' : fields[k]); });
         attempts.push(fd);
       }
-
       let lastError = null;
       for (let i = 0; i < attempts.length; i++) {
         try {
@@ -309,22 +218,27 @@
             credentials: 'omit'
           });
           const text = await res.text();
-          try {
-            return JSON.parse(text.trim());
-          } catch (e) {
-            lastError = new Error('Server error. Please try again.');
-          }
+          try { return JSON.parse(text.trim()); }
+          catch (e) { lastError = new Error('Server error. Please try again.'); }
         } catch (err) {
           lastError = err;
         }
       }
       throw lastError || new Error('Network error. Please try again.');
     }
-
     window.PM_API_BASE = HOSTINGER_API;
     window.PM_HOSTINGER_API = HOSTINGER_API;
     window.pmApiPost = apiPost;
   })();
+
+  function showMessage(elementId, msg, isError) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.style.display = 'block';
+    el.textContent = msg;
+    el.className = 'message ' + (isError ? 'error' : 'success');
+  }
+  window.showMessage = showMessage;
 </script>
 
 <script type="module">
@@ -349,7 +263,6 @@
     return await u.getIdToken(true);
   };
 
-  // App WebView me popup block hota hai — native Google sign-in use karo.
   function isNativeApp() {
     if (window.Capacitor
       && typeof window.Capacitor.isNativePlatform === 'function'
@@ -402,6 +315,7 @@
       const originalBtnContent = googleBtn.innerHTML;
       try {
         googleBtn.textContent = 'Verifying...';
+        googleBtn.disabled = true;
         const user = await doGoogleSignIn();
 
         const fd = new FormData();
@@ -414,7 +328,6 @@
           console.warn('check_user failed, continuing with Google session', e);
         }
 
-        // Google login: DB me na ho to bhi session save — buy ke liye email kaafi
         let phone = String((checkData && checkData.phone) || '').replace(/\D/g, '').slice(-10);
         if (phone.length !== 10 || phone === '0000000000' || phone === '9999999999') {
           try {
@@ -428,201 +341,20 @@
         if (!window.saveLoginSession(user.email, name, phone || '0000000000')) {
           throw new Error('Could not save session. Allow cookies/storage.');
         }
-        if (!checkData.exists) {
-          // Prefill signup for later, but let them browse/buy with Google email
-          try {
-            document.getElementById('regEmail').value = user.email;
-            document.getElementById('regName').value = user.displayName || '';
-          } catch (e) {}
-        }
+        window.showMessage('loginMsg', 'Login successful! Redirecting…', false);
         window.location.replace('index.html');
         return;
       } catch (error) {
         console.error('Google login error:', error);
         if (error.code !== 'auth/popup-closed-by-user') {
           const msg = (error && error.message) ? error.message : 'Google login failed.';
-          alert(msg);
+          window.showMessage('loginMsg', msg, true);
         }
         googleBtn.innerHTML = originalBtnContent;
+        googleBtn.disabled = false;
       }
     });
   }
-</script>
-
-<script>
-  const API_BASE = window.PM_API_BASE || 'https://premind.diplomawallah.in';
-  const BASE_URL = API_BASE;
-  let   pendingEmail = '';
-  const apiPost = window.pmApiPost;
-  const apiOk = window.pmIsApiSuccess;
-
-  // ── Screen switcher with Smooth Animation ──
-  window.showScreen = function(screenId) {
-    ['mainScreen','otpForm','forgotScreen','resetScreen'].forEach(id => {
-      const el = document.getElementById(id);
-      if (id === screenId) {
-        el.style.display = 'block';
-        el.classList.add('animate-enter');
-      } else {
-        el.style.display = 'none';
-        el.classList.remove('animate-enter');
-      }
-    });
-  }
-
-  // ── Tab Switcher with Slider Animation ──
-  window.switchTab = function(tab) {
-    const tabsContainer = document.getElementById('authTabs');
-    tabsContainer.setAttribute('data-active', tab);
-    
-    document.getElementById('loginForm').style.display    = tab === 'login'    ? 'block' : 'none';
-    document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
-    
-    if (tab === 'login') {
-      document.getElementById('loginForm').classList.add('animate-enter');
-      document.getElementById('registerForm').classList.remove('animate-enter');
-    } else {
-      document.getElementById('registerForm').classList.add('animate-enter');
-      document.getElementById('loginForm').classList.remove('animate-enter');
-    }
-
-    document.getElementById('loginTab').classList.toggle('active',    tab === 'login');
-    document.getElementById('registerTab').classList.toggle('active', tab === 'register');
-    
-    document.getElementById('loginMsg').style.display = 'none';
-    document.getElementById('regMsg').style.display   = 'none';
-  }
-
-  function showMessage(elementId, msg, isError) {
-    const el = document.getElementById(elementId);
-    el.style.display = 'block';
-    el.textContent   = msg;
-    el.className     = 'message ' + (isError ? 'error' : 'success');
-  }
-
-  // ══ 1. REGISTER (TEMPORARY SAVE & SEND OTP) ══
-  document.getElementById('registerForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('regBtn');
-    btn.textContent = 'Sending OTP...'; btn.disabled = true;
-
-    const formData = {
-      name: document.getElementById('regName').value.trim(),
-      email: document.getElementById('regEmail').value.trim(),
-      phone: document.getElementById('regPhone').value.trim(),
-      password: document.getElementById('regPassword').value
-    };
-
-    try {
-      const data = await apiPost('/register_api.php', formData);
-
-      if (apiOk(data)) {
-        pendingEmail = formData.email;
-        document.getElementById('otpEmail').value = pendingEmail;
-        document.getElementById('displayOtpEmail').innerText = pendingEmail;
-        showScreen('otpForm');
-        showMessage('otpMsg', data.message, false);
-      } else {
-        showMessage('regMsg', data.message, true);
-      }
-    } catch (err) { showMessage('regMsg', err.message || 'Network error.', true); }
-
-    btn.textContent = 'Create Account'; btn.disabled = false;
-  });
-
-  // ══ 2. OTP VERIFY (FINAL DATABASE INSERT) ══
-  window.submitOTP = function() {
-    const btn = document.getElementById('otpBtn');
-    btn.textContent = 'Verifying & Saving...'; btn.disabled = true;
-
-    apiPost('/verify_otp.php', {
-      email: document.getElementById('otpEmail').value,
-      otp: document.getElementById('otpInput').value
-    })
-      .then(data => {
-        if (apiOk(data)) {
-          alert('✅ Account created successfully! Please login now.');
-          showScreen('mainScreen');
-          switchTab('login');
-        } else {
-          showMessage('otpMsg', data.message, true);
-        }
-      })
-      .catch(() => showMessage('otpMsg', 'Network error.', true))
-      .finally(() => { btn.textContent = 'Verify & Save Data'; btn.disabled = false; });
-  }
-
-  // ══ 3. LOGIN ══
-  document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('loginBtn');
-    btn.textContent = 'Logging in...'; btn.disabled = true;
-
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-
-    try {
-      const data = await apiPost('/login_api.php', { email, password });
-
-      if (apiOk(data)) {
-        const sessionEmail = String(data.email || email).trim();
-        if (!window.saveLoginSession(sessionEmail, data.name || data.user_name, data.phone)) {
-          showMessage('loginMsg', 'Login OK but session save failed. Allow site cookies.', true);
-          return;
-        }
-        window.location.replace('index.html');
-      } else {
-        showMessage('loginMsg', data.message || data.error || 'Invalid email or password.', true);
-      }
-    } catch (err) {
-      console.error('Login error:', err);
-      showMessage('loginMsg', err.message || 'Network error. Please try again.', true);
-    }
-
-    btn.textContent = 'Login to Continue'; btn.disabled = false;
-  });
-
-  // ══ 4. FORGOT PASSWORD ══
-  document.getElementById('forgotForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('forgotBtn');
-    btn.textContent = 'Sending...'; btn.disabled = true;
-
-    pendingEmail = document.getElementById('forgotEmail').value.trim();
-
-    try {
-      const data = await apiPost('/forgot_password.php', { email: pendingEmail });
-
-      if (apiOk(data)) {
-        showMessage('forgotMsg', '✅ OTP sent! Check your email.', false);
-        setTimeout(() => { showScreen('resetScreen'); }, 1500);
-      } else { showMessage('forgotMsg', data.message, true); }
-    } catch (err) { showMessage('forgotMsg', err.message || 'Network error.', true); }
-
-    btn.textContent = 'Send Reset OTP'; btn.disabled = false;
-  });
-
-  // ══ 5. RESET PASSWORD ══
-  document.getElementById('resetForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('resetBtn');
-    btn.textContent = 'Resetting...'; btn.disabled = true;
-
-    try {
-      const data = await apiPost('/reset_password.php', {
-        email: pendingEmail,
-        otp: document.getElementById('resetOtp').value,
-        new_password: document.getElementById('newPassword').value
-      });
-
-      if (apiOk(data)) {
-        showMessage('resetMsg', '✅ Password reset! Redirecting to login...', false);
-        setTimeout(() => { showScreen('mainScreen'); switchTab('login'); }, 1500);
-      } else { showMessage('resetMsg', data.message, true); }
-    } catch (err) { showMessage('resetMsg', err.message || 'Network error.', true); }
-
-    btn.textContent = 'Update Password'; btn.disabled = false;
-  });
 </script>
 
 <script src="pm-inspect-block.js"></script>
