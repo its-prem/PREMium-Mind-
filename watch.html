@@ -821,6 +821,106 @@
          window.AndroidPdfSaver.finish();
      }
 
+     function offlineCacheKey() {
+         return String(userEmail || '') + '|' + String(pdfFile || '');
+     }
+
+     function offlineTitle() {
+         try {
+             if (customTitle) return decodeURIComponent(customTitle);
+         } catch (e) {}
+         if (customTitle) return customTitle;
+         if (pdfFile) {
+             const n = pdfFile.substring(pdfFile.lastIndexOf('/') + 1).replace(/\.pdf$/i, '');
+             if (n) return n;
+         }
+         return 'PDF Notes';
+     }
+
+     async function cachePdfForOffline(buf) {
+         if (!isNativeApp() || !window.AndroidPdfSaver || !window.AndroidPdfSaver.cacheBegin) return;
+         const key = offlineCacheKey();
+         if (!key || key === '|') return;
+         try {
+             window.AndroidPdfSaver.cacheBegin(key, offlineTitle());
+             const bytes = new Uint8Array(buf);
+             const chunkSize = 128 * 1024;
+             for (let i = 0; i < bytes.length; i += chunkSize) {
+                 const slice = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+                 window.AndroidPdfSaver.cacheAppend(bytesToBase64(slice));
+                 if (i > 0 && i % (chunkSize * 4) === 0) {
+                     await new Promise(r => setTimeout(r, 0));
+                 }
+             }
+             window.AndroidPdfSaver.cacheFinish();
+         } catch (e) {
+             console.warn('offline cache failed', e);
+         }
+     }
+
+     async function loadOfflinePdfBytes() {
+         if (!isNativeApp() || !window.AndroidPdfSaver || !window.AndroidPdfSaver.hasOfflineCache) {
+             return null;
+         }
+         const key = offlineCacheKey();
+         if (!window.AndroidPdfSaver.hasOfflineCache(key)) return null;
+         const size = window.AndroidPdfSaver.offlineCacheSize(key) || 0;
+         if (size < 64) return null;
+         const chunkSize = 128 * 1024;
+         const parts = [];
+         let total = 0;
+         for (let offset = 0; offset < size; offset += chunkSize) {
+             const b64 = window.AndroidPdfSaver.readOfflineChunk(key, offset, chunkSize);
+             if (!b64) break;
+             const bin = atob(b64);
+             const u8 = new Uint8Array(bin.length);
+             for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+             parts.push(u8);
+             total += u8.length;
+         }
+         if (total < 64) return null;
+         const out = new Uint8Array(total);
+         let o = 0;
+         for (let i = 0; i < parts.length; i++) {
+             out.set(parts[i], o);
+             o += parts[i].length;
+         }
+         return out.buffer;
+     }
+
+     async function getPdfBytesForViewer() {
+         try {
+             return await fetchSecurePdfBytes('view');
+         } catch (netErr) {
+             const key = offlineCacheKey();
+             const hasNativeCache = isNativeApp()
+                 && window.AndroidPdfSaver
+                 && window.AndroidPdfSaver.hasOfflineCache
+                 && window.AndroidPdfSaver.hasOfflineCache(key);
+
+             // Fully offline: native viewer (no pdf.js CDN needed)
+             if (hasNativeCache && !navigator.onLine && window.AndroidPdfSaver.openCachedViewer) {
+                 toastNative('Opening offline copy');
+                 window.AndroidPdfSaver.openCachedViewer(key, offlineTitle());
+                 throw new Error('Opened offline viewer');
+             }
+
+             // Flaky network but page/pdf.js already loaded — try bytes into viewer
+             const offlineBuf = await loadOfflinePdfBytes();
+             if (offlineBuf) {
+                 toastNative('Opening offline copy');
+                 return offlineBuf;
+             }
+
+             if (hasNativeCache && window.AndroidPdfSaver.openCachedViewer) {
+                 toastNative('Opening offline copy');
+                 window.AndroidPdfSaver.openCachedViewer(key, offlineTitle());
+                 throw new Error('Opened offline viewer');
+             }
+             throw netErr;
+         }
+     }
+
      function toastNative(msg) {
          try {
              if (window.AndroidPdfSaver && window.AndroidPdfSaver.showToast) {
@@ -971,12 +1071,23 @@
              return Math.max(240, w - pad);
          }
 
-         fetchSecurePdfBytes('view')
+         getPdfBytesForViewer()
          .then(async (pdfData) => {
+             // Keep a copy for offline cache before pdf.js consumes/nulls it
+             let cacheCopy = null;
+             try {
+                 if (isNativeApp()) cacheCopy = pdfData.slice(0);
+             } catch (e) { cacheCopy = null; }
+
              pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
              const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
              pdfData = null;
+
+             if (cacheCopy) {
+                 cachePdfForOffline(cacheCopy).catch(function () {});
+                 cacheCopy = null;
+             }
 
              const isMobile = window.innerWidth < 700 || /Android|iPhone|iPad/i.test(navigator.userAgent);
              const nativeApp = isNativeApp();
@@ -984,13 +1095,13 @@
              function getRenderQuality() {
                  if (nativeApp) {
                      return {
-                         dpr: Math.min(window.devicePixelRatio || 2.5, 3),
-                         maxEdge: 8192
+                         dpr: Math.min(window.devicePixelRatio || 1.75, 2),
+                         maxEdge: 4096
                      };
                  }
                  return {
-                     dpr: Math.min(window.devicePixelRatio || 1, isMobile ? 2.5 : 2),
-                     maxEdge: isMobile ? 5600 : 6400
+                     dpr: Math.min(window.devicePixelRatio || 1, isMobile ? 2 : 1.75),
+                     maxEdge: isMobile ? 4096 : 5600
                  };
              }
 
@@ -1008,12 +1119,12 @@
              }
 
              function calcPixelRatio(viewport) {
-                 let pr = Math.max(quality.dpr, nativeApp ? 2 : 1);
+                 let pr = Math.max(quality.dpr, nativeApp ? 1.5 : 1);
                  const longEdge = Math.max(viewport.width, viewport.height) * pr;
                  if (longEdge > quality.maxEdge) {
                      pr = quality.maxEdge / Math.max(viewport.width, viewport.height);
                  }
-                 return Math.max(pr, nativeApp ? 1.75 : 1);
+                 return Math.max(pr, nativeApp ? 1.25 : 1);
              }
 
              async function renderEntry(entry, renderScale) {
@@ -1053,18 +1164,28 @@
 
              fitScale = computeFitScale();
 
-             for (let num = 1; num <= pdfDoc.numPages; num++) {
-                 if (loaderText) loaderText.textContent = 'Loading ' + num + '/' + pdfDoc.numPages + '...';
+             // Fast first paint: show page 1 ASAP, then load remaining pages in background
+             const totalPages = pdfDoc.numPages;
+             async function mountAndRender(num) {
+                 if (loaderText) loaderText.textContent = 'Loading ' + num + '/' + totalPages + '...';
                  const page = await pdfDoc.getPage(num);
                  const wrapper = document.createElement('div');
                  wrapper.className = 'page-wrapper';
+                 // Reserve height so scroll doesn't jump while later pages load
+                 wrapper.style.minHeight = Math.round(baseVp.height * fitScale) + 'px';
                  container.appendChild(wrapper);
                  const entry = { page, wrapper, renderedScale: 0 };
                  entries.push(entry);
                  await renderEntry(entry, fitScale);
+                 return entry;
              }
 
+             await mountAndRender(1);
              loadingState.style.display = 'none';
+
+             for (let num = 2; num <= totalPages; num++) {
+                 await mountAndRender(num);
+             }
 
              let zoomTimer = null;
              let zoomBusy = false;
@@ -1119,7 +1240,11 @@
          .catch(err => {
              loadingState.classList.add('is-error');
              const msg = (err && err.message) ? String(err.message) : 'Secure Connection Failed';
-             loadingState.innerHTML = "<p class='loader-text'>Access Denied. " + msg.replace(/[<>&]/g, '') + "</p>";
+             if (/Opened offline viewer/i.test(msg)) {
+                 loadingState.innerHTML = "<p class='loader-text'>Opening offline PDF…</p>";
+                 return;
+             }
+             loadingState.innerHTML = "<p class='loader-text'>Access Denied. " + msg.replace(/[<>&']/g, '') + "</p>";
              console.error(err);
          });
      } else {

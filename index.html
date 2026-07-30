@@ -2359,11 +2359,34 @@
         window.loadCourses = async function (userEmail = '') {
             try {
                 const container = document.getElementById('dynamic-products-container');
-                container.innerHTML = '<p style="text-align:center; width:100%;">Loading Premium Store...</p>';
+                const cacheKey = 'pm_store_cache_v1_' + String(userEmail || 'guest');
+                let usedCache = false;
+
+                // Instant paint from last successful store fetch
+                try {
+                    const cached = localStorage.getItem(cacheKey);
+                    if (cached) {
+                        const parsed = JSON.parse(cached);
+                        if (Array.isArray(parsed) && parsed.length) {
+                            globalLoadedCourses = parsed.filter(c => {
+                                const deletedVal = c.is_deleted;
+                                const isDeleted = deletedVal == 1 || deletedVal === '1' || deletedVal === true;
+                                return !isDeleted;
+                            });
+                            window.globalLoadedCourses = globalLoadedCourses;
+                            renderStoreGrid();
+                            usedCache = true;
+                        }
+                    }
+                } catch (e) {}
+
+                if (!usedCache && container) {
+                    container.innerHTML = '<p style="text-align:center; width:100%;">Loading Premium Store...</p>';
+                }
 
                 const apiUrl = userEmail ? `https://premind.diplomawallah.in/api.php?email=${encodeURIComponent(userEmail)}` : 'https://premind.diplomawallah.in/api.php';
 
-                const response = await fetch(apiUrl);
+                const response = await fetch(apiUrl, { cache: 'no-store' });
                 const allCourses = await response.json();
 
                 // 🚫 Filter out soft-deleted courses (is_deleted = 1). Only is_deleted = 0 (or missing) shows.
@@ -2373,6 +2396,10 @@
                     return !isDeleted;
                 }) : [];
                 window.globalLoadedCourses = globalLoadedCourses;
+
+                try {
+                    localStorage.setItem(cacheKey, JSON.stringify(globalLoadedCourses));
+                } catch (e) {}
 
                 renderStoreGrid();
                 // Deep link from app: ?pm_buy=COURSE_ID
@@ -2391,7 +2418,9 @@
                     }
                 } catch (e) {}
             } catch (error) {
-                document.getElementById('dynamic-products-container').innerHTML = '<p style="text-align:center; width:100%; color:red;">Database Connection Error.</p>';
+                if (!document.querySelector('#dynamic-products-container .course-card')) {
+                    document.getElementById('dynamic-products-container').innerHTML = '<p style="text-align:center; width:100%; color:red;">Database Connection Error.</p>';
+                }
             }
         };
 
@@ -2553,7 +2582,7 @@
           <div class="course-card">
               <div class="card-img-wrapper">
                   ${badgeHTML}
-                  <img src="${course.image || 'small-logo.png'}" alt="${course.title}" onerror="this.src='small-logo.png'">
+                  <img src="${course.image || 'small-logo.png'}" alt="${course.title}" loading="lazy" decoding="async" fetchpriority="${index < 4 ? 'high' : 'low'}" onerror="this.src='small-logo.png'">
               </div>
               
               ${previewLinkHTML}

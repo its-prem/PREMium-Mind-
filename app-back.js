@@ -354,12 +354,12 @@
     try {
       if (window.Android && typeof window.Android.downloadUrl === 'function') {
         window.Android.downloadUrl(apkUrl, fileName);
-        await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification shade check karo', fileName);
+        await window.pmNotifyDownload('Downloading APK…', fileName + ' — check notifications / Downloads', fileName);
         return 'started';
       }
       if (window.Android && typeof window.Android.downloadApk === 'function') {
         window.Android.downloadApk(apkUrl, fileName);
-        await window.pmNotifyDownload('Downloading APK…', fileName + ' — notification shade check karo', fileName);
+        await window.pmNotifyDownload('Downloading APK…', fileName + ' — check notifications / Downloads', fileName);
         return 'started';
       }
     } catch (e0) { /* continue */ }
@@ -368,7 +368,7 @@
     try {
       if (window.Android && typeof window.Android.openUrl === 'function') {
         window.Android.openUrl(apkUrl);
-        await window.pmNotifyDownload('Opening download', fileName + ' — browser me complete karo', fileName);
+        await window.pmNotifyDownload('Opening download', fileName + ' — complete the download in your browser', fileName);
         return 'external';
       }
     } catch (e1) { /* continue */ }
@@ -413,6 +413,16 @@
   };
 
   if (!isNativeApp()) return;
+
+  // Never show WhatsApp download helpers inside the app WebView
+  try {
+    document.querySelectorAll('#waApkBtn, a[href*="wa.me"], a[href*="whatsapp"]').forEach(function (el) {
+      if (el && el.closest && el.closest('#inAppDlHelp, .hero-card, main.wrap')) {
+        el.style.display = 'none';
+        el.setAttribute('hidden', 'hidden');
+      }
+    });
+  } catch (eWa) { /* ignore */ }
 
   // Index already lays out correctly without extra inset; watch + app-download need it.
   var path = (window.location.pathname || window.location.href || '').toLowerCase();
