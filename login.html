@@ -330,13 +330,17 @@
 
         let profile = null;
         try {
-          const uRes = await fetch('https://premind.diplomawallah.in/get_user.php?email=' + encodeURIComponent(user.email));
+          const uRes = await fetch(
+            'https://premind.diplomawallah.in/get_user.php?email=' + encodeURIComponent(user.email),
+            { mode: 'cors', credentials: 'omit', cache: 'no-store' }
+          );
           profile = await uRes.json();
         } catch (e) {}
 
+        // Hostinger APIs: check_user → {exists:true}; get_user → {status,phone} (often no name)
         const dbName = String(
-          (checkData && (checkData.name || checkData.user_name))
-          || (profile && (profile.name || profile.user_name))
+          (checkData && (checkData.name || checkData.user_name || checkData.full_name))
+          || (profile && (profile.name || profile.user_name || profile.full_name))
           || ''
         ).trim();
         const phone = String(
@@ -347,9 +351,10 @@
 
         const profileOk = !!(profile && (
           String(profile.status || '').toLowerCase() === 'success'
-          || profile.email
-          || profile.id
-          || profile.user_id
+          || !!profile.email
+          || !!profile.id
+          || !!profile.user_id
+          || isValidPhone(profile.phone || profile.mobile)
         ));
 
         const accountExists = !!(checkData && (
@@ -359,10 +364,10 @@
           || checkData.exists === 'true'
           || String(checkData.status || '').toLowerCase() === 'found'
           || String(checkData.message || '').toLowerCase().includes('exists')
-        )) || (profileOk && !!dbName && isValidPhone(phone));
+        )) || (profileOk && isValidPhone(phone));
 
-        // New users must complete Sign Up (name + email + phone) before Google login.
-        if (!accountExists || !dbName || !isValidPhone(phone)) {
+        // New users must Sign Up first. Existing DB users can login even if API omits name.
+        if (!accountExists || !isValidPhone(phone)) {
           switchTab('register');
           try {
             document.getElementById('regEmail').value = user.email || '';
