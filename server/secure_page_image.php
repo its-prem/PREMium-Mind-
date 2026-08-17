@@ -216,7 +216,9 @@ try {
 
     $draw = new ImagickDraw();
     $draw->setFillColor(new ImagickPixel('rgba(90,90,90,0.30)'));
-    $draw->setFont('Helvetica');
+    // Don't force a specific font family — "Helvetica" isn't registered on
+    // most Linux/ImageMagick installs and throws. Imagick's built-in
+    // default font is always available and is fine for a watermark.
     $fontSize = max(14, (int)($w / 26));
     $draw->setFontSize($fontSize);
     $draw->setTextAlignment(Imagick::ALIGN_CENTER);
@@ -246,5 +248,7 @@ try {
     echo $blob;
 } catch (Throwable $e) {
     http_response_code(500);
-    exit('Error: Render error');
+    // TEMP: surface the real error while wiring this up. Remove before
+    // leaving this endpoint unattended.
+    exit('Error: Render error - ' . $e->getMessage());
 }
