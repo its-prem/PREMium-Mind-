@@ -137,6 +137,15 @@ if (strpos($file, 'uploads/pdfs/') !== 0 || strpos($file, '..') !== false) {
 require_once __DIR__ . '/pm_pdf_access.php';
 require_once __DIR__ . '/db_connect.php';
 $conn->set_charset('utf8mb4');
+
+$courseForFile = pm_find_course_for_pdf($conn, $file);
+if ($courseForFile !== null && !empty($courseForFile['app_only'])
+    && !pm_pdf_admin_bypass($email) && !pm_is_native_app_request()) {
+    http_response_code(403);
+    echo json_encode(['status' => 'error', 'message' => 'This content is only available in the PREMium Mind app. Please open it from the app.']);
+    exit;
+}
+
 if (!pm_user_can_access_pdf($conn, $email, $file)) {
     http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'You are not enrolled in this course']);

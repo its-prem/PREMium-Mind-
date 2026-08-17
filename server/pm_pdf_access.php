@@ -39,13 +39,13 @@ function pm_pdf_matches(string $dbValue, string $wantFile): bool {
 
 /**
  * $file must already be normalized to the "uploads/pdfs/..." form.
- * Returns the owning course's id + allow_download flag, or null if no
- * active course has this exact PDF.
+ * Returns the owning course's id + allow_download + app_only flags, or
+ * null if no active course has this exact PDF.
  */
 function pm_find_course_for_pdf(mysqli $conn, string $file): ?array {
     if ($file === '') return null;
 
-    $result = $conn->query("SELECT id, pdf_file, allow_download FROM courses WHERE pdf_file IS NOT NULL AND pdf_file <> '' AND is_deleted = 0");
+    $result = $conn->query("SELECT id, pdf_file, allow_download, app_only FROM courses WHERE pdf_file IS NOT NULL AND pdf_file <> '' AND is_deleted = 0");
     if (!$result) return null;
 
     while ($row = $result->fetch_assoc()) {
@@ -53,6 +53,7 @@ function pm_find_course_for_pdf(mysqli $conn, string $file): ?array {
             return [
                 'id' => (int)$row['id'],
                 'allow_download' => !empty($row['allow_download']) && (int)$row['allow_download'] === 1,
+                'app_only' => !empty($row['app_only']) && (int)$row['app_only'] === 1,
             ];
         }
     }
@@ -60,8 +61,35 @@ function pm_find_course_for_pdf(mysqli $conn, string $file): ?array {
 }
 
 /**
- * Returns true only if a non-deleted course owns this exact PDF and the
- * email is enrolled in that course (or is an admin).
+ * Origins that only the native (Capacitor) app WebView can send — a normal
+ * browser visiting the website can never present one of these, since
+ * browsers set Origin to the page's real https:// domain and JS cannot
+ * override it. Used to gate app_only courses at the file-serving layer,
+ * not just at purchase time.
+ */
+function pm_native_app_origins(): array {
+    return ['https://localhost', 'http://localhost', 'capacitor://localhost', 'ionic://localhost'];
+}
+
+function pm_is_native_app_request(): bool {
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    if ($origin !== '' && in_array($origin, pm_native_app_origins(), true)) return true;
+
+    $referer = $_SERVER['HTTP_REFERER'] ?? '';
+    foreach (pm_native_app_origins() as $appOrigin) {
+        if ($referer !== '' && strpos($referer, $appOrigin) === 0) return true;
+    }
+    return false;
+}
+
+/**
+ * Returns true only if a non-deleted course owns this exact PDF, the email
+ * is enrolled in that course (or is an admin), AND — when the course is
+ * marked app_only — the request actually comes from the native app, not a
+ * regular browser. Marking a course app_only in the admin panel previously
+ * only blocked the *purchase* flow (create_order.php); the PDF endpoints
+ * never checked it, so an enrolled email could still open/download the
+ * file from any normal website browser.
  */
 function pm_user_can_access_pdf(mysqli $conn, string $email, string $file): bool {
     $email = strtolower(trim($email));
@@ -70,6 +98,10 @@ function pm_user_can_access_pdf(mysqli $conn, string $email, string $file): bool
 
     $course = pm_find_course_for_pdf($conn, $file);
     if ($course === null) return false; // File doesn't belong to any active course
+
+    if (!empty($course['app_only']) && !pm_is_native_app_request()) {
+        return false; // App-exclusive course; reject website/browser requests
+    }
 
     $chk = $conn->prepare("SELECT 1 FROM user_courses WHERE user_email = ? AND course_id = ? LIMIT 1");
     if (!$chk) return false;
