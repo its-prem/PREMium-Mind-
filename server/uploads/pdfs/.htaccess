@@ -1,0 +1,18 @@
+# Block ALL direct HTTP access to uploaded PDFs. Every PDF must be served
+# through proxy_pdf.php / secure_pdf.php, where entitlement, the
+# allow_download flag, and the app_only check actually run — a raw request
+# to a file in this folder skipped all of that.
+#
+# This only blocks direct web requests; PHP's own file reads
+# (fopen/readfile/Imagick in proxy_pdf.php, secure_pdf.php, preview_pdf.php)
+# are untouched, since those never go back out through the webserver.
+
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>
+
+Options -Indexes
