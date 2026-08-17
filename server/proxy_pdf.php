@@ -224,6 +224,12 @@ if (!pm_user_can_access_pdf($conn, $email, $file)) {
     exit('Error: You are not enrolled in this course');
 }
 
+$purpose = (string)($payload['p'] ?? 'view');
+if ($purpose === 'download' && !pm_user_can_download_pdf($conn, $email, $file)) {
+    http_response_code(403);
+    exit('Error: Download is not allowed for this course');
+}
+
 // Resolve file relative to this PHP location (premind/)
 $fullPath = __DIR__ . '/' . $file;
 if (!is_file($fullPath) || !is_readable($fullPath)) {

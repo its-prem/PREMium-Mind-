@@ -147,6 +147,16 @@ if (!in_array($purpose, ['view', 'download'], true)) {
     $purpose = 'view';
 }
 
+// Authoritative download permission — never trust a client-supplied flag
+// (e.g. a `download` URL parameter) for this. Only the course's own
+// allow_download setting decides it.
+$canDownload = pm_user_can_download_pdf($conn, $email, $file);
+if ($purpose === 'download' && !$canDownload) {
+    http_response_code(403);
+    echo json_encode(['status' => 'error', 'message' => 'Download is not allowed for this course']);
+    exit;
+}
+
 $exp   = time() + $TOKEN_TTL;
 $nonce = bin2hex(random_bytes(16));
 $payload = [
@@ -163,8 +173,9 @@ $sig          = hash_hmac('sha256', $payload_b64, $SECRET);
 $token        = $payload_b64 . '.' . $sig;
 
 echo json_encode([
-    'status'  => 'success',
-    'token'   => $token,
-    'file'    => $file,
-    'expires' => $exp,
+    'status'         => 'success',
+    'token'          => $token,
+    'file'           => $file,
+    'expires'        => $exp,
+    'allow_download' => $canDownload,
 ]);

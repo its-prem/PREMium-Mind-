@@ -39,6 +39,27 @@ function pm_pdf_matches(string $dbValue, string $wantFile): bool {
 
 /**
  * $file must already be normalized to the "uploads/pdfs/..." form.
+ * Returns the owning course's id + allow_download flag, or null if no
+ * active course has this exact PDF.
+ */
+function pm_find_course_for_pdf(mysqli $conn, string $file): ?array {
+    if ($file === '') return null;
+
+    $result = $conn->query("SELECT id, pdf_file, allow_download FROM courses WHERE pdf_file IS NOT NULL AND pdf_file <> '' AND is_deleted = 0");
+    if (!$result) return null;
+
+    while ($row = $result->fetch_assoc()) {
+        if (pm_pdf_matches((string)$row['pdf_file'], $file)) {
+            return [
+                'id' => (int)$row['id'],
+                'allow_download' => !empty($row['allow_download']) && (int)$row['allow_download'] === 1,
+            ];
+        }
+    }
+    return null;
+}
+
+/**
  * Returns true only if a non-deleted course owns this exact PDF and the
  * email is enrolled in that course (or is an admin).
  */
@@ -47,23 +68,27 @@ function pm_user_can_access_pdf(mysqli $conn, string $email, string $file): bool
     if ($email === '' || $file === '') return false;
     if (pm_pdf_admin_bypass($email)) return true;
 
-    $result = $conn->query("SELECT id, pdf_file FROM courses WHERE pdf_file IS NOT NULL AND pdf_file <> '' AND is_deleted = 0");
-    if (!$result) return false;
-
-    $courseId = null;
-    while ($row = $result->fetch_assoc()) {
-        if (pm_pdf_matches((string)$row['pdf_file'], $file)) {
-            $courseId = (int)$row['id'];
-            break;
-        }
-    }
-    if ($courseId === null) return false; // File doesn't belong to any active course
+    $course = pm_find_course_for_pdf($conn, $file);
+    if ($course === null) return false; // File doesn't belong to any active course
 
     $chk = $conn->prepare("SELECT 1 FROM user_courses WHERE user_email = ? AND course_id = ? LIMIT 1");
     if (!$chk) return false;
-    $chk->bind_param('si', $email, $courseId);
+    $chk->bind_param('si', $email, $course['id']);
     $chk->execute();
     $ok = (bool)$chk->get_result()->fetch_row();
     $chk->close();
     return $ok;
+}
+
+/**
+ * Whether this email is allowed to use purpose=download for this PDF —
+ * true for admins, otherwise only when the owning course has
+ * allow_download=1. This is the authoritative source; the client's
+ * `download` URL parameter is just a UI hint and must never be trusted.
+ */
+function pm_user_can_download_pdf(mysqli $conn, string $email, string $file): bool {
+    $email = strtolower(trim($email));
+    if (pm_pdf_admin_bypass($email)) return true;
+    $course = pm_find_course_for_pdf($conn, $file);
+    return $course !== null && $course['allow_download'];
 }

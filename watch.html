@@ -688,6 +688,27 @@
          downloadMsg = 'Download abhi available nahi hai. Exam se 1 din pehle unlock hoga.';
      }
 
+     // The `download` URL param is only an initial UI guess (avoids a flash
+     // of the wrong button state) — it is fully client-editable and must
+     // never be trusted. The server's allow_download value (returned by
+     // get_pdf_token.php) is the real source of truth and overrides it below.
+     function applyServerDownloadPermission(canDownload) {
+         if (typeof canDownload !== 'boolean') return;
+         allowDownload = canDownload;
+         const downloadBtn = document.getElementById('downloadBtn');
+         if (!downloadBtn) return;
+         const dlText = document.getElementById('dl-text');
+         if (allowDownload) {
+             downloadBtn.classList.remove('locked');
+             if (dlText) dlText.innerText = 'Save PDF';
+             downloadBtn.setAttribute('aria-label', 'Download PDF');
+         } else {
+             downloadBtn.classList.add('locked');
+             if (dlText) dlText.innerText = 'Locked';
+             downloadBtn.setAttribute('aria-label', 'Download locked');
+         }
+     }
+
      (function initWatchReturnUrl() {
          try {
              const fromParam = urlParams.get('from');
@@ -765,6 +786,7 @@
              if (!tokenRes.ok || tokenData.status !== 'success' || !tokenData.token) {
                  throw new Error(tokenData.message || 'Token request failed');
              }
+             applyServerDownloadPermission(tokenData.allow_download);
              const res = await fetch(`${API_BASE}/proxy_pdf.php`, {
                  method: 'POST',
                  headers: { 'Content-Type': 'application/json' },
