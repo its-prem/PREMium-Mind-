@@ -245,7 +245,7 @@
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential, signInWithRedirect, getRedirectResult } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
   const firebaseConfig = {
     apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
@@ -298,10 +298,109 @@
     return userCred.user;
   }
 
+  // Browsers/webviews that block window.open() (mobile Chrome, in-app
+  // browsers like WhatsApp/Instagram, strict popup blockers) throw one of
+  // these from signInWithPopup — fall back to a full-page redirect instead
+  // of just failing.
+  const POPUP_FALLBACK_CODES = [
+    'auth/popup-blocked',
+    'auth/operation-not-supported-in-this-environment',
+    'auth/cancelled-popup-request'
+  ];
+
   async function doGoogleSignIn() {
     if (isNativeApp()) return nativeGoogleSignIn();
-    const result = await signInWithPopup(auth, provider);
-    return result.user;
+    try {
+      const result = await signInWithPopup(auth, provider);
+      return result.user;
+    } catch (err) {
+      if (POPUP_FALLBACK_CODES.includes(err.code)) {
+        console.warn('Popup sign-in blocked, falling back to redirect.', err);
+        await signInWithRedirect(auth, provider);
+        return null; // page is navigating away to Google now
+      }
+      throw err;
+    }
+  }
+
+  function isValidPhone(p) {
+    p = String(p || '').replace(/\D/g, '').slice(-10);
+    return p.length === 10 && p !== '0000000000' && p !== '9999999999';
+  }
+
+  async function handleGoogleUser(user, googleBtn, originalBtnContent) {
+    const fd = new FormData();
+    fd.append('email', user.email);
+
+    let checkData = { exists: false };
+    try {
+      checkData = await window.pmApiPost('/check_user.php', fd);
+    } catch (e) {
+      throw new Error('Could not verify account. Please try again.');
+    }
+
+    let profile = null;
+    try {
+      const uRes = await fetch(
+        'https://premind.diplomawallah.in/get_user.php?email=' + encodeURIComponent(user.email),
+        { mode: 'cors', credentials: 'omit', cache: 'no-store' }
+      );
+      profile = await uRes.json();
+    } catch (e) {}
+
+    // Hostinger APIs: check_user → {exists:true}; get_user → {status,phone} (often no name)
+    const dbName = String(
+      (checkData && (checkData.name || checkData.user_name || checkData.full_name))
+      || (profile && (profile.name || profile.user_name || profile.full_name))
+      || ''
+    ).trim();
+    const phone = String(
+      (checkData && (checkData.phone || checkData.mobile))
+      || (profile && (profile.phone || profile.mobile))
+      || ''
+    ).replace(/\D/g, '').slice(-10);
+
+    const profileOk = !!(profile && (
+      String(profile.status || '').toLowerCase() === 'success'
+      || !!profile.email
+      || !!profile.id
+      || !!profile.user_id
+      || isValidPhone(profile.phone || profile.mobile)
+    ));
+
+    const accountExists = !!(checkData && (
+      checkData.exists === true
+      || checkData.exists === 1
+      || checkData.exists === '1'
+      || checkData.exists === 'true'
+      || String(checkData.status || '').toLowerCase() === 'found'
+      || String(checkData.message || '').toLowerCase().includes('exists')
+    )) || (profileOk && isValidPhone(phone));
+
+    // New users must Sign Up first. Existing DB users can login even if API omits name.
+    if (!accountExists || !isValidPhone(phone)) {
+      switchTab('register');
+      try {
+        document.getElementById('regEmail').value = user.email || '';
+        document.getElementById('regName').value = dbName || user.displayName || '';
+        if (isValidPhone(phone)) document.getElementById('regPhone').value = phone;
+      } catch (e) {}
+      showMessage(
+        'regMsg',
+        'Please complete Sign Up first with your name, email and phone number. After OTP verification, use Continue with Google with the same email.',
+        true
+      );
+      try { if (typeof auth !== 'undefined' && auth.signOut) await auth.signOut(); } catch (e) {}
+      if (googleBtn) { googleBtn.innerHTML = originalBtnContent; googleBtn.disabled = false; }
+      return;
+    }
+
+    const name = dbName || user.displayName || 'User';
+    if (!window.saveLoginSession(user.email, name, phone)) {
+      throw new Error('Could not save session. Please allow cookies/storage.');
+    }
+    showMessage('loginMsg', 'Login successful. Redirecting...', false);
+    window.location.replace('index.html');
   }
 
   const googleBtn = document.getElementById('googleLoginBtn');
@@ -312,86 +411,8 @@
         googleBtn.textContent = 'Verifying...';
         googleBtn.disabled = true;
         const user = await doGoogleSignIn();
-
-        const fd = new FormData();
-        fd.append('email', user.email);
-
-        function isValidPhone(p) {
-          p = String(p || '').replace(/\D/g, '').slice(-10);
-          return p.length === 10 && p !== '0000000000' && p !== '9999999999';
-        }
-
-        let checkData = { exists: false };
-        try {
-          checkData = await window.pmApiPost('/check_user.php', fd);
-        } catch (e) {
-          throw new Error('Could not verify account. Please try again.');
-        }
-
-        let profile = null;
-        try {
-          const uRes = await fetch(
-            'https://premind.diplomawallah.in/get_user.php?email=' + encodeURIComponent(user.email),
-            { mode: 'cors', credentials: 'omit', cache: 'no-store' }
-          );
-          profile = await uRes.json();
-        } catch (e) {}
-
-        // Hostinger APIs: check_user → {exists:true}; get_user → {status,phone} (often no name)
-        const dbName = String(
-          (checkData && (checkData.name || checkData.user_name || checkData.full_name))
-          || (profile && (profile.name || profile.user_name || profile.full_name))
-          || ''
-        ).trim();
-        const phone = String(
-          (checkData && (checkData.phone || checkData.mobile))
-          || (profile && (profile.phone || profile.mobile))
-          || ''
-        ).replace(/\D/g, '').slice(-10);
-
-        const profileOk = !!(profile && (
-          String(profile.status || '').toLowerCase() === 'success'
-          || !!profile.email
-          || !!profile.id
-          || !!profile.user_id
-          || isValidPhone(profile.phone || profile.mobile)
-        ));
-
-        const accountExists = !!(checkData && (
-          checkData.exists === true
-          || checkData.exists === 1
-          || checkData.exists === '1'
-          || checkData.exists === 'true'
-          || String(checkData.status || '').toLowerCase() === 'found'
-          || String(checkData.message || '').toLowerCase().includes('exists')
-        )) || (profileOk && isValidPhone(phone));
-
-        // New users must Sign Up first. Existing DB users can login even if API omits name.
-        if (!accountExists || !isValidPhone(phone)) {
-          switchTab('register');
-          try {
-            document.getElementById('regEmail').value = user.email || '';
-            document.getElementById('regName').value = dbName || user.displayName || '';
-            if (isValidPhone(phone)) document.getElementById('regPhone').value = phone;
-          } catch (e) {}
-          showMessage(
-            'regMsg',
-            'Please complete Sign Up first with your name, email and phone number. After OTP verification, use Continue with Google with the same email.',
-            true
-          );
-          try { if (typeof auth !== 'undefined' && auth.signOut) await auth.signOut(); } catch (e) {}
-          googleBtn.innerHTML = originalBtnContent;
-          googleBtn.disabled = false;
-          return;
-        }
-
-        const name = dbName || user.displayName || 'User';
-        if (!window.saveLoginSession(user.email, name, phone)) {
-          throw new Error('Could not save session. Please allow cookies/storage.');
-        }
-        showMessage('loginMsg', 'Login successful. Redirecting...', false);
-        window.location.replace('index.html');
-        return;
+        if (!user) return; // redirect flow in progress — page is navigating away
+        await handleGoogleUser(user, googleBtn, originalBtnContent);
       } catch (error) {
         console.error('Google login error:', error);
         if (error.code !== 'auth/popup-closed-by-user') {
@@ -403,6 +424,23 @@
       }
     });
   }
+
+  // If we just came back from a signInWithRedirect() round-trip, finish the
+  // same account check / login flow that the popup path uses.
+  (async function completeRedirectSignIn() {
+    try {
+      const result = await getRedirectResult(auth);
+      if (!result || !result.user) return;
+      const btn = document.getElementById('googleLoginBtn');
+      const original = btn ? btn.innerHTML : '';
+      if (btn) { btn.textContent = 'Verifying...'; btn.disabled = true; }
+      await handleGoogleUser(result.user, btn, original);
+    } catch (error) {
+      console.error('Google redirect sign-in error:', error);
+      const msg = (error && error.message) ? error.message : 'Google login failed.';
+      showMessage('loginMsg', msg, true);
+    }
+  })();
 </script>
 
 <script>
