@@ -16,3 +16,14 @@
 </IfModule>
 
 Options -Indexes
+
+# Stop LiteSpeed/Cloudflare from caching anything out of this folder long
+# term — a previously-cached 200 here was still being served for a while
+# after this .htaccess first went up, which is exactly what this prevents
+# going forward.
+<IfModule mod_headers.c>
+  Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+</IfModule>
+<IfModule LiteSpeed>
+  CacheDisable public /
+</IfModule>
