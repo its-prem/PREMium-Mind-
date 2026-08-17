@@ -1093,8 +1093,79 @@
              return Math.max(240, w - pad);
          }
 
-         getPdfBytesForViewer()
-         .then(async (pdfData) => {
+         // Session token good for several minutes, used to pull one
+         // watermarked page image at a time instead of the raw PDF —
+         // only used when the course's allow_download is off.
+         async function getPageViewSession() {
+             const res = await fetch(`${API_BASE}/get_pdf_token.php`, {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({ file: pdfFile, email: userEmail, purpose: 'page_view' })
+             });
+             const data = await res.json().catch(() => ({}));
+             if (!res.ok || data.status !== 'success' || !data.token) {
+                 throw new Error(data.message || 'Token request failed');
+             }
+             applyServerDownloadPermission(data.allow_download);
+             return data;
+         }
+
+         async function fetchWatermarkedPage(token, pageNum) {
+             const res = await fetch(`${API_BASE}/secure_page_image.php`, {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({ file: pdfFile, email: userEmail, token, page: pageNum })
+             });
+             if (!res.ok) {
+                 const errText = await res.text().catch(() => '');
+                 throw new Error(errText || 'Page load failed');
+             }
+             const blob = await res.blob();
+             return await createImageBitmap(blob);
+         }
+
+         // Download-disabled courses never bring the raw PDF into the
+         // browser at all — each page arrives pre-rendered server-side
+         // with the viewer's email/phone burned into the pixels, so
+         // there's nothing clean to extract from DevTools/Network tab.
+         async function renderWatermarkedPages(session) {
+             const totalPages = Math.max(1, parseInt(session.pages, 10) || 1);
+
+             async function mountPage(num, bitmap) {
+                 if (loaderText) loaderText.textContent = 'Loading ' + num + '/' + totalPages + '...';
+                 const wrapper = document.createElement('div');
+                 wrapper.className = 'page-wrapper';
+                 const canvas = document.createElement('canvas');
+                 canvas.oncontextmenu = () => false;
+                 canvas.width = bitmap.width;
+                 canvas.height = bitmap.height;
+                 canvas.style.width = '100%';
+                 canvas.style.height = 'auto';
+                 const ctx = canvas.getContext('2d', { alpha: false });
+                 ctx.drawImage(bitmap, 0, 0);
+                 wrapper.appendChild(canvas);
+                 container.appendChild(wrapper);
+             }
+
+             const first = await fetchWatermarkedPage(session.token, 1);
+             await mountPage(1, first);
+             loadingState.style.display = 'none';
+
+             for (let num = 2; num <= totalPages; num++) {
+                 const bmp = await fetchWatermarkedPage(session.token, num);
+                 await mountPage(num, bmp);
+             }
+         }
+
+         (async function initViewer() {
+         try {
+         const session = await getPageViewSession();
+         if (!session.allow_download && session.pages) {
+             await renderWatermarkedPages(session);
+             return;
+         }
+         let pdfData = await getPdfBytesForViewer();
+         {
              // Keep a copy for offline cache before pdf.js consumes/nulls it
              let cacheCopy = null;
              try {
@@ -1258,8 +1329,8 @@
              scrollArea.addEventListener('scroll', () => {
                  if (currentScale > 1.05) window.__reRenderZoom();
              }, { passive: true });
-         })
-         .catch(err => {
+         }
+         } catch (err) {
              loadingState.classList.add('is-error');
              const msg = (err && err.message) ? String(err.message) : 'Secure Connection Failed';
              if (/Opened offline viewer/i.test(msg)) {
@@ -1268,7 +1339,8 @@
              }
              loadingState.innerHTML = "<p class='loader-text'>Access Denied. " + msg.replace(/[<>&']/g, '') + "</p>";
              console.error(err);
-         });
+         }
+         })();
      } else {
          const loadingState = document.getElementById('loadingState');
          loadingState.classList.add('is-error');

@@ -152,7 +152,7 @@ if (!pm_user_can_access_pdf($conn, $email, $file)) {
     exit;
 }
 
-if (!in_array($purpose, ['view', 'download'], true)) {
+if (!in_array($purpose, ['view', 'download', 'page_view'], true)) {
     $purpose = 'view';
 }
 
@@ -166,7 +166,11 @@ if ($purpose === 'download' && !$canDownload) {
     exit;
 }
 
-$exp   = time() + $TOKEN_TTL;
+// page_view tokens back a whole viewing session (many page-image
+// fetches via secure_page_image.php), not a single one-shot file
+// request, so they get a longer TTL and are not single-use.
+$ttl = $purpose === 'page_view' ? 300 : $TOKEN_TTL;
+$exp   = time() + $ttl;
 $nonce = bin2hex(random_bytes(16));
 $payload = [
     'f' => $file,
@@ -181,10 +185,24 @@ $payload_b64  = rtrim(strtr(base64_encode($payload_json), '+/', '-_'), '=');
 $sig          = hash_hmac('sha256', $payload_b64, $SECRET);
 $token        = $payload_b64 . '.' . $sig;
 
+$pageCount = null;
+if ($purpose === 'page_view' && extension_loaded('imagick')) {
+    try {
+        $im = new Imagick();
+        $im->pingImage(__DIR__ . '/' . $file);
+        $pageCount = $im->getNumberImages();
+        $im->clear();
+        $im->destroy();
+    } catch (Throwable $e) {
+        $pageCount = null;
+    }
+}
+
 echo json_encode([
     'status'         => 'success',
     'token'          => $token,
     'file'           => $file,
     'expires'        => $exp,
     'allow_download' => $canDownload,
+    'pages'          => $pageCount,
 ]);
