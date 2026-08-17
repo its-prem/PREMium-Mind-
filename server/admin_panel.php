@@ -28,6 +28,21 @@ function pm_is_admin_email($email, $list) {
     return false;
 }
 
+/** Safe for plain HTML text/attribute content (student names, emails, messages, etc). */
+function pm_h($v) {
+    return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * Safe to splice directly into onclick='fn(...)' as a JS string argument —
+ * json_encode() adds + escapes the quotes, then htmlspecialchars() makes
+ * the whole thing safe as an HTML attribute value. Do not add extra quotes
+ * around the result.
+ */
+function pm_js_attr($v) {
+    return htmlspecialchars(json_encode((string)$v), ENT_QUOTES, 'UTF-8');
+}
+
 function pm_http_request($url, $method = 'GET', $jsonBody = null) {
     $method = strtoupper($method);
     $headers = [];
@@ -455,9 +470,9 @@ if (isset($_GET['fetch_students'])) {
                 $chk = in_array($c['id'], $enrolled) ? 'checked' : '';
                 $toggles .= "
                 <div class='ct-item'>
-                    <span class='ct-name'>".$c['title']."</span>
+                    <span class='ct-name'>".pm_h($c['title'])."</span>
                     <label class='switch'>
-                        <input type='checkbox' class='course-chk' data-uemail='".$row['email']."' data-cid='".$c['id']."' $chk>
+                        <input type='checkbox' class='course-chk' data-uemail='".pm_h($row['email'])."' data-cid='".$c['id']."' $chk>
                         <span class='slider'></span>
                     </label>
                 </div>";
@@ -468,17 +483,17 @@ if (isset($_GET['fetch_students'])) {
             echo "
             <div class='user-card fade-in'>
                 <div class='user-header'>
-                    <div class='u-avatar'>".strtoupper(substr($row['name'], 0, 1))."</div>
+                    <div class='u-avatar'>".pm_h(strtoupper(substr($row['name'], 0, 1)))."</div>
                     <div class='u-details'>
                         <div class='u-name-row'>
-                            <h4>".$row['name']."</h4>
+                            <h4>".pm_h($row['name'])."</h4>
                             $verified
                         </div>
-                        <p><ion-icon name='mail-outline'></ion-icon> ".$row['email']."</p>
+                        <p><ion-icon name='mail-outline'></ion-icon> ".pm_h($row['email'])."</p>
                         <p><ion-icon name='calendar-outline'></ion-icon> Joined: $created</p>
                     </div>
                 </div>
-                
+
                 <div class='user-enroll-meta'>
                     <span>Enrolled Courses:</span> <span style='color:var(--success); font-size:1rem;'>$enrolledCount</span>
                 </div>
@@ -487,7 +502,7 @@ if (isset($_GET['fetch_students'])) {
 
                 <div class='course-toggle-list' id='$accId'>
                     $toggles
-                    <button class='btn-submit' style='margin-top:15px; padding:10px; font-size:0.85rem;' onclick='saveEnrollment(\"".$row['email']."\", this)'>💾 Save Changes</button>
+                    <button class='btn-submit' style='margin-top:15px; padding:10px; font-size:0.85rem;' onclick='saveEnrollment(".pm_js_attr($row['email']).", this)'>💾 Save Changes</button>
                 </div>
             </div>";
         }
@@ -513,10 +528,10 @@ if (isset($_GET['fetch_reports'])) {
         while ($row = $result->fetch_assoc()) {
             $date = date('d M Y, h:i A', strtotime($row['created_at']));
             $screenshot = $row['screenshot'];
-            $name = !empty($row['user_name']) ? $row['user_name'] : 'Unknown User';
-            $phone = !empty($row['user_phone']) ? $row['user_phone'] : 'N/A';
+            $name = pm_h(!empty($row['user_name']) ? $row['user_name'] : 'Unknown User');
+            $phone = pm_h(!empty($row['user_phone']) ? $row['user_phone'] : 'N/A');
             $msg = htmlspecialchars($row['message']);
-            $subject_name = !empty($row['course_title']) ? $row['course_title'] : 'Unknown Course (ID: ' . $row['course_id'] . ')';
+            $subject_name = pm_h(!empty($row['course_title']) ? $row['course_title'] : 'Unknown Course (ID: ' . $row['course_id'] . ')');
 
             echo "
             <div class='user-card fade-in' style='border-color: #fca5a5;'>
@@ -530,22 +545,22 @@ if (isset($_GET['fetch_reports'])) {
 
                 <div class='u-details' style='margin-bottom:15px;'>
                     <h4 style='font-size:1.1rem; color:var(--dark); margin-bottom:5px;'><ion-icon name='person'></ion-icon> $name</h4>
-                    <p style='color:var(--primary); font-weight:600;'><ion-icon name='mail'></ion-icon> ".$row['email']."</p>
+                    <p style='color:var(--primary); font-weight:600;'><ion-icon name='mail'></ion-icon> ".pm_h($row['email'])."</p>
                     <p><ion-icon name='call'></ion-icon> $phone</p>
-                    
+
                     <div style='margin-top:12px; padding:12px; background:var(--gray-soft); border-radius:8px; font-size:0.9rem; color:var(--dark); border:1px solid var(--gray-border);'>
                         <strong style='color:#be123c;'>Problem Description:</strong><br>$msg
                     </div>
                     <small style='display:block; margin-top:8px; color:var(--gray-dark); font-weight:600;'><ion-icon name='time'></ion-icon> Reported on: $date</small>
                 </div>";
-                
+
                 if(!empty($screenshot)) {
-                    echo "<button class='btn-outline' style='border-color:#fda4af; color:#be123c; background:#fff1f2; margin-bottom:12px;' onclick='viewImage(\"$screenshot\")'><ion-icon name='image'></ion-icon> View Screenshot</button>";
+                    echo "<button class='btn-outline' style='border-color:#fda4af; color:#be123c; background:#fff1f2; margin-bottom:12px;' onclick='viewImage(".pm_js_attr($screenshot).")'><ion-icon name='image'></ion-icon> View Screenshot</button>";
                 }
                 
                 echo "
                 <div style='display:flex; flex-direction:column; gap:10px; border-top: 1px dashed var(--gray-border); padding-top: 15px;'>
-                    <button class='btn-outline' style='border-color:#93c5fd; color:#1d4ed8; background:#eff6ff;' onclick='goToStudentAccess(\"".$row['email']."\")'><ion-icon name='open'></ion-icon> Open Student Profile</button>
+                    <button class='btn-outline' style='border-color:#93c5fd; color:#1d4ed8; background:#eff6ff;' onclick='goToStudentAccess(".pm_js_attr($row['email']).")'><ion-icon name='open'></ion-icon> Open Student Profile</button>
                     <button class='btn-submit' style='background:var(--success);' onclick='resolveReport(".$row['id'].")'><ion-icon name='checkmark-circle'></ion-icon> Mark Issue as Resolved</button>
                 </div>
             </div>";
