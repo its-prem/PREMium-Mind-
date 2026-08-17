@@ -81,14 +81,15 @@ function pm_user_can_access_pdf(mysqli $conn, string $email, string $file): bool
 }
 
 /**
- * Whether this email is allowed to use purpose=download for this PDF —
- * true for admins, otherwise only when the owning course has
- * allow_download=1. This is the authoritative source; the client's
- * `download` URL parameter is just a UI hint and must never be trusted.
+ * Whether this email is allowed to use purpose=download for this PDF.
+ * Deliberately follows the course's own allow_download setting for
+ * everyone, including admins — admin emails only bypass the enrollment
+ * check above (so they can view/QA any course without being "enrolled"),
+ * not this per-course download toggle. This is the authoritative source;
+ * the client's `download` URL parameter is just a UI hint and must never
+ * be trusted.
  */
 function pm_user_can_download_pdf(mysqli $conn, string $email, string $file): bool {
-    $email = strtolower(trim($email));
-    if (pm_pdf_admin_bypass($email)) return true;
     $course = pm_find_course_for_pdf($conn, $file);
     return $course !== null && $course['allow_download'];
 }
