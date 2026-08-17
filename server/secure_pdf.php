@@ -107,6 +107,14 @@ if (strpos($file, 'uploads/pdfs/') !== 0 || strpos($file, '..') !== false) {
     exit('Invalid file path');
 }
 
+require_once __DIR__ . '/pm_pdf_access.php';
+require_once __DIR__ . '/db_connect.php';
+$conn->set_charset('utf8mb4');
+if (!pm_user_can_access_pdf($conn, $email, $file)) {
+    http_response_code(403);
+    exit('Access Denied: You are not enrolled in this course');
+}
+
 $fullPath = __DIR__ . '/' . $file;
 if (!is_file($fullPath) || !is_readable($fullPath)) {
     if (!is_file($file) || !is_readable($file)) {

@@ -134,6 +134,15 @@ if (strpos($file, 'uploads/pdfs/') !== 0 || strpos($file, '..') !== false) {
     exit;
 }
 
+require_once __DIR__ . '/pm_pdf_access.php';
+require_once __DIR__ . '/db_connect.php';
+$conn->set_charset('utf8mb4');
+if (!pm_user_can_access_pdf($conn, $email, $file)) {
+    http_response_code(403);
+    echo json_encode(['status' => 'error', 'message' => 'You are not enrolled in this course']);
+    exit;
+}
+
 if (!in_array($purpose, ['view', 'download'], true)) {
     $purpose = 'view';
 }

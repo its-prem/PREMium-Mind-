@@ -213,6 +213,17 @@ if ($nonce === '' || !mark_token_used($nonce)) {
     exit('Error: Token already used');
 }
 
+// Defense-in-depth: re-verify enrollment even though the token was already
+// entitlement-checked at issuance (protects against a leaked HMAC secret
+// being used to forge tokens directly against this endpoint).
+require_once __DIR__ . '/pm_pdf_access.php';
+require_once __DIR__ . '/db_connect.php';
+$conn->set_charset('utf8mb4');
+if (!pm_user_can_access_pdf($conn, $email, $file)) {
+    http_response_code(403);
+    exit('Error: You are not enrolled in this course');
+}
+
 // Resolve file relative to this PHP location (premind/)
 $fullPath = __DIR__ . '/' . $file;
 if (!is_file($fullPath) || !is_readable($fullPath)) {
