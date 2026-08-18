@@ -138,12 +138,21 @@ require_once __DIR__ . '/pm_pdf_access.php';
 require_once __DIR__ . '/db_connect.php';
 $conn->set_charset('utf8mb4');
 
-$courseForFile = pm_find_course_for_pdf($conn, $file);
-if ($courseForFile !== null && !empty($courseForFile['app_only'])
-    && !pm_pdf_admin_bypass($email) && !pm_is_native_app_request()) {
-    http_response_code(403);
-    echo json_encode(['status' => 'error', 'message' => 'This content is only available in the PREMium Mind app. Please open it from the app.']);
-    exit;
+// Friendlier message for the common case — only shown when EVERY course
+// tied to this file requires the app (if even one matching course doesn't,
+// pm_user_can_access_pdf() below will correctly resolve per-course, so
+// this is just clearer wording, not the actual security check).
+$coursesForFile = pm_find_courses_for_pdf($conn, $file);
+if (!empty($coursesForFile) && !pm_pdf_admin_bypass($email) && !pm_is_native_app_request()) {
+    $allAppOnly = true;
+    foreach ($coursesForFile as $c) {
+        if (empty($c['app_only'])) { $allAppOnly = false; break; }
+    }
+    if ($allAppOnly) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'This content is only available in the PREMium Mind app. Please open it from the app.']);
+        exit;
+    }
 }
 
 if (!pm_user_can_access_pdf($conn, $email, $file)) {

@@ -41,25 +41,34 @@ function pm_pdf_matches(string $dbValue, string $wantFile): bool {
 
 /**
  * $file must already be normalized to the "uploads/pdfs/..." form.
- * Returns the owning course's id + allow_download + app_only flags, or
- * null if no active course has this exact PDF.
+ * Returns every active (non-deleted) course whose pdf_file resolves to
+ * this exact path, each with its id + allow_download + app_only flags.
+ *
+ * More than one course can legitimately point at the same uploaded PDF
+ * (e.g. the same notes re-listed under a different category/price), and
+ * those courses can have different allow_download / app_only settings.
+ * Callers must check every match the user is enrolled in, not just the
+ * first one — otherwise a paying user can get "not enrolled" simply
+ * because an unrelated course sharing the same file happened to come
+ * back first from this query.
  */
-function pm_find_course_for_pdf(mysqli $conn, string $file): ?array {
-    if ($file === '') return null;
+function pm_find_courses_for_pdf(mysqli $conn, string $file): array {
+    if ($file === '') return [];
 
     $result = $conn->query("SELECT id, pdf_file, allow_download, app_only FROM courses WHERE pdf_file IS NOT NULL AND pdf_file <> '' AND is_deleted = 0");
-    if (!$result) return null;
+    if (!$result) return [];
 
+    $matches = [];
     while ($row = $result->fetch_assoc()) {
         if (pm_pdf_matches((string)$row['pdf_file'], $file)) {
-            return [
+            $matches[] = [
                 'id' => (int)$row['id'],
                 'allow_download' => !empty($row['allow_download']) && (int)$row['allow_download'] === 1,
                 'app_only' => !empty($row['app_only']) && (int)$row['app_only'] === 1,
             ];
         }
     }
-    return null;
+    return $matches;
 }
 
 /**
@@ -155,20 +164,26 @@ function pm_user_can_access_pdf(mysqli $conn, string $email, string $file): bool
     if ($email === '' || $file === '') return false;
     if (pm_pdf_admin_bypass($email)) return true;
 
-    $course = pm_find_course_for_pdf($conn, $file);
-    if ($course === null) return false; // File doesn't belong to any active course
+    $courses = pm_find_courses_for_pdf($conn, $file);
+    if (empty($courses)) return false; // File doesn't belong to any active course
 
-    if (!empty($course['app_only']) && !pm_is_native_app_request()) {
-        return false; // App-exclusive course; reject website/browser requests
-    }
-
+    $isNativeApp = pm_is_native_app_request();
     $chk = $conn->prepare("SELECT 1 FROM user_courses WHERE user_email = ? AND course_id = ? LIMIT 1");
     if (!$chk) return false;
-    $chk->bind_param('si', $email, $course['id']);
-    $chk->execute();
-    $ok = (bool)$chk->get_result()->fetch_row();
+
+    foreach ($courses as $course) {
+        if (!empty($course['app_only']) && !$isNativeApp) {
+            continue; // this particular course is app-exclusive; try other matches
+        }
+        $chk->bind_param('si', $email, $course['id']);
+        $chk->execute();
+        if ($chk->get_result()->fetch_row()) {
+            $chk->close();
+            return true;
+        }
+    }
     $chk->close();
-    return $ok;
+    return false;
 }
 
 /**
@@ -181,6 +196,29 @@ function pm_user_can_access_pdf(mysqli $conn, string $email, string $file): bool
  * be trusted.
  */
 function pm_user_can_download_pdf(mysqli $conn, string $email, string $file): bool {
-    $course = pm_find_course_for_pdf($conn, $file);
-    return $course !== null && $course['allow_download'];
+    $email = strtolower(trim($email));
+    $courses = pm_find_courses_for_pdf($conn, $file);
+    if (empty($courses)) return false;
+
+    if (pm_pdf_admin_bypass($email)) {
+        foreach ($courses as $course) {
+            if ($course['allow_download']) return true;
+        }
+        return false;
+    }
+
+    $chk = $conn->prepare("SELECT 1 FROM user_courses WHERE user_email = ? AND course_id = ? LIMIT 1");
+    if (!$chk) return false;
+
+    foreach ($courses as $course) {
+        if (!$course['allow_download']) continue;
+        $chk->bind_param('si', $email, $course['id']);
+        $chk->execute();
+        if ($chk->get_result()->fetch_row()) {
+            $chk->close();
+            return true;
+        }
+    }
+    $chk->close();
+    return false;
 }
