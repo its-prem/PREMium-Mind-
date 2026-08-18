@@ -43,6 +43,20 @@ function pm_js_attr($v) {
     return htmlspecialchars(json_encode((string)$v), ENT_QUOTES, 'UTF-8');
 }
 
+/** Renders a course table's clickable ON/OFF pill for a single boolean flag column. */
+function pm_flag_toggle_btn(int $id, string $field, bool $isOn, string $onIcon, string $label, string $onBg, string $onColor): string {
+    $offIcons = ['app_only' => 'globe-outline', 'show_preview' => 'eye-off-outline'];
+    $icon = $isOn ? $onIcon : ($offIcons[$field] ?? 'close-outline');
+    $bg = $isOn ? $onBg : '#f1f5f9';
+    $color = $isOn ? $onColor : '#64748b';
+    $nextAction = $isOn ? 'OFF' : 'ON';
+
+    return "<button type='button' class='flag-toggle-btn' data-id='$id' data-field='" . pm_h($field) . "' data-value='" . ($isOn ? 1 : 0) . "'"
+        . " style='background:$bg; color:$color;' onclick='toggleCourseFlag(this)' title='Tap to turn " . pm_h($label) . " $nextAction'>"
+        . "<ion-icon name='$icon'></ion-icon> " . pm_h($label) . ": " . ($isOn ? 'ON' : 'OFF')
+        . "</button>";
+}
+
 function pm_http_request($url, $method = 'GET', $jsonBody = null) {
     $method = strtoupper($method);
     $headers = [];
@@ -344,19 +358,14 @@ if (isset($_GET['fetch_table'])) {
                 ? "<span class='badge-success' style='display:inline-flex; align-items:center; gap:4px; margin-bottom:6px; white-space:nowrap;'>📄 PDF Uploaded</span>" 
                 : "<span class='badge-danger' style='display:inline-flex; align-items:center; gap:4px; margin-bottom:6px; white-space:nowrap;'>No PDF</span>";
             
-            $dl_status = (!empty($row['allow_download']) && (int)$row['allow_download'] === 1)
-                ? "<span style='display:inline-flex; align-items:center; gap:4px; background:#eff6ff; color:#2563eb; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap;'><ion-icon name='download-outline'></ion-icon> DOWNLOAD BTN: ON</span>"
-                : "<span style='display:inline-flex; align-items:center; gap:4px; background:#f1f5f9; color:#64748b; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap;'><ion-icon name='close-outline'></ion-icon> DOWNLOAD BTN: OFF</span>";
+            $dl_on = !empty($row['allow_download']) && (int)$row['allow_download'] === 1;
+            $dl_status = pm_flag_toggle_btn((int)$row['id'], 'allow_download', $dl_on, 'download-outline', 'DOWNLOAD', '#eff6ff', '#2563eb');
 
             $app_only_on = !empty($row['app_only']) && (int)$row['app_only'] === 1;
-            $app_only_status = $app_only_on
-                ? "<span style='display:inline-flex; align-items:center; gap:4px; background:#111; color:#fff; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap; margin-top:6px;'><ion-icon name='phone-portrait-outline'></ion-icon> APP ONLY: ON</span>"
-                : "<span style='display:inline-flex; align-items:center; gap:4px; background:#f1f5f9; color:#64748b; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap; margin-top:6px;'><ion-icon name='globe-outline'></ion-icon> APP ONLY: OFF</span>";
+            $app_only_status = pm_flag_toggle_btn((int)$row['id'], 'app_only', $app_only_on, 'phone-portrait-outline', 'APP ONLY', '#111111', '#ffffff');
 
             $preview_on = !empty($row['show_preview']) && (int)$row['show_preview'] === 1;
-            $preview_status = $preview_on
-                ? "<span style='display:inline-flex; align-items:center; gap:4px; background:#eff6ff; color:#1d4ed8; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap; margin-top:6px;'><ion-icon name='eye-outline'></ion-icon> PREVIEW: ON</span>"
-                : "<span style='display:inline-flex; align-items:center; gap:4px; background:#f1f5f9; color:#64748b; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap; margin-top:6px;'><ion-icon name='eye-off-outline'></ion-icon> PREVIEW: OFF</span>";
+            $preview_status = pm_flag_toggle_btn((int)$row['id'], 'show_preview', $preview_on, 'eye-outline', 'PREVIEW', '#eff6ff', '#1d4ed8');
 
             // Check if course is deleted
             $is_deleted = isset($row['is_deleted']) && $row['is_deleted'] == 1;
@@ -652,6 +661,31 @@ if (isset($_POST['ajax_hard_delete'])) {
     exit;
 }
 
+// 5.7 QUICK TOGGLE (Download / App Only / Preview) FROM THE LIST — no need to open Edit
+if (isset($_POST['ajax_toggle_flag'])) {
+    pm_require_admin(true);
+    $id = (int)($_POST['id'] ?? 0);
+    $field = (string)($_POST['field'] ?? '');
+    $value = (!empty($_POST['value']) && (string)$_POST['value'] === '1') ? 1 : 0;
+
+    $allowedFields = ['allow_download', 'app_only', 'show_preview'];
+    if ($id <= 0 || !in_array($field, $allowedFields, true)) {
+        echo json_encode(['status' => 'error', 'msg' => 'Invalid field']);
+        exit;
+    }
+
+    $stmt = $conn->prepare("UPDATE courses SET $field = ? WHERE id = ?");
+    if (!$stmt) {
+        echo json_encode(['status' => 'error', 'msg' => $conn->error]);
+        exit;
+    }
+    $stmt->bind_param('ii', $value, $id);
+    $ok = $stmt->execute();
+    $stmt->close();
+    echo json_encode(['status' => $ok ? 'success' : 'error', 'field' => $field, 'value' => $value]);
+    exit;
+}
+
 // 6. UPDATE ENROLLMENT
 if (isset($_POST['ajax_enrollment'])) {
     pm_require_admin(true);
@@ -818,6 +852,18 @@ input:checked + .slider:before { transform: translateX(20px); }
 .badge-success { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
 .badge-warning { background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
 .badge-danger { background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+
+/* Flag toggle buttons (Download / App Only / Preview — click to flip) */
+.flag-toggle-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 700;
+    white-space: nowrap; margin-top: 6px; border: none; cursor: pointer;
+    font-family: inherit; transition: var(--smooth); position: relative;
+}
+.flag-toggle-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); filter: brightness(0.96); }
+.flag-toggle-btn:active { transform: translateY(0); filter: brightness(0.92); }
+.flag-toggle-btn:disabled { opacity: 0.55; cursor: wait; transform: none; }
+.flag-toggle-btn ion-icon { font-size: 13px; flex-shrink: 0; }
 
 /* Table */
 .list-section { background: var(--white); padding: 25px; border-radius: 20px; margin-top: 30px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-border); }
@@ -2069,6 +2115,41 @@ input:checked + .slider:before { transform: translateX(20px); }
                     showToast("Permanently Deleted!"); 
                     loadCourses(); 
                 } else showToast('Delete failed!', 'error'); 
+            });
+        }
+
+        // QUICK TOGGLE (Download / App Only / Preview) — click the pill right in the list
+        window.toggleCourseFlag = function(btn) {
+            const id = btn.dataset.id;
+            const field = btn.dataset.field;
+            const nextValue = btn.dataset.value === '1' ? 0 : 1;
+            const originalHTML = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = '<ion-icon name="sync-outline" class="spinner"></ion-icon>';
+
+            const fd = new FormData();
+            fd.append('ajax_toggle_flag', '1');
+            fd.append('id', id);
+            fd.append('field', field);
+            fd.append('value', nextValue);
+
+            fetch(window.location.href, {method: 'POST', body: fd})
+            .then(res => res.json())
+            .then(d => {
+                if (d.status === 'success') {
+                    showToast('Updated!');
+                    loadCourses();
+                } else {
+                    showToast(d.msg || 'Update failed!', 'error');
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                }
+            })
+            .catch(() => {
+                showToast('Update failed!', 'error');
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
             });
         }
 
