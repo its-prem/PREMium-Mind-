@@ -1,9 +1,14 @@
 <?php
 /**
  * Shared secrets loader for PDF token / proxy.
- * Prefer pm_secrets.php; fall back to legacy secret so PDFs keep working
- * if Hostinger upload of pm_secrets.php was skipped.
+ * Order of preference: .env (server/.env, see .env.example) → pm_secrets.php
+ * → legacy hardcoded fallback, so PDFs keep working no matter which of
+ * these has actually been uploaded to Hostinger.
  */
+
+require_once __DIR__ . '/pm_load_env.php';
+pm_load_dotenv(__DIR__ . '/.env');
+
 function pm_load_secrets(): array {
     static $cached = null;
     if (is_array($cached)) return $cached;
@@ -18,14 +23,19 @@ function pm_load_secrets(): array {
     return $cached;
 }
 
-/** Primary signing secret (file first, else legacy). */
+/** Primary signing secret: .env → pm_secrets.php → legacy hardcoded fallback. */
 function pm_pdf_hmac_secret(): string {
+    $envSecret = pm_env('PDF_HMAC_SECRET');
+    if ($envSecret !== '' && $envSecret !== 'CHANGE_ME_TO_A_LONG_RANDOM_SECRET') {
+        return $envSecret;
+    }
+
     $cfg = pm_load_secrets();
     $secret = isset($cfg['pdf_hmac_secret']) ? trim((string)$cfg['pdf_hmac_secret']) : '';
     if ($secret !== '' && $secret !== 'CHANGE_ME_TO_A_LONG_RANDOM_SECRET') {
         return $secret;
     }
-    // Legacy fallback (pre-rotation) — keeps PDFs working without pm_secrets.php
+    // Legacy fallback (pre-rotation) — keeps PDFs working without .env/pm_secrets.php
     return 'PREM_MIND_SECURE_2026';
 }
 
@@ -52,11 +62,16 @@ function pm_pdf_hmac_secrets(): array {
 
 /**
  * Secret shared with the Android app for proving a request genuinely came
- * from it (see APP_ONLY_COURSES_SETUP.txt). Empty string if not configured
- * yet — callers must treat that as "app signature not available" rather
- * than a valid empty secret.
+ * from it (see APP_ONLY_COURSES_SETUP.txt). Checks .env first, then
+ * pm_secrets.php. Empty string if not configured anywhere — callers must
+ * treat that as "app signature not available" rather than a valid secret.
  */
 function pm_app_shared_secret(): string {
+    $envSecret = pm_env('APP_SHARED_SECRET');
+    if ($envSecret !== '' && $envSecret !== 'CHANGE_ME_TO_ANOTHER_LONG_RANDOM_SECRET') {
+        return $envSecret;
+    }
+
     $cfg = pm_load_secrets();
     $secret = isset($cfg['app_shared_secret']) ? trim((string)$cfg['app_shared_secret']) : '';
     if ($secret === '' || $secret === 'CHANGE_ME_TO_ANOTHER_LONG_RANDOM_SECRET') {

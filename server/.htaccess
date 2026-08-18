@@ -1,0 +1,28 @@
+# Block direct HTTP access to environment/secret files in this folder.
+# Without this, a plain GET request to /.env would download it as raw
+# text (unlike .php files, which always execute instead of being shown
+# as source) — this is one of the most common ways .env files leak on
+# real sites. Scoped narrowly so it doesn't affect anything else here.
+
+<FilesMatch "(^|/)\.env">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Also block the plain-PHP secrets file and its committed template by
+# name, and any stray backup/editor files (.bak, .swp, ~) that could
+# otherwise be served as plain text if left behind after an edit.
+<FilesMatch "(pm_secrets\.php|\.bak$|\.swp$|~$)">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
