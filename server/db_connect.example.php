@@ -1,17 +1,22 @@
 <?php
 /**
- * Shared MySQL connection, credentials from .env (see .env.example).
- * Upload to Hostinger premind/ as: db_connect.php (this replaces your
- * existing db_connect.php — check it doesn't already do anything extra
- * your other scripts rely on before overwriting it).
- *
- * DB_HOST is "localhost" on virtually every Hostinger shared plan since
- * PHP and MySQL run on the same box — only change it if your hPanel
- * database page shows a different host.
+ * Shared session + MySQL connection, credentials from .env (see .env.example).
+ * Upload to Hostinger premind/ as: db_connect.php
  */
 
 require_once __DIR__ . '/pm_load_env.php';
 pm_load_dotenv(__DIR__ . '/.env');
+
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_set_cookie_params([
+        'lifetime' => 86400, // 1 din
+        'path' => '/',
+        'secure' => true,     // HTTPS-only — matches the site, which is HTTPS everywhere
+        'httponly' => true,   // JS ko block karega (Security)
+        'samesite' => 'Strict'
+    ]);
+    session_start();
+}
 
 $DB_HOST = pm_env('DB_HOST', 'localhost');
 $DB_NAME = pm_env('DB_NAME');
