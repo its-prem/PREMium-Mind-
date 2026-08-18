@@ -92,6 +92,26 @@ function pm_is_native_app_origin(): bool {
 }
 
 /**
+ * The app is a Capacitor WebView pointing at the *live Netlify site*
+ * (see pm-app-gate.js: "Capacitor bridge (remote Netlify URL inside
+ * app)") — so its Origin is the same premind.netlify.app used by
+ * regular browsers, not a capacitor://localhost-style origin.
+ * pm_native_app_origins() alone therefore misclassifies real app
+ * traffic as "website" and was blocking paying app users from their
+ * own app_only courses.
+ *
+ * The User-Agent is the one signal pm-app-gate.js's own isNativeApp()
+ * already relies on for this exact case — mirror it here.
+ */
+function pm_is_native_app_user_agent(): bool {
+    $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    if ($ua === '' || stripos($ua, 'Android') === false) return false;
+    return (bool)preg_match('/; wv\)/i', $ua)
+        || stripos($ua, 'Capacitor') !== false
+        || stripos($ua, 'premiummind') !== false;
+}
+
+/**
  * Real proof the request came from the Android app: it must send
  * X-PM-App-Ts (current unix time) and X-PM-App-Sign =
  * hex(HMAC-SHA256(ts, app_shared_secret)). Unlike Origin/Referer, a raw
@@ -118,7 +138,7 @@ function pm_app_signature_valid(): bool {
 
 /** True if this request can be trusted as coming from the native app. */
 function pm_is_native_app_request(): bool {
-    return pm_app_signature_valid() || pm_is_native_app_origin();
+    return pm_app_signature_valid() || pm_is_native_app_origin() || pm_is_native_app_user_agent();
 }
 
 /**
