@@ -1,2851 +1,326 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PREMium Mind - Your Learning Partner</title>
-    <link rel="icon" type="image/png" href="small-logo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="pm-navbar.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bree+Serif&family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Kalam:wght@300;400;700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
-    <!-- Ionicons -->
-    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-
+    <title>PREMium Mind | Updating...</title>
+    <meta name="robots" content="noindex, nofollow">
 
     <style>
-        @media screen and (max-width: 600px) {
-            .card-container {
-                padding-left: 10px !important;
-                padding-right: 10px !important;
-            }
-
-            .course-card {
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-            }
-
-            .footer-container {
-                padding-left: 10px !important;
-                padding-right: 10px !important;
-            }
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Hero Section */
-        .hero-section {
-            background: linear-gradient(135deg, #000000 0%, #434343 100%);
-            color: white;
-            padding: 80px 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 0.5;
-            }
-
-            50% {
-                opacity: 1;
-            }
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            background: rgba(20, 20, 20, 0.6);
-            backdrop-filter: blur(10px);
-            padding: 8px 24px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #fbbf24;
-            margin-bottom: 25px;
-            border: 1px solid rgba(251, 191, 36, 0.4);
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
-            text-transform: uppercase;
-            transition: all 0.3s ease;
-        }
-        .hero-badge:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.25);
-            border-color: rgba(251, 191, 36, 0.8);
-        }
-
-        .hero-section h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-
-        .hero-section p {
-            font-size: 1.3rem;
-            margin-bottom: 35px;
-            opacity: 0.95;
-            line-height: 1.6;
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .cta-btn {
-            padding: 15px 35px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .cta-primary {
-            background: white;
-            color: #000;
-        }
-
-        .cta-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
-        }
-
-        .cta-secondary {
-            background: transparent;
-            color: white;
-            border: 2px solid white;
-        }
-
-        .cta-secondary:hover {
-            background: white;
-            color: #000;
-        }
-
-        /* Stats Section */
-        .stats-section {
-            background: #f9f9f9;
-            padding: 60px 20px;
-        }
-
-        .stats-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 35px 25px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #000;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            font-size: 1rem;
-            color: #666;
-            font-weight: 500;
-        }
-
-        /* Features Section */
-        .features-section {
-            padding: 80px 20px;
-            background: white;
-        }
-
-        .features-header {
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto 60px;
-        }
-
-        .features-header h2 {
-            font-size: 2.8rem;
-            font-weight: 800;
-            margin-bottom: 15px;
-            background: linear-gradient(135deg, #000000 0%, #434343 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .features-header p {
-            font-size: 1.2rem;
-            color: #666;
-        }
-
-        .features-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 35px;
-        }
-
-        .feature-card {
-            padding: 35px;
-            border-radius: 15px;
-            background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
-            border: 2px solid #f0f0f0;
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover {
-            border-color: #000;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-icon {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
-        .feature-card p {
-            color: #666;
-            line-height: 1.7;
-            font-size: 1rem;
-        }
-
-        /* User Profile in Sidebar */
-        .user-profile {
-            text-align: center;
-            padding: 20px 15px;
-            border-bottom: 2px solid rgba(0, 0, 0, 0.08);
-            margin: 0 15px 20px 15px;
-            background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .profile-photo-container {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 15px;
-        }
-
-        .profile-photo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #000;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        .profile-photo:hover {
-            transform: scale(1.08);
-            border-color: #333;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-        }
-
-        .change-photo-btn {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            background: linear-gradient(135deg, #000 0%, #333 100%);
-            color: #fff;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .change-photo-btn:hover {
-            background: linear-gradient(135deg, #333 0%, #000 100%);
-            transform: scale(1.15) rotate(15deg);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .user-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #000;
-            margin-bottom: 6px;
-            letter-spacing: 0.3px;
-        }
-
-        .user-email {
-            font-size: 0.85rem;
-            color: #666;
-            word-break: break-all;
-            background: rgba(0, 0, 0, 0.03);
-            padding: 5px 10px;
-            border-radius: 6px;
-            display: inline-block;
-        }
-
-        .logout-btn-sidebar {
-            width: 90%;
-            margin: 15px auto 10px;
-            padding: 11px;
-            background: linear-gradient(135deg, #000 0%, #333 100%);
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            letter-spacing: 0.5px;
-        }
-
-        .logout-btn-sidebar:hover {
-            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
-        }
-
-        .logout-btn-sidebar:active {
-            transform: translateY(0);
-        }
-
-        .login-prompt {
-            text-align: center;
-            padding: 25px 20px;
-            background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
-            margin: 0 15px 20px 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .login-prompt h3 {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #000 0%, #333 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 800;
-        }
-
-        .login-prompt p {
-            margin: 10px 0;
-            color: #666;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .login-btn {
-            background: linear-gradient(135deg, #000 0%, #333 100%);
-            color: #fff;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 15px;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            letter-spacing: 0.5px;
-        }
-
-        .login-btn:hover {
-            background: linear-gradient(135deg, #333 0%, #000 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .login-btn:active {
-            transform: translateY(0);
-        }
-
-        #photo-input {
-            display: none;
-        }
-
-        .protected-route {
-            position: relative;
-        }
-
-        .protected-route.locked::after {
-            content: '🔒';
-            margin-left: 5px;
-        }
-
-        /* Course Enrollment Badge */
-        .enrolled-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
-        .enroll-btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 1rem;
-            margin-top: 10px;
-            transition: all 0.3s;
-        }
-
-        .enroll-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
-        }
-
-        .buy-course-btn {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 1rem;
-            margin-top: 10px;
-            transition: all 0.3s;
-        }
-
-        .buy-course-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
-        }
-
-        .card-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .course-card {
-            position: relative;
-            width: 280px;
-            border-radius: 12px;
-            padding: 15px;
-            background: #fff;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            transition: transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .course-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .course-card img {
-            width: 100%;
-            border-radius: 8px;
-        }
-
-        .course-card h2 {
-            font-size: 18px;
-            margin: 22px 0px 5px 0px;
-        }
-
-        .price {
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .price span {
-            color: #888;
-            text-decoration: line-through;
-            font-size: 14px;
-            margin-left: 6px;
-        }
-
-        .disabled-btn {
-            width: 100%;
-            padding: 10px;
-            background: #ff9800;
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 16px;
-            cursor: not-allowed;
-            font-weight: bold;
-            opacity: 0.95;
-        }
-
-        .coming-soon-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 15px;
-            font-weight: 800;
-            cursor: not-allowed;
-            letter-spacing: 0.4px;
-            text-transform: uppercase;
-            opacity: 1 !important;
-            pointer-events: none;
-            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
-        }
-        .coming-soon-btn:disabled {
-            opacity: 1 !important;
-            color: #fff;
-        }
-
-        .new-badge {
-            position: absolute;
-            top: 12px;
-            right: -35px;
-            background: red;
-            color: #fff;
-            font-size: 13px;
-            font-weight: bold;
-            padding: 6px 40px;
-            transform: rotate(45deg);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .course-section h1 {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #000000 0%, #434343 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 40px 0 30px 0;
-            padding: 0 20px;
-            letter-spacing: 1px;
-            position: relative;
-        }
-
-        .course-section h1::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 4px;
-            background: linear-gradient(90deg, #000000, #666666);
-            border-radius: 2px;
-        }
-
-        .mini-timer {
-            font-size: 12px;
-            font-weight: 700;
-            color: #d32f2f;
-            margin: 4px 0;
-            text-align: center;
-        }
-
-        .mini-timer span {
-            background: #fdecea;
-            color: #b71c1c;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 700;
-        }
-
-        @media screen and (max-width: 768px) {
-            .hero-section h1 {
-                font-size: 2.2rem;
-            }
-
-            .hero-section p {
-                font-size: 1.1rem;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-            }
-
-            .cta-btn {
-                width: 100%;
-            }
-        }
-
-        /* --- 💥 NEW WHATSAPP MODAL & BUTTON STYLES 💥 --- */
-        .card-report-slot {
-            display: flex;
-            justify-content: flex-end;
-            width: 100%;
-        }
-
-        .wa-unlock-btn {
-            width: max-content;
-            align-self: flex-end;
-            margin: 0 0 10px auto;
-            background: #f0fdf4;
-            color: #15803d;
-            border: 1.5px dashed #22c55e;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.75rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            transition: 0.3s;
-        }
-
-        .wa-unlock-btn:hover {
-            background: #dcfce7;
-            transform: translateY(-2px);
-        }
-
-        /* --- 👁️ PREVIEW BUTTON & BADGE STYLES 👁️ --- */
-        .preview-badge-btn {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(255, 255, 255, 0.95);
-            color: #1e293b;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            z-index: 10;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transition: all 0.2s ease;
-        }
-
-        .preview-badge-btn:hover {
-            background: #ffffff;
-            transform: translateY(-1px) scale(1.03);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-            color: #0f172a;
-        }
-        
-        .preview-badge-btn ion-icon {
-            font-size: 13px;
-            color: #2563eb; /* premium blue icon */
-        }
-
-        .preview-btn-bottom {
-            flex: 1;
-            background: #f8fafc;
-            color: #334155;
-            border: 1px solid #cbd5e1;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            transition: all 0.2s ease;
-        }
-
-        .preview-btn-bottom:hover {
-            background: #f1f5f9;
-            color: #1e293b;
-            border-color: #94a3b8;
-        }
-
-        .btn-reviewing {
-            width: 100%;
-            background: #94a3b8 !important;
-            color: white !important;
-            border: none !important;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: not-allowed !important;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        /* --- 🚩 REPORT BUTTON & SOLVING STATES 🚩 --- */
-        .course-card .report-btn {
-            width: max-content !important;
-            align-self: flex-end !important;
-            margin: 0 0 10px auto !important;
-            background: #fff1f2 !important;
-            color: #e11d48 !important;
-            border: 1.5px dashed #f43f5e !important;
-            padding: 6px 14px !important;
-            border-radius: 8px !important;
-            font-weight: 700 !important;
-            font-size: 0.75rem !important;
-            cursor: pointer !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 4px !important;
-            transition: 0.3s !important;
-        }
-
-        .course-card .report-btn:hover {
-            background: #ffe4e6 !important;
-            transform: translateY(-2px) !important;
-        }
-
-        .course-card .btn-solving {
-            width: max-content !important;
-            align-self: flex-end !important;
-            margin: 0 0 10px auto !important;
-            background: #fef08a !important;
-            color: #854d0e !important;
-            border: 1.5px dashed #eab308 !important;
-            padding: 6px 14px !important;
-            border-radius: 8px !important;
-            cursor: not-allowed !important;
-            font-weight: bold !important;
-            font-size: 0.75rem !important;
-            display: inline-flex !important;
-        }
-
-        /* MODAL BASE */
-        .wa-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 10001;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            backdrop-filter: blur(5px);
-        }
-
-        .wa-content {
-            background: white;
-            width: 100%;
-            max-width: 400px;
-            padding: 30px;
-            border-radius: 20px;
-            position: relative;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .wa-input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1.5px solid #eee;
-            border-radius: 10px;
-            outline: none;
-            font-family: 'Poppins';
-            box-sizing: border-box;
-        }
-
-        .wa-submit-btn {
-            width: 100%;
-            padding: 14px;
-            background: #000;
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        /* ================================================================
-       📱 IMPROVED RESPONSIVE RULES (added)
-       ================================================================ */
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .card-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            justify-content: center;
-        }
-
-        .course-card {
-            width: 100%;
-            max-width: 320px;
-            margin: 0 auto;
-        }
-
-        @media screen and (max-width: 1024px) {
-            .features-grid {
-                gap: 25px;
-            }
-
-            .stats-container {
-                gap: 20px;
-            }
-        }
-
-        @media screen and (max-width: 768px) {
-            .stats-container {
-                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-                gap: 15px;
-            }
-
-            .stat-card {
-                padding: 22px 15px;
-            }
-
-            .stat-number {
-                font-size: 2rem;
-            }
-
-            .stat-icon {
-                font-size: 2.2rem;
-                margin-bottom: 8px;
-            }
-
-            .features-section {
-                padding: 50px 15px;
-            }
-
-            .features-header h2 {
-                font-size: 2rem;
-            }
-
-            .features-header p {
-                font-size: 1rem;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .feature-card {
-                padding: 25px;
-            }
-
-            .course-section h1 {
-                font-size: 1.7rem;
-                margin: 25px 0 20px 0;
-            }
-
-            .card-container {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-                gap: 12px;
-                padding: 12px;
-            }
-
-            .course-card {
-                padding: 10px;
-                max-width: 100%;
-            }
-
-            .course-card h2 {
-                font-size: 15px;
-                margin: 6px 0;
-            }
-
-            .course-card p {
-                font-size: 10px;
-            }
-
-            .price {
-                font-size: 15px;
-            }
-
-            .wa-content {
-                padding: 20px;
-                border-radius: 14px;
-            }
-
-            .footer-container {
-                flex-direction: column;
-                text-align: center;
-                align-items: center;
-            }
-
-            .footer-part {
-                width: 100%;
-                margin-bottom: 25px;
-            }
-
-            .logo-part {
-                justify-content: center;
-                margin: 0 auto;
-            }
-
-            .logo-part .logo {
-                margin: 0 auto;
-                display: block;
-            }
-
-            .footer-part.text-part {
-                flex-direction: column;
-                padding: 0;
-                align-items: center;
-            }
-
-            .contact-info ul {
-                padding: 0;
-                margin: 0;
-            }
-
-            .footer-part.form-part {
-                display: flex;
-                justify-content: center;
-                width: 100%;
-            }
-
-            .footer-form {
-                width: 100%;
-                max-width: 400px;
-                margin: 0 auto;
-            }
-
-            .footer-form form {
-                margin: 0 auto;
-                text-align: left;
-            }
-        }
-
-        @media screen and (max-width: 480px) {
-            .hero-section {
-                padding: 55px 15px;
-            }
-
-            .hero-section h1 {
-                font-size: 1.7rem;
-            }
-
-            .hero-section p {
-                font-size: 0.95rem;
-            }
-
-            .hero-badge {
-                font-size: 0.75rem;
-                padding: 6px 14px;
-            }
-
-            .card-container {
-                grid-template-columns: 1fr;
-                gap: 20px;
-                padding: 12px;
-            }
-
-            .course-card {
-                padding: 13px;
-                border-radius: 8px;
-                max-width: 420px;
-                margin: 0 auto;
-                width: 100%;
-                min-height: auto;
-            }
-
-            .course-card h2 {
-                font-size: 16px;
-                margin: 6px 0;
-            }
-
-            .course-card p {
-                font-size: 13px;
-                line-height: 1.4;
-                margin: 0px 0PX 0PX 0PX;
-            }
-
-            .price {
-                font-size: 16px;
-                margin: 10px 0;
-            }
-
-            .disabled-btn,
-            .coming-soon-btn,
-            .enroll-btn,
-            .buy-course-btn {
-                font-size: 14px;
-                padding: 10px;
-            }
-
-            .new-badge {
-                font-size: 10px;
-                padding: 4px 30px;
-                right: -30px;
-                top: 8px;
-            }
-
-            .course-section h1 {
-                font-size: 1.3rem;
-            }
-
-            .wa-content {
-                padding: 15px;
-            }
-
-            .wa-input {
-                padding: 10px;
-                font-size: 13px;
-            }
-        }
-
-
-        /* Hero Title Animations */
-        .animated-hero-title {
-            font-size: 48px;
-            line-height: 1.35;
-            margin-bottom: 24px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 10px 14px;
-            cursor: pointer;
-        }
-
-        .animated-word {
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(35px) scale(0.85);
-            filter: blur(8px);
-            animation: wordPopIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            transition: transform 0.3s ease;
-        }
-
-        .animated-word:hover {
-            transform: translateY(-4px) scale(1.06) !important;
-        }
-
-        .animated-word.word-1 {
-            animation-delay: 0.1s;
-        }
-
-        .animated-word.word-2 {
-            animation-delay: 0.2s;
-        }
-
-        .animated-word.word-3 {
-            animation-delay: 0.3s;
-        }
-
-        .animated-word.word-4 {
-            animation-delay: 0.4s;
-        }
-
-        .animated-word.word-5 {
-            animation-delay: 0.5s;
-        }
-
-        .animated-word.word-6 {
-            animation-delay: 0.6s;
-        }
-
-        .animated-word.word-7 {
-            animation-delay: 0.7s;
-        }
-
-        @keyframes wordPopIn {
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-                filter: blur(0);
-            }
-        }
-
-        .font-kalam {
-            font-family: 'Kalam', cursive;
-            color: #111;
-            font-weight: 800;
-            background: #fbbf24; /* Bright amber/yellow */
-            padding: 4px 20px;
-            border-radius: 8px;
-            border: 2px solid #fff;
-            transform: rotate(-4deg);
-            display: inline-block;
-            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.4);
-        }
-
-        .font-serif {
-            font-family: 'Crimson Pro', 'EB Garamond', serif;
-            font-style: italic;
-            font-weight: 600;
+        body {
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top left, #222 0%, transparent 35%),
+                radial-gradient(circle at bottom right, #222 0%, transparent 35%),
+                #050505;
             color: #fff;
-            font-size: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
         }
 
-        .accent-fails {
-            font-family: 'EB Garamond', serif;
-            font-weight: 800;
-            color: #dc2626;
-            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .font-archivo {
-            font-family: 'Archivo Black', sans-serif;
-            letter-spacing: -1px;
-            font-size: 50px;
-        }
-
-        .brand-gradient {
-            background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .works-badge {
-            color: #000;
-            background: linear-gradient(135deg, #ffffff 0%, #dddddd 100%);
-            padding: 4px 22px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2);
-            animation: wordPopIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s forwards, pulseWorks 2.5s infinite 1.4s ease-in-out;
-        }
-
-        @keyframes pulseWorks {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.06);
-            }
-        }
-
-        .hero-break {
-            flex-basis: 100%;
-            height: 0;
-        }
-
-        /* Category Tab Styles */
-        .store-categories-wrapper {
+        .maintenance-container {
             width: 100%;
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 8px 4px 14px 4px;
-            margin-top: 20px;
+            max-width: 650px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
             margin-bottom: 25px;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(0, 0, 0, 0.4) transparent;
+            filter: drop-shadow(0 10px 25px rgba(255,255,255,0.12));
         }
 
-        .store-categories-wrapper::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .store-categories-wrapper::-webkit-scrollbar-track {
-            background: rgba(226, 232, 240, 0.6);
-            border-radius: 10px;
-        }
-
-        .store-categories-wrapper::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.35);
-            border-radius: 10px;
-        }
-
-        .store-categories-wrapper::-webkit-scrollbar-thumb:hover {
-            background: #000;
-        }
-
-        .store-categories-tabs {
-            display: flex;
-            gap: 12px;
-            flex-wrap: nowrap;
-            width: max-content;
-            justify-content: center;
-            margin: 0 auto;
-        }
-
-        .category-tab {
-            white-space: nowrap;
-            flex-shrink: 0;
-            background: #fff;
-            border: 1px solid #e1e1e1;
-            color: #555;
-            padding: 11px 24px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-
-        .category-tab ion-icon {
-            font-size: 16px;
-            color: #888;
-        }
-
-        .category-tab:hover {
-            border-color: #000;
-            color: #000;
-            transform: translateY(-2px);
-        }
-
-        .category-tab.active {
-            background: #000;
-            color: #fff;
-            border-color: #000;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-        }
-
-        .category-tab.active ion-icon {
-            color: #fff;
-        }
-
-        /* Course Meta & Pricing Blocks */
-        .course-meta {
-            margin-top: auto;
-            padding-top: 6px;
-            padding-bottom: 6px;
-            border-top: 1px dashed #e1e1e1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .price-box {
-            display: flex;
-            align-items: baseline;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-
-        .price {
-            font-size: 22px !important;
-            font-weight: 800 !important;
-            color: #000 !important;
-            margin: 0 !important;
-        }
-
-        .old-price {
-            font-size: 13px !important;
-            color: #888 !important;
-            text-decoration: line-through !important;
-            font-weight: 600 !important;
-            margin-left: 5px !important;
-        }
-
-        .rating {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 13px;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .rating ion-icon {
-            color: #f59e0b;
-            font-size: 15px;
-        }
-
-        .card-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 100%;
-            margin-top: 4px;
-        }
-
-        /* Project Link Styles inside Description Slot */
-        .see-project-link {
+        .badge {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            color: #000;
+            gap: 8px;
+            padding: 8px 18px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06);
+            border-radius: 50px;
+            color: #fbbf24;
             font-size: 13px;
             font-weight: 700;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            background: rgba(0, 0, 0, 0.05);
-            padding: 4px 10px;
-            border-radius: 6px;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
         }
 
-        .see-project-link:hover {
-            color: #333;
-            background: rgba(0, 0, 0, 0.12);
-            transform: translateX(3px);
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #fbbf24;
+            border-radius: 50%;
+            animation: blink 1.2s infinite;
         }
 
-        /* Empty State for Store Categories */
-        .empty-category-state {
-            grid-column: 1 / -1;
-            background: #fff;
-            border: 2px dashed #e1e1e1;
-            border-radius: 24px;
-            padding: 60px 20px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            width: 100%;
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
         }
 
-        .empty-icon-box {
-            width: 70px;
-            height: 70px;
-            border-radius: 20px;
-            background: #f5f5f5;
-            color: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-        }
-
-        .empty-category-state h3 {
-            font-size: 22px;
+        h1 {
+            font-size: clamp(32px, 7vw, 58px);
+            line-height: 1.1;
+            margin-bottom: 20px;
             font-weight: 800;
-            margin: 0;
+            background: linear-gradient(135deg, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .empty-category-state p {
-            color: #666;
-            font-size: 15px;
-            max-width: 450px;
-            margin: 0;
+        .description {
+            color: #aaa;
+            font-size: 17px;
+            line-height: 1.7;
+            max-width: 550px;
+            margin: 0 auto 30px;
         }
 
-        .empty-action-btn {
-            background: #000;
-            color: #fff;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 50px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .update-box {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 22px;
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+        }
+
+        .update-title {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .timer {
             display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .empty-action-btn:hover {
-            background: #333;
-            transform: translateY(-2px);
-        }
-
-        .card-img-wrapper {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-            border-radius: 12px;
-            margin-bottom: -15px;
-        }
-
-        /* PDF Preview modal (1 page only) */
-        .pdf-preview-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 100000;
-            background: rgba(15, 23, 42, 0.72);
-            align-items: center;
             justify-content: center;
-            padding: 16px;
-            box-sizing: border-box;
+            gap: 12px;
         }
-        .pdf-preview-modal.show { display: flex; }
-        .pdf-preview-box {
-            width: min(560px, 100%);
-            max-height: min(92vh, 900px);
-            background: #fff;
-            border-radius: 16px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 24px 60px rgba(0,0,0,.35);
-        }
-        .pdf-preview-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 14px 16px;
-            border-bottom: 1px solid #e2e8f0;
-            background: #f8fafc;
-        }
-        .pdf-preview-head h3 {
-            margin: 0;
-            font-size: 0.98rem;
-            font-weight: 700;
-            color: #0f172a;
-            line-height: 1.3;
-        }
-        .pdf-preview-head .pdf-preview-sub {
-            margin: 2px 0 0;
-            font-size: 0.72rem;
-            color: #64748b;
-            font-weight: 600;
-        }
-        .pdf-preview-close {
-            border: none;
-            background: #fee2e2;
-            color: #b91c1c;
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            font-size: 22px;
-            cursor: pointer;
-            line-height: 1;
-            flex-shrink: 0;
-        }
-        .pdf-preview-body {
-            padding: 12px;
-            overflow: auto;
-            background: #e2e8f0;
-            text-align: center;
-            min-height: 220px;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-        .pdf-preview-body canvas,
-        .pdf-preview-body img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(15,23,42,.18);
-            background: #fff;
-        }
-        .pdf-preview-status {
-            color: #475569;
-            font-size: 0.9rem;
-            font-weight: 600;
-            padding: 40px 12px;
-        }
-        .pdf-preview-status.error { color: #b91c1c; }
-    </style>
 
-    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+        .time-box {
+            min-width: 80px;
+            padding: 15px 10px;
+            background: #111;
+            border: 1px solid #292929;
+            border-radius: 14px;
+        }
+
+        .time-number {
+            display: block;
+            font-size: 30px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .time-label {
+            display: block;
+            font-size: 10px;
+            color: #777;
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        .status {
+            margin-top: 25px;
+            color: #777;
+            font-size: 13px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #555;
+            font-size: 12px;
+        }
+
+        @media (max-width: 480px) {
+
+            body {
+                overflow-y: auto;
+            }
+
+            .logo {
+                width: 70px;
+                height: 70px;
+            }
+
+            .description {
+                font-size: 14px;
+            }
+
+            .timer {
+                gap: 6px;
+            }
+
+            .time-box {
+                min-width: 65px;
+                padding: 12px 6px;
+            }
+
+            .time-number {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <nav class="navbar">
-        <div class="logo-container">
-            <a href="index.html">
-                <img src="PM-LOGO-TEXT.png" alt="PM Logo" class="logo-image" />
-            </a>
+    <main class="maintenance-container">
+
+        <!-- Your logo -->
+        <img
+            src="small-logo.png"
+            alt="PREMium Mind"
+            class="logo"
+        >
+
+        <div class="badge">
+            <span class="dot"></span>
+            WEBSITE UPDATE IN PROGRESS
         </div>
 
-        <ul class="nav-links">
-            <li>
-                <a href="index.html" class="nav-link">
-                    <ion-icon name="home-outline"></ion-icon> Home
-                </a>
-            </li>
+        <h1>
+            We're Improving<br>
+            PREMium Mind
+        </h1>
 
-            <!-- PREMium Store Dropdown -->
-            <li class="nav-dropdown">
-                <a href="#store" class="nav-link store-trigger dropdown-toggle" id="store-dropdown-btn">
-                    <ion-icon name="bag-handle-outline"></ion-icon> PREMium Store
-                    <ion-icon name="chevron-down-outline" class="dropdown-arrow"></ion-icon>
-                </a>
-                <div class="dropdown-menu">
-                    <div class="dropdown-header">Explore Categories</div>
-                    <a href="#notes" class="dropdown-item"
-                        onclick="if(window.filterCategoryGlobal) window.filterCategoryGlobal('notes');">
-                        <div class="dropdown-icon icon-blue"><ion-icon name="document-text-outline"></ion-icon></div>
-                        <div class="dropdown-text">
-                            <span class="item-title">Notes</span>
-                            <span class="item-desc">Handwritten &amp; exam notes</span>
-                        </div>
-                    </a>
-                    <a href="#ebooks" class="dropdown-item"
-                        onclick="if(window.filterCategoryGlobal) window.filterCategoryGlobal('ebooks');">
-                        <div class="dropdown-icon icon-purple"><ion-icon name="book-outline"></ion-icon></div>
-                        <div class="dropdown-text">
-                            <span class="item-title">E-Books</span>
-                            <span class="item-desc">Complete syllabus guides</span>
-                        </div>
-                    </a>
-                    <a href="#resume" class="dropdown-item"
-                        onclick="if(window.filterCategoryGlobal) window.filterCategoryGlobal('resume');">
-                        <div class="dropdown-icon icon-green"><ion-icon name="briefcase-outline"></ion-icon></div>
-                        <div class="dropdown-text">
-                            <span class="item-title">Resume</span>
-                            <span class="item-desc">ATS-ready professional formats</span>
-                        </div>
-                    </a>
-                    <a href="#report-writing" class="dropdown-item"
-                        onclick="if(window.filterCategoryGlobal) window.filterCategoryGlobal('report-writing');">
-                        <div class="dropdown-icon icon-amber"><ion-icon name="bar-chart-outline"></ion-icon></div>
-                        <div class="dropdown-text">
-                            <span class="item-title">Report Writing</span>
-                            <span class="item-desc">Industrial &amp; academic reports</span>
-                        </div>
-                    </a>
-                    <a href="#projects" class="dropdown-item"
-                        onclick="if(window.filterCategoryGlobal) window.filterCategoryGlobal('projects');">
-                        <div class="dropdown-icon icon-rose"><ion-icon name="code-slash-outline"></ion-icon></div>
-                        <div class="dropdown-text">
-                            <span class="item-title">Project</span>
-                            <span class="item-desc">Major &amp; minor project code</span>
-                        </div>
-                        <span class="dropdown-badge">Hot</span>
-                    </a>
-                </div>
-            </li>
+        <p class="description">
+            PREMium Mind is temporarily unavailable while we apply
+            important updates and improvements.
+            We’ll be back shortly with a better experience.
+        </p>
 
-            <li>
-                <a href="lecture.html" class="nav-link protected-route" id="coursesLinkNav">
-                    <ion-icon name="play-circle-outline"></ion-icon> My Courses
-                </a>
-            </li>
-            <li>
-                <a href="app-download.html" class="nav-link">
-                    <ion-icon name="phone-portrait-outline"></ion-icon> App Version
-                </a>
-            </li>
-            <li>
-                <a href="#help-form" class="nav-link">
-                    <ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us
-                </a>
-            </li>
-            <li id="desktopLoginBtnContainer">
-                <a href="login.html" class="nav-link" style="background: #111; color: #fff;">
-                    <ion-icon name="person-circle-outline" style="color:#fff;"></ion-icon> Login
-                </a>
-            </li>
-            <li id="desktopUserPillContainer" style="display: none;">
-                <div class="nav-user-pill" onclick="document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active');">
-                    <img src="" id="navAvatarImg" alt="Profile" class="nav-avatar">
-                    <span class="nav-user-name" id="navUserName">User</span>
-                    <ion-icon name="chevron-down-outline" style="color: #2563eb; font-size: 16px; margin-left: 2px;"></ion-icon>
-                </div>
-            </li>
-        </ul>
-        <div class="menu-btn" id="menu-btn">☰</div>
-    </nav>
+        <div class="update-box">
 
-    <!-- ANIMATED SIDEBAR -->
-    <div class="overlay" id="overlay"></div>
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-scroll">
-            <div class="sidebar-header">
-                <img src="PM-LOGO-TEXT.png" alt="PREMium Mind" class="sidebar-logo"
-                    onerror="this.onerror=null; this.src='small-logo.png';">
-                <button class="close-sidebar" id="close-sidebar-btn"
-                    onclick="document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active');">
-                    <ion-icon name="close-outline"></ion-icon>
-                </button>
+            <div class="update-title">
+                Website will be back in
             </div>
 
-            <div class="user-profile-compact" id="userProfile" style="display: none;">
-                <div class="profile-photo-container">
-                    <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile"
-                        class="profile-photo" id="profilePhoto" title="Click to change photo"
-                        onclick="document.getElementById('photo-input').click()">
-                </div>
-                <input type="file" id="photo-input" accept="image/*" style="display:none;">
-                <div class="profile-info">
-                    <div class="user-name" id="userName">User Name</div>
-                    <div class="user-email-chip" id="userEmail">user@example.com</div>
-                </div>
-            </div>
+            <div class="timer">
 
-            <div class="login-prompt" id="loginPrompt"
-                style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; border: 1px solid #e2e8f0;">
-                <h3 style="margin:0 0 5px 0; font-size:15px; color:#111;">Welcome to PREMium Mind</h3>
-                <p style="margin:0 0 10px 0; font-size:12px; color:#666;">Access your courses and profile.</p>
-                <button onclick="window.location.href='login.html'"
-                    style="width:100%; padding:10px; border:none; background:#111; color:#fff; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
-                    <ion-icon name="log-in-outline" style="font-size:18px;"></ion-icon> Login / Sign Up
-                </button>
-            </div>
-
-            <ul class="sidebar-menu">
-                <li class="sidebar-item" style="--delay: 0.1s">
-                    <a href="index.html" class="sidebar-link">
-                        <ion-icon name="home-outline"></ion-icon> Home
-                    </a>
-                </li>
-
-                <!-- Mobile Store Dropdown Accordion -->
-                <li class="sidebar-item sidebar-dropdown" style="--delay: 0.2s">
-                    <div class="sidebar-dropdown-toggle" id="mobile-store-toggle"
-                        onclick="this.parentElement.classList.toggle('open')">
-                        <span class="sidebar-link-content">
-                            <ion-icon name="bag-handle-outline"></ion-icon> PREMium Store
-                        </span>
-                        <ion-icon name="chevron-down-outline" class="mobile-dropdown-arrow"></ion-icon>
-                    </div>
-                    <div class="sidebar-submenu" id="mobile-store-submenu">
-                        <a href="#notes" class="sidebar-sublink"
-                            onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('notes'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
-                                name="document-text-outline"></ion-icon> Notes</a>
-                        <a href="#ebooks" class="sidebar-sublink"
-                            onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('ebooks'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
-                                name="book-outline"></ion-icon> E-Books</a>
-                        <a href="#resume" class="sidebar-sublink"
-                            onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('resume'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
-                                name="briefcase-outline"></ion-icon> Resume</a>
-                        <a href="#report-writing" class="sidebar-sublink"
-                            onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('report-writing'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
-                                name="bar-chart-outline"></ion-icon> Report Writing</a>
-                        <a href="#projects" class="sidebar-sublink"
-                            onclick="if(window.filterCategoryGlobal) { window.filterCategoryGlobal('projects'); document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }"><ion-icon
-                                name="code-slash-outline"></ion-icon> Project</a>
-                    </div>
-                </li>
-
-                <li class="sidebar-item" style="--delay: 0.3s">
-                    <a href="lecture.html" class="sidebar-link protected-route" id="coursesLink">
-                        <ion-icon name="play-circle-outline"></ion-icon> My Courses
-                    </a>
-                </li>
-                <li class="sidebar-item" style="--delay: 0.35s">
-                    <a href="app-download.html" class="sidebar-link">
-                        <ion-icon name="phone-portrait-outline"></ion-icon> App Version
-                    </a>
-                </li>
-                <li class="sidebar-item pm-admin-panel-link" id="pmAdminPanelLink" style="--delay: 0.37s; display:none;">
-                    <a href="https://premind.diplomawallah.in/admin_panel.php" class="sidebar-link pm-admin-panel-anchor">
-                        <ion-icon name="settings-outline"></ion-icon> Admin Panel
-                    </a>
-                </li>
-                <li class="sidebar-item" style="--delay: 0.4s">
-                    <a href="#help-form" class="sidebar-link"
-                        onclick="document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active');">
-                        <ion-icon name="chatbubble-ellipses-outline"></ion-icon> Contact Us
-                    </a>
-                </li>
-                <li class="sidebar-item" style="--delay: 0.5s">
-                    <a href="termcondition.html" class="sidebar-link">
-                        <ion-icon name="shield-checkmark-outline"></ion-icon> Privacy Policy
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Bottom Logout Action (always pinned) -->
-        <div class="sidebar-footer" id="sidebarFooter">
-            <button id="sidebarLogoutBtn" onclick="handleLogout()"
-                style="width:100%; padding:12px; background:#fff1f2; color:#e11d48; border:1px solid #ffe4e6; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
-                <ion-icon name="log-out-outline" style="font-size:18px;"></ion-icon> Logout Account
-            </button>
-        </div>
-    </div>
-
-    <section class="hero-section">
-        <div class="hero-content">
-            <span class="hero-badge">🎓 Your Learning Partner</span>
-            <h1 class="animated-hero-title" id="hero-title" title="Click to replay animation">
-                <span class="animated-word word-1 font-kalam" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.15em; font-weight: 700; text-shadow: 0px 4px 20px rgba(245, 158, 11, 0.4); display: inline-block; padding-right: 5px;">Boss,</span>
-                <span class="animated-word word-2 font-serif">When</span>
-                <span class="animated-word word-3 font-serif">Everything</span>
-                <span class="animated-word word-4 font-serif accent-fails">Fails...</span>
-                <br class="hero-break">
-                <span class="animated-word word-5 font-archivo brand-gradient">PREMium</span>
-                <span class="animated-word word-6 font-archivo brand-gradient">Mind</span>
-                <span class="animated-word word-7 font-archivo works-badge">Works.</span>
-            </h1>
-            <p>Access premium study materials, expert-crafted notes, and career-building resources designed for
-                ambitious students and professionals.</p>
-            <div class="cta-buttons">
-                <a href="#products" class="cta-btn cta-primary">Explore Products</a>
-                <a href="termcondition.html" class="cta-btn cta-secondary">Privacy & Policy</a>
-            </div>
-        </div>
-    </section>
-
-    <section class="course-section" id="products">
-        <h1>EXPLORE OUR PREMium Mind STORE</h1>
-        <div class="store-categories-wrapper">
-            <div class="store-categories-tabs" id="category-tabs">
-                <button class="category-tab active" data-category="all">
-                    <ion-icon name="grid-outline"></ion-icon><span>All Items</span>
-                </button>
-                <button class="category-tab" data-category="notes">
-                    <ion-icon name="document-text-outline"></ion-icon><span> Notes</span>
-                </button>
-                <button class="category-tab" data-category="ebooks">
-                    <ion-icon name="book-outline"></ion-icon><span> E-Books</span>
-                </button>
-                <button class="category-tab" data-category="resume">
-                    <ion-icon name="briefcase-outline"></ion-icon><span> Resume</span>
-                </button>
-                <button class="category-tab" data-category="report-writing">
-                    <ion-icon name="bar-chart-outline"></ion-icon><span>Reports</span>
-                </button>
-                <button class="category-tab" data-category="projects">
-                    <ion-icon name="code-slash-outline"></ion-icon><span> Projects</span>
-                </button>
-            </div>
-        </div>
-        <div class="card-container" id="dynamic-products-container">
-            <p style="text-align: center; width: 100%;">Loading Premium Store...</p>
-        </div>
-    </section>
-
-    <div id="reportModal" class="wa-modal">
-        <div class="wa-content">
-            <span onclick="document.getElementById('reportModal').style.display='none'"
-                style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
-            <h3 style="margin-bottom:8px; font-size:1.4rem; color: #be123c;">Report an Issue 🚩</h3>
-            <p style="font-size:13px; color:#666; margin-bottom:20px;">Describe your problem below. If it's a payment
-                issue, please attach a screenshot.</p>
-            <form id="reportForm">
-                <input type="hidden" id="report_cid">
-                <label style="font-size:12px; font-weight:600;">Your Message*</label>
-                <textarea id="report_msg" class="wa-input" rows="3" placeholder="Explain your issue here..."
-                    required></textarea>
-
-                <label style="font-size:12px; font-weight:600;">Upload Payment Screenshot (Optional for Payment
-                    Issues)</label>
-                <input type="file" id="report_file" accept="image/*"
-                    style="margin-bottom:15px; font-size:12px; width: 100%;">
-
-                <div
-                    style="margin-bottom: 15px; display: flex; gap: 8px; align-items: start; background: #fef2f2; padding: 12px; border-radius: 8px; border: 1px dashed #fda4af;">
-                    <input type="checkbox" id="report_agree" required style="margin-top: 2px;">
-                    <label for="report_agree"
-                        style="font-size: 11px; color: #be123c; font-weight: 600; cursor: pointer;">I understand that my
-                        problem will be reviewed and resolved within 1-2 hours.</label>
+                <div class="time-box">
+                    <span class="time-number" id="hours">01</span>
+                    <span class="time-label">Hours</span>
                 </div>
 
-                <button type="submit" id="reportSubmit" class="wa-submit-btn" style="background: #be123c;">Submit
-                    Report</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="pdfPreviewModal" class="pdf-preview-modal" role="dialog" aria-modal="true" aria-labelledby="pdfPreviewTitle">
-        <div class="pdf-preview-box">
-            <div class="pdf-preview-head">
-                <div>
-                    <h3 id="pdfPreviewTitle">PDF Preview</h3>
-                    <p class="pdf-preview-sub">Only page 1 · Buy to unlock full PDF</p>
-                </div>
-                <button type="button" class="pdf-preview-close" onclick="window.closePdfPreview()" aria-label="Close">&times;</button>
-            </div>
-            <div class="pdf-preview-body" id="pdfPreviewBody">
-                <div class="pdf-preview-status">Loading preview…</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="tncModal" class="wa-modal">
-        <div class="wa-content">
-            <span onclick="closeTncModal()"
-                style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
-            <h3 style="margin-bottom:8px; font-size:1.4rem;">Terms & Conditions 📜</h3>
-            <p style="font-size:13px; color:#666; margin-bottom:15px;">Please read terms before payment.</p>
-
-            <div id="tncTextBody"
-                style="background:#f9fafb; padding:15px; border-radius:8px; font-size:11px; color:#444; margin-bottom:15px; border:1px solid #eee; line-height: 1.6; height: 240px; overflow-y: auto;">
-            </div>
-
-            <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
-                <input type="checkbox" id="tnc_agree" style="width: 16px; height: 16px;">
-                <label for="tnc_agree" style="font-size: 13px; font-weight: 700; color: #111; cursor: pointer;">I agree
-                    to the Terms & Conditions</label>
-            </div>
-
-            <button type="button" id="tncProceedBtn" class="wa-submit-btn"
-                style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Accept & Proceed to
-                Payment</button>
-        </div>
-    </div>
-
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-part logo-part">
-                <img src="small-logo.png" alt="Premium Learnings Logo" class="logo" />
-            </div>
-
-            <div class="footer-part text-part">
-                <div class="footer-column">
-                    <h3>About Us</h3>
-                    <p>At <strong>PREMium Mind</strong>, we are committed to empowering students and freshers with
-                        job-ready skills through practical learning and expert-led courses.</p>
+                <div class="time-box">
+                    <span class="time-number" id="minutes">00</span>
+                    <span class="time-label">Minutes</span>
                 </div>
 
-                <div class="footer-column">
-                    <h3>Why Choose Us?</h3>
-                    <p>With personalized mentorship, project-based learning, and lifetime support, we ensure your career
-                        doesn't just start — it accelerates.</p>
+                <div class="time-box">
+                    <span class="time-number" id="seconds">00</span>
+                    <span class="time-label">Seconds</span>
                 </div>
 
-                <div class="contact-info">
-                    <h3>Contact Us on WhatsApp</h3>
-                    <p><strong>Contact course counsellor</strong></p>
-                    <ul style="list-style: none;">
-                        <li>📞 +91 8709911016</li>
-                    </ul>
-                </div>
             </div>
 
-            <div class="footer-part form-part" id="help-form">
-                <div class="footer-form">
-                    <form id="whForm">
-                        <label>Full Name:
-                            <input type="text" id="name" required placeholder="Enter Full Name" />
-                        </label>
-                        <label>Phone Number:
-                            <input type="tel" id="phone" pattern="[0-9]{10}" required
-                                placeholder="Enter Phone Number" />
-                        </label>
-                        <label>Report Problem:
-                            <textarea id="message" rows="4" placeholder="Your message..." required></textarea>
-                        </label>
-                        <button type="submit">Submit</button>
-                    </form>
-                </div>
+            <div class="status">
+                🔧 Updating system &nbsp;•&nbsp; Please check back soon
             </div>
+
         </div>
 
-        <div class="footer-bottom">
-            <p>&copy; 2025 PREMium Mind | <a href="termcondition.html">Privacy Policy</a></p>
+        <div class="footer">
+            © 2026 PREMium Mind. All rights reserved.
         </div>
-    </footer>
 
-    <script src="pm-session.js"></script>
-    <script src="pm-app-gate.js"></script>
-    <script>
-        // Cookie helpers for profile photos (session lives in pm-session.js)
-        function setCookie(name, value, days = 30) {
-            const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-            const secure = location.protocol === 'https:' ? '; Secure' : '';
-            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax${secure}`;
-        }
+    </main>
 
-        function getCookie(name) {
-            return window.pmGetCookie ? window.pmGetCookie(name) : null;
-        }
-
-        function deleteCookie(name) {
-            const secure = location.protocol === 'https:' ? '; Secure' : '';
-            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax${secure}`;
-        }
-    </script>
-
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
-        import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY",
-            authDomain: "premium-mind-fcb16.firebaseapp.com",
-            databaseURL: "https://premium-mind-fcb16-default-rtdb.firebaseio.com",
-            projectId: "premium-mind-fcb16",
-            storageBucket: "premium-mind-fcb16.firebasestorage.app",
-            messagingSenderId: "864874199521",
-            appId: "1:864874199521:web:5deb96a956dc404a077aa0"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        // Used by Admin Panel SSO (Firebase ID token → Hostinger session)
-        window.pmGetIdToken = async function () {
-            const u = auth.currentUser;
-            if (!u) return null;
-            return await u.getIdToken(true);
-        };
-        const storage = getStorage(app);
-        const database = getDatabase(app);
-
-        function updateUI(name, email, photoSrc) {
-            const userProfile = document.getElementById('userProfile');
-            const loginPrompt = document.getElementById('loginPrompt');
-            const coursesLink = document.getElementById('coursesLink');
-            const coursesLinkNav = document.getElementById('coursesLinkNav');
-            const sidebarFooter = document.getElementById('sidebarFooter');
-            
-            const desktopLoginBtn = document.getElementById('desktopLoginBtnContainer');
-            const desktopUserPill = document.getElementById('desktopUserPillContainer');
-
-            userProfile.style.display = 'flex';
-            loginPrompt.style.display = 'none';
-            if (sidebarFooter) sidebarFooter.classList.add('is-visible');
-
-            document.getElementById('userName').textContent = name || 'User';
-            document.getElementById('userEmail').textContent = email || '';
-
-            const finalPhotoSrc = photoSrc || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=000&color=fff&size=80`;
-            document.getElementById('profilePhoto').src = finalPhotoSrc;
-
-            if (desktopLoginBtn) desktopLoginBtn.style.display = 'none';
-            if (desktopUserPill) {
-                desktopUserPill.style.display = 'block';
-                document.getElementById('navUserName').textContent = (name || 'User').toString().split(' ')[0];
-                document.getElementById('navAvatarImg').src = finalPhotoSrc;
-            }
-
-            if (coursesLink) { coursesLink.classList.remove('locked'); coursesLink.onclick = null; }
-            if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
-
-            if (typeof window.loadCourses === 'function') {
-                window.loadCourses(email);
-            }
-            if (window.pmRefreshAdminMenu) window.pmRefreshAdminMenu(email);
-        }
-
-        function showLoggedOut() {
-            const userProfile = document.getElementById('userProfile');
-            const loginPrompt = document.getElementById('loginPrompt');
-            const coursesLink = document.getElementById('coursesLink');
-            const coursesLinkNav = document.getElementById('coursesLinkNav');
-            const sidebarFooter = document.getElementById('sidebarFooter');
-            
-            const desktopLoginBtn = document.getElementById('desktopLoginBtnContainer');
-            const desktopUserPill = document.getElementById('desktopUserPillContainer');
-
-            userProfile.style.display = 'none';
-            loginPrompt.style.display = 'block';
-            if (sidebarFooter) sidebarFooter.classList.remove('is-visible');
-            
-            if (desktopLoginBtn) desktopLoginBtn.style.display = 'block';
-            if (desktopUserPill) desktopUserPill.style.display = 'none';
-
-            // Index pe browsing free — My Courses pe click lecture.html khud login maangega
-            if (coursesLink) { coursesLink.classList.remove('locked'); coursesLink.onclick = null; }
-            if (coursesLinkNav) { coursesLinkNav.classList.remove('locked'); coursesLinkNav.onclick = null; }
-            if (window.pmRefreshAdminMenu) window.pmRefreshAdminMenu();
-
-            if (typeof window.loadCourses === 'function') {
-                window.loadCourses('');
-            }
-        }
-
-        // Session check — index browse bina login; login sirf Buy pe chahiye
-        const customEmail = window.getStoredEmail ? window.getStoredEmail() : null;
-        const customName = window.getStoredName ? window.getStoredName() : null;
-
-        async function syncProfilePhoneFromServer(email) {
-            if (!email) return '';
-            try {
-                const res = await fetch('https://premind.diplomawallah.in/get_user.php?email=' + encodeURIComponent(email));
-                const data = await res.json();
-                const phone = String((data && (data.phone || data.mobile)) || '').replace(/\D/g, '').slice(-10);
-                if (phone.length === 10 && phone !== '0000000000' && phone !== '9999999999') {
-                    const name = (data && data.name) || (window.getStoredName && window.getStoredName()) || 'User';
-                    if (window.saveLoginSession) window.saveLoginSession(email, name, phone);
-                    return phone;
-                }
-            } catch (e) { /* ignore */ }
-            return '';
-        }
-        window.syncProfilePhoneFromServer = syncProfilePhoneFromServer;
-
-        if (customEmail) {
-            updateUI(customName, customEmail, null);
-            syncProfilePhoneFromServer(customEmail);
-        } else {
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    const photoURL = localStorage.getItem('profilePhoto_' + user.uid) || getCookie('profilePhoto_' + user.uid) || user.photoURL;
-                    updateUI(user.displayName, user.email, photoURL);
-                    syncProfilePhoneFromServer(user.email).then(function (phone) {
-                        if (window.saveLoginSession) {
-                            window.saveLoginSession(user.email, user.displayName || 'User', phone || ((window.getStoredPhone && window.getStoredPhone()) || ''));
-                        }
-                    });
-                } else {
-                    showLoggedOut();
-                }
-            });
-        }
-
-        
-        document.getElementById('photo-input').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const user = auth.currentUser;
-            if (!user) return;
-            try {
-                const photoStorageRef = storageRef(storage, `profile_photos/${user.uid}/${Date.now()}_${file.name}`);
-                await uploadBytes(photoStorageRef, file);
-                const photoURL = await getDownloadURL(photoStorageRef);
-                localStorage.setItem('profilePhoto_' + user.uid, photoURL);
-                setCookie('profilePhoto_' + user.uid, photoURL);
-                document.getElementById('profilePhoto').src = photoURL;
-                alert('Profile photo updated successfully!');
-            } catch (error) {
-                console.error('Error uploading photo:', error);
-                alert('Error uploading photo. Please try again.');
-            }
-        });
-
-        window.handleLogout = async () => {
-            window.clearStoredSession();
-            try { await signOut(auth); } catch (error) { }
-            alert('Logged out successfully!');
-            window.location.reload();
-        };
-    </script>
 
     <script>
-        // -------------------------------------------------------------
-        // PAYMENT SDK & ENROLLMENT LOGIC (FRONTEND)
-        // -------------------------------------------------------------
 
-        const cashfree = Cashfree({
-            mode: "production",
-        });
+        /*
+         * 1 HOUR MAINTENANCE TIMER
+         */
 
-        // Modal/iframe hides GPay-PhonePe. Full-page checkout on phone/app shows UPI app icons (Cashfree dashboard style).
-        function isNativeAppCheckout() {
-            if (window.pmIsNativeApp && window.pmIsNativeApp()) return true;
-            if (window.__PM_NATIVE_APP__) return true;
-            if (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) return true;
-            if (typeof window.Android !== 'undefined' || typeof window.AndroidPdfSaver !== 'undefined') return true;
-            const ua = navigator.userAgent || '';
-            return /Android/.test(ua) && (/; wv\)/.test(ua) || /Capacitor/i.test(ua));
-        }
-        function isMobileCheckout() {
-            return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') || window.matchMedia('(max-width: 900px)').matches;
-        }
-        function getCashfreeRedirectTarget() {
-            // App + phone: full-page so GPay/PhonePe show; desktop keeps modal
-            return (isNativeAppCheckout() || isMobileCheckout()) ? '_self' : '_modal';
-        }
-        function getCheckoutCustomerPhone() {
-            const raw = (window.getStoredPhone && window.getStoredPhone()) || localStorage.getItem('customUserPhone') || '';
-            const digits = String(raw).replace(/\D/g, '');
-            if (digits.length >= 10) {
-                const p = digits.slice(-10);
-                if (p !== '0000000000' && p !== '9999999999') return p;
-            }
-            return '';
+        const duration = 60 * 60 * 1000;
+
+        /*
+         * Timer start time save rahega.
+         * Page refresh karne par timer dobara 1 hour se start nahi hoga.
+         */
+
+        let startTime = localStorage.getItem("premiumMaintenanceStart");
+
+        if (!startTime) {
+            startTime = Date.now();
+            localStorage.setItem(
+                "premiumMaintenanceStart",
+                startTime
+            );
         }
 
-        window.closeTncModal = function () {
-            document.getElementById('tncModal').style.display = 'none';
-        }
+        const endTime = Number(startTime) + duration;
 
-        // Default T&C sample — used when course has no custom tnc_text
-        // Format: "N. Title: body" → Title bold, body normal (same look as before)
-        const PM_DEFAULT_TNC =
-`1. Non-Refundable: All sales are final. No refunds will be provided once the course access is granted.
-2. No Sharing: Sharing your account details with others is strictly prohibited and will lead to an instant permanent ban without refund.
-3. Personal Use: The study material is for your personal use only. Distribution or piracy will invite legal actions.
-4. Download Policy: You can download the content only one day before the exam at 6:00 PM when the download button unlocks.
-5. Payment Instruction: After successful payment, please wait for 10 seconds on the same page. Then check your profile for access to the purchased content.
-6. Important Notice: This content is based on analysis and predictions; exact exam questions are not guaranteed.
-7. Agreement: By proceeding, you agree to PREMium Mind's standard terms of service.`;
 
-        function resolveCourseById(courseId) {
-            const list = window.globalLoadedCourses || globalLoadedCourses || [];
-            if (!Array.isArray(list)) return null;
-            return list.find(function (c) { return String(c.id) === String(courseId); }) || null;
-        }
+        function updateTimer() {
 
-        function escapeTncHtml(s) {
-            return String(s)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
-        }
+            const remaining = endTime - Date.now();
 
-        function formatTncHtml(raw) {
-            const text = String(raw || '').trim();
-            if (!text) return '';
-            // Admin pasted HTML (strong/br) — use as-is
-            if (/<\s*(strong|b|br|p|em|div)\b/i.test(text)) return text;
-            return text.split(/\n+/).map(function (line) {
-                line = line.trim();
-                if (!line) return '';
-                const m = line.match(/^(\d+\.\s*[^:]+:)\s*(.*)$/);
-                if (m) {
-                    return '<strong>' + escapeTncHtml(m[1]) + '</strong> ' + escapeTncHtml(m[2]);
-                }
-                return escapeTncHtml(line);
-            }).filter(Boolean).join('<br>');
-        }
+            if (remaining <= 0) {
 
-        function fillTncModalText(courseId) {
-            const body = document.getElementById('tncTextBody');
-            if (!body) return;
-            const course = resolveCourseById(courseId);
-            const custom = course && course.tnc_text ? String(course.tnc_text).trim() : '';
-            body.innerHTML = formatTncHtml(custom || PM_DEFAULT_TNC);
-        }
+                /*
+                 * 1 hour complete
+                 */
 
-        let currentPurchaseInfo = {};
-        let globalLoadedCourses = [];
-        let currentActiveCategory = 'all';
+                localStorage.removeItem(
+                    "premiumMaintenanceStart"
+                );
 
-        function resolveCoursePrice(courseId, fallbackPrice) {
-            const list = window.globalLoadedCourses || globalLoadedCourses;
-            let p = parseFloat(String(fallbackPrice == null ? '' : fallbackPrice).replace(/[^0-9.]/g, ''));
-            if (!(isFinite(p) && p > 0) && Array.isArray(list)) {
-                const found = list.find(function (c) {
-                    return String(c.id) === String(courseId);
-                });
-                if (found && found.price != null) {
-                    p = parseFloat(String(found.price).replace(/[^0-9.]/g, ''));
-                }
-            }
-            if (isFinite(p) && p > 0) return Math.round(p * 100) / 100;
-            return 0;
-        }
+                window.location.href = "index-main.html";
 
-        window.initiatePurchase = function (cid, price, showTnc) {
-            const courseId = (cid === 0 || cid) ? String(cid).trim() : '';
-            if (!courseId || courseId === 'null' || courseId === 'undefined') {
-                alert('Course ID missing. Please refresh the page and try again.');
-                return;
-            }
-            if (window.pmGateAppOnly && window.pmGateAppOnly(courseId, 'buy')) return;
-            const email = (window.getStoredEmail && window.getStoredEmail()) || '';
-            const loggedInUi = document.getElementById('userProfile') && document.getElementById('userProfile').style.display !== 'none';
-            if (!email && !loggedInUi) {
-                alert("Please Login / Sign Up first to buy this course.");
-                window.location.href = 'login.html';
                 return;
             }
 
-            const resolvedPrice = resolveCoursePrice(courseId, price);
+            const totalSeconds =
+                Math.floor(remaining / 1000);
 
-            if (showTnc === '1' || showTnc === 1) {
-                currentPurchaseInfo = { cid: courseId, price: resolvedPrice };
-                document.getElementById('tnc_agree').checked = false;
-                fillTncModalText(courseId);
-                document.getElementById('tncModal').style.display = 'flex';
-            } else {
-                window.enrollCourse(courseId, resolvedPrice);
-            }
+            const hours =
+                Math.floor(totalSeconds / 3600);
+
+            const minutes =
+                Math.floor((totalSeconds % 3600) / 60);
+
+            const seconds =
+                totalSeconds % 60;
+
+
+            document.getElementById("hours").textContent =
+                String(hours).padStart(2, "0");
+
+            document.getElementById("minutes").textContent =
+                String(minutes).padStart(2, "0");
+
+            document.getElementById("seconds").textContent =
+                String(seconds).padStart(2, "0");
         }
 
-        document.getElementById('tncProceedBtn').onclick = function () {
-            if (!document.getElementById('tnc_agree').checked) {
-                alert("Please check the box to agree to the Terms & Conditions.");
-                return;
-            }
 
-            document.getElementById('tncModal').style.display = 'none';
-            window.enrollCourse(currentPurchaseInfo.cid, currentPurchaseInfo.price);
-        }
+        updateTimer();
 
-
-        window.enrollCourse = async function (courseId, price, btnEl) {
-            // 🔥 FIX: CASHFREE LOCALHOST BLOCKER ALERT 🔥
-            if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
-                alert("⚠️ WARNING: Cashfree Payments strictly block localhost/127.0.0.1 for security reasons.\n\nTo test payments, please deploy/upload this HTML file to your live server (Netlify or Hostinger).");
-                return;
-            }
-
-            // Must be a real course id number — never accept a Function (ASI bug guard)
-            const safeCourseId = String(typeof courseId === 'function' ? '' : (courseId == null ? '' : courseId)).trim();
-
-            const emailToUse = String((window.getStoredEmail && window.getStoredEmail()) || (document.getElementById('userEmail') && document.getElementById('userEmail').textContent) || '').trim();
-
-            if (!emailToUse || emailToUse === 'null') {
-                alert("Please Login / Sign Up first to buy this course.");
-                window.location.href = 'login.html';
-                return;
-            }
-            if (!/^\d+$/.test(safeCourseId)) {
-                alert('Course ID missing. Please refresh and try again.');
-                return;
-            }
-
-            const btn = (btnEl && typeof btnEl === 'object' && btnEl.tagName)
-                ? btnEl
-                : (document.getElementById('tncProceedBtn') || null);
-            const originalText = btn ? (btn.innerText || btn.textContent || 'Buy') : 'Buy';
-
-            try {
-                if (btn) {
-                    btn.innerText = "Processing...";
-                    btn.disabled = true;
-                }
-
-                const phoneToUse = getCheckoutCustomerPhone()
-                    || (window.syncProfilePhoneFromServer ? await window.syncProfilePhoneFromServer(emailToUse) : '');
-                if (!phoneToUse) {
-                    throw new Error('Profile phone number missing. Please Sign Up with your mobile number, then login again.');
-                }
-                const nameToUse = (window.getStoredName && window.getStoredName()) || localStorage.getItem('customUserName') || 'Student';
-                const redirectTarget = getCashfreeRedirectTarget();
-                // Keep under Cashfree 500-char return_url limit
-                const returnUrl = 'https://premind.netlify.app/index.html'
-                    + '?pm=1&oid={order_id}&cid=' + encodeURIComponent(safeCourseId)
-                    + '&e=' + encodeURIComponent(emailToUse);
-
-                // Price: loaded courses list se resolve; server DB se bhi fix karega
-                const safePrice = resolveCoursePrice(safeCourseId, price);
-
-                const payload = {
-                    email: emailToUse,
-                    course_id: safeCourseId,
-                    price: safePrice > 0 ? safePrice : 1,
-                    phone: phoneToUse || '',
-                    name: nameToUse || 'Student',
-                    return_url: returnUrl,
-                    from_app: !!(window.pmIsNativeApp && window.pmIsNativeApp())
-                };
-
-                const response = await fetch("https://premind.diplomawallah.in/create_order.php", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
-
-                if (data.error) {
-                    throw new Error(data.error + (data.hint ? (' (' + data.hint + ')') : ''));
-                }
-
-                if (data.payment_session_id) {
-                    if (typeof cashfree === 'undefined') {
-                        throw new Error('Payment SDK not loaded. Refresh the page.');
-                    }
-
-                    let checkoutOptions = {
-                        paymentSessionId: data.payment_session_id,
-                        redirectTarget: redirectTarget,
-                    };
-
-                    cashfree.checkout(checkoutOptions).then((result) => {
-                        if (result.error) {
-                            alert("Payment Failed: " + result.error.message);
-                            if (btn) { btn.innerText = originalText; btn.disabled = false; }
-                        }
-                        if (result.paymentDetails) {
-                            if (btn) btn.innerText = "Verifying...";
-                            fetch(`https://premind.diplomawallah.in/verify_payment.php?order_id=${data.order_id}&course_id=${safeCourseId}&email=${encodeURIComponent(emailToUse)}`)
-                                .then(res => res.json())
-                                .then(verifyData => {
-                                    if (verifyData.status === 'success') {
-                                        alert("🎉 Payment Successful! Course is now added to your account.");
-                                        window.loadCourses(emailToUse);
-                                    } else {
-                                        alert("Payment verification failed.");
-                                        if (btn) { btn.innerText = originalText; btn.disabled = false; }
-                                    }
-                                })
-                                .catch(err => {
-                                    window.loadCourses(emailToUse);
-                                });
-                        } else if (redirectTarget === '_self') {
-                            if (btn) { btn.innerText = originalText; btn.disabled = false; }
-                        }
-                    }).catch(function (err) {
-                        console.error('Cashfree checkout error:', err);
-                        alert((err && err.message) || 'Could not open payment. Try again.');
-                        if (btn) { btn.innerText = originalText; btn.disabled = false; }
-                    });
-                } else {
-                    alert(data.message || "Error initializing payment.");
-                    if (btn) { btn.innerText = originalText; btn.disabled = false; }
-                }
-
-            } catch (error) {
-                console.error('enrollCourse error:', error);
-                alert((error && error.message) ? error.message : "Connection issue. Please try again.");
-                if (btn) { btn.innerText = originalText; btn.disabled = false; }
-            }
-        };
-
-        // Full-page Cashfree return (mobile/app) — verifies payment without touching login
-        // Leading semicolon prevents ASI from treating this as enrollCourse(...)(IIFE)
-        ;(function () {
-            const params = new URLSearchParams(window.location.search);
-            const orderId = params.get('oid') || params.get('order_id');
-            const courseId = params.get('cid') || params.get('course_id');
-            const email = params.get('e') || params.get('email') || (window.getStoredEmail && window.getStoredEmail());
-            const isPaymentReturn = params.get('pm') === '1' || params.get('pmPayment') === '1';
-            if (!isPaymentReturn) return;
-            history.replaceState({}, document.title, window.location.pathname + window.location.hash);
-            if (!orderId || !courseId || !email) return;
-            fetch('https://premind.diplomawallah.in/verify_payment.php?order_id=' + encodeURIComponent(orderId) + '&course_id=' + encodeURIComponent(courseId) + '&email=' + encodeURIComponent(email))
-                .then(function (res) { return res.json(); })
-                .then(function (verifyData) {
-                    if (verifyData.status === 'success') {
-                        alert('🎉 Payment Successful! Course is now added to your account.');
-                    } else {
-                        alert('Payment received. If course is not unlocked, contact support with Order ID: ' + orderId);
-                    }
-                    if (typeof window.loadCourses === 'function') window.loadCourses(email);
-                })
-                .catch(function () {
-                    if (typeof window.loadCourses === 'function') window.loadCourses(email);
-                });
-        })();
-
-        window.loadCourses = async function (userEmail = '') {
-            try {
-                const container = document.getElementById('dynamic-products-container');
-                const cacheKey = 'pm_store_cache_v1_' + String(userEmail || 'guest');
-                let usedCache = false;
-
-                // Instant paint from last successful store fetch
-                try {
-                    const cached = localStorage.getItem(cacheKey);
-                    if (cached) {
-                        const parsed = JSON.parse(cached);
-                        if (Array.isArray(parsed) && parsed.length) {
-                            globalLoadedCourses = parsed.filter(c => {
-                                const deletedVal = c.is_deleted;
-                                const isDeleted = deletedVal == 1 || deletedVal === '1' || deletedVal === true;
-                                return !isDeleted;
-                            });
-                            window.globalLoadedCourses = globalLoadedCourses;
-                            renderStoreGrid();
-                            usedCache = true;
-                        }
-                    }
-                } catch (e) {}
-
-                if (!usedCache && container) {
-                    container.innerHTML = '<p style="text-align:center; width:100%;">Loading Premium Store...</p>';
-                }
-
-                const apiUrl = userEmail ? `https://premind.diplomawallah.in/api.php?email=${encodeURIComponent(userEmail)}` : 'https://premind.diplomawallah.in/api.php';
-
-                const response = await fetch(apiUrl, { cache: 'no-store' });
-                const allCourses = await response.json();
-
-                // 🚫 Filter out soft-deleted courses (is_deleted = 1). Only is_deleted = 0 (or missing) shows.
-                globalLoadedCourses = Array.isArray(allCourses) ? allCourses.filter(c => {
-                    const deletedVal = c.is_deleted;
-                    const isDeleted = deletedVal == 1 || deletedVal === '1' || deletedVal === true;
-                    return !isDeleted;
-                }) : [];
-                window.globalLoadedCourses = globalLoadedCourses;
-
-                try {
-                    localStorage.setItem(cacheKey, JSON.stringify(globalLoadedCourses));
-                } catch (e) {}
-
-                renderStoreGrid();
-                // Deep link from app: ?pm_buy=COURSE_ID
-                try {
-                    const buyId = new URLSearchParams(window.location.search).get('pm_buy');
-                    if (buyId && window.pmIsNativeApp && window.pmIsNativeApp() && typeof window.initiatePurchase === 'function') {
-                        history.replaceState({}, document.title, window.location.pathname + window.location.hash);
-                        const course = globalLoadedCourses.find(c => String(c.id) === String(buyId));
-                        if (course && !(course.is_enrolled == 1 || course.is_enrolled == '1')) {
-                            setTimeout(function () {
-                                window.initiatePurchase(String(course.id), String(course.price), course.show_tnc || 0);
-                            }, 400);
-                        } else if (course) {
-                            window.location.href = 'lecture.html?id=' + encodeURIComponent(buyId);
-                        }
-                    }
-                } catch (e) {}
-            } catch (error) {
-                if (!document.querySelector('#dynamic-products-container .course-card')) {
-                    document.getElementById('dynamic-products-container').innerHTML = '<p style="text-align:center; width:100%; color:red;">Database Connection Error.</p>';
-                }
-            }
-        };
-
-        function renderStoreGrid() {
-            const container = document.getElementById('dynamic-products-container');
-            if (!container) return;
-            container.innerHTML = '';
-
-            // Filter by category
-            const filtered = globalLoadedCourses.filter(course => {
-                const cat = (course.category || 'projects').toLowerCase();
-                return currentActiveCategory === 'all' || cat === currentActiveCategory;
-            }).sort(function (a, b) {
-                // Admin Store Ranking: lower sort_order = higher on page
-                const sa = parseInt(a.sort_order, 10);
-                const sb = parseInt(b.sort_order, 10);
-                const na = isFinite(sa) ? sa : 999999;
-                const nb = isFinite(sb) ? sb : 999999;
-                if (na !== nb) return na - nb;
-                return Number(b.id) - Number(a.id);
-            });
-
-            if (filtered.length === 0) {
-                const categoryTitles = {
-                    'notes': 'Notes & PYQs',
-                    'ebooks': 'E-Books & Syllabus Guides',
-                    'resume': 'ATS Resume Templates',
-                    'report-writing': 'Report Writing Resources',
-                    'projects': 'Projects & Source Code'
-                };
-
-                const title = categoryTitles[currentActiveCategory] || 'Resources';
-
-                container.innerHTML = `
-          <div class="empty-category-state">
-              <div class="empty-icon-box">
-                  <ion-icon name="cloud-upload-outline"></ion-icon>
-              </div>
-              <h3>${title} Coming Soon!</h3>
-              <p>We are currently compiling high-quality ${title.toLowerCase()} for you. Stay tuned!</p>
-              <button class="empty-action-btn" onclick="window.filterCategoryGlobal('all')">
-                  <ion-icon name="arrow-back-outline"></ion-icon> View All Products
-              </button>
-          </div>
-      `;
-                return;
-            }
-
-            filtered.forEach((course, index) => {
-                // Badge Ribbon / Badge
-                let badgeHTML = '';
-                if (course.badge) {
-                    badgeHTML = `<span class="new-badge">${course.badge}</span>`;
-                } else if (course.is_new == 1 || course.new_badge) {
-                    badgeHTML = `<span class="new-badge">${course.new_badge || 'NEW'}</span>`;
-                }
-
-                let oldPriceHTML = course.old_price ? `<span class="old-price">₹${course.old_price}</span>` : '';
-
-                // Category
-                const cat = (course.category || 'projects').toLowerCase();
-
-                // Descriptions
-                let descHTML = '';
-                if (cat === 'projects') {
-                    if (course.website_link && course.website_link.trim() !== '') {
-                        descHTML = `<a href="${course.website_link}" target="_blank" class="see-project-link">see project <ion-icon name="arrow-forward-outline"></ion-icon></a>`;
-                    } else {
-                        if (course.desc1) descHTML += `<p>${course.desc1}</p>`;
-                        if (course.desc2) descHTML += `<p>${course.desc2}</p>`;
-                    }
-                } else {
-                    if (course.desc1) descHTML += `<p>${course.desc1}</p>`;
-                    if (course.desc2) descHTML += `<p>${course.desc2}</p>`;
-                    if (!course.desc1 && !course.desc2 && course.desc) descHTML += `<p>${course.desc}</p>`;
-                }
-
-                // Mini Timer Box
-                let timerHTML = '';
-                if (course.timer || course.timer_text || course.show_timer == 1 || course.show_timer == "1") {
-                    const timerVal = course.timer || course.timer_text || '02h 15m';
-                    timerHTML = `<div class="mini-timer">⏰ Limited Offer: <span>${timerVal}</span></div>`;
-                }
-
-                // Report Problem / Solving Button Container
-                let reportBtnContainerHTML = '';
-                if (course.show_report_btn == 1 || course.show_report_btn == "1") {
-                    let reportBtnHTML = '';
-                    if (course.report_status === 'pending') {
-                        reportBtnHTML = `<button class="btn-solving" disabled>Solving... ⏳</button>`;
-                    } else {
-                        reportBtnHTML = `<button class="report-btn" onclick="openReportModal(${course.id})">🚩 Report</button>`;
-                    }
-                    reportBtnContainerHTML = `
-              <div class="card-report-slot">
-                  ${reportBtnHTML}
-              </div>
-            `;
-                }
-
-                // Main CTA Button
-                // App-only: always use initiatePurchase / lecture click handlers so native
-                // detection runs at click-time (bridge may load after first render).
-                let btnHTML = '';
-                const appOnly = window.pmIsAppOnlyCourse && window.pmIsAppOnlyCourse(course);
-                const inApp = window.pmIsNativeApp && window.pmIsNativeApp();
-                const btnType = String(course.btn_type || '').trim().toLowerCase();
-                const rawBtnText = String(course.btn_text || '').trim();
-                // Coming Soon: always show clear label (ignore default "Buy Now")
-                const comingSoonLabel = (!rawBtnText || /^buy\s*now$/i.test(rawBtnText))
-                    ? 'Coming Soon'
-                    : rawBtnText;
-
-                if (course.is_enrolled == 1 || course.is_enrolled == "1") {
-                    if (appOnly && !inApp) {
-                        btnHTML = `<button type="button" class="buy-course-btn" style="background: linear-gradient(135deg, #111 0%, #334155 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="if(window.pmGateAppOnly&&window.pmGateAppOnly('${course.id}','open'))return; window.location.href='lecture.html?id=${course.id}'">Open in App 📱</button>`;
-                    } else if (cat === 'projects') {
-                        const waText = encodeURIComponent(`Hello PREMium Mind! 👋\n\nI have purchased the project: *${course.title}*.\n\nPlease share the project source code/files.\nEmail: ${getStoredEmail()}`);
-                        btnHTML = `<button class="buy-course-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.open('https://wa.me/918709911016?text=${waText}', '_blank')">Access Now 🎓</button>`;
-                    } else {
-                        btnHTML = `<button class="buy-course-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.location.href='lecture.html?id=${course.id}'">Access Now 🎓</button>`;
-                    }
-                } else if (course.req_status === 'pending') {
-                    btnHTML = `<button class="btn-reviewing" disabled>Reviewing... ⏳</button>`;
-                } else if (btnType === 'coming_soon' || btnType === 'comingsoon' || btnType === 'coming soon') {
-                    btnHTML = `<button type="button" class="coming-soon-btn" disabled aria-disabled="true">${comingSoonLabel}</button>`;
-                } else if (btnType === 'disabled_look') {
-                    btnHTML = `<button type="button" class="disabled-btn" disabled>${rawBtnText || 'Coming Soon'}</button>`;
-                } else if (btnType === 'disabled') {
-                    btnHTML = `<button type="button" class="disabled-btn" disabled>${rawBtnText || 'Unavailable'}</button>`;
-                } else if (course.is_free == 1 || course.price == 0) {
-                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="0" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${rawBtnText || 'Get Free Access'}</button>`;
-                } else if (course.is_disabled == 1 || course.disabled == 1 || course.is_disabled == "1") {
-                    btnHTML = `<button class="disabled-btn" disabled>Sold Out / Closed</button>`;
-                } else if (appOnly && !inApp) {
-                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">Buy in App 📱</button>`;
-                } else {
-                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${rawBtnText || 'Buy Now'}</button>`;
-                }
-
-                const showPdfPreview = course.show_preview == 1 || course.show_preview === '1' || course.show_preview === true;
-                const safePreviewTitle = String(course.title || 'PDF Preview')
-                    .replace(/\\/g, '\\\\')
-                    .replace(/'/g, "\\'")
-                    .replace(/"/g, '&quot;');
-                // Simple left text under photo — no badge/button design
-                let previewLinkHTML = '';
-                if (showPdfPreview) {
-                    previewLinkHTML = `<div style="text-align:left;margin-top:8px;margin-bottom:-10px;padding:0 5px;">
-                        <span style="color:#dc2626;text-decoration:underline;font-weight:bold;cursor:pointer;font-size:13.5px;" onclick="window.openPdfPreview(${Number(course.id)}, '${safePreviewTitle}')">Preview</span>
-                    </div>`;
-                } else if (btnType === 'preview_buy' && course.demo_link && course.demo_link.trim() !== '' && course.demo_link.startsWith('http')) {
-                    previewLinkHTML = `<div style="text-align:left;margin-top:8px;margin-bottom:-10px;padding:0 5px;">
-                        <span style="color:#dc2626;text-decoration:underline;font-weight:bold;cursor:pointer;font-size:13.5px;" onclick="window.open('${course.demo_link}', '_blank')">Preview</span>
-                    </div>`;
-                }
-
-                const cardHTML = `
-          <div class="course-card">
-              <div class="card-img-wrapper">
-                  ${badgeHTML}
-                  <img src="${course.image || 'small-logo.png'}" alt="${course.title}" loading="lazy" decoding="async" fetchpriority="${index < 4 ? 'high' : 'low'}" onerror="this.src='small-logo.png'">
-              </div>
-              
-              ${previewLinkHTML}
-              
-              ${reportBtnContainerHTML}
-              <h2>${course.title}</h2>
-              <div style="min-height: 44px; margin-bottom: -1px;">
-                  ${descHTML}
-              </div>
-              ${timerHTML}
-              <div class="course-meta">
-                  <div class="price-box">
-                      <span class="price">₹${course.price}</span>
-                      ${oldPriceHTML}
-                  </div>
-                  <div class="rating"><ion-icon name="star"></ion-icon> 4.9</div>
-              </div>
-              <div class="card-actions">
-                  ${btnHTML}
-              </div>
-          </div>
-        `;
-                container.insertAdjacentHTML('beforeend', cardHTML);
-            });
-        }
-
-        // 👁️ PDF Preview — only page 1 when admin Show Preview is ON
-        (function setupPdfPreview() {
-            const PREVIEW_API = 'https://premind.diplomawallah.in/preview_pdf.php';
-            let previewBusy = false;
-
-            window.closePdfPreview = function () {
-                const modal = document.getElementById('pdfPreviewModal');
-                const body = document.getElementById('pdfPreviewBody');
-                if (modal) modal.classList.remove('show');
-                if (body) body.innerHTML = '<div class="pdf-preview-status">Loading preview…</div>';
-                previewBusy = false;
-            };
-
-            window.openPdfPreview = async function (courseId, title) {
-                const modal = document.getElementById('pdfPreviewModal');
-                const body = document.getElementById('pdfPreviewBody');
-                const titleEl = document.getElementById('pdfPreviewTitle');
-                if (!modal || !body) return;
-                if (previewBusy) return;
-                previewBusy = true;
-
-                if (titleEl) titleEl.textContent = title || 'PDF Preview';
-                body.innerHTML = '<div class="pdf-preview-status">Loading page 1…</div>';
-                modal.classList.add('show');
-
-                const id = Number(courseId);
-                if (!id) {
-                    body.innerHTML = '<div class="pdf-preview-status error">Invalid course.</div>';
-                    previewBusy = false;
-                    return;
-                }
-
-                try {
-                    // Prefer server-rendered page-1 image (Imagick) when available
-                    const imgUrl = PREVIEW_API + '?course_id=' + id + '&as=image&t=' + Date.now();
-                    const imgProbe = await fetch(imgUrl, { cache: 'no-store' });
-                    const imgType = (imgProbe.headers.get('content-type') || '').toLowerCase();
-                    if (imgProbe.ok && imgType.indexOf('image/') === 0) {
-                        const blob = await imgProbe.blob();
-                        const url = URL.createObjectURL(blob);
-                        body.innerHTML = '';
-                        const img = document.createElement('img');
-                        img.alt = 'Page 1 preview';
-                        img.src = url;
-                        img.onload = function () { try { URL.revokeObjectURL(url); } catch (e) {} };
-                        img.oncontextmenu = function (e) { e.preventDefault(); return false; };
-                        body.appendChild(img);
-                        previewBusy = false;
-                        return;
-                    }
-
-                    // Fallback: PDF.js render only page 1
-                    if (typeof pdfjsLib === 'undefined') {
-                        throw new Error('Preview engine missing');
-                    }
-                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-
-                    const pdfUrl = PREVIEW_API + '?course_id=' + id + '&t=' + Date.now();
-                    const res = await fetch(pdfUrl, { cache: 'no-store' });
-                    if (!res.ok) {
-                        let msg = 'Preview unavailable';
-                        try {
-                            const err = await res.json();
-                            if (err && err.message) msg = err.message;
-                        } catch (eJ) {}
-                        throw new Error(msg);
-                    }
-                    const buf = await res.arrayBuffer();
-                    const pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
-                    const page = await pdfDoc.getPage(1);
-                    const baseViewport = page.getViewport({ scale: 1 });
-                    const maxW = Math.min(520, (body.clientWidth || 320) - 8);
-                    const scale = Math.min(1.6, maxW / baseViewport.width);
-                    const viewport = page.getViewport({ scale: scale });
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = viewport.width;
-                    canvas.height = viewport.height;
-                    canvas.oncontextmenu = function (e) { e.preventDefault(); return false; };
-                    body.innerHTML = '';
-                    body.appendChild(canvas);
-                    await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-                } catch (err) {
-                    console.error(err);
-                    body.innerHTML = '<div class="pdf-preview-status error">'
-                        + (err && err.message ? err.message : 'Could not load preview')
-                        + '</div>';
-                } finally {
-                    previewBusy = false;
-                }
-            };
-
-            var previewModalEl = document.getElementById('pdfPreviewModal');
-            if (previewModalEl) {
-                previewModalEl.addEventListener('click', function (e) {
-                    if (e.target === previewModalEl) window.closePdfPreview();
-                });
-            }
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') window.closePdfPreview();
-            });
-        })();
+        setInterval(updateTimer, 1000);
 
     </script>
 
-    <script>
-        // 🚩 REPORT ISSUE MODAL LOGIC 🚩
-        window.openReportModal = function (cid) {
-            if (!getStoredEmail()) {
-                alert("Please login first to report an issue!");
-                window.location.href = 'login.html';
-                return;
-            }
-            document.getElementById('report_cid').value = cid;
-            document.getElementById('reportModal').style.display = 'flex';
-        }
-
-        document.getElementById('reportForm').onsubmit = async (e) => {
-            e.preventDefault();
-            if (!document.getElementById('report_agree').checked) {
-                alert("Please acknowledge the resolution time by checking the box.");
-                return;
-            }
-            const btn = document.getElementById('reportSubmit');
-            btn.innerText = "Submitting..."; btn.disabled = true;
-
-            const fd = new FormData();
-            fd.append('email', getStoredEmail());
-            fd.append('course_id', document.getElementById('report_cid').value);
-            fd.append('message', document.getElementById('report_msg').value);
-
-            if (document.getElementById('report_file').files[0]) {
-                fd.append('screenshot', document.getElementById('report_file').files[0]);
-            }
-
-            try {
-                const res = await fetch('https://premind.diplomawallah.in/submit_report.php', { method: 'POST', body: fd });
-                const data = await res.json();
-                if (data.status === 'success') {
-                    alert("✅ Report Submitted! We will look into it within 1-2 hours.");
-                    window.location.reload();
-                } else {
-                    alert("Error: " + data.message);
-                }
-            } catch (error) {
-                alert("Server Error. Please check backend API.");
-            }
-            btn.innerText = "Submit Report"; btn.disabled = false;
-        };
-
-        // Footer WhatsApp Contact Form logic
-        document.getElementById("whForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-            const name = encodeURIComponent(document.getElementById("name").value);
-            const phone = encodeURIComponent(document.getElementById("phone").value);
-            const msg = encodeURIComponent(document.getElementById("message").value);
-            window.open(`https://wa.me/918709911016?text=Name: ${name}%0APhone: ${phone}%0AMessage: ${msg}`, "_blank");
-        });
-
-        const menuBtn = document.getElementById("menu-btn");
-        const sidebar = document.getElementById("sidebar");
-        const overlay = document.getElementById("overlay");
-        if (menuBtn) {
-            menuBtn.addEventListener("click", () => {
-                sidebar.classList.add("active");
-                overlay.classList.add("active");
-                if (window.pmRefreshAdminMenu) window.pmRefreshAdminMenu();
-            });
-        }
-        if (overlay) {
-            overlay.addEventListener("click", () => { sidebar.classList.remove("active"); overlay.classList.remove("active"); });
-        }
-        document.querySelectorAll(".sidebar ul li a").forEach(link => {
-            link.addEventListener("click", () => { sidebar.classList.remove("active"); overlay.classList.remove("active"); });
-        });
-
-        // --- Category Filter Tab Clicks ---
-        window.filterCategoryGlobal = function (categoryName) {
-            currentActiveCategory = categoryName.toLowerCase();
-            window.location.hash = currentActiveCategory;
-
-            const categoryTabs = document.querySelectorAll('.category-tab');
-            categoryTabs.forEach(tab => {
-                if (tab.getAttribute('data-category') === currentActiveCategory) {
-                    tab.classList.add('active');
-                    tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-                } else {
-                    tab.classList.remove('active');
-                }
-            });
-
-            renderStoreGrid();
-        };
-
-        // Hash Change Listener
-        function handleHashFilter() {
-            const hash = window.location.hash.replace('#', '').toLowerCase();
-            if (['notes', 'ebooks', 'resume', 'report-writing', 'projects', 'all'].includes(hash)) {
-                window.filterCategoryGlobal(hash);
-                const storeElem = document.getElementById('products');
-                if (storeElem) {
-                    storeElem.scrollIntoView({ behavior: 'smooth' });
-                }
-            }
-        }
-
-        window.addEventListener('hashchange', handleHashFilter);
-
-        // Replay hero title animation on click
-        const heroTitle = document.getElementById('hero-title');
-        if (heroTitle) {
-            heroTitle.addEventListener('click', () => {
-                const words = heroTitle.querySelectorAll('.animated-word');
-                words.forEach(word => {
-                    word.style.animation = 'none';
-                    word.offsetHeight;
-                    word.style.animation = '';
-                });
-            });
-        }
-
-        // Bind click event to tab buttons
-        document.querySelectorAll('.category-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const cat = tab.getAttribute('data-category');
-                window.filterCategoryGlobal(cat);
-            });
-        });
-
-        // Check initial hash on page load
-        handleHashFilter();
-
-    </script>
-
-<script src="pm-inspect-block.js"></script>
-<script src="app-back.js"></script>
 </body>
-
 </html>
