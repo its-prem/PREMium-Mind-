@@ -115,6 +115,15 @@ if (!pm_user_can_access_pdf($conn, $email, $file)) {
     exit('Access Denied: You are not enrolled in this course');
 }
 
+// This endpoint always streams the complete original file with no purpose
+// distinction at all, so — same as proxy_pdf.php — it can only be used for
+// courses where allow_download is on. Locked courses must use the
+// watermarked page_view flow (secure_page_image.php) instead.
+if (!pm_user_can_download_pdf($conn, $email, $file)) {
+    http_response_code(403);
+    exit('Access Denied: Download is not allowed for this course');
+}
+
 $fullPath = __DIR__ . '/' . $file;
 if (!is_file($fullPath) || !is_readable($fullPath)) {
     if (!is_file($file) || !is_readable($file)) {

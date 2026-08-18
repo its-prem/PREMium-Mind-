@@ -160,9 +160,18 @@ if (!in_array($purpose, ['view', 'download', 'page_view'], true)) {
 // (e.g. a `download` URL parameter) for this. Only the course's own
 // allow_download setting decides it.
 $canDownload = pm_user_can_download_pdf($conn, $email, $file);
-if ($purpose === 'download' && !$canDownload) {
+
+// proxy_pdf.php hands back the complete original file no matter which
+// purpose the token was issued for — 'view' is not actually safer than
+// 'download' there. So for a locked course, 'view' has to be refused
+// here too; only 'page_view' (watermarked, per-page images via
+// secure_page_image.php) is allowed to view it. Without this, the
+// watermarking added above was opt-in from the client's side only —
+// anyone calling this API directly with purpose=view could still pull
+// the clean, un-watermarked file.
+if (($purpose === 'download' || $purpose === 'view') && !$canDownload) {
     http_response_code(403);
-    echo json_encode(['status' => 'error', 'message' => 'Download is not allowed for this course']);
+    echo json_encode(['status' => 'error', 'message' => 'Download is not allowed for this course. Use the secure viewer instead.']);
     exit;
 }
 

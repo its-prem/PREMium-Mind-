@@ -248,7 +248,5 @@ try {
     echo $blob;
 } catch (Throwable $e) {
     http_response_code(500);
-    // TEMP: surface the real error while wiring this up. Remove before
-    // leaving this endpoint unattended.
-    exit('Error: Render error - ' . $e->getMessage());
+    exit('Error: Render error');
 }

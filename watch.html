@@ -1160,7 +1160,13 @@
          (async function initViewer() {
          try {
          const session = await getPageViewSession();
-         if (!session.allow_download && session.pages) {
+         if (!session.allow_download) {
+             // Never fall back to the raw-PDF path for a locked course —
+             // if the page count is missing for any reason, that's a hard
+             // error, not a reason to serve the unprotected original file.
+             if (!session.pages) {
+                 throw new Error('Could not prepare secure viewer for this document. Please try again.');
+             }
              await renderWatermarkedPages(session);
              return;
          }

@@ -224,8 +224,12 @@ if (!pm_user_can_access_pdf($conn, $email, $file)) {
     exit('Error: You are not enrolled in this course');
 }
 
+// proxy_pdf.php always hands back the complete original file, so it can
+// only ever be used for courses where allow_download is on — 'view' is
+// not a lesser-privilege purpose here. Locked courses must go through
+// secure_page_image.php's page_view flow instead.
 $purpose = (string)($payload['p'] ?? 'view');
-if ($purpose === 'download' && !pm_user_can_download_pdf($conn, $email, $file)) {
+if (($purpose === 'download' || $purpose === 'view') && !pm_user_can_download_pdf($conn, $email, $file)) {
     http_response_code(403);
     exit('Error: Download is not allowed for this course');
 }
