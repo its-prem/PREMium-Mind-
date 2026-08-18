@@ -177,7 +177,13 @@ function pm_user_can_access_pdf(mysqli $conn, string $email, string $file): bool
         }
         $chk->bind_param('si', $email, $course['id']);
         $chk->execute();
-        if ($chk->get_result()->fetch_row()) {
+        // Must free each result before re-executing the same statement for
+        // the next course, or mysqli throws "Commands out of sync" on the
+        // second execute() (only shows up once a file has 2+ courses).
+        $result = $chk->get_result();
+        $found = $result ? $result->fetch_row() : null;
+        if ($result) $result->free();
+        if ($found) {
             $chk->close();
             return true;
         }
@@ -214,7 +220,10 @@ function pm_user_can_download_pdf(mysqli $conn, string $email, string $file): bo
         if (!$course['allow_download']) continue;
         $chk->bind_param('si', $email, $course['id']);
         $chk->execute();
-        if ($chk->get_result()->fetch_row()) {
+        $result = $chk->get_result();
+        $found = $result ? $result->fetch_row() : null;
+        if ($result) $result->free();
+        if ($found) {
             $chk->close();
             return true;
         }
