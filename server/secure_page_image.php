@@ -215,11 +215,11 @@ try {
     $label = $email . ($phone !== '' ? ' | ' . $phone : '');
 
     $draw = new ImagickDraw();
-    $draw->setFillColor(new ImagickPixel('rgba(90,90,90,0.30)'));
+    $draw->setFillColor(new ImagickPixel('rgba(100,100,100,0.14)'));
     // Don't force a specific font family — "Helvetica" isn't registered on
     // most Linux/ImageMagick installs and throws. Imagick's built-in
     // default font is always available and is fine for a watermark.
-    $fontSize = max(14, (int)($w / 26));
+    $fontSize = max(10, (int)($w / 42));
     $draw->setFontSize($fontSize);
     $draw->setTextAlignment(Imagick::ALIGN_CENTER);
 
@@ -227,8 +227,8 @@ try {
     // random offset — a fixed-region crop can't reliably remove it, and
     // it doesn't repeat identically between requests/pages.
     $angle = -30;
-    $stepX = max(220, $fontSize * 10);
-    $stepY = max(140, $fontSize * 6);
+    $stepX = max(260, $fontSize * 14);
+    $stepY = max(170, $fontSize * 9);
     $offsetX = random_int(0, (int)$stepX);
     $offsetY = random_int(0, (int)$stepY);
 
