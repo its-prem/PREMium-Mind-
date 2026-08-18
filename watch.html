@@ -564,12 +564,14 @@
 
      const scrollArea = document.getElementById('scrollArea');
      const ZOOM_MIN = 1;
-     const ZOOM_MAX = 4;
+     const ZOOM_MAX = 6;
      let currentScale = 1;
      let pinchStartDist = 0;
      let pinchStartScale = 1;
      let pinchCenterX = 0;
      let pinchCenterY = 0;
+     let pinchRAF = null;
+     let pendingPinch = null;
 
      function applyZoom(newScale, anchorX, anchorY) {
          const prev = currentScale;
@@ -605,13 +607,25 @@
              const rect = scrollArea.getBoundingClientRect();
              pinchCenterX = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left;
              pinchCenterY = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top;
-             applyZoom(pinchStartScale * (dist / pinchStartDist), pinchCenterX, pinchCenterY);
+             // Touchmove can fire far faster than the browser can relayout
+             // the scaled container, which is what made pinch-zoom feel
+             // jittery/unstable. Coalesce into at most one applyZoom per
+             // animation frame instead of one per touch event.
+             pendingPinch = { scale: pinchStartScale * (dist / pinchStartDist), x: pinchCenterX, y: pinchCenterY };
+             if (!pinchRAF) {
+                 pinchRAF = requestAnimationFrame(() => {
+                     pinchRAF = null;
+                     if (pendingPinch) applyZoom(pendingPinch.scale, pendingPinch.x, pendingPinch.y);
+                 });
+             }
          }
      }, {passive: false});
 
      scrollArea.addEventListener('touchend', () => {
          if (pinchStartDist > 0) {
              pinchStartDist = 0;
+             pendingPinch = null;
+             if (pinchRAF) { cancelAnimationFrame(pinchRAF); pinchRAF = null; }
              if (typeof window.__reRenderZoom === 'function') window.__reRenderZoom();
          }
      }, {passive: true});

@@ -194,7 +194,9 @@ if (!extension_loaded('imagick')) {
 
 try {
     $im = new Imagick();
-    $im->setResolution(150, 150);
+    // A bit higher than before so pinch-zoom (now up to 6x) stays readable
+    // instead of turning to mush past ~2x on the old 150dpi render.
+    $im->setResolution(190, 190);
     $im->readImage($fullPath . '[' . ($page - 1) . ']');
     $im->setImageFormat('png');
     $im->setImageBackgroundColor(new ImagickPixel('white'));
