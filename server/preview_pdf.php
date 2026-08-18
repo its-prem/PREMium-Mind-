@@ -137,28 +137,46 @@ if (!is_file($abs) || !is_readable($abs)) {
 
 $wantImage = isset($_GET['as']) && strtolower((string)$_GET['as']) === 'image';
 
-// True 1-page preview when Imagick is available
-if ($wantImage && extension_loaded('imagick')) {
-    try {
-        $im = new Imagick();
-        $im->setResolution(140, 140);
-        $im->readImage($abs . '[0]');
+// This endpoint must NEVER serve the original multi-page file — only ever
+// the single first page, rebuilt via Imagick. It previously fell back to
+// readfile($abs) (the complete original PDF, no page limit) whenever
+// as=image was omitted or Imagick failed, which made every show_preview=1
+// course's full PDF fetchable by anyone with no login, no token, and no
+// payment — index.html's own client-side pdf.js fallback path called it
+// exactly that way.
+if (!extension_loaded('imagick')) {
+    http_response_code(500);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['status' => 'error', 'message' => 'Preview engine unavailable']);
+    exit;
+}
+
+try {
+    $im = new Imagick();
+    $im->setResolution(140, 140);
+    $im->readImage($abs . '[0]'); // only ever the first page
+    $im->setImageBackgroundColor('white');
+    $im = $im->mergeImageLayers(Imagick::LAYERMETHOD_FLATTEN);
+
+    if ($wantImage) {
         $im->setImageFormat('png');
-        $im->setImageBackgroundColor('white');
-        $im = $im->mergeImageLayers(Imagick::LAYERMETHOD_FLATTEN);
         header('Content-Type: image/png');
         header('Content-Disposition: inline; filename="preview-page1.png"');
         echo $im->getImageBlob();
-        $im->clear();
-        $im->destroy();
-        exit;
-    } catch (Throwable $e) {
-        // fall through to PDF stream
+    } else {
+        // Single-page PDF rebuilt from that same page-1 image — never the
+        // original file — for the client's PDF.js fallback path.
+        $im->setImageFormat('pdf');
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: inline; filename="preview-page1.pdf"');
+        echo $im->getImageBlob();
     }
+    $im->clear();
+    $im->destroy();
+    exit;
+} catch (Throwable $e) {
+    http_response_code(500);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['status' => 'error', 'message' => 'Preview render failed']);
+    exit;
 }
-
-header('Content-Type: application/pdf');
-header('Content-Disposition: inline; filename="preview.pdf"');
-header('Content-Length: ' . (string)filesize($abs));
-readfile($abs);
-exit;
