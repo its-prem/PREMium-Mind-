@@ -15,9 +15,11 @@
 </FilesMatch>
 
 # Also block the plain-PHP secrets file and its committed template by
-# name, and any stray backup/editor files (.bak, .swp, ~) that could
-# otherwise be served as plain text if left behind after an edit.
-<FilesMatch "(pm_secrets\.php|\.bak$|\.swp$|~$)">
+# name, any stray backup/editor files (.bak, .swp, ~) that could otherwise
+# be served as plain text if left behind after an edit, and webhook.php's
+# debug log (it records customer emails + course ids on every payment
+# webhook — must never be directly downloadable).
+<FilesMatch "(pm_secrets\.php|webhook_debug\.txt|\.bak$|\.swp$|~$)">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>
