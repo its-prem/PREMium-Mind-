@@ -29,6 +29,13 @@ if ($DB_NAME === '' || $DB_NAME === 'CHANGE_ME' || $DB_USER === '' || $DB_USER =
     die('Database not configured.');
 }
 
+// mysqli throws an uncaught mysqli_sql_exception on connect failure by
+// default since PHP 8.1 (MYSQLI_REPORT_ERROR|STRICT is the default report
+// mode) — so a bad password/host doesn't just set ->connect_error, it
+// fatals the whole request with a blank page before that check ever runs.
+// Wrap it so a credential typo/rotation mistake fails cleanly instead of
+// crashing every script that includes this file.
+mysqli_report(MYSQLI_REPORT_OFF);
 $conn = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
 if ($conn->connect_error) {
     http_response_code(500);
