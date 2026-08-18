@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PREMium Mind | Updating...</title>
+    <meta name="robots" content="noindex, nofollow">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top left, #222 0%, transparent 35%),
+                radial-gradient(circle at bottom right, #222 0%, transparent 35%),
+                #050505;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .maintenance-container {
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 10px 25px rgba(255,255,255,0.12));
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06);
+            border-radius: 50px;
+            color: #fbbf24;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #fbbf24;
+            border-radius: 50%;
+            animation: blink 1.2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        h1 {
+            font-size: clamp(32px, 7vw, 58px);
+            line-height: 1.1;
+            margin-bottom: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .description {
+            color: #aaa;
+            font-size: 17px;
+            line-height: 1.7;
+            max-width: 550px;
+            margin: 0 auto 30px;
+        }
+
+        .update-box {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 22px;
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+        }
+
+        .update-title {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .timer {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .time-box {
+            min-width: 80px;
+            padding: 15px 10px;
+            background: #111;
+            border: 1px solid #292929;
+            border-radius: 14px;
+        }
+
+        .time-number {
+            display: block;
+            font-size: 30px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .time-label {
+            display: block;
+            font-size: 10px;
+            color: #777;
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        .status {
+            margin-top: 25px;
+            color: #777;
+            font-size: 13px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #555;
+            font-size: 12px;
+        }
+
+        @media (max-width: 480px) {
+
+            body {
+                overflow-y: auto;
+            }
+
+            .logo {
+                width: 70px;
+                height: 70px;
+            }
+
+            .description {
+                font-size: 14px;
+            }
+
+            .timer {
+                gap: 6px;
+            }
+
+            .time-box {
+                min-width: 65px;
+                padding: 12px 6px;
+            }
+
+            .time-number {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="maintenance-container">
+
+        <!-- Your logo -->
+        <img
+            src="small-logo.png"
+            alt="PREMium Mind"
+            class="logo"
+        >
+
+        <div class="badge">
+            <span class="dot"></span>
+            WEBSITE UPDATE IN PROGRESS
+        </div>
+
+        <h1>
+            We're Improving<br>
+            PREMium Mind
+        </h1>
+
+        <p class="description">
+            PREMium Mind is temporarily unavailable while we apply
+            important updates and improvements.
+            We’ll be back shortly with a better experience.
+        </p>
+
+        <div class="update-box">
+
+            <div class="update-title">
+                Website will be back in
+            </div>
+
+            <div class="timer">
+
+                <div class="time-box">
+                    <span class="time-number" id="hours">01</span>
+                    <span class="time-label">Hours</span>
+                </div>
+
+                <div class="time-box">
+                    <span class="time-number" id="minutes">00</span>
+                    <span class="time-label">Minutes</span>
+                </div>
+
+                <div class="time-box">
+                    <span class="time-number" id="seconds">00</span>
+                    <span class="time-label">Seconds</span>
+                </div>
+
+            </div>
+
+            <div class="status">
+                🔧 Updating system &nbsp;•&nbsp; Please check back soon
+            </div>
+
+        </div>
+
+        <div class="footer">
+            © 2026 PREMium Mind. All rights reserved.
+        </div>
+
+    </main>
+
+
+    <script>
+
+        /*
+         * 1 HOUR MAINTENANCE TIMER
+         */
+
+        const duration = 60 * 60 * 1000;
+
+        /*
+         * Timer start time save rahega.
+         * Page refresh karne par timer dobara 1 hour se start nahi hoga.
+         */
+
+        let startTime = localStorage.getItem("premiumMaintenanceStart");
+
+        if (!startTime) {
+            startTime = Date.now();
+            localStorage.setItem(
+                "premiumMaintenanceStart",
+                startTime
+            );
+        }
+
+        const endTime = Number(startTime) + duration;
+
+
+        function updateTimer() {
+
+            const remaining = endTime - Date.now();
+
+            if (remaining <= 0) {
+
+                /*
+                 * 1 hour complete
+                 */
+
+                localStorage.removeItem(
+                    "premiumMaintenanceStart"
+                );
+
+                window.location.href = "index-main.html";
+
+                return;
+            }
+
+            const totalSeconds =
+                Math.floor(remaining / 1000);
+
+            const hours =
+                Math.floor(totalSeconds / 3600);
+
+            const minutes =
+                Math.floor((totalSeconds % 3600) / 60);
+
+            const seconds =
+                totalSeconds % 60;
+
+
+            document.getElementById("hours").textContent =
+                String(hours).padStart(2, "0");
+
+            document.getElementById("minutes").textContent =
+                String(minutes).padStart(2, "0");
+
+            document.getElementById("seconds").textContent =
+                String(seconds).padStart(2, "0");
+        }
+
+
+        updateTimer();
+
+        setInterval(updateTimer, 1000);
+
+    </script>
+
+</body>
+</html>
