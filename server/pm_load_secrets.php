@@ -49,3 +49,18 @@ function pm_pdf_hmac_secrets(): array {
 
     return $list;
 }
+
+/**
+ * Secret shared with the Android app for proving a request genuinely came
+ * from it (see APP_ONLY_COURSES_SETUP.txt). Empty string if not configured
+ * yet — callers must treat that as "app signature not available" rather
+ * than a valid empty secret.
+ */
+function pm_app_shared_secret(): string {
+    $cfg = pm_load_secrets();
+    $secret = isset($cfg['app_shared_secret']) ? trim((string)$cfg['app_shared_secret']) : '';
+    if ($secret === '' || $secret === 'CHANGE_ME_TO_ANOTHER_LONG_RANDOM_SECRET') {
+        return '';
+    }
+    return $secret;
+}

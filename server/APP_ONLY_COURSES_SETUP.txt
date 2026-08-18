@@ -82,3 +82,43 @@ QUICK TEST
 3. Click → Open in App / Download page
 4. App me same course normal Buy chalega
 5. Website se create_order directly try → "App exclusive course" error
+
+
+7) PDF SERVING — REAL "sirf app me khule" ENFORCEMENT
+-------------------------------------------------------
+app_only PDFs (get_pdf_token.php / proxy_pdf.php / secure_pdf.php /
+secure_page_image.php) abhi Origin header check karte hain
+(capacitor://localhost, https://localhost, etc.) — ye normal browser
+se block karta hai, LEKIN curl/Postman jaisa tool Origin header khud
+fake kar sakta hai. Isse 100% "sirf app" banane ke liye app ko har PDF
+request ke saath ek signature bhejna hoga jo sirf app ke paas hi ban
+sakta hai.
+
+Server-side ye already ready hai (pm_pdf_access.php: pm_app_signature_valid())
+— bas app update hone ka wait kar raha hai. Jab tak app ye headers nahi
+bhejta, purana Origin-check hi kaam karta rahega (kuch nahi tootega).
+
+SECRET (already set in server/pm_secrets.php as 'app_shared_secret'):
+  4ce7f41875b7849cfa444b89019e73e59e16f93e3dca98b571d3c2951603a23f
+
+App me is secret ko compiled code me daalo (BuildConfig field / native
+code me — SharedPreferences ya kisi asaani se extract hone waali jagah
+NAHI). Har PDF-related request (get_pdf_token.php, proxy_pdf.php,
+secure_pdf.php, secure_page_image.php) ke saath ye 2 headers bhejo:
+
+  X-PM-App-Ts:   current unix timestamp (seconds), e.g. 1786992167
+  X-PM-App-Sign: hex(HMAC_SHA256(ts_as_string, app_shared_secret))
+
+Kotlin example:
+  val ts = (System.currentTimeMillis() / 1000).toString()
+  val mac = Mac.getInstance("HmacSHA256")
+  mac.init(SecretKeySpec(APP_SHARED_SECRET.toByteArray(), "HmacSHA256"))
+  val sign = mac.doFinal(ts.toByteArray()).joinToString("") { "%02x".format(it) }
+  // headers: X-PM-App-Ts = ts, X-PM-App-Sign = sign
+
+Signature 5 minute ke andar hi valid hai (replay protection) — har
+request pe fresh ts/signature banao, purana reuse mat karo.
+
+Test hone ke baad, agar chaho to Origin-check hata kar SIRF signature
+required bana sakte ho (aur zyada strict) — abhi dono ek saath (OR)
+kaam karte hain taaki purana app version na toote.

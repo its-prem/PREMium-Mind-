@@ -9,6 +9,8 @@
  * to read/download any paid PDF.
  */
 
+require_once __DIR__ . '/pm_load_secrets.php';
+
 $PM_PDF_ADMIN_EMAILS = ['premku0237@gmail.com', 'ar0319515@gmail.com'];
 
 function pm_pdf_admin_bypass(string $email): bool {
@@ -66,12 +68,19 @@ function pm_find_course_for_pdf(mysqli $conn, string $file): ?array {
  * browsers set Origin to the page's real https:// domain and JS cannot
  * override it. Used to gate app_only courses at the file-serving layer,
  * not just at purchase time.
+ *
+ * Caveat: this is only a real guarantee against a *browser*. A raw HTTP
+ * client (curl, Postman) can set any Origin/Referer header it wants, so
+ * this alone does not stop someone who deliberately sets out to impersonate
+ * the app. pm_app_signature_valid() below is the real guarantee once the
+ * app is updated to send it; until then this Origin check is the best
+ * available signal and is kept as a fallback even after that.
  */
 function pm_native_app_origins(): array {
     return ['https://localhost', 'http://localhost', 'capacitor://localhost', 'ionic://localhost'];
 }
 
-function pm_is_native_app_request(): bool {
+function pm_is_native_app_origin(): bool {
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
     if ($origin !== '' && in_array($origin, pm_native_app_origins(), true)) return true;
 
@@ -80,6 +89,36 @@ function pm_is_native_app_request(): bool {
         if ($referer !== '' && strpos($referer, $appOrigin) === 0) return true;
     }
     return false;
+}
+
+/**
+ * Real proof the request came from the Android app: it must send
+ * X-PM-App-Ts (current unix time) and X-PM-App-Sign =
+ * hex(HMAC-SHA256(ts, app_shared_secret)). Unlike Origin/Referer, a raw
+ * HTTP client cannot produce a valid signature without knowing the secret
+ * compiled into the app — see APP_ONLY_COURSES_SETUP.txt for what the app
+ * needs to send. Returns false (not an error) until the app is updated to
+ * send this and app_shared_secret is configured in pm_secrets.php — the
+ * feature quietly does nothing until both sides are wired up.
+ */
+function pm_app_signature_valid(): bool {
+    $secret = pm_app_shared_secret();
+    if ($secret === '') return false;
+
+    $ts = $_SERVER['HTTP_X_PM_APP_TS'] ?? '';
+    $sign = $_SERVER['HTTP_X_PM_APP_SIGN'] ?? '';
+    if ($ts === '' || $sign === '' || !ctype_digit((string)$ts)) return false;
+
+    // Reject stale/replayed signatures — 5 minute window.
+    if (abs(time() - (int)$ts) > 300) return false;
+
+    $expected = hash_hmac('sha256', (string)$ts, $secret);
+    return hash_equals($expected, strtolower($sign));
+}
+
+/** True if this request can be trusted as coming from the native app. */
+function pm_is_native_app_request(): bool {
+    return pm_app_signature_valid() || pm_is_native_app_origin();
 }
 
 /**
