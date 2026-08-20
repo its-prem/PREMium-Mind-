@@ -709,6 +709,13 @@
      function applyServerDownloadPermission(canDownload) {
          if (typeof canDownload !== 'boolean') return;
          allowDownload = canDownload;
+         if (!canDownload) {
+             // A course that used to allow downloads (and got cached
+             // on-device back then) must not still be readable from that
+             // old cache after being locked — wipe it every time we learn
+             // the course is currently locked, not just on the transition.
+             try { wipeStaleOfflineCache(); } catch (e) {}
+         }
          const downloadBtn = document.getElementById('downloadBtn');
          if (!downloadBtn) return;
          const dlText = document.getElementById('dl-text');
@@ -786,6 +793,15 @@
          return data.token;
      }
 
+     // Errors the server raised on purpose (403/expired token/locked course)
+     // must never be treated the same as "couldn't reach the server" — only
+     // the latter should ever fall back to a cached copy on the device.
+     function pmDeniedError(msg) {
+         const e = new Error(msg);
+         e.pmDenied = true;
+         return e;
+     }
+
      async function fetchSecurePdfBytesWithTimeout(purpose, ms) {
          const ctrl = new AbortController();
          const t = setTimeout(() => ctrl.abort(), ms);
@@ -798,7 +814,7 @@
              });
              const tokenData = await tokenRes.json().catch(() => ({}));
              if (!tokenRes.ok || tokenData.status !== 'success' || !tokenData.token) {
-                 throw new Error(tokenData.message || 'Token request failed');
+                 throw pmDeniedError(tokenData.message || 'Token request failed');
              }
              applyServerDownloadPermission(tokenData.allow_download);
              const res = await fetch(`${API_BASE}/proxy_pdf.php`, {
@@ -807,7 +823,7 @@
                  body: JSON.stringify({ file: pdfFile, email: userEmail, token: tokenData.token }),
                  signal: ctrl.signal
              });
-             if (!res.ok) throw new Error('Unauthorized Access or Invalid Token');
+             if (!res.ok) throw pmDeniedError('Unauthorized Access or Invalid Token');
              return await res.arrayBuffer();
          } catch (err) {
              if (err && err.name === 'AbortError') throw new Error('Download timeout — check internet and retry');
@@ -873,6 +889,21 @@
          return 'PDF Notes';
      }
 
+     // Overwrites any previously-cached full copy for this course with an
+     // empty one — cacheBegin()+cacheFinish() with nothing appended in
+     // between. loadOfflinePdfBytes() already treats anything under 64
+     // bytes as "no usable cache", so this makes a stale full copy
+     // unreadable going forward without needing any native-app changes.
+     function wipeStaleOfflineCache() {
+         if (!isNativeApp() || !window.AndroidPdfSaver || !window.AndroidPdfSaver.cacheBegin || !window.AndroidPdfSaver.cacheFinish) return;
+         const key = offlineCacheKey();
+         if (!key || key === '|') return;
+         try {
+             window.AndroidPdfSaver.cacheBegin(key, offlineTitle());
+             window.AndroidPdfSaver.cacheFinish();
+         } catch (e) { /* best effort */ }
+     }
+
      async function cachePdfForOffline(buf) {
          if (!isNativeApp() || !window.AndroidPdfSaver || !window.AndroidPdfSaver.cacheBegin) return;
          const key = offlineCacheKey();
@@ -928,6 +959,12 @@
          try {
              return await fetchSecurePdfBytes('view');
          } catch (netErr) {
+             // The server explicitly said no (course got locked, token
+             // invalid, etc.) — that must surface as a real error, never
+             // silently fall back to a copy that may have been cached on
+             // this device from before the course was locked.
+             if (netErr && netErr.pmDenied) throw netErr;
+
              const key = offlineCacheKey();
              const hasNativeCache = isNativeApp()
                  && window.AndroidPdfSaver
