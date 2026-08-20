@@ -579,9 +579,18 @@
          if (Math.abs(currentScale - prev) < 0.001) return;
 
          const ratio = currentScale / prev;
-         scrollArea.scrollLeft = (scrollArea.scrollLeft + anchorX) * ratio - anchorX;
-         scrollArea.scrollTop = (scrollArea.scrollTop + anchorY) * ratio - anchorY;
+         const prevScrollLeft = scrollArea.scrollLeft;
+         const prevScrollTop = scrollArea.scrollTop;
+
+         // Resize the container FIRST so the browser knows the new
+         // (larger/smaller) scrollable bounds. Setting scrollLeft/scrollTop
+         // before this gets silently clamped to the OLD size, which is
+         // exactly what made the zoom anchor point drift instead of
+         // staying fixed under the finger/cursor.
          document.documentElement.style.setProperty('--pdf-scale', currentScale);
+
+         scrollArea.scrollLeft = (prevScrollLeft + anchorX) * ratio - anchorX;
+         scrollArea.scrollTop = (prevScrollTop + anchorY) * ratio - anchorY;
      }
 
      scrollArea.addEventListener('touchstart', (e) => {
