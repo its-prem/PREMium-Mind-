@@ -43,21 +43,46 @@ function pm_js_attr($v) {
     return htmlspecialchars(json_encode((string)$v), ENT_QUOTES, 'UTF-8');
 }
 
+/** Button Style options — kept in sync with the edit form's <select>. */
+function pm_btn_type_options(): array {
+    return [
+        'normal'        => 'Normal (Black clickable)',
+        'coming_soon'   => 'Coming Soon (Unclickable)',
+        'disabled_look' => 'Disabled Look (Orange)',
+        'preview_buy'   => 'Preview (Demo) + Buy',
+        'disabled'      => 'Completely Disabled',
+    ];
+}
+
 /**
- * Renders one ON/OFF <select> for a boolean flag column in the course list.
- * Changing it only stages the change client-side (data-original vs current
- * value) — nothing is written until "Save Changes" posts them in one batch.
+ * ON/OFF pill for a boolean flag column in the course list. Clicking only
+ * stages the change client-side (data-original vs data-value) — nothing is
+ * written until "Update All Changes" posts them in one batch.
  */
-function pm_flag_select(int $id, string $field, bool $isOn, string $icon, string $label): string {
+function pm_flag_toggle(int $id, string $field, bool $isOn, string $icon, string $label): string {
     $val = $isOn ? '1' : '0';
-    return "<div class='flag-select-row" . ($isOn ? " is-on" : "") . "' data-flag-row='$id:" . pm_h($field) . "'>"
+    return "<button type='button' class='flag-btn" . ($isOn ? " is-on" : "") . "'"
+        . " data-id='$id' data-field='" . pm_h($field) . "' data-original='$val' data-value='$val'"
+        . " onclick='toggleFlagBtn(this)' title='Click to turn " . pm_h($label) . " " . ($isOn ? 'OFF' : 'ON') . "'>"
         . "<ion-icon name='" . pm_h($icon) . "'></ion-icon>"
-        . "<span class='flag-select-label'>" . pm_h($label) . "</span>"
-        . "<select class='flag-select' data-id='$id' data-field='" . pm_h($field) . "' data-original='$val' onchange='markFlagDirty(this)'>"
-        . "<option value='1'" . ($isOn ? " selected" : "") . ">ON</option>"
-        . "<option value='0'" . (!$isOn ? " selected" : "") . ">OFF</option>"
-        . "</select>"
-        . "</div>";
+        . "<span class='flag-btn-label'>" . pm_h($label) . "</span>"
+        . "<span class='flag-btn-state'>" . ($isOn ? 'ON' : 'OFF') . "</span>"
+        . "</button>";
+}
+
+/** Button Style dropdown in the list — staged the same way as the toggles. */
+function pm_btn_type_select(int $id, string $current): string {
+    $opts = pm_btn_type_options();
+    if (!isset($opts[$current])) $current = 'normal';
+
+    $html = "<div class='flag-select-row' data-flag-row='$id:btn_type'>"
+        . "<ion-icon name='color-palette-outline'></ion-icon>"
+        . "<span class='flag-select-label'>Button</span>"
+        . "<select class='flag-select' data-id='$id' data-field='btn_type' data-original='" . pm_h($current) . "' onchange='markFlagDirty(this)'>";
+    foreach ($opts as $val => $labelText) {
+        $html .= "<option value='" . pm_h($val) . "'" . ($val === $current ? " selected" : "") . ">" . pm_h($labelText) . "</option>";
+    }
+    return $html . "</select></div>";
 }
 
 function pm_http_request($url, $method = 'GET', $jsonBody = null) {
@@ -362,13 +387,15 @@ if (isset($_GET['fetch_table'])) {
                 : "<span class='badge-danger' style='display:inline-flex; align-items:center; gap:4px; margin-bottom:6px; white-space:nowrap;'>No PDF</span>";
             
             $dl_on = !empty($row['allow_download']) && (int)$row['allow_download'] === 1;
-            $dl_status = pm_flag_select((int)$row['id'], 'allow_download', $dl_on, 'download-outline', 'Download');
+            $dl_status = pm_flag_toggle((int)$row['id'], 'allow_download', $dl_on, 'download-outline', 'Download');
 
             $app_only_on = !empty($row['app_only']) && (int)$row['app_only'] === 1;
-            $app_only_status = pm_flag_select((int)$row['id'], 'app_only', $app_only_on, 'phone-portrait-outline', 'App Only');
+            $app_only_status = pm_flag_toggle((int)$row['id'], 'app_only', $app_only_on, 'phone-portrait-outline', 'App Only');
 
             $preview_on = !empty($row['show_preview']) && (int)$row['show_preview'] === 1;
-            $preview_status = pm_flag_select((int)$row['id'], 'show_preview', $preview_on, 'eye-outline', 'Preview');
+            $preview_status = pm_flag_toggle((int)$row['id'], 'show_preview', $preview_on, 'eye-outline', 'Preview');
+
+            $btn_type_status = pm_btn_type_select((int)$row['id'], (string)($row['btn_type'] ?? 'normal'));
 
             // Check if course is deleted
             $is_deleted = isset($row['is_deleted']) && $row['is_deleted'] == 1;
@@ -398,6 +425,7 @@ if (isset($_GET['fetch_table'])) {
                         $dl_status
                         $app_only_status
                         $preview_status
+                        $btn_type_status
                     </div>
                 </td>
                 <td>
@@ -691,7 +719,8 @@ if (isset($_POST['ajax_bulk_update_flags'])) {
         exit;
     }
 
-    $allowedFields = ['allow_download', 'app_only', 'show_preview'];
+    $allowedFlags = ['allow_download', 'app_only', 'show_preview'];
+    $allowedBtnTypes = array_keys(pm_btn_type_options());
     // One prepared statement per column (field names can't be bound), then
     // reused for every row changing that column.
     $stmts = [];
@@ -701,14 +730,27 @@ if (isset($_POST['ajax_bulk_update_flags'])) {
     foreach ($changes as $ch) {
         $id = (int)($ch['id'] ?? 0);
         $field = (string)($ch['field'] ?? '');
-        $value = ((string)($ch['value'] ?? '0') === '1') ? 1 : 0;
-        if ($id <= 0 || !in_array($field, $allowedFields, true)) continue;
+        if ($id <= 0) continue;
 
-        if (!isset($stmts[$field])) {
-            $stmts[$field] = $conn->prepare("UPDATE courses SET $field = ? WHERE id = ?");
-            if (!$stmts[$field]) { $ok = false; break; }
+        if ($field === 'btn_type') {
+            $strValue = (string)($ch['value'] ?? '');
+            if (!in_array($strValue, $allowedBtnTypes, true)) continue;
+            if (!isset($stmts[$field])) {
+                $stmts[$field] = $conn->prepare("UPDATE courses SET btn_type = ? WHERE id = ?");
+                if (!$stmts[$field]) { $ok = false; break; }
+            }
+            $stmts[$field]->bind_param('si', $strValue, $id);
+        } elseif (in_array($field, $allowedFlags, true)) {
+            $intValue = ((string)($ch['value'] ?? '0') === '1') ? 1 : 0;
+            if (!isset($stmts[$field])) {
+                $stmts[$field] = $conn->prepare("UPDATE courses SET $field = ? WHERE id = ?");
+                if (!$stmts[$field]) { $ok = false; break; }
+            }
+            $stmts[$field]->bind_param('ii', $intValue, $id);
+        } else {
+            continue;
         }
-        $stmts[$field]->bind_param('ii', $value, $id);
+
         if (!$stmts[$field]->execute()) { $ok = false; break; }
         $updated++;
     }
@@ -887,7 +929,27 @@ input:checked + .slider:before { transform: translateX(20px); }
 .badge-warning { background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
 .badge-danger { background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
 
-/* Flag dropdowns (Download / App Only / Preview) — staged, saved in bulk */
+/* ON/OFF pills (Download / App Only / Preview) — staged, saved in bulk */
+.flag-btn {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 6px;
+    padding: 5px 10px; border-radius: 10px; border: 1.5px solid #e2e8f0;
+    background: #f1f5f9; color: #64748b; font-size: 11px; font-weight: 800;
+    white-space: nowrap; cursor: pointer; font-family: inherit;
+    transition: var(--smooth); min-width: 148px;
+}
+.flag-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.flag-btn:active { transform: translateY(0); }
+.flag-btn ion-icon { font-size: 14px; flex-shrink: 0; }
+.flag-btn .flag-btn-label { flex: 1; text-align: left; }
+.flag-btn .flag-btn-state {
+    padding: 2px 8px; border-radius: 6px; background: #e2e8f0;
+    color: #475569; font-size: 10px; letter-spacing: 0.03em;
+}
+.flag-btn.is-on { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+.flag-btn.is-on .flag-btn-state { background: var(--success); color: #fff; }
+.flag-btn.is-dirty { background: #fef3c7; border-color: #f59e0b; color: #92400e; box-shadow: 0 0 0 2px #fde68a; }
+
+/* Button Style dropdown in the list */
 .flag-select-row {
     display: flex; align-items: center; gap: 6px; margin-top: 6px;
     padding: 4px 8px; border-radius: 10px; background: #f1f5f9;
@@ -897,7 +959,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 .flag-select-row.is-on { background: #eff6ff; color: #1d4ed8; }
 .flag-select-row.is-dirty { background: #fef3c7; color: #92400e; box-shadow: 0 0 0 2px #fcd34d; }
 .flag-select-row ion-icon { font-size: 14px; flex-shrink: 0; }
-.flag-select-label { min-width: 62px; }
+.flag-select-label { min-width: 46px; }
 .flag-select {
     width: auto !important; margin: 0 !important; padding: 3px 22px 3px 8px !important;
     font-size: 11px !important; font-weight: 800; border-radius: 8px !important;
@@ -986,7 +1048,12 @@ input:checked + .slider:before { transform: translateX(20px); }
 .rank-item {
     display: flex; align-items: center; gap: 10px; background: white; border: 1px solid var(--gray-border);
     border-radius: 14px; padding: 12px; box-shadow: var(--shadow-sm); user-select: none; -webkit-user-select: none;
-    touch-action: none; width: 100%; box-sizing: border-box; min-width: 0;
+    /* pan-y, not none: `none` here meant a touch anywhere on a row was
+       swallowed instead of scrolling the page, so on phones the ranking
+       list couldn't be scrolled at all. Dragging is handle-only anyway
+       (Sortable is configured with handle: '.rank-handle'), so only the
+       handle needs to opt out of native touch gestures. */
+    touch-action: pan-y; width: 100%; box-sizing: border-box; min-width: 0;
 }
 .rank-item.rank-chosen { border-color: #818cf8; background: #f8fafc; }
 .rank-item.rank-ghost { opacity: 0.35; background: #e0e7ff; border-style: dashed; }
@@ -995,6 +1062,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     width: 40px; height: 40px; border-radius: 10px; background: #f1f5f9; color: #64748b;
     display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: grab;
     font-size: 1.35rem; border: 1px solid #e2e8f0;
+    touch-action: none; /* the one spot that must not scroll — drag starts here */
 }
 .rank-handle:active { cursor: grabbing; background: #e0e7ff; color: #4338ca; }
 .rank-num {
@@ -2288,23 +2356,32 @@ input:checked + .slider:before { transform: translateX(20px); }
             label.textContent = n === 1 ? '1 unsaved change' : n + ' unsaved changes';
         }
 
-        window.markFlagDirty = function (sel) {
-            const id = sel.dataset.id;
-            const field = sel.dataset.field;
-            const original = sel.dataset.original;
+        // Shared by both control types: record/clear a staged change
+        function stageFlagChange(el, id, field, value, original) {
             const key = id + ':' + field;
-            const row = sel.closest('.flag-select-row');
-
-            if (row) row.classList.toggle('is-on', sel.value === '1');
-
-            if (sel.value === original) {
+            if (String(value) === String(original)) {
                 delete window.pmDirtyFlags[key];
-                if (row) row.classList.remove('is-dirty');
+                el.classList.remove('is-dirty');
             } else {
-                window.pmDirtyFlags[key] = { id: id, field: field, value: sel.value };
-                if (row) row.classList.add('is-dirty');
+                window.pmDirtyFlags[key] = { id: id, field: field, value: String(value) };
+                el.classList.add('is-dirty');
             }
             updateAssetSaveBar();
+        }
+
+        window.toggleFlagBtn = function (btn) {
+            const next = btn.dataset.value === '1' ? '0' : '1';
+            btn.dataset.value = next;
+            const isOn = next === '1';
+            btn.classList.toggle('is-on', isOn);
+            const state = btn.querySelector('.flag-btn-state');
+            if (state) state.textContent = isOn ? 'ON' : 'OFF';
+            stageFlagChange(btn, btn.dataset.id, btn.dataset.field, next, btn.dataset.original);
+        };
+
+        window.markFlagDirty = function (sel) {
+            const row = sel.closest('.flag-select-row') || sel;
+            stageFlagChange(row, sel.dataset.id, sel.dataset.field, sel.value, sel.dataset.original);
         };
 
         window.discardFlagChanges = function () {
