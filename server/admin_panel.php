@@ -43,18 +43,21 @@ function pm_js_attr($v) {
     return htmlspecialchars(json_encode((string)$v), ENT_QUOTES, 'UTF-8');
 }
 
-/** Renders a course table's clickable ON/OFF pill for a single boolean flag column. */
-function pm_flag_toggle_btn(int $id, string $field, bool $isOn, string $onIcon, string $label, string $onBg, string $onColor): string {
-    $offIcons = ['app_only' => 'globe-outline', 'show_preview' => 'eye-off-outline'];
-    $icon = $isOn ? $onIcon : ($offIcons[$field] ?? 'close-outline');
-    $bg = $isOn ? $onBg : '#f1f5f9';
-    $color = $isOn ? $onColor : '#64748b';
-    $nextAction = $isOn ? 'OFF' : 'ON';
-
-    return "<button type='button' class='flag-toggle-btn' data-id='$id' data-field='" . pm_h($field) . "' data-value='" . ($isOn ? 1 : 0) . "'"
-        . " style='background:$bg; color:$color;' onclick='toggleCourseFlag(this)' title='Tap to turn " . pm_h($label) . " $nextAction'>"
-        . "<ion-icon name='$icon'></ion-icon> " . pm_h($label) . ": " . ($isOn ? 'ON' : 'OFF')
-        . "</button>";
+/**
+ * Renders one ON/OFF <select> for a boolean flag column in the course list.
+ * Changing it only stages the change client-side (data-original vs current
+ * value) — nothing is written until "Save Changes" posts them in one batch.
+ */
+function pm_flag_select(int $id, string $field, bool $isOn, string $icon, string $label): string {
+    $val = $isOn ? '1' : '0';
+    return "<div class='flag-select-row" . ($isOn ? " is-on" : "") . "' data-flag-row='$id:" . pm_h($field) . "'>"
+        . "<ion-icon name='" . pm_h($icon) . "'></ion-icon>"
+        . "<span class='flag-select-label'>" . pm_h($label) . "</span>"
+        . "<select class='flag-select' data-id='$id' data-field='" . pm_h($field) . "' data-original='$val' onchange='markFlagDirty(this)'>"
+        . "<option value='1'" . ($isOn ? " selected" : "") . ">ON</option>"
+        . "<option value='0'" . (!$isOn ? " selected" : "") . ">OFF</option>"
+        . "</select>"
+        . "</div>";
 }
 
 function pm_http_request($url, $method = 'GET', $jsonBody = null) {
@@ -359,13 +362,13 @@ if (isset($_GET['fetch_table'])) {
                 : "<span class='badge-danger' style='display:inline-flex; align-items:center; gap:4px; margin-bottom:6px; white-space:nowrap;'>No PDF</span>";
             
             $dl_on = !empty($row['allow_download']) && (int)$row['allow_download'] === 1;
-            $dl_status = pm_flag_toggle_btn((int)$row['id'], 'allow_download', $dl_on, 'download-outline', 'DOWNLOAD', '#eff6ff', '#2563eb');
+            $dl_status = pm_flag_select((int)$row['id'], 'allow_download', $dl_on, 'download-outline', 'Download');
 
             $app_only_on = !empty($row['app_only']) && (int)$row['app_only'] === 1;
-            $app_only_status = pm_flag_toggle_btn((int)$row['id'], 'app_only', $app_only_on, 'phone-portrait-outline', 'APP ONLY', '#111111', '#ffffff');
+            $app_only_status = pm_flag_select((int)$row['id'], 'app_only', $app_only_on, 'phone-portrait-outline', 'App Only');
 
             $preview_on = !empty($row['show_preview']) && (int)$row['show_preview'] === 1;
-            $preview_status = pm_flag_toggle_btn((int)$row['id'], 'show_preview', $preview_on, 'eye-outline', 'PREVIEW', '#eff6ff', '#1d4ed8');
+            $preview_status = pm_flag_select((int)$row['id'], 'show_preview', $preview_on, 'eye-outline', 'Preview');
 
             // Check if course is deleted
             $is_deleted = isset($row['is_deleted']) && $row['is_deleted'] == 1;
@@ -440,18 +443,30 @@ if (isset($_POST['ajax_save_ranking'])) {
         echo json_encode(['status' => 'error', 'msg' => 'Invalid order list']);
         exit;
     }
+    // Single UPDATE ... CASE instead of one query per course — reordering
+    // ~25 courses was 25 separate round-trips to MySQL, which is what made
+    // saving the ranking feel slow. Every value here is cast to int first.
     $rank = 1;
-    $ok = true;
+    $cases = '';
+    $idList = [];
     foreach ($ids as $cid) {
         $cid = (int)$cid;
         if ($cid <= 0) continue;
-        if (!$conn->query("UPDATE courses SET sort_order=$rank WHERE id=$cid AND is_deleted=0")) {
-            $ok = false;
-            break;
-        }
+        $cases .= " WHEN $cid THEN $rank";
+        $idList[] = $cid;
         $rank++;
     }
-    echo $ok ? json_encode(['status' => 'success']) : json_encode(['status' => 'error', 'msg' => $conn->error]);
+
+    if (empty($idList)) {
+        echo json_encode(['status' => 'error', 'msg' => 'Invalid order list']);
+        exit;
+    }
+
+    $inList = implode(',', $idList);
+    $ok = $conn->query("UPDATE courses SET sort_order = CASE id$cases END WHERE id IN ($inList) AND is_deleted = 0");
+    echo $ok
+        ? json_encode(['status' => 'success', 'ranked' => count($idList)])
+        : json_encode(['status' => 'error', 'msg' => $conn->error]);
     exit;
 }
 
@@ -604,8 +619,12 @@ if (isset($_POST['ajax_add'])) {
     $tnc_text = $conn->real_escape_string(trim((string)($_POST['tnc_text'] ?? '')));
     $download_msg = $conn->real_escape_string(trim((string)($_POST['download_msg'] ?? '')));
 
-    $image_path = $conn->real_escape_string($_POST['existing_image'] ?? 'small-logo.png');
-    $pdf_path = $conn->real_escape_string($_POST['existing_pdf'] ?? '');
+    // Empty (not just missing) means the admin cleared it with the X button,
+    // so fall back to the placeholder rather than storing a blank image path.
+    $existing_image_raw = trim((string)($_POST['existing_image'] ?? ''));
+    if ($existing_image_raw === '') $existing_image_raw = 'small-logo.png';
+    $image_path = $conn->real_escape_string($existing_image_raw);
+    $pdf_path = $conn->real_escape_string(trim((string)($_POST['existing_pdf'] ?? '')));
     
     if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] == 0) {
         $upload_dir_img = 'uploads/thumbnails/';
@@ -661,28 +680,43 @@ if (isset($_POST['ajax_hard_delete'])) {
     exit;
 }
 
-// 5.7 QUICK TOGGLE (Download / App Only / Preview) FROM THE LIST — no need to open Edit
-if (isset($_POST['ajax_toggle_flag'])) {
+// 5.7 BULK SAVE of the Download / App Only / Preview dropdowns in the list.
+// The UI stages every change and posts them together, so one click can
+// update many courses at once without opening the Edit form.
+if (isset($_POST['ajax_bulk_update_flags'])) {
     pm_require_admin(true);
-    $id = (int)($_POST['id'] ?? 0);
-    $field = (string)($_POST['field'] ?? '');
-    $value = (!empty($_POST['value']) && (string)$_POST['value'] === '1') ? 1 : 0;
+    $changes = json_decode((string)($_POST['changes'] ?? '[]'), true);
+    if (!is_array($changes) || count($changes) === 0) {
+        echo json_encode(['status' => 'error', 'msg' => 'No changes to save']);
+        exit;
+    }
 
     $allowedFields = ['allow_download', 'app_only', 'show_preview'];
-    if ($id <= 0 || !in_array($field, $allowedFields, true)) {
-        echo json_encode(['status' => 'error', 'msg' => 'Invalid field']);
-        exit;
+    // One prepared statement per column (field names can't be bound), then
+    // reused for every row changing that column.
+    $stmts = [];
+    $updated = 0;
+    $ok = true;
+
+    foreach ($changes as $ch) {
+        $id = (int)($ch['id'] ?? 0);
+        $field = (string)($ch['field'] ?? '');
+        $value = ((string)($ch['value'] ?? '0') === '1') ? 1 : 0;
+        if ($id <= 0 || !in_array($field, $allowedFields, true)) continue;
+
+        if (!isset($stmts[$field])) {
+            $stmts[$field] = $conn->prepare("UPDATE courses SET $field = ? WHERE id = ?");
+            if (!$stmts[$field]) { $ok = false; break; }
+        }
+        $stmts[$field]->bind_param('ii', $value, $id);
+        if (!$stmts[$field]->execute()) { $ok = false; break; }
+        $updated++;
     }
 
-    $stmt = $conn->prepare("UPDATE courses SET $field = ? WHERE id = ?");
-    if (!$stmt) {
-        echo json_encode(['status' => 'error', 'msg' => $conn->error]);
-        exit;
-    }
-    $stmt->bind_param('ii', $value, $id);
-    $ok = $stmt->execute();
-    $stmt->close();
-    echo json_encode(['status' => $ok ? 'success' : 'error', 'field' => $field, 'value' => $value]);
+    foreach ($stmts as $s) { $s->close(); }
+    echo json_encode($ok
+        ? ['status' => 'success', 'updated' => $updated]
+        : ['status' => 'error', 'msg' => $conn->error ?: 'Update failed']);
     exit;
 }
 
@@ -853,17 +887,50 @@ input:checked + .slider:before { transform: translateX(20px); }
 .badge-warning { background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
 .badge-danger { background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
 
-/* Flag toggle buttons (Download / App Only / Preview — click to flip) */
-.flag-toggle-btn {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 700;
-    white-space: nowrap; margin-top: 6px; border: none; cursor: pointer;
-    font-family: inherit; transition: var(--smooth); position: relative;
+/* Flag dropdowns (Download / App Only / Preview) — staged, saved in bulk */
+.flag-select-row {
+    display: flex; align-items: center; gap: 6px; margin-top: 6px;
+    padding: 4px 8px; border-radius: 10px; background: #f1f5f9;
+    color: #64748b; font-size: 11px; font-weight: 700; white-space: nowrap;
+    transition: var(--smooth);
 }
-.flag-toggle-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); filter: brightness(0.96); }
-.flag-toggle-btn:active { transform: translateY(0); filter: brightness(0.92); }
-.flag-toggle-btn:disabled { opacity: 0.55; cursor: wait; transform: none; }
-.flag-toggle-btn ion-icon { font-size: 13px; flex-shrink: 0; }
+.flag-select-row.is-on { background: #eff6ff; color: #1d4ed8; }
+.flag-select-row.is-dirty { background: #fef3c7; color: #92400e; box-shadow: 0 0 0 2px #fcd34d; }
+.flag-select-row ion-icon { font-size: 14px; flex-shrink: 0; }
+.flag-select-label { min-width: 62px; }
+.flag-select {
+    width: auto !important; margin: 0 !important; padding: 3px 22px 3px 8px !important;
+    font-size: 11px !important; font-weight: 800; border-radius: 8px !important;
+    border: 1.5px solid #cbd5e1 !important; background: #fff !important;
+    color: inherit; cursor: pointer; font-family: inherit;
+}
+.flag-select:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px var(--primary-light) !important; }
+
+/* Sticky "save all staged changes" bar under the course table */
+.asset-save-bar {
+    position: sticky; bottom: 12px; z-index: 30; margin-top: 16px;
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    padding: 12px 14px; background: rgba(255,255,255,0.97);
+    border: 2px solid #fcd34d; border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(15,23,42,0.15); backdrop-filter: blur(8px);
+}
+.asset-save-bar .dirty-count { font-weight: 800; color: #92400e; font-size: 0.9rem; flex: 1; min-width: 140px; }
+.asset-save-bar .btn-submit, .asset-save-bar .btn-outline { width: auto; margin: 0; padding: 10px 18px; font-size: 0.88rem; }
+
+/* Remove-file (X) button on the existing image / PDF chips in the form */
+.file-chip {
+    display: inline-flex; align-items: center; gap: 8px; margin-top: 10px;
+    padding: 6px 6px 6px 12px; border-radius: 10px; background: #ecfdf5;
+    border: 1px solid #a7f3d0; font-size: 0.8rem; font-weight: 700; color: #065f46;
+    max-width: 100%; position: relative; z-index: 20;
+}
+.file-chip .chip-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-chip button {
+    flex-shrink: 0; width: 24px; height: 24px; border-radius: 7px; border: none;
+    background: #fee2e2; color: #991b1b; cursor: pointer; font-size: 15px;
+    display: flex; align-items: center; justify-content: center; transition: var(--smooth);
+}
+.file-chip button:hover { background: var(--danger); color: #fff; }
 
 /* Table */
 .list-section { background: var(--white); padding: 25px; border-radius: 20px; margin-top: 30px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-border); }
@@ -1206,6 +1273,11 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     <input type="file" name="image_file" id="inp_image_file" accept="image/*" onchange="showImgName(this)">
                                     <input type="hidden" name="existing_image" id="inp_existing_image">
                                     <div id="img-name" class="file-name-display"></div>
+                                    <div id="img-chip" class="file-chip" style="display:none; background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8;">
+                                        <ion-icon name="image"></ion-icon>
+                                        <span class="chip-text" id="img-chip-text"></span>
+                                        <button type="button" onclick="removeExistingImage(event)" title="Remove this thumbnail">&times;</button>
+                                    </div>
                                 </div>
                                 
                                 <div class="row">
@@ -1253,6 +1325,11 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     <input type="file" name="pdf_file" id="inp_pdf_file" accept=".pdf,application/pdf" onchange="showFileName(this)">
                                     <input type="hidden" name="existing_pdf" id="inp_existing_pdf">
                                     <div id="file-name" class="file-name-display" style="color: var(--success);"></div>
+                                    <div id="pdf-chip" class="file-chip" style="display:none;">
+                                        <ion-icon name="document-text"></ion-icon>
+                                        <span class="chip-text" id="pdf-chip-text"></span>
+                                        <button type="button" onclick="removeExistingPdf(event)" title="Remove this PDF">&times;</button>
+                                    </div>
                                     <div id="pdf-error" class="upload-error-text"></div>
                                 </div>
 
@@ -1394,6 +1471,12 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     <tr><td colspan="5" style="text-align:center;"><div class="shimmer" style="height: 40px; width: 100%;"></div></td></tr>
                                 </tbody>
                             </table>
+                        </div>
+
+                        <div class="asset-save-bar" id="assetSaveBar" style="display:none;">
+                            <span class="dirty-count" id="assetDirtyCount">0 unsaved changes</span>
+                            <button type="button" class="btn-outline" onclick="discardFlagChanges()"><ion-icon name="arrow-undo-outline"></ion-icon> Discard</button>
+                            <button type="button" class="btn-submit" id="btnSaveFlags" onclick="saveAllFlagChanges()"><ion-icon name="save"></ion-icon> Update All Changes</button>
                         </div>
                     </div>
                 </div>
@@ -1681,16 +1764,25 @@ input:checked + .slider:before { transform: translateX(20px); }
                 }
 
                 display.innerText = `Selected PDF: ${file.name} (${sizeMB} MB)`;
+                // A newly picked file replaces whatever the card was using
+                const chip = document.getElementById('pdf-chip');
+                if (chip) chip.style.display = 'none';
             }
-            else display.innerText = "";
+            else {
+                display.innerText = "";
+                renderExistingPdfChip();
+            }
         }
 
         function showImgName(input) {
             const display = document.getElementById('img-name');
             if (input.files && input.files[0]) {
                 display.innerText = "Selected Image: " + input.files[0].name;
+                const chip = document.getElementById('img-chip');
+                if (chip) chip.style.display = 'none';
             } else {
                 display.innerText = "";
+                renderExistingImageChip();
             }
         }
 
@@ -1705,6 +1797,10 @@ input:checked + .slider:before { transform: translateX(20px); }
                 const r = await fetch('?fetch_table=1', { credentials: 'same-origin' });
                 if (r.status === 403) { showToast('Session expired. Please login again.', 'error'); return; }
                 tbody.innerHTML = await r.text();
+                // Rows (and their dropdowns) were just replaced with fresh
+                // server values, so any staged edits no longer apply.
+                window.pmDirtyFlags = {};
+                updateAssetSaveBar();
                 refreshCopySelect();
             } catch(e) { showToast("Failed to load courses", "error"); }
         }
@@ -1790,15 +1886,24 @@ input:checked + .slider:before { transform: translateX(20px); }
         }
 
         window.moveRankById = function (id, dir) {
-            const list = window.pmRankOrder || [];
-            const index = list.findIndex(function (c) { return String(c.id) === String(id); });
-            if (index < 0) return;
-            const j = index + dir;
-            if (j < 0 || j >= list.length) return;
-            const tmp = list[index];
-            list[index] = list[j];
-            list[j] = tmp;
-            renderRankingList();
+            const box = document.getElementById('ranking_list');
+            if (!box) return;
+            const el = box.querySelector('.rank-item[data-id="' + id + '"]');
+            if (!el) return;
+
+            // Move just the two affected nodes instead of re-rendering (and
+            // re-binding Sortable on) the whole list — that full rebuild is
+            // what made each up/down tap feel sluggish.
+            if (dir < 0) {
+                const prev = el.previousElementSibling;
+                if (!prev) return;
+                box.insertBefore(el, prev);
+            } else {
+                const next = el.nextElementSibling;
+                if (!next) return;
+                box.insertBefore(next, el);
+            }
+            syncRankOrderFromDom();
         };
 
         window.loadRanking = async function () {
@@ -1979,6 +2084,53 @@ input:checked + .slider:before { transform: translateX(20px); }
             }
         }
 
+        // Existing-file chips: show what the card will keep using if no new
+        // file is uploaded, with an X to drop it (needed when copying a card,
+        // since the copy otherwise silently inherits the original's PDF).
+        function renderExistingPdfChip() {
+            const val = (document.getElementById('inp_existing_pdf') || {}).value || '';
+            const chip = document.getElementById('pdf-chip');
+            const text = document.getElementById('pdf-chip-text');
+            if (!chip || !text) return;
+            if (val) {
+                text.textContent = val.split('/').pop();
+                chip.style.display = 'inline-flex';
+            } else {
+                chip.style.display = 'none';
+            }
+        }
+
+        function renderExistingImageChip() {
+            const val = (document.getElementById('inp_existing_image') || {}).value || '';
+            const chip = document.getElementById('img-chip');
+            const text = document.getElementById('img-chip-text');
+            if (!chip || !text) return;
+            if (val) {
+                text.textContent = val.split('/').pop();
+                chip.style.display = 'inline-flex';
+            } else {
+                chip.style.display = 'none';
+            }
+        }
+
+        window.removeExistingPdf = function (ev) {
+            if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+            document.getElementById('inp_existing_pdf').value = '';
+            document.getElementById('inp_pdf_file').value = '';
+            document.getElementById('file-name').innerHTML = '';
+            renderExistingPdfChip();
+            showToast('PDF removed — upload a new one or save without it');
+        };
+
+        window.removeExistingImage = function (ev) {
+            if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+            document.getElementById('inp_existing_image').value = '';
+            document.getElementById('inp_image_file').value = '';
+            document.getElementById('img-name').innerHTML = '';
+            renderExistingImageChip();
+            showToast('Thumbnail removed — upload a new one or save without it');
+        };
+
         function fillCourseForm(data, opts) {
             opts = opts || {};
             const isCopy = !!opts.isCopy;
@@ -1993,12 +2145,14 @@ input:checked + .slider:before { transform: translateX(20px); }
             }
 
             document.getElementById('inp_existing_image').value = data.image || '';
-            document.getElementById('img-name').innerText = data.image ? ('Using: ' + data.image) : '';
+            document.getElementById('img-name').innerText = '';
             document.getElementById('inp_image_file').value = '';
+            renderExistingImageChip();
 
             document.getElementById('inp_existing_pdf').value = data.pdf_file || '';
-            document.getElementById('file-name').innerHTML = data.pdf_file ? 'Using existing PDF (same file OK for new card)' : '';
+            document.getElementById('file-name').innerHTML = '';
             document.getElementById('inp_pdf_file').value = '';
+            renderExistingPdfChip();
             const pdfErr = document.getElementById('pdf-error');
             if (pdfErr) { pdfErr.style.display = 'none'; pdfErr.innerText = ''; }
 
@@ -2054,7 +2208,9 @@ input:checked + .slider:before { transform: translateX(20px); }
             document.getElementById('inp_existing_pdf').value = '';
             document.getElementById('img-name').innerHTML = '';
             document.getElementById('inp_existing_image').value = '';
-            
+            renderExistingPdfChip();
+            renderExistingImageChip();
+
             document.getElementById('inp_show_tnc').checked = false;
             document.getElementById('inp_show_report_btn').checked = false;
             document.getElementById('inp_app_only').checked = false;
@@ -2118,40 +2274,81 @@ input:checked + .slider:before { transform: translateX(20px); }
             });
         }
 
-        // QUICK TOGGLE (Download / App Only / Preview) — click the pill right in the list
-        window.toggleCourseFlag = function(btn) {
-            const id = btn.dataset.id;
-            const field = btn.dataset.field;
-            const nextValue = btn.dataset.value === '1' ? 0 : 1;
-            const originalHTML = btn.innerHTML;
+        // ==========================================
+        // ASSET FLAG DROPDOWNS — stage locally, save in one batch
+        // ==========================================
+        window.pmDirtyFlags = {};
 
-            btn.disabled = true;
-            btn.innerHTML = '<ion-icon name="sync-outline" class="spinner"></ion-icon>';
+        function updateAssetSaveBar() {
+            const bar = document.getElementById('assetSaveBar');
+            const label = document.getElementById('assetDirtyCount');
+            if (!bar || !label) return;
+            const n = Object.keys(window.pmDirtyFlags).length;
+            bar.style.display = n ? 'flex' : 'none';
+            label.textContent = n === 1 ? '1 unsaved change' : n + ' unsaved changes';
+        }
+
+        window.markFlagDirty = function (sel) {
+            const id = sel.dataset.id;
+            const field = sel.dataset.field;
+            const original = sel.dataset.original;
+            const key = id + ':' + field;
+            const row = sel.closest('.flag-select-row');
+
+            if (row) row.classList.toggle('is-on', sel.value === '1');
+
+            if (sel.value === original) {
+                delete window.pmDirtyFlags[key];
+                if (row) row.classList.remove('is-dirty');
+            } else {
+                window.pmDirtyFlags[key] = { id: id, field: field, value: sel.value };
+                if (row) row.classList.add('is-dirty');
+            }
+            updateAssetSaveBar();
+        };
+
+        window.discardFlagChanges = function () {
+            window.pmDirtyFlags = {};
+            updateAssetSaveBar();
+            loadCourses();
+        };
+
+        window.saveAllFlagChanges = async function () {
+            const changes = Object.values(window.pmDirtyFlags);
+            if (!changes.length) { showToast('Nothing to save', 'error'); return; }
+
+            const btn = document.getElementById('btnSaveFlags');
+            const original = btn ? btn.innerHTML : '';
+            if (btn) { btn.disabled = true; btn.innerHTML = '<ion-icon name="sync" class="spinner"></ion-icon> Saving...'; }
 
             const fd = new FormData();
-            fd.append('ajax_toggle_flag', '1');
-            fd.append('id', id);
-            fd.append('field', field);
-            fd.append('value', nextValue);
+            fd.append('ajax_bulk_update_flags', '1');
+            fd.append('changes', JSON.stringify(changes));
 
-            fetch(window.location.href, {method: 'POST', body: fd})
-            .then(res => res.json())
-            .then(d => {
+            try {
+                const res = await fetch(window.location.href, { method: 'POST', body: fd, credentials: 'same-origin' });
+                const d = await res.json();
                 if (d.status === 'success') {
-                    showToast('Updated!');
+                    showToast('Saved ' + (d.updated || changes.length) + ' change(s)!');
+                    window.pmDirtyFlags = {};
+                    updateAssetSaveBar();
                     loadCourses();
                 } else {
                     showToast(d.msg || 'Update failed!', 'error');
-                    btn.innerHTML = originalHTML;
-                    btn.disabled = false;
                 }
-            })
-            .catch(() => {
+            } catch (e) {
                 showToast('Update failed!', 'error');
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
-            });
-        }
+            }
+            if (btn) { btn.disabled = false; btn.innerHTML = original; }
+        };
+
+        // Warn before losing staged (unsaved) dropdown changes
+        window.addEventListener('beforeunload', function (e) {
+            if (Object.keys(window.pmDirtyFlags || {}).length) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
 
         window.toggleAccordion = function(accId, btn) {
             const acc = document.getElementById(accId);
