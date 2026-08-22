@@ -4,8 +4,12 @@
     {
       "name": "premplayer",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8765"],
-      "port": 8765
+      "runtimeArgs": [
+        "-c",
+        "import os,http.server,socketserver;socketserver.TCPServer.allow_reuse_address=True;p=int(os.environ.get('PORT','8766'));socketserver.TCPServer(('127.0.0.1',p),http.server.SimpleHTTPRequestHandler).serve_forever()"
+      ],
+      "port": 8766,
+      "autoPort": true
     }
   ]
 }

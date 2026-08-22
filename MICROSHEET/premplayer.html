@@ -745,6 +745,12 @@
   "use strict";
 
   var LS_KEY = "prem_music_v2";
+  var SEED_KEY = "prem_music_seeded";
+
+  // Playlist that loads itself the first time the app is opened.
+  // Re-seeds only if the user has never been seeded before, so a
+  // deliberately cleared playlist stays cleared.
+  var DEFAULT_LIST = "PL9bw4S5ePsEG1BSA7I5EtqskLWRaQojwR";
 
   var state = {
     songs: [],
@@ -959,6 +965,7 @@
       $("npArtist").textContent = "Add a YouTube link to start";
       $("npLabel").textContent = "Now Playing";
       document.title = "PREM MUSIC — Personal Music Player";
+      updateMediaSession();
       return;
     }
 
@@ -967,6 +974,7 @@
     $("npArtist").textContent = s.author || parts.artist;
     $("npLabel").textContent = state.playing ? "Now Playing" : "Paused";
     document.title = (state.playing ? "▶ " : "⏸ ") + (s.title || "PREM MUSIC");
+    updateMediaSession();
   }
 
   var PLAY = '<path d="M8 5v14l11-7z"/>';
@@ -976,6 +984,7 @@
     $("bPlayIcon").innerHTML = state.playing ? PAUSE : PLAY;
     document.body.classList.toggle("is-playing", state.playing);
     if (state.current >= 0) $("npLabel").textContent = state.playing ? "Now Playing" : "Paused";
+    updateMediaState();
   }
 
   function renderModes() {
@@ -1007,10 +1016,76 @@
       renderList();
       save();
     }
+
+    updateMediaPosition();
   }
 
   function startTick() { stopTick(); tick = setInterval(renderProgress, 250); }
   function stopTick() { if (tick) { clearInterval(tick); tick = null; } }
+
+  /* ---------------- background playback / OS media controls ----------------
+     Media Session gives the song lock-screen + notification controls and tells
+     the browser this page is a real media app, which is what keeps audio alive
+     while the tab is in the background. */
+
+  var mediaReady = "mediaSession" in navigator;
+
+  function updateMediaSession() {
+    if (!mediaReady) return;
+    var s = state.songs[state.current];
+
+    if (!s) {
+      try { navigator.mediaSession.metadata = null; } catch (e) {}
+      return;
+    }
+
+    var parts = splitTitle(s.title);
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: s.title ? parts.title : "Loading…",
+        artist: s.author || parts.artist,
+        album: "PREM MUSIC",
+        artwork: [
+          { src: "https://i.ytimg.com/vi/" + s.id + "/mqdefault.jpg",     sizes: "320x180",  type: "image/jpeg" },
+          { src: "https://i.ytimg.com/vi/" + s.id + "/hqdefault.jpg",     sizes: "480x360",  type: "image/jpeg" },
+          { src: "https://i.ytimg.com/vi/" + s.id + "/maxresdefault.jpg", sizes: "1280x720", type: "image/jpeg" }
+        ]
+      });
+    } catch (e) {}
+  }
+
+  function updateMediaState() {
+    if (!mediaReady) return;
+    try { navigator.mediaSession.playbackState = state.playing ? "playing" : "paused"; } catch (e) {}
+  }
+
+  function updateMediaPosition() {
+    if (!mediaReady || !navigator.mediaSession.setPositionState) return;
+    try {
+      var d = player.getDuration() || 0;
+      var c = player.getCurrentTime() || 0;
+      if (d > 0 && c <= d) {
+        navigator.mediaSession.setPositionState({ duration: d, position: c, playbackRate: 1 });
+      }
+    } catch (e) {}
+  }
+
+  function wireMediaSession() {
+    if (!mediaReady) return;
+    var acts = [
+      ["play",          function () { try { player.playVideo(); } catch (e) {} }],
+      ["pause",         function () { try { player.pauseVideo(); } catch (e) {} }],
+      ["previoustrack", function () { prev(); }],
+      ["nexttrack",     function () { next(false); }],
+      ["seekbackward",  function (d) { try { player.seekTo(Math.max(0, player.getCurrentTime() - ((d && d.seekOffset) || 10)), true); } catch (e) {} }],
+      ["seekforward",   function (d) { try { player.seekTo(player.getCurrentTime() + ((d && d.seekOffset) || 10), true); } catch (e) {} }],
+      ["seekto",        function (d) { try { if (d && d.seekTime != null) player.seekTo(d.seekTime, true); } catch (e) {} }],
+      ["stop",          function () { try { player.stopVideo(); } catch (e) {} }]
+    ];
+    acts.forEach(function (a) {
+      try { navigator.mediaSession.setActionHandler(a[0], a[1]); } catch (e) { /* unsupported action */ }
+    });
+  }
 
   function buildWave() {
     var el = $("wave");
@@ -1199,6 +1274,41 @@
     });
   }
 
+  /** First-run import of DEFAULT_LIST. Runs once, never overwrites the user's list. */
+  function seedDefaultPlaylist() {
+    if (!DEFAULT_LIST) return;
+    var seeded;
+    try { seeded = localStorage.getItem(SEED_KEY); } catch (e) { seeded = null; }
+    if (seeded || state.songs.length) return;
+
+    try { localStorage.setItem(SEED_KEY, "1"); } catch (e) {}
+    toast("Loading your playlist…");
+
+    readPlaylist(DEFAULT_LIST).then(function (ids) {
+      if (!ids || !ids.length) {
+        toast("Default playlist load nahi hui — + se links add karo", "err", 3600);
+        return;
+      }
+
+      var songs = ids
+        .filter(function (id) { return /^[A-Za-z0-9_-]{11}$/.test(id); })
+        .map(makeSong);
+      if (!songs.length) return;
+
+      state.songs = songs;
+      state.current = -1;
+      renderList();
+      save();
+      toast(songs.length + " songs loaded");
+
+      fetchTitles(songs, function () { renderList(); renderNow(); save(); })
+        .then(function () { renderList(); renderNow(); save(); });
+
+      // cue the first track so it's ready — actual play needs a user gesture
+      loadSong(0, false);
+    });
+  }
+
   /** newest first — prepend, keeping the playing song pointed at the same track */
   function prependSongs(newOnes) {
     state.songs = newOnes.concat(state.songs);
@@ -1372,6 +1482,8 @@
             // restored session: cue only — browsers block autoplay without a gesture
             try { player.cueVideoById(state.songs[state.current].id); } catch (e) {}
           }
+
+          seedDefaultPlaylist();
         },
 
         onStateChange: function (ev) {
@@ -1523,6 +1635,18 @@
 
   window.addEventListener("resize", buildWave);
 
+  /* Nothing here pauses on hide — audio is meant to keep running in the
+     background. On return, just re-sync the UI with the real player state. */
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden || !player || !player.getPlayerState) return;
+    try {
+      state.playing = player.getPlayerState() === YT.PlayerState.PLAYING;
+    } catch (e) { return; }
+    renderPlayState();
+    renderProgress();
+    if (state.playing) startTick();
+  });
+
   /* ---------------- boot ---------------- */
 
   load();
@@ -1532,6 +1656,7 @@
   renderModes();
   buildWave();
   wireSeek();
+  wireMediaSession();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(buildWave);
 
   // backfill titles that never resolved before
