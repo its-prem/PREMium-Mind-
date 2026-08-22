@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Microsheet — Match FEEE Style</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Carlito:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  @page { size: A4 portrait; margin: 0; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+  body {
+    font-family: Carlito, Calibri, Arial, sans-serif;
+    background: linear-gradient(180deg, #eef2f6 0%, #e4e9ef 100%);
+    color: #000;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+    min-height: 100vh;
+  }
+
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 14px;
+    background: linear-gradient(180deg, #22303f 0%, #1e2a38 100%);
+    color: #f5f7fa;
+    box-shadow: 0 2px 10px rgba(0,0,0,.18);
+  }
+
+  .toolbar-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .toolbar button {
+    font: 600 13px/1 Carlito, Calibri, sans-serif;
+    min-height: 42px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #fff;
+    color: #1e2a38;
+    touch-action: manipulation;
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .toolbar button:active { transform: scale(0.96); }
+
+  .toolbar button.primary {
+    background: #3b82f6;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(59,130,246,.35);
+  }
+
+  .toolbar button.primary:hover { background: #2f6fe0; }
+
+  .toolbar button:not(.ghost):not(.primary):hover { background: #eef2f7; }
+
+  .toolbar button.ghost {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.45);
+  }
+
+  .toolbar button.ghost:hover { background: rgba(255,255,255,.08); }
+
+  .toolbar .hint {
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    opacity: .85;
+    line-height: 1.4;
+  }
+
+  .workspace {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .editor-col {
+    flex: 0 0 50%;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: var(--toolbar-h, 64px);
+    align-self: flex-start;
+    height: calc(100vh - var(--toolbar-h, 64px));
+    overflow-y: auto;
+    padding: 24px;
+    box-sizing: border-box;
+  }
+
+  .preview-col {
+    flex: 1 1 50%;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .editor {
+    width: 100%;
+    max-width: 460px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .editor.hidden { display: none; }
+
+  .field-label {
+    display: block;
+    font: 700 12px/1 Carlito, Calibri, sans-serif;
+    color: #516070;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin: 12px 0 6px;
+  }
+
+  .field-label:first-of-type { margin-top: 0; }
+
+  .panel {
+    background: #fff;
+    border: 1px solid #d0d7df;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 10px 26px rgba(30,40,55,.1);
+  }
+
+  .panel h1 {
+    font-size: 19px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #1e2a38;
+  }
+
+  .panel p {
+    font-size: 13px;
+    color: #4a5563;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .panel code {
+    background: #f1f4f8;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  #rawInput {
+    width: 100%;
+    min-height: 280px;
+    resize: vertical;
+    border: 1px solid #c9d2dc;
+    border-radius: 10px;
+    padding: 12px;
+    font: 14px/1.5 Consolas, "Courier New", monospace;
+    color: #1a1a1a;
+    background: #fcfdff;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+
+  #rawInput:focus, #subjectInput:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+  }
+
+  #subjectInput {
+    width: 100%;
+    margin-bottom: 10px;
+    border: 1px solid #c9d2dc;
+    border-radius: 10px;
+    padding: 11px 13px;
+    font: 15px/1.3 Carlito, Calibri, sans-serif;
+  }
+
+  .status {
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: #3d4b5c;
+    background: #f4f7fa;
+    border-radius: 8px;
+    padding: 8px 10px;
+    line-height: 1.4;
+  }
+
+  .stage {
+    width: 100%;
+    padding: 18px 10px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+  }
+
+  /* Boxes only — full A4 with ~10mm margins, Calibri 5.04pt */
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #c5ccd4;
+    border-radius: 3px;
+    box-shadow: 0 10px 28px rgba(20,30,40,.14);
+    page-break-after: always;
+    break-after: page;
+    flex: none;
+  }
+
+  .grid {
+    position: absolute;
+    left: 10mm;
+    top: 10mm;
+    right: 10mm;
+    bottom: 10mm;
+    width: auto;
+    height: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    border: 0.5pt solid #000;
+    background: #000;
+    gap: 0.5pt;
+  }
+
+  .cell {
+    background: #fff;
+    padding: 1.4mm;
+    overflow: hidden;
+    min-height: 0;
+    min-width: 0;
+    position: relative;
+  }
+
+  .cell-inner {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Carlito, Calibri, Arial, sans-serif;
+    font-size: 5.04pt;
+    line-height: 6.12pt;
+    font-weight: 400;
+    color: #000;
+    text-align: justify;
+    text-justify: inter-word;
+    word-break: break-word;
+    hyphens: auto;
+  }
+
+  .cell-inner .q {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.6mm;
+    text-align: justify;
+  }
+
+  .cell-inner .a {
+    display: block;
+    white-space: pre-wrap;
+    text-align: justify;
+    overflow: hidden;
+  }
+
+  .cell-inner .a .lbl {
+    font-weight: 700;
+  }
+
+  .cell.empty .cell-inner {
+    color: #b8bec6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8pt;
+    line-height: 1.2;
+  }
+
+  .cell.overflow {
+    outline: none;
+  }
+
+  .cell.cell-summary {
+    background: #f7f9fb;
+  }
+
+  .cell.cell-summary .cell-inner .q {
+    text-align: center;
+    border-top: 0.5pt solid #000;
+    border-bottom: 0.5pt solid #000;
+    padding: 0.5mm 0;
+    margin-bottom: 0.8mm;
+  }
+
+  .page-badge {
+    position: absolute;
+    right: 10mm;
+    bottom: 3.5mm;
+    font: 600 8pt/1 Carlito, Calibri, sans-serif;
+    color: #666;
+  }
+
+  .meta {
+    max-width: 210mm;
+    width: 100%;
+    font-size: 12px;
+    color: #516070;
+    text-align: center;
+    padding: 0 10px 10px;
+  }
+
+  @media screen and (max-width: 900px) {
+    .workspace { display: block; }
+    .editor-col {
+      width: 100%;
+      flex: none;
+      position: static;
+      height: auto;
+      padding: 10px 10px 0;
+    }
+    .preview-col { width: 100%; }
+    .editor { max-width: none; }
+    .stage { padding: 14px 0 90px; overflow-x: hidden; }
+    .sheet {
+      transform-origin: top center;
+      transform: scale(var(--mobile-scale, 0.45));
+      margin-bottom: calc((297mm * var(--mobile-scale, 0.45)) - 297mm);
+    }
+    .panel { padding: 13px; border-radius: 10px; }
+    .panel h1 { font-size: 17px; }
+    #rawInput { min-height: 220px; font-size: 14px; }
+  }
+
+  @media screen and (max-width: 560px) {
+    .toolbar { padding: 10px; gap: 6px; }
+    .toolbar-group { gap: 6px; width: 100%; }
+    .toolbar button { flex: 1 1 auto; min-width: 0; padding: 10px 8px; font-size: 12.5px; }
+    .toolbar .hint { font-size: 11px; order: -1; margin-bottom: 2px; }
+  }
+
+  @media print {
+    body { background: #fff; }
+    .toolbar, .editor-col, .meta { display: none !important; }
+    .workspace { display: block; }
+    .preview-col { width: 100%; }
+    .stage { padding: 0; gap: 0; }
+    .sheet {
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      margin: 0;
+      transform: none !important;
+    }
+    .cell.overflow { outline: none; }
+    .page-badge { color: #444; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="toolbar-group">
+    <button type="button" id="btnToggle">Edit Text</button>
+    <button type="button" id="btnFill" class="primary">Fill Boxes</button>
+    <button type="button" id="btnFit">Auto-Fit</button>
+    <button type="button" id="btnPrint">Print / PDF</button>
+    <button type="button" id="btnDoc" class="primary">Export DOCX</button>
+    <button type="button" class="ghost" id="btnClear">Clear</button>
+  </div>
+  <div class="hint">Format: <b>Q.7 Question...</b> then answer · blank lines auto-remove · 9 boxes/page · last box = Covered Ques summary</div>
+</div>
+
+<div class="workspace">
+  <div class="editor-col">
+    <div class="editor" id="editor">
+      <div class="panel">
+        <h1>Microsheet filler</h1>
+        <p>
+          Naya box <strong>sirf</strong> <code>Q.7</code> se banega. Numbered points usi box me rahenge.
+          Markdown code marks (triple backticks) answer se auto hata diye jate hain.
+          Sabse last box me saare questions ki list "Subject Covered Ques" heading ke sath auto ban jayegi.
+          DOC export name: <code>SubjectName_imp-ques.docx</code>
+        </p>
+        <label class="field-label" for="subjectInput">Subject name</label>
+        <input id="subjectInput" type="text" placeholder="Subject name (DOC file name)" value="Project Management">
+        <label class="field-label" for="rawInput">Questions &amp; answers</label>
+        <textarea id="rawInput" spellcheck="false"></textarea>
+        <div class="status" id="status">Ready</div>
+      </div>
+    </div>
+  </div>
+  <div class="preview-col">
+    <div class="stage" id="stage"></div>
+    <div class="meta" id="meta"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var BOXES_PER_PAGE = 9;
+  var BASE_PT = 5.04;
+  var BASE_LH = 6.12;
+  var FIT_SAFETY_PX = 1.2; // buffer so exported DOCX/print never visibly overflows the box
+
+  var rawInput = document.getElementById("rawInput");
+  var subjectInput = document.getElementById("subjectInput");
+  var stage = document.getElementById("stage");
+  var editor = document.getElementById("editor");
+  var statusEl = document.getElementById("status");
+  var metaEl = document.getElementById("meta");
+  var lastItems = [];
+
+  var SAMPLE = [
+    "Q.7 — Explain the Project Management process and define Project Scope.",
+    "Meaning of Project Management Process: The Project Management Process refers to the set of steps followed to plan, execute, and complete a project successfully. It generally includes five main steps that guide the project from start to finish.",
+    "1. Initiating: In this step, the project idea is identified, its need and feasibility are checked, and formal approval is taken to start the project. A project charter is prepared, and key stakeholders are identified at this stage.",
+    "2. Planning: In this step, a detailed plan is prepared covering the scope, schedule, budget, resources, quality requirements, and risk management strategy for the whole project. This step decides how the project will actually be carried out.",
+    "3. Executing: In this step, the actual work of the project is carried out as per the plan. The team is assembled, resources are used, and the actual deliverables of the project start getting created.",
+    "4. Monitoring and Controlling: In this step, the progress of the project is regularly checked against the plan, and any deviations in time, cost, or quality are corrected through proper actions.",
+    "5. Closing: In this step, the project is formally completed, final approval is taken from the client, resources are released, and all project documents are properly filed for future reference.",
+    "Meaning of Project Scope: Project Scope refers to the detailed description of all the work that needs to be done to successfully complete a project, including what is included in the project and what is not included in it. It defines the boundaries of the project clearly so that everyone involved understands exactly what needs to be delivered.",
+    "Importance of Project Scope: Defining the scope properly at the beginning of the project helps in avoiding confusion, prevents unnecessary extra work (called scope creep) from being added later without proper planning, and makes sure that the project stays within its decided time and budget. A good project scope statement usually includes the project's objectives, deliverables, milestones, boundaries (what is excluded), and the acceptance criteria that decide when the work is considered complete. Without a clearly defined scope, project teams may waste time and resources on unnecessary tasks, and disagreements can arise between the client and the project team about what was actually supposed to be delivered, making scope definition one of the most important steps in the planning phase of any project."
+  ].join("\n");
+
+  rawInput.value = SAMPLE;
+
+  function setStatus(msg) { statusEl.textContent = msg; }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/\x3c/g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  /** Remove markdown code fences from answers */
+  function stripMarkdownJunk(s) {
+    var t = String(s || "");
+    // Fenced blocks
+    t = t.replace(/`{3}[\w+-]*\s*\n?([\s\S]*?)`{3}/g, "$1");
+    t = t.replace(/`{3}[\w+-]*/g, "");
+    t = t.replace(/`{1,3}/g, "");
+    return t;
+  }
+
+  /** Bold label prefixes like "Definition:" / "1. Initiating:" */
+  function formatAnswer(text) {
+    var cleaned = stripMarkdownJunk(text);
+    var lines = String(cleaned || "").split("\n").filter(function (l) { return l.trim(); });
+    return lines.map(function (line) {
+      var t = escapeHtml(line.trim());
+      t = t.replace(/^(\d+\s*[\.\)\-:]|[ivxlcdm]+[\.\)]|\([ivxlcdm]+\)|\([a-z]\))(\s+)/i, '<span class="lbl">$1<\/span>$2');
+      t = t.replace(/^([^:\n]{2,55}:)/, '<span class="lbl">$1<\/span>');
+      return t;
+    }).join("\n");
+  }
+
+  function isQuestionLine(trimmed) {
+    // ONLY real question headers — answer points like "1. Initiating:" must NEVER match
+    if (/^Q\.\s*\d+\b/i.test(trimmed)) return true;
+    if (/^Q\s*\d+\s*[\-—–:.]/i.test(trimmed)) return true;
+    if (/^Question\s*\d+\b/i.test(trimmed)) return true;
+    return false;
+  }
+
+  /** If Q + answer same line pe chipke hain, alag karo */
+  function splitGluedAnswer(questionLine) {
+    var line = String(questionLine || "").trim();
+    if (!line) return { q: "", a: "" };
+
+    var answerStart =
+      "Meaning|Definition|Importance|Answer|Ans|Explanation|Introduction|" +
+      "Note|Purpose|Types?|Steps?|Advantages?|Disadvantages?|Features?|" +
+      "Applications?|Working|Principle|Construction|Conclusion|Tools?|" +
+      "Process|Scope|Objectives?|Characteristics?|Classification|" +
+      "Procedure|Method|Concept|Need|Necessity";
+
+    // Q.18 Discuss .... Meaning: ...
+    var reLabel = new RegExp(
+      "^(Q\\.?\\s*\\d+|Question\\s*\\d+)\\s*[\\-\\u2014\\u2013:]*\\s*(.+?)([.?])\\s+((?:" +
+        answerStart +
+        ")\\b\\s*[:\\uFF1A].*)$",
+      "i"
+    );
+    var m = line.match(reLabel);
+    if (m) {
+      return {
+        q: normalizeQuestionNum(m[1]) + " " + m[2].trim() + m[3],
+        a: m[4].trim()
+      };
+    }
+
+    // Q.18 short question. Long paragraph (after first . or ?)
+    var reSentence = /^(Q\.?\s*\d+|Question\s*\d+)\s*[\-—–:]*\s*(.+?[.?])\s+([A-Z].{40,})$/;
+    m = line.match(reSentence);
+    if (m) {
+      if (!/^(Explain|Discuss|Define|Describe|Compare|State|List|Write)\b/i.test(m[3])) {
+        return {
+          q: normalizeQuestionNum(m[1]) + " " + m[2].trim(),
+          a: m[3].trim()
+        };
+      }
+    }
+
+    return { q: line, a: "" };
+  }
+
+  function normalizeQuestionNum(num) {
+    var n = String(num || "").replace(/\s+/g, "");
+    if (/^Question/i.test(n)) n = "Q." + n.replace(/^Question/i, "");
+    else if (/^Q\d/i.test(n) && n.indexOf(".") < 0) n = "Q." + n.slice(1);
+    return n;
+  }
+
+  function cleanBlankLines(s) {
+    return stripMarkdownJunk(String(s || ""))
+      .replace(/\r\n/g, "\n")
+      .replace(/\u00a0/g, " ")
+      .replace(/[\u200B-\u200D\uFEFF]/g, "")
+      .split("\n")
+      .map(function (l) { return l.trim(); })
+      .filter(function (l) {
+        if (!l.length) return false;
+        if (/^`+$/.test(l)) return false;
+        if (/^`{3}[\w+-]*$/.test(l)) return false;
+        return true;
+      })
+      .join("\n");
+  }
+
+  function parseQA(text) {
+    var raw = cleanBlankLines(text);
+    if (!raw) return [];
+
+    var lines = raw.split("\n");
+    var items = [];
+    var cur = null;
+
+    function pushCur() {
+      if (!cur) return;
+      cur.q = cur.q.trim();
+      cur.a = cleanBlankLines(cur.a.replace(/^(Ans(?:wer)?\s*[:：]\s*)/i, ""));
+      if (cur.q) items.push(cur);
+      cur = null;
+    }
+
+    function normalizeQuestion(trimmed) {
+      var m = trimmed.match(/^(Q\.?\s*\d+|Question\s*\d+)\s*[\-—–:]*\s*(.*)$/i);
+      if (m) {
+        var num = normalizeQuestionNum(m[1]);
+        return m[2] ? (num + " " + m[2]) : num;
+      }
+      return trimmed;
+    }
+
+    for (var i = 0; i < lines.length; i++) {
+      var trimmed = lines[i].trim();
+      if (!trimmed) continue;
+
+      // Strict: sirf Q.7 / Q.8 wali line naya box banati hai
+      if (isQuestionLine(trimmed)) {
+        pushCur();
+        var split = splitGluedAnswer(trimmed);
+        cur = {
+          q: split.a ? split.q : normalizeQuestion(trimmed),
+          a: split.a || ""
+        };
+        continue;
+      }
+
+      if (!cur) {
+        cur = { q: trimmed, a: "" };
+      } else {
+        cur.a += (cur.a ? "\n" : "") + trimmed;
+      }
+    }
+    pushCur();
+    return items;
+  }
+
+  /** "Q.7 Explain the..." -> "Explain the..." (drop the Q.N label) */
+  function stripQuestionPrefix(q) {
+    return String(q || "").replace(/^(Q\.?\s*\d+|Question\s*\d+)\s*[\-—–:.]*\s*/i, "").trim();
+  }
+
+  /** Build the extra "last box" item listing every question under the subject heading */
+  function buildCoveredSummaryItem(items) {
+    if (!items || !items.length) return null;
+    var subject = (subjectInput.value || "Subject").trim() || "Subject";
+    var lines = items.map(function (it, idx) {
+      return (idx + 1) + ". " + stripQuestionPrefix(it.q);
+    });
+    return {
+      q: subject + " Covered Ques",
+      a: lines.join("\n"),
+      isSummary: true
+    };
+  }
+
+  /** Append the covered-questions summary as the final item so it always lands in the last box */
+  function withCoveredSummary(items) {
+    var summary = buildCoveredSummaryItem(items);
+    return summary ? items.concat([summary]) : items;
+  }
+
+  function createSheet(pageNo, pageTotal) {
+    var sheet = document.createElement("section");
+    sheet.className = "sheet";
+    sheet.setAttribute("data-page", String(pageNo || 1));
+    var grid = document.createElement("div");
+    grid.className = "grid";
+    for (var i = 0; i < BOXES_PER_PAGE; i++) {
+      var cell = document.createElement("div");
+      cell.className = "cell empty";
+      cell.innerHTML = '<div class="cell-inner">Empty<\/div>';
+      grid.appendChild(cell);
+    }
+    sheet.appendChild(grid);
+    if (pageTotal > 1) {
+      var badge = document.createElement("div");
+      badge.className = "page-badge";
+      badge.textContent = "Page " + pageNo + " / " + pageTotal;
+      sheet.appendChild(badge);
+    }
+    return sheet;
+  }
+
+  function fillBoxes(items) {
+    lastItems = items || [];
+    stage.innerHTML = "";
+    if (!items.length) {
+      stage.appendChild(createSheet(1, 1));
+      metaEl.textContent = "0 questions";
+      setStatus("No Q&A found. Sirf Q.7 / Q.8 se naya box banta hai. (1. 2. 3. answer ke andar rehte hain)");
+      return;
+    }
+
+    var pages = Math.ceil(items.length / BOXES_PER_PAGE);
+    var idx = 0;
+
+    for (var p = 0; p < pages; p++) {
+      var sheet = createSheet(p + 1, pages);
+      var cells = sheet.querySelectorAll(".cell");
+      for (var c = 0; c < BOXES_PER_PAGE; c++) {
+        if (idx >= items.length) break;
+        var item = items[idx++];
+        var cell = cells[c];
+        cell.classList.remove("empty");
+        if (item.isSummary) cell.classList.add("cell-summary");
+        cell.innerHTML =
+          '<div class="cell-inner">' +
+            '<span class="q">' + escapeHtml(item.q) + " <\/span>" +
+            '<span class="a">' + formatAnswer(item.a || "") + "<\/span>" +
+          "<\/div>";
+      }
+      stage.appendChild(sheet);
+    }
+
+    var from = 1;
+    var summary = [];
+    for (var p2 = 0; p2 < pages; p2++) {
+      var to = Math.min(items.length, from + BOXES_PER_PAGE - 1);
+      summary.push("P" + (p2 + 1) + ": Q" + from + "–" + to);
+      from = to + 1;
+    }
+
+    metaEl.textContent = items.length + " questions → " + pages + " page(s) · " + summary.join(" · ");
+    setStatus(items.length + " boxes filled · " + pages + " page(s). Extra text box ke bahar kabhi nahi dikhega.");
+    updateMobileScale();
+    truncateAllCells();
+  }
+
+  function fitsInCell(cell, inner) {
+    return inner.scrollHeight <= (cell.clientHeight - FIT_SAFETY_PX) &&
+      inner.scrollWidth <= cell.clientWidth + 0.5;
+  }
+
+  /** Cut answer text so it stops exactly at box end — never leaks outside the box */
+  function truncateCell(cell) {
+    var inner = cell.querySelector(".cell-inner");
+    if (!inner || cell.classList.contains("empty")) return;
+
+    cell.classList.remove("overflow");
+    inner.style.fontSize = BASE_PT + "pt";
+    inner.style.lineHeight = BASE_LH + "pt";
+
+    if (fitsInCell(cell, inner)) return;
+
+    var qEl = inner.querySelector(".q");
+    var aEl = inner.querySelector(".a");
+    if (!aEl) return;
+
+    var fullA = aEl.textContent || "";
+    if (!fullA) return;
+
+    // Binary search: keep as much answer as fits, with safety buffer
+    var lo = 0;
+    var hi = fullA.length;
+    var best = 0;
+    while (lo <= hi) {
+      var mid = (lo + hi) >> 1;
+      aEl.textContent = fullA.slice(0, mid);
+      if (fitsInCell(cell, inner)) {
+        best = mid;
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
+      }
+    }
+
+    // Prefer cut at word / line boundary
+    var cut = fullA.slice(0, best);
+    var nicer = cut.replace(/\s+\S*$/, "");
+    if (nicer.length > best * 0.7) cut = nicer;
+    cut = cut.replace(/\s+$/, "");
+    aEl.textContent = cut;
+
+    // Final safety: if still overflowing, shave a few more chars
+    var guard = 60;
+    while (!fitsInCell(cell, inner) && cut.length && guard--) {
+      cut = cut.slice(0, -8).replace(/\s+\S*$/, "").replace(/\s+$/, "");
+      aEl.textContent = cut;
+    }
+
+    // Re-apply bold labels on truncated plain text
+    aEl.innerHTML = formatAnswer(aEl.textContent || "");
+    // If formatting caused overflow again, fall back to plain truncated text
+    if (!fitsInCell(cell, inner)) {
+      aEl.textContent = cut;
+    }
+    // Absolute last resort: force-clip via CSS so nothing can ever visibly
+    // escape the box, even if measurement above was imperfect.
+    if (!fitsInCell(cell, inner)) {
+      inner.style.overflow = "hidden";
+      cell.style.overflow = "hidden";
+    }
+  }
+
+  function truncateAllCells() {
+    var cells = stage.querySelectorAll(".cell:not(.empty)");
+    var cutCount = 0;
+    cells.forEach(function (cell) {
+      var inner = cell.querySelector(".cell-inner");
+      if (!inner) return;
+      var before = (inner.querySelector(".a") && inner.querySelector(".a").textContent) || "";
+      // Summary box lists every question, so allow it to shrink before truncating
+      if (cell.classList.contains("cell-summary")) {
+        fitCell(cell, true);
+      } else {
+        truncateCell(cell);
+      }
+      var after = (inner.querySelector(".a") && inner.querySelector(".a").textContent) || "";
+      if (after.length < before.length) cutCount++;
+    });
+    if (cutCount) {
+      setStatus(cutCount + " box(es) me extra answer box ke andar hi hide ho gaya (box limit se bahar kuch nahi dikhega).");
+    } else {
+      setStatus("All boxes OK. Export DOC / Print ready.");
+    }
+  }
+
+  function fitCell(cell, allowShrink) {
+    // Kept for Auto-Fit button: first try slight shrink, else truncate
+    var inner = cell.querySelector(".cell-inner");
+    if (!inner || cell.classList.contains("empty")) return;
+
+    cell.classList.remove("overflow");
+    inner.style.fontSize = BASE_PT + "pt";
+    inner.style.lineHeight = BASE_LH + "pt";
+
+    if (fitsInCell(cell, inner)) return;
+
+    if (allowShrink) {
+      var min = 4.2;
+      var max = BASE_PT;
+      var best = min;
+      for (var i = 0; i < 12; i++) {
+        var mid = (min + max) / 2;
+        var lh = mid * (BASE_LH / BASE_PT);
+        inner.style.fontSize = mid + "pt";
+        inner.style.lineHeight = lh + "pt";
+        if (fitsInCell(cell, inner)) {
+          best = mid;
+          min = mid;
+        } else {
+          max = mid;
+        }
+      }
+      var finalLh = best * (BASE_LH / BASE_PT);
+      inner.style.fontSize = best.toFixed(2) + "pt";
+      inner.style.lineHeight = finalLh.toFixed(2) + "pt";
+    }
+
+    if (!fitsInCell(cell, inner)) truncateCell(cell);
+  }
+
+  function fitAllCells(allowShrink) {
+    var cells = stage.querySelectorAll(".cell:not(.empty)");
+    cells.forEach(function (c) { fitCell(c, allowShrink); });
+    setStatus(allowShrink ? "Auto-Fit done (extra text box ke andar hi chhup jayega)." : "Ready.");
+  }
+
+  function updateMobileScale() {
+    if (window.innerWidth > 900) {
+      document.documentElement.style.removeProperty("--mobile-scale");
+      return;
+    }
+    var available = Math.max(stage.clientWidth || window.innerWidth, 1) - 16;
+    var scale = Math.min(1, available / (210 * 3.7795275591));
+    document.documentElement.style.setProperty("--mobile-scale", String(Math.max(0.24, scale)));
+  }
+
+  var toolbarEl = document.querySelector(".toolbar");
+  function updateToolbarOffset() {
+    if (!toolbarEl) return;
+    document.documentElement.style.setProperty("--toolbar-h", toolbarEl.offsetHeight + "px");
+  }
+
+  function subjectBaseName() {
+    var name = (subjectInput.value || "Subject").trim();
+    name = name
+      .replace(/[<>:"/\\|?*\x00-\x1F]/g, "")
+      .replace(/\s+/g, "_")
+      .replace(/_+/g, "_")
+      .replace(/^_|_$/g, "");
+    return name || "Subject";
+  }
+
+  function docFileName() {
+    return subjectBaseName() + "_imp-ques.docx";
+  }
+
+  /** Answer text -> plain lines for Word (no HTML) */
+  function answerLinesForDoc(text) {
+    var cleaned = stripMarkdownJunk(text);
+    return String(cleaned || "")
+      .split("\n")
+      .map(function (l) { return l.trim(); })
+      .filter(function (l) { return l.length > 0; });
+  }
+
+  /** Read exactly what is visible in each on-screen box (already truncated) */
+  function cellsFromDom() {
+    var sheets = stage.querySelectorAll(".sheet");
+    var pages = [];
+    sheets.forEach(function (sheet) {
+      var row = [];
+      sheet.querySelectorAll(".cell").forEach(function (cell) {
+        if (cell.classList.contains("empty")) {
+          row.push({ empty: true, q: "", lines: [] });
+          return;
+        }
+        var qEl = cell.querySelector(".q");
+        var aEl = cell.querySelector(".a");
+        var q = qEl ? String(qEl.textContent || "").trim() : "";
+        var a = aEl ? String(aEl.textContent || "").trim() : "";
+        row.push({
+          empty: false,
+          q: q,
+          lines: answerLinesForDoc(a),
+          isSummary: cell.classList.contains("cell-summary")
+        });
+      });
+      while (row.length < 9) row.push({ empty: true, q: "", lines: [] });
+      pages.push(row.slice(0, 9));
+    });
+    return pages;
+  }
+
+  function xmlEscape(s) {
+    return String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/\x3c/g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function wText(s, bold) {
+    var t = xmlEscape(s);
+    // preserve leading/trailing spaces in Word
+    var space = /^\s|\s$/.test(s) ? " xml:space=\"preserve\"" : "";
+    return (
+      "<w:r>" +
+      "<w:rPr>" +
+      (bold ? "<w:b/>" : "") +
+      '<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/>' +
+      '<w:sz w:val="10"/><w:szCs w:val="10"/>' + // 5pt
+      "<\/w:rPr>" +
+      "<w:t" + space + ">" + t + "<\/w:t>" +
+      "<\/w:r>"
+    );
+  }
+
+  function wBr() {
+    return "<w:r><w:br/><\/w:r>";
+  }
+
+  function wLineRuns(line) {
+    // Bold label prefixes like "Meaning:" / "1. Initiating:"
+    var lm = line.match(/^(\d+\s*[\.\)\-:]|[ivxlcdm]+[\.\)]|\([ivxlcdm]+\)|\([a-z]\))(\s+)(.*)$/i);
+    if (lm) return wText(lm[1] + lm[2], true) + wText(lm[3], false);
+    var lm2 = line.match(/^([^:\n]{2,55}:)(\s*)(.*)$/);
+    if (lm2) return wText(lm2[1] + lm2[2], true) + wText(lm2[3], false);
+    return wText(line, false);
+  }
+
+  // NOTE: lineRule="atLeast" (not "exact") — "exact" locks every line to a fixed
+  // height, so a run that wraps to 2 lines inside the cell gets squashed/overlapped
+  // and never shows a true justified wrap. "atLeast" lets the line grow when needed.
+  function wParagraph(runs, jc, extraPPr) {
+    return (
+      "<w:p>" +
+      "<w:pPr>" +
+      '<w:jc w:val="' + jc + '"/>' +
+      '<w:spacing w:before="0" w:after="0" w:line="120" w:lineRule="atLeast"/>' +
+      (extraPPr || "") +
+      "<w:rPr>" +
+      '<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/>' +
+      '<w:sz w:val="10"/><w:szCs w:val="10"/>' +
+      "<\/w:rPr>" +
+      "<\/w:pPr>" +
+      runs +
+      "<\/w:p>"
+    );
+  }
+
+  function wSummaryHeadingParagraph(text) {
+    var pBdr =
+      "<w:pBdr>" +
+      '<w:top w:val="single" w:sz="4" w:space="1" w:color="000000"/>' +
+      '<w:bottom w:val="single" w:sz="4" w:space="1" w:color="000000"/>' +
+      "<\/w:pBdr>";
+    return wParagraph(wText(text, true), "center", pBdr);
+  }
+
+  /** Cell content -> one or more Word paragraphs (multiple for the summary box: heading + list) */
+  function wParagraphsFromCell(cell) {
+    if (!cell || cell.empty) {
+      return wParagraph(wText(" ", false), "both");
+    }
+
+    var lines = cell.lines || [];
+
+    if (cell.isSummary) {
+      var heading = wSummaryHeadingParagraph(cell.q || "Covered Ques");
+      var listRuns = "";
+      for (var i = 0; i < lines.length; i++) {
+        if (i > 0) listRuns += wBr();
+        listRuns += wLineRuns(lines[i]);
+      }
+      if (!listRuns) listRuns = wText(" ", false);
+      return heading + wParagraph(listRuns, "both");
+    }
+
+    var runs = "";
+    if (cell.q) runs += wText(cell.q, true);
+    for (var j = 0; j < lines.length; j++) {
+      runs += wBr();
+      runs += wLineRuns(lines[j]);
+    }
+    if (!cell.q && !lines.length) runs = wText(" ", false);
+    return wParagraph(runs, "both");
+  }
+
+  // A4 twips — same as microtemp.docx (10mm margins, equal 3×3)
+  var DXA_PAGE_W = 11906;
+  var DXA_PAGE_H = 16838;
+  var DXA_MARGIN = 567; // 10mm
+  var DXA_COL = 3591;   // ~equal thirds of usable width
+  var DXA_ROW = 5200;   // slightly under usable/3 so Word never spills a row
+
+  function wTableCell(cell) {
+    return (
+      "<w:tc>" +
+      "<w:tcPr>" +
+      '<w:tcW w:w="' + DXA_COL + '" w:type="dxa"/>' +
+      "<w:tcBorders>" +
+      '<w:top w:val="single" w:sz="4" w:space="0" w:color="000000"/>' +
+      '<w:left w:val="single" w:sz="4" w:space="0" w:color="000000"/>' +
+      '<w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000"/>' +
+      '<w:right w:val="single" w:sz="4" w:space="0" w:color="000000"/>' +
+      "<\/w:tcBorders>" +
+      // ~1.4mm padding on all 4 sides (same as screen cells)
+      '<w:tcMar>' +
+      '<w:top w:w="80" w:type="dxa"/>' +
+      '<w:left w:w="80" w:type="dxa"/>' +
+      '<w:bottom w:w="80" w:type="dxa"/>' +
+      '<w:right w:w="80" w:type="dxa"/>' +
+      "<\/w:tcMar>" +
+      '<w:vAlign w:val="top"/>' +
+      "<\/w:tcPr>" +
+      wParagraphsFromCell(cell) +
+      "<\/w:tc>"
+    );
+  }
+
+  function wTablePage(cells) {
+    var rowsXml = "";
+    for (var r = 0; r < 3; r++) {
+      rowsXml +=
+        "<w:tr>" +
+        "<w:trPr>" +
+        '<w:trHeight w:val="' + DXA_ROW + '" w:hRule="exact"/>' +
+        "<w:cantSplit/>" +
+        "<\/w:trPr>";
+      for (var c = 0; c < 3; c++) {
+        rowsXml += wTableCell(cells[r * 3 + c] || { empty: true });
+      }
+      rowsXml += "<\/w:tr>";
+    }
+
+    return (
+      "<w:tbl>" +
+      "<w:tblPr>" +
+      '<w:tblStyle w:val="TableGrid"/>' +
+      '<w:tblW w:w="' + DXA_COL * 3 + '" w:type="dxa"/>' +
+      '<w:tblLayout w:type="fixed"/>' +
+      "<w:tblBorders>" +
+      '<w:top w:val="single" w:sz="4" w:space="0" w:color="000000"/>' +
+      '<w:left w:val="single" w:sz="4" w:space="0" w:color="000000"/>' +
+      '<w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000"/>' +
+      '<w:right w:val="single" w:sz="4" w:space="0" w:color="000000"/>' +
+      '<w:insideH w:val="single" w:sz="4" w:space="0" w:color="000000"/>' +
+      '<w:insideV w:val="single" w:sz="4" w:space="0" w:color="000000"/>' +
+      "<\/w:tblBorders>" +
+      "<\/w:tblPr>" +
+      "<w:tblGrid>" +
+      '<w:gridCol w:w="' + DXA_COL + '"/>' +
+      '<w:gridCol w:w="' + DXA_COL + '"/>' +
+      '<w:gridCol w:w="' + DXA_COL + '"/>' +
+      "<\/w:tblGrid>" +
+      rowsXml +
+      "<\/w:tbl>"
+    );
+  }
+
+  function buildDocumentXml(pages) {
+    var body = "";
+    for (var p = 0; p < pages.length; p++) {
+      var cells = pages[p].slice();
+      while (cells.length < 9) cells.push({ empty: true, q: "", lines: [] });
+      if (p > 0) {
+        body += '<w:p><w:r><w:br w:type="page"/><\/w:r><\/w:p>';
+      }
+      body += wTablePage(cells);
+    }
+
+    body +=
+      "<w:sectPr>" +
+      '<w:pgSz w:w="' + DXA_PAGE_W + '" w:h="' + DXA_PAGE_H + '"/>' +
+      '<w:pgMar w:top="' + DXA_MARGIN + '" w:right="' + DXA_MARGIN +
+      '" w:bottom="' + DXA_MARGIN + '" w:left="' + DXA_MARGIN +
+      '" w:header="0" w:footer="0" w:gutter="0"/>' +
+      "<\/w:sectPr>";
+
+    return (
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" ' +
+      'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+      "<w:body>" + body + "<\/w:body><\/w:document>"
+    );
+  }
+
+  function buildDocxBlob(pages) {
+    if (!window.JSZip) {
+      return Promise.reject(new Error("JSZip load nahi hua — internet on karke refresh karo"));
+    }
+    var zip = new JSZip();
+    zip.file(
+      "[Content_Types].xml",
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+        '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+        '<Default Extension="xml" ContentType="application/xml"/>' +
+        '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' +
+        '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>' +
+        "<\/Types>"
+    );
+    zip.folder("_rels").file(
+      ".rels",
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>' +
+        "<\/Relationships>"
+    );
+    var word = zip.folder("word");
+    word.file("document.xml", buildDocumentXml(pages));
+    word.file(
+      "styles.xml",
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">' +
+        "<w:docDefaults><w:rPrDefault><w:rPr>" +
+        '<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/>' +
+        '<w:sz w:val="10"/><w:szCs w:val="10"/>' +
+        "<\/w:rPr><\/w:rPrDefault>" +
+        "<w:pPrDefault><w:pPr>" +
+        '<w:jc w:val="both"/>' +
+        '<w:spacing w:after="0" w:line="120" w:lineRule="atLeast"/>' +
+        "<\/w:pPr><\/w:pPrDefault><\/w:docDefaults>" +
+        "<\/w:styles>"
+    );
+    word.folder("_rels").file(
+      "document.xml.rels",
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>' +
+        "<\/Relationships>"
+    );
+
+    return zip.generateAsync({
+      type: "blob",
+      mimeType:
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    });
+  }
+
+  async function exportDoc() {
+    try {
+      if (fillTimer) clearTimeout(fillTimer);
+      var items = parseQA(rawInput.value);
+      if (!items.length) {
+        fillBoxes(items);
+        setStatus("Pehle Q&A paste karo, phir Export DOC dabao.");
+        return;
+      }
+      fillBoxes(withCoveredSummary(items));
+
+      truncateAllCells();
+      var pages = cellsFromDom();
+      if (!pages.length) {
+        setStatus("Boxes empty — Fill Boxes ke baad Export DOC dabao.");
+        return;
+      }
+
+      setStatus("DOCX bana rahe hain...");
+      var fileName = docFileName();
+      var blob = await buildDocxBlob(pages);
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+      setStatus("Saved: " + fileName + " (Word me 3×3 same page)");
+    } catch (err) {
+      console.error(err);
+      setStatus("Export failed: " + (err && err.message ? err.message : "unknown error"));
+    }
+  }
+
+  function applyFill() {
+    fillBoxes(withCoveredSummary(parseQA(rawInput.value)));
+  }
+
+  var fillTimer = null;
+  function scheduleFill() {
+    if (fillTimer) clearTimeout(fillTimer);
+    fillTimer = setTimeout(function () {
+      applyFill();
+    }, 350);
+  }
+
+  document.getElementById("btnFill").addEventListener("click", function () {
+    if (fillTimer) clearTimeout(fillTimer);
+    applyFill();
+    // Editor open hi rahe taaki naya add kar sako
+    editor.classList.remove("hidden");
+    document.getElementById("btnToggle").textContent = "Hide Editor";
+  });
+
+  rawInput.addEventListener("input", scheduleFill);
+  rawInput.addEventListener("paste", function () {
+    setTimeout(scheduleFill, 0);
+  });
+  subjectInput.addEventListener("input", scheduleFill);
+
+  document.getElementById("btnFit").addEventListener("click", function () {
+    fitAllCells(true);
+  });
+
+  document.getElementById("btnPrint").addEventListener("click", function () {
+    if (fillTimer) clearTimeout(fillTimer);
+    applyFill();
+    window.print();
+  });
+
+  document.getElementById("btnDoc").addEventListener("click", function () {
+    exportDoc();
+  });
+
+  document.getElementById("btnToggle").addEventListener("click", function () {
+    editor.classList.toggle("hidden");
+    this.textContent = editor.classList.contains("hidden") ? "Edit Text" : "Hide Editor";
+  });
+
+  document.getElementById("btnClear").addEventListener("click", function () {
+    if (fillTimer) clearTimeout(fillTimer);
+    rawInput.value = "";
+    stage.innerHTML = "";
+    stage.appendChild(createSheet(1, 1));
+    metaEl.textContent = "";
+    setStatus("Cleared. Naya Q&A paste/type karo — boxes auto update honge.");
+    editor.classList.remove("hidden");
+    document.getElementById("btnToggle").textContent = "Hide Editor";
+    rawInput.focus();
+  });
+
+  window.addEventListener("resize", updateMobileScale);
+  window.addEventListener("resize", updateToolbarOffset);
+  updateToolbarOffset();
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(updateToolbarOffset);
+  }
+  applyFill();
+})();
+</script>
+</body>
+</html>
