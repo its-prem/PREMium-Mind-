@@ -623,6 +623,59 @@ if (isset($_GET['fetch_reports'])) {
     exit;
 }
 
+// 3b. FETCH RECENT PURCHASES (live sales feed on the dashboard)
+if (isset($_GET['fetch_recent_purchases'])) {
+    pm_require_admin(true);
+    header('Content-Type: application/json; charset=utf-8');
+
+    // user_courses rows come from three places and not all of them fill
+    // purchased_at (the webhook does; verify_payment.php and the admin's
+    // manual enrolment don't), so sort real timestamps first and fall back
+    // to insertion order for the rest.
+    $hasPurchasedAt = false;
+    $chk = @$conn->query("SHOW COLUMNS FROM user_courses LIKE 'purchased_at'");
+    if ($chk && $chk->num_rows > 0) $hasPurchasedAt = true;
+
+    $hasId = false;
+    $chkId = @$conn->query("SHOW COLUMNS FROM user_courses LIKE 'id'");
+    if ($chkId && $chkId->num_rows > 0) $hasId = true;
+
+    $orderParts = [];
+    if ($hasPurchasedAt) {
+        $orderParts[] = 'uc.purchased_at IS NULL ASC';
+        $orderParts[] = 'uc.purchased_at DESC';
+    }
+    if ($hasId) $orderParts[] = 'uc.id DESC';
+    if (empty($orderParts)) $orderParts[] = 'uc.user_email DESC';
+    $orderBy = implode(', ', $orderParts);
+
+    $purchasedCol = $hasPurchasedAt ? 'uc.purchased_at' : 'NULL';
+    $rowKey = $hasId ? 'uc.id' : "CONCAT(uc.user_email, '-', uc.course_id)";
+
+    $sql = "SELECT $rowKey AS row_key,
+                   uc.user_email,
+                   uc.course_id,
+                   $purchasedCol AS purchased_at,
+                   u.name  AS user_name,
+                   c.title AS course_title,
+                   c.price AS course_price,
+                   c.image AS course_image
+            FROM user_courses uc
+            LEFT JOIN users u   ON u.email = uc.user_email
+            LEFT JOIN courses c ON c.id = uc.course_id
+            ORDER BY $orderBy
+            LIMIT 20";
+
+    $result = $conn->query($sql);
+    $rows = [];
+    if ($result) {
+        while ($r = $result->fetch_assoc()) $rows[] = $r;
+    }
+
+    echo json_encode(['status' => 'success', 'purchases' => $rows]);
+    exit;
+}
+
 // 4. ADD OR EDIT COURSE
 if (isset($_POST['ajax_add'])) {
     pm_require_admin(true);
@@ -1017,6 +1070,86 @@ input:checked + .slider:before { transform: translateX(20px); }
 .stat-info h3 { font-size: 1.8rem; font-weight: 800; color: var(--dark); line-height: 1.2; }
 .stat-info p { font-size: 0.85rem; font-weight: 600; color: var(--dark-muted); }
 
+/* ==========================================
+   RECENT PURCHASES — live sales feed
+========================================== */
+.sales-feed-section {
+    margin-top: 30px; background: var(--white); border: 1px solid var(--gray-border);
+    border-radius: 20px; padding: 24px; box-shadow: var(--shadow-sm);
+}
+.sales-feed-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sales-feed-sub { font-size: 0.85rem; color: var(--dark-muted); margin: 6px 0 18px; font-weight: 500; }
+.sales-refresh-btn { width: auto !important; padding: 8px 16px !important; font-size: 0.82rem !important; }
+
+.live-dot {
+    display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+    background: var(--success); margin-left: 4px; flex-shrink: 0;
+    animation: livePulse 2s ease-in-out infinite;
+}
+@keyframes livePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.55); opacity: 1; }
+    70% { box-shadow: 0 0 0 8px rgba(16,185,129,0); opacity: 0.85; }
+}
+
+.sales-feed { display: flex; flex-direction: column; gap: 10px; max-height: 560px; overflow-y: auto; padding-right: 4px; }
+
+.sale-item {
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+    background: var(--gray-bg); border: 1px solid var(--gray-border);
+    border-radius: 14px; transition: var(--smooth);
+    /* Each row pops in with its own stagger delay set inline from JS */
+    opacity: 0; transform: translateY(14px) scale(0.96);
+    animation: salePop 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes salePop {
+    from { opacity: 0; transform: translateY(14px) scale(0.96); }
+    60%  { opacity: 1; transform: translateY(-3px) scale(1.012); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.sale-item:hover { background: #fff; border-color: #cbd5e1; box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+/* A purchase that appeared since the last refresh */
+.sale-item.is-new { border-color: #6ee7b7; background: #f0fdf4; }
+.sale-item.is-new::after {
+    content: 'NEW'; position: absolute; top: -7px; right: 12px;
+    background: var(--success); color: #fff; font-size: 9px; font-weight: 800;
+    padding: 2px 7px; border-radius: 20px; letter-spacing: 0.05em;
+}
+.sale-item.is-new { position: relative; }
+
+.sale-avatar {
+    width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--dark); color: #fff; font-weight: 800; font-size: 1.05rem;
+    overflow: hidden;
+}
+.sale-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.sale-body { flex: 1; min-width: 0; }
+.sale-name { font-weight: 800; color: var(--dark); font-size: 0.95rem; line-height: 1.25; margin-bottom: 3px;
+             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sale-course { font-size: 0.82rem; color: var(--primary); font-weight: 700; display: flex; align-items: center; gap: 5px;
+               white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sale-course ion-icon { flex-shrink: 0; font-size: 13px; }
+.sale-email { font-size: 0.75rem; color: var(--dark-muted); margin-top: 2px;
+              white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.sale-right { text-align: right; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.sale-amount { font-weight: 800; color: var(--success); font-size: 1.05rem; white-space: nowrap; }
+.sale-time { font-size: 0.72rem; color: var(--dark-muted); font-weight: 600; white-space: nowrap; }
+
+.sales-empty { text-align: center; padding: 40px 20px; color: var(--dark-muted);
+               border: 1px dashed #cbd5e1; border-radius: 14px; background: var(--gray-bg); }
+
+@media (max-width: 600px) {
+    .sales-feed-section { padding: 16px; border-radius: 16px; }
+    .sale-item { padding: 12px; gap: 10px; }
+    .sale-avatar { width: 38px; height: 38px; font-size: 0.9rem; border-radius: 10px; }
+    .sale-name { font-size: 0.88rem; }
+    .sale-amount { font-size: 0.95rem; }
+    .sale-email { display: none; }
+}
+
 /* Students Grid */
 .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 15px; flex-wrap: wrap; }
 .search-box { position: relative; flex: 1; max-width: 400px; }
@@ -1303,6 +1436,24 @@ input:checked + .slider:before { transform: translateX(20px); }
                                 <h3 style="color: #ef4444;"><?= $pendingReports ?></h3>
                                 <p style="color: #991b1b;">Pending Issues</p>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="sales-feed-section">
+                        <div class="sales-feed-header">
+                            <h3 class="section-title" style="margin:0;">
+                                <ion-icon name="cart"></ion-icon> Recent Purchases
+                                <span class="live-dot" title="Auto-refreshes every 30s"></span>
+                            </h3>
+                            <button type="button" class="btn-outline sales-refresh-btn" onclick="loadRecentPurchases(true)">
+                                <ion-icon name="refresh-outline"></ion-icon> Refresh
+                            </button>
+                        </div>
+                        <p class="sales-feed-sub">Latest 20 course purchases — newest first.</p>
+                        <div id="salesFeed" class="sales-feed">
+                            <div class="shimmer" style="height:74px;border-radius:14px;margin-bottom:10px;"></div>
+                            <div class="shimmer" style="height:74px;border-radius:14px;margin-bottom:10px;"></div>
+                            <div class="shimmer" style="height:74px;border-radius:14px;"></div>
                         </div>
                     </div>
                 </div>
@@ -1660,6 +1811,8 @@ input:checked + .slider:before { transform: translateX(20px); }
             loadCourses();
             loadStudents();
             loadReports();
+            loadRecentPurchases(false);
+            startSalesAutoRefresh();
         }
 
         function showLoginScreen(msg) {
@@ -1791,6 +1944,7 @@ input:checked + .slider:before { transform: translateX(20px); }
             if(tabId === 'ranking') loadRanking();
             if(tabId === 'students') loadStudents();
             if(tabId === 'reports') loadReports();
+            if(tabId === 'dashboard') loadRecentPurchases(false);
         }
 
         function showToast(message, type = 'success') {
@@ -1871,6 +2025,112 @@ input:checked + .slider:before { transform: translateX(20px); }
                 updateAssetSaveBar();
                 refreshCopySelect();
             } catch(e) { showToast("Failed to load courses", "error"); }
+        }
+
+        // ==========================================
+        // RECENT PURCHASES — live sales feed
+        // ==========================================
+        window.pmSeenSaleKeys = null;   // null = first load, don't flag everything as new
+        window.pmSalesTimer = null;
+
+        function pmEscape(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function pmTimeAgo(ts) {
+            if (!ts) return '';
+            // MySQL DATETIME ("2026-08-18 14:12:05") — Safari/iOS won't parse
+            // that with a space, so normalise to ISO-ish before Date().
+            const d = new Date(String(ts).replace(' ', 'T'));
+            if (isNaN(d.getTime())) return '';
+            const secs = Math.floor((Date.now() - d.getTime()) / 1000);
+            if (secs < 0) return 'just now';
+            if (secs < 60) return 'just now';
+            const mins = Math.floor(secs / 60);
+            if (mins < 60) return mins + 'm ago';
+            const hrs = Math.floor(mins / 60);
+            if (hrs < 24) return hrs + 'h ago';
+            const days = Math.floor(hrs / 24);
+            if (days < 30) return days + 'd ago';
+            return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function renderSalesFeed(list) {
+            const box = document.getElementById('salesFeed');
+            if (!box) return;
+
+            if (!list.length) {
+                box.innerHTML = '<div class="sales-empty">'
+                    + '<ion-icon name="cart-outline" style="font-size:42px;"></ion-icon>'
+                    + '<h4 style="margin-top:8px;color:var(--dark);">No purchases yet</h4>'
+                    + '<p style="font-size:0.85rem;">New sales will appear here automatically.</p></div>';
+                return;
+            }
+
+            const firstLoad = window.pmSeenSaleKeys === null;
+            const seen = window.pmSeenSaleKeys || {};
+
+            box.innerHTML = list.map(function (p, i) {
+                const key = String(p.row_key || (p.user_email + '-' + p.course_id));
+                const isNew = !firstLoad && !seen[key];
+
+                const name = (p.user_name && String(p.user_name).trim()) ? String(p.user_name).trim() : 'Unknown Student';
+                const course = (p.course_title && String(p.course_title).trim()) ? String(p.course_title).trim() : ('Course #' + (p.course_id || '?'));
+                const price = (p.course_price === null || p.course_price === undefined || p.course_price === '') ? '' : ('₹' + p.course_price);
+                const img = p.course_image ? String(p.course_image) : '';
+                const initial = name.charAt(0).toUpperCase();
+
+                const avatar = img
+                    ? '<div class="sale-avatar"><img src="' + pmEscape(img) + '" alt="" onerror="this.parentNode.textContent=\'' + pmEscape(initial) + '\'"></div>'
+                    : '<div class="sale-avatar">' + pmEscape(initial) + '</div>';
+
+                return '<div class="sale-item' + (isNew ? ' is-new' : '') + '" style="animation-delay:'
+                        + Math.min(i * 45, 700) + 'ms;">'
+                    + avatar
+                    + '<div class="sale-body">'
+                        + '<div class="sale-name">' + pmEscape(name) + '</div>'
+                        + '<div class="sale-course"><ion-icon name="book-outline"></ion-icon>' + pmEscape(course) + '</div>'
+                        + '<div class="sale-email">' + pmEscape(p.user_email || '') + '</div>'
+                    + '</div>'
+                    + '<div class="sale-right">'
+                        + '<div class="sale-amount">' + pmEscape(price) + '</div>'
+                        + '<div class="sale-time">' + pmEscape(pmTimeAgo(p.purchased_at)) + '</div>'
+                    + '</div>'
+                + '</div>';
+            }).join('');
+
+            const nextSeen = {};
+            list.forEach(function (p) {
+                nextSeen[String(p.row_key || (p.user_email + '-' + p.course_id))] = true;
+            });
+            window.pmSeenSaleKeys = nextSeen;
+        }
+
+        window.loadRecentPurchases = async function (manual) {
+            const box = document.getElementById('salesFeed');
+            if (!box) return;
+            try {
+                const r = await fetch('?fetch_recent_purchases=1', { credentials: 'same-origin' });
+                if (r.status === 403) { if (manual) showToast('Session expired. Please login again.', 'error'); return; }
+                const data = await r.json();
+                renderSalesFeed(Array.isArray(data.purchases) ? data.purchases : []);
+                if (manual) showToast('Purchases refreshed!');
+            } catch (e) {
+                if (manual) showToast('Failed to load purchases', 'error');
+            }
+        };
+
+        function startSalesAutoRefresh() {
+            if (window.pmSalesTimer) clearInterval(window.pmSalesTimer);
+            window.pmSalesTimer = setInterval(function () {
+                const tab = document.getElementById('tab-dashboard');
+                // Only poll while the dashboard is actually on screen
+                if (tab && tab.classList.contains('active') && !document.hidden) {
+                    loadRecentPurchases(false);
+                }
+            }, 30000);
         }
 
         // Homepage / Index ranking — drag / slide to reorder
