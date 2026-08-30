@@ -2,227 +2,494 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<title>Microsheet — Match FEEE Style</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Microsheet — Q&amp;A to A4 Boxes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Carlito:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   @page { size: A4 portrait; margin: 0; }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary: #ff5722;
+    --primary-dark: #e64a19;
+    --bg-dark: #0a0a0a;
+    --bg-light: #141414;
+    --bg-lift: #1b1b1b;
+    --text-light: #ffffff;
+    --text-muted: #a0a0a0;
+    --line: rgba(255,255,255,.08);
+    --line-2: rgba(255,255,255,.16);
+    --transition: all 0.3s ease;
+    --ease: cubic-bezier(.4, 0, .2, 1);
+    --drawer-w: 380px;
+    --gap: 22px;
+    --toolbar-h: 64px;
+  }
 
-  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
+  /* first paint applies the open state instantly — no slide-in on load
+     (also keeps the layout correct if the tab starts in the background,
+     where the browser freezes transitions) */
+  body.booting, body.booting * { transition: none !important; }
+
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+  /* App shell: the window itself never scrolls — only the editor box and
+     the preview scroll, each inside its own column. Toolbar and side tab
+     stay put. (Phones switch back to normal page scroll further down.) */
   body {
-    font-family: Carlito, Calibri, Arial, sans-serif;
-    background: linear-gradient(180deg, #eef2f6 0%, #e4e9ef 100%);
-    color: #000;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: geometricPrecision;
-    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    line-height: 1.6;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
   }
 
+  a { text-decoration: none; color: inherit; }
+  ul, ol { list-style: none; }
+  h1, h2, h3, h4, .logo { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
+
+  /* =======================================================
+     TOP BAR
+  ======================================================= */
   .toolbar {
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 50;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(10, 10, 10, .95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 5px 20px rgba(0,0,0,.5);
+  }
+
+  .bar-inner {
+    width: 94%;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 12px 0;
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
     align-items: center;
-    padding: 12px 14px;
-    background: linear-gradient(180deg, #22303f 0%, #1e2a38 100%);
-    color: #f5f7fa;
-    box-shadow: 0 2px 10px rgba(0,0,0,.18);
-  }
-
-  .toolbar-group {
-    display: flex;
+    justify-content: space-between;
+    gap: 16px;
     flex-wrap: wrap;
+  }
+
+  .logo a { font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; color: #fff; }
+  .logo a span { color: var(--primary); }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
     gap: 8px;
-    justify-content: center;
-  }
-
-  .toolbar button {
-    font: 600 13px/1 Carlito, Calibri, sans-serif;
-    min-height: 42px;
-    padding: 10px 16px;
-    border: none;
-    border-radius: 8px;
+    padding: 10px 20px;
+    background: var(--primary);
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: .84rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 2px solid var(--primary);
+    border-radius: 4px;
     cursor: pointer;
-    background: #fff;
-    color: #1e2a38;
-    touch-action: manipulation;
-    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
-    -webkit-tap-highlight-color: transparent;
+    transition: var(--transition);
+    white-space: nowrap;
   }
+  .btn:hover { background: transparent; color: var(--primary); }
+  .btn:active { transform: scale(.97); }
 
-  .toolbar button:active { transform: scale(0.96); }
+  .btn.ghost { background: transparent; color: #fff; border-color: var(--line-2); }
+  .btn.ghost:hover { border-color: var(--primary); color: var(--primary); }
 
-  .toolbar button.primary {
-    background: #3b82f6;
-    color: #fff;
-    box-shadow: 0 3px 10px rgba(59,130,246,.35);
-  }
+  .btn.danger { background: transparent; color: var(--text-muted); border-color: var(--line-2); }
+  .btn.danger:hover { border-color: #c62828; color: #ef5350; }
 
-  .toolbar button.primary:hover { background: #2f6fe0; }
-
-  .toolbar button:not(.ghost):not(.primary):hover { background: #eef2f7; }
-
-  .toolbar button.ghost {
-    background: transparent;
-    color: #fff;
-    border: 1px solid rgba(255,255,255,.45);
-  }
-
-  .toolbar button.ghost:hover { background: rgba(255,255,255,.08); }
-
-  .toolbar .hint {
+  .hint {
     width: 100%;
     text-align: center;
-    font-size: 12px;
-    opacity: .85;
-    line-height: 1.4;
+    font-size: .74rem;
+    color: var(--text-muted);
+    letter-spacing: .3px;
+    padding-bottom: 10px;
+    margin-top: -4px;
+  }
+  .hint b { color: var(--primary); }
+
+  /* =======================================================
+     SIDE TAB  (opens the editor)
+  ======================================================= */
+  .side-tab {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 9px;
+    background: var(--bg-light);
+    border: 1px solid var(--line-2);
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    color: #fff;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .side-tab:hover { background: var(--primary); border-color: var(--primary); }
+  .side-tab:active { transform: translateY(-50%) scale(.96); }
+
+  .side-tab .tab-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: .72rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
   }
 
+  .side-tab .tab-chev { font-size: .8rem; transition: transform .34s var(--ease); }
+  body.drawer-open .side-tab .tab-chev { transform: rotate(180deg); }
+
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 890;
+    background: rgba(0,0,0,.7);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s ease, visibility .3s;
+  }
+
+  /* the column is in flow on wide screens, so no dimming layer is needed */
+  .scrim { display: none; }
+
+  /* =======================================================
+     WORKSPACE — editor owns the left third, preview takes the rest
+  ======================================================= */
   .workspace {
     display: flex;
     align-items: stretch;
+    justify-content: flex-start;
+    height: calc(100dvh - var(--toolbar-h));
+    margin-top: var(--toolbar-h);
   }
 
+  /* Left column = one third of the screen (clamped so it stays usable).
+     The panel is centred inside that third; the extra left padding keeps
+     it clear of the fixed side tab. */
   .editor-col {
-    flex: 0 0 50%;
-    width: 50%;
+    flex: 0 0 var(--col-w, clamp(330px, 33.333%, 520px));
+    width: var(--col-w, clamp(330px, 33.333%, 520px));
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    position: sticky;
-    top: var(--toolbar-h, 64px);
-    align-self: flex-start;
-    height: calc(100vh - var(--toolbar-h, 64px));
+    padding: 22px 16px 40px 58px;
+    height: 100%;
     overflow-y: auto;
-    padding: 24px;
-    box-sizing: border-box;
+    overscroll-behavior: contain;
+    opacity: 1;
+    transition: flex-basis .38s var(--ease), width .38s var(--ease),
+                padding .38s var(--ease), opacity .26s ease, transform .38s var(--ease);
   }
+
+  body:not(.drawer-open) .editor-col {
+    flex-basis: 0;
+    width: 0;
+    /* flex min-width:auto would otherwise pin the column at content width */
+    min-width: 0;
+    padding: 0;
+    opacity: 0;
+    transform: translateX(-20px);
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .editor { width: 100%; }
+
+  .editor-col::-webkit-scrollbar { width: 7px; }
+  .editor-col::-webkit-scrollbar-track { background: transparent; }
+  .editor-col::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 99px; }
+  .editor-col::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
   .preview-col {
-    flex: 1 1 50%;
-    width: 50%;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-width: 0;
+    /* the sheet is a fixed 210mm — keep any excess scrolling inside this
+       column instead of widening the whole page */
+    max-width: 100%;
+    height: 100%;
+    padding: 22px 12px 40px;
+    overflow: auto;
+    overscroll-behavior: contain;
   }
 
-  .editor {
-    width: 100%;
-    max-width: 460px;
-    margin: 0;
-    padding: 0;
-  }
+  .preview-col::-webkit-scrollbar { width: 9px; height: 9px; }
+  .preview-col::-webkit-scrollbar-track { background: transparent; }
+  .preview-col::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 99px; }
+  .preview-col::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-  .editor.hidden { display: none; }
-
-  .field-label {
-    display: block;
-    font: 700 12px/1 Carlito, Calibri, sans-serif;
-    color: #516070;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    margin: 12px 0 6px;
-  }
-
-  .field-label:first-of-type { margin-top: 0; }
-
+  /* =======================================================
+     EDITOR PANEL
+  ======================================================= */
   .panel {
-    background: #fff;
-    border: 1px solid #d0d7df;
-    border-radius: 12px;
-    padding: 18px;
-    box-shadow: 0 10px 26px rgba(30,40,55,.1);
+    background: var(--bg-light);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
   }
 
-  .panel h1 {
-    font-size: 19px;
-    font-weight: 700;
-    margin-bottom: 4px;
-    color: #1e2a38;
+  .panel-head {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, #181818 0%, #131313 100%);
   }
 
-  .panel p {
-    font-size: 13px;
-    color: #4a5563;
-    margin-bottom: 12px;
+  .head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .panel-head h1 {
+    font-size: 1.15rem;
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .panel-head h1 i { color: var(--primary); font-size: 1rem; }
+
+  .panel-close {
+    flex: none;
+    width: 30px; height: 30px;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    border: 1px solid var(--line-2);
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .panel-close:hover { border-color: var(--primary); color: var(--primary); }
+
+  .status {
+    margin-top: 9px;
+    font-size: .74rem;
+    color: var(--text-muted);
+    border-left: 2px solid var(--primary);
+    padding-left: 9px;
     line-height: 1.5;
   }
 
-  .panel code {
-    background: #f1f4f8;
-    padding: 1px 5px;
+  .panel-body { padding: 14px; }
+
+  /* ---- accordion ---- */
+  .acc {
+    background: var(--bg-dark);
+    border: 1px solid var(--line);
+    border-left: 3px solid transparent;
     border-radius: 4px;
-    font-size: 12px;
+    margin-bottom: 12px;
+    transition: var(--transition);
   }
+  .acc.open { border-left-color: var(--primary); }
 
-  #rawInput {
+  .acc-head {
     width: 100%;
-    min-height: 280px;
-    resize: vertical;
-    border: 1px solid #c9d2dc;
-    border-radius: 10px;
-    padding: 12px;
-    font: 14px/1.5 Consolas, "Courier New", monospace;
-    color: #1a1a1a;
-    background: #fcfdff;
-    transition: border-color .15s ease, box-shadow .15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 13px 14px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-size: .82rem;
+    font-weight: 500;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .acc-head:hover { color: var(--primary); }
+  .acc.open .acc-head { color: var(--primary); }
+
+  .acc-head .left { display: flex; align-items: center; gap: 9px; }
+  .acc-head .chev { transition: transform .32s var(--ease); font-size: .78rem; }
+  .acc.open .acc-head .chev { transform: rotate(180deg); }
+
+  .chip {
+    background: var(--primary);
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-size: .66rem;
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 99px;
+    letter-spacing: 0;
   }
 
-  #rawInput:focus, #subjectInput:focus {
+  .acc-body {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 14px;
+    transition: max-height .36s var(--ease), padding .36s var(--ease);
+  }
+  .acc.open .acc-body { max-height: 720px; padding: 0 14px 14px; }
+
+  .acc-body p {
+    font-size: .8rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+  }
+  .acc-body code {
+    background: #000;
+    color: var(--primary);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: .74rem;
+  }
+  .acc-body strong { color: #fff; }
+
+  /* ---- fields ---- */
+  .field { margin-bottom: 12px; }
+
+  .field-label {
+    display: block;
+    font-family: 'Oswald', sans-serif;
+    font-size: .74rem;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 7px;
+  }
+
+  #subjectInput, #rawInput {
+    width: 100%;
+    background: var(--bg-dark);
+    border: 1px solid var(--line-2);
+    color: #fff;
+    border-radius: 4px;
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+    transition: var(--transition);
+    font-size: .88rem;
   }
 
   #subjectInput {
+    padding: 12px 13px;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  #rawInput {
+    min-height: 260px;
+    resize: vertical;
+    padding: 12px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: .8rem;
+    line-height: 1.65;
+  }
+
+  #subjectInput:focus, #rawInput:focus { border-color: var(--primary); }
+  #subjectInput::placeholder, #rawInput::placeholder { color: #555; }
+
+  /* ---- question jump list ---- */
+  .qlist {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .qlist::-webkit-scrollbar { width: 6px; }
+  .qlist::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 99px; }
+  .qlist::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+  .qitem {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
     width: 100%;
-    margin-bottom: 10px;
-    border: 1px solid #c9d2dc;
-    border-radius: 10px;
-    padding: 11px 13px;
-    font: 15px/1.3 Carlito, Calibri, sans-serif;
+    padding: 9px 11px;
+    background: var(--bg-light);
+    border: 1px solid var(--line);
+    border-left: 3px solid transparent;
+    border-radius: 4px;
+    color: var(--text-muted);
+    font-family: 'Poppins', sans-serif;
+    font-size: .78rem;
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .qitem:hover { background: var(--bg-lift); color: #fff; border-left-color: var(--primary); transform: translateX(3px); }
+  .qitem.flash { border-left-color: var(--primary); background: rgba(255,87,34,.14); color: #fff; }
+
+  .qitem .qnum {
+    flex: none;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    color: var(--primary);
+    font-size: .78rem;
+    min-width: 22px;
+  }
+  .qitem .qtext {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  .status {
-    margin-top: 10px;
-    font-size: 12.5px;
-    color: #3d4b5c;
-    background: #f4f7fa;
-    border-radius: 8px;
-    padding: 8px 10px;
-    line-height: 1.4;
+  .qlist-empty {
+    font-size: .78rem;
+    color: #555;
+    padding: 14px 4px;
+    text-align: center;
+    line-height: 1.7;
   }
 
+  /* =======================================================
+     A4 PREVIEW  (stays print-accurate: white paper, black ink)
+  ======================================================= */
   .stage {
     width: 100%;
-    padding: 18px 10px 60px;
+    padding: 0 0 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 22px;
+    gap: 20px;
   }
 
-  /* Boxes only — full A4 with ~10mm margins, Calibri 5.04pt */
   .sheet {
     width: 210mm;
     height: 297mm;
     background: #fff;
     position: relative;
     overflow: hidden;
-    border: 1px solid #c5ccd4;
-    border-radius: 3px;
-    box-shadow: 0 10px 28px rgba(20,30,40,.14);
+    border-radius: 2px;
+    box-shadow: 0 14px 40px rgba(0,0,0,.6);
     page-break-after: always;
     break-after: page;
     flex: none;
@@ -230,12 +497,11 @@
 
   .grid {
     position: absolute;
+    /* original default: 10mm on all four sides */
     left: 10mm;
     top: 10mm;
     right: 10mm;
     bottom: 10mm;
-    width: auto;
-    height: auto;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
@@ -262,8 +528,7 @@
     line-height: 6.12pt;
     font-weight: 400;
     color: #000;
-    text-align: justify;
-    text-justify: inter-word;
+    text-align: left;
     word-break: break-word;
     hyphens: auto;
   }
@@ -272,22 +537,20 @@
     display: block;
     font-weight: 700;
     margin-bottom: 0.6mm;
-    text-align: justify;
+    text-align: left;
   }
 
   .cell-inner .a {
     display: block;
     white-space: pre-wrap;
-    text-align: justify;
+    text-align: left;
     overflow: hidden;
   }
 
-  .cell-inner .a .lbl {
-    font-weight: 700;
-  }
+  .cell-inner .a .lbl { font-weight: 700; }
 
   .cell.empty .cell-inner {
-    color: #b8bec6;
+    color: #c9ced4;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -295,13 +558,7 @@
     line-height: 1.2;
   }
 
-  .cell.overflow {
-    outline: none;
-  }
-
-  .cell.cell-summary {
-    background: #f7f9fb;
-  }
+  .cell.cell-summary { background: #f7f9fb; }
 
   .cell.cell-summary .cell-inner .q {
     text-align: center;
@@ -320,48 +577,133 @@
   }
 
   .meta {
-    max-width: 210mm;
     width: 100%;
-    font-size: 12px;
-    color: #516070;
+    font-size: .76rem;
+    color: var(--text-muted);
     text-align: center;
-    padding: 0 10px 10px;
+    padding: 14px 10px 0;
+    letter-spacing: .3px;
   }
 
-  @media screen and (max-width: 900px) {
-    .workspace { display: block; }
+  /* =======================================================
+     RESPONSIVE
+  ======================================================= */
+
+  /* Below this the left third + the 210mm sheet no longer fit side by side,
+     so the column floats over the preview — still anchored left. */
+  @media screen and (max-width: 1240px) {
     .editor-col {
-      width: 100%;
-      flex: none;
-      position: static;
-      height: auto;
-      padding: 10px 10px 0;
+      position: fixed;
+      left: 0;
+      top: var(--toolbar-h);
+      z-index: 895;
+      flex-basis: auto;
+      width: min(400px, 92vw);
+      height: calc(100dvh - var(--toolbar-h));
+      max-height: none;
+      padding: 14px;
+      background: var(--bg-dark);
+      border-right: 1px solid var(--line-2);
+      box-shadow: 8px 0 30px rgba(0,0,0,.6);
+      transform: translateX(-100%);
+      opacity: 1;
+      transition: transform .34s var(--ease);
     }
-    .preview-col { width: 100%; }
-    .editor { max-width: none; }
-    .stage { padding: 14px 0 90px; overflow-x: hidden; }
+
+    body.drawer-open .editor-col { transform: translateX(0); }
+
+    body:not(.drawer-open) .editor-col {
+      flex-basis: auto;
+      width: min(400px, 92vw);
+      padding: 14px;
+      opacity: 1;
+      transform: translateX(-100%);
+    }
+
+    /* while it floats, the tab would sit on top of the panel */
+    body.drawer-open .side-tab { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .scrim { display: block; }
+    body.drawer-open .scrim { opacity: 1; visibility: visible; }
+
+    .preview-col { flex: 1 1 100%; width: 100%; padding: 22px 14px 40px; }
+  }
+
+  /* Phones: no side-by-side and no drawer — the editor simply sits on top
+     and the sheet below it, with the whole page scrolling normally. */
+  @media screen and (max-width: 900px) {
+    body { height: auto; overflow: visible; overflow-x: hidden; }
+
+    .workspace {
+      display: block;
+      height: auto;
+      margin-top: var(--toolbar-h);
+    }
+
+    .editor-col,
+    body:not(.drawer-open) .editor-col,
+    body.drawer-open .editor-col {
+      position: static;
+      width: 100%;
+      flex-basis: auto;
+      min-width: 0;
+      height: auto;
+      max-height: none;
+      padding: 16px 12px 4px;
+      opacity: 1;
+      visibility: visible;
+      overflow: visible;
+      pointer-events: auto;
+      transform: none;
+      background: transparent;
+      border-right: none;
+      box-shadow: none;
+    }
+
+    .preview-col {
+      width: 100%;
+      height: auto;
+      padding: 8px 10px 70px;
+      overflow: visible;
+    }
+
+    /* the editor is always visible here, so the launcher and its close
+       button have nothing to do */
+    .side-tab, .scrim, .panel-close { display: none !important; }
+
+    .stage { overflow-x: hidden; }
     .sheet {
       transform-origin: top center;
       transform: scale(var(--mobile-scale, 0.45));
+      /* the scaled sheet still reserves its full 210×297mm box, so pull the
+         layout box back in on all sides or the page overflows sideways */
       margin-bottom: calc((297mm * var(--mobile-scale, 0.45)) - 297mm);
+      margin-left: calc(((210mm * var(--mobile-scale, 0.45)) - 210mm) / 2);
+      margin-right: calc(((210mm * var(--mobile-scale, 0.45)) - 210mm) / 2);
     }
-    .panel { padding: 13px; border-radius: 10px; }
-    .panel h1 { font-size: 17px; }
-    #rawInput { min-height: 220px; font-size: 14px; }
   }
 
-  @media screen and (max-width: 560px) {
-    .toolbar { padding: 10px; gap: 6px; }
-    .toolbar-group { gap: 6px; width: 100%; }
-    .toolbar button { flex: 1 1 auto; min-width: 0; padding: 10px 8px; font-size: 12.5px; }
-    .toolbar .hint { font-size: 11px; order: -1; margin-bottom: 2px; }
+  @media screen and (max-width: 640px) {
+    .bar-inner { width: 96%; }
+    .logo a { font-size: 1.25rem; }
+    .actions { width: 100%; }
+    .btn { flex: 1 1 auto; justify-content: center; padding: 10px 12px; font-size: .76rem; }
+    .hint { font-size: .68rem; }
+    .side-tab { padding: 14px 7px; }
+    .panel-head { padding: 13px 14px; }
+    .panel-body { padding: 12px; }
+    #rawInput { min-height: 200px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
   }
 
   @media print {
     body { background: #fff; }
-    .toolbar, .editor-col, .meta { display: none !important; }
-    .workspace { display: block; }
-    .preview-col { width: 100%; }
+    .toolbar, .editor-col, .meta, .side-tab, .scrim { display: none !important; }
+    .workspace { display: block; padding: 0; }
+    .preview-col { width: 100%; overflow: visible; }
     .stage { padding: 0; gap: 0; }
     .sheet {
       border: none;
@@ -370,48 +712,97 @@
       margin: 0;
       transform: none !important;
     }
-    .cell.overflow { outline: none; }
     .page-badge { color: #444; }
   }
 </style>
 </head>
 <body>
 
-<div class="toolbar">
-  <div class="toolbar-group">
-    <button type="button" id="btnToggle">Edit Text</button>
-    <button type="button" id="btnFill" class="primary">Fill Boxes</button>
-    <button type="button" id="btnFit">Auto-Fit</button>
-    <button type="button" id="btnPrint">Print / PDF</button>
-    <button type="button" id="btnDoc" class="primary">Export DOCX</button>
-    <button type="button" class="ghost" id="btnClear">Clear</button>
-  </div>
-  <div class="hint">Format: <b>Q.7 Question...</b> then answer · blank lines auto-remove · 9 boxes/page · last box = Covered Ques summary</div>
-</div>
-
-<div class="workspace">
-  <div class="editor-col">
-    <div class="editor" id="editor">
-      <div class="panel">
-        <h1>Microsheet filler</h1>
-        <p>
-          Naya box <strong>sirf</strong> <code>Q.7</code> se banega. Numbered points usi box me rahenge.
-          Markdown code marks (triple backticks) answer se auto hata diye jate hain.
-          Sabse last box me saare questions ki list "Subject Covered Ques" heading ke sath auto ban jayegi.
-          DOC export name: <code>SubjectName_imp-ques.docx</code>
-        </p>
-        <label class="field-label" for="subjectInput">Subject name</label>
-        <input id="subjectInput" type="text" placeholder="Subject name (DOC file name)" value="Project Management">
-        <label class="field-label" for="rawInput">Questions &amp; answers</label>
-        <textarea id="rawInput" spellcheck="false"></textarea>
-        <div class="status" id="status">Ready</div>
-      </div>
+<header class="toolbar" id="topbar">
+  <div class="bar-inner">
+    <div class="logo"><a href="javascript:void(0)">Micro<span>sheet</span></a></div>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="btnFit"><i class="fa fa-compress"></i> Auto-Fit</button>
+      <button type="button" class="btn ghost" id="btnPrint"><i class="fa fa-print"></i> Print / PDF</button>
+      <button type="button" class="btn" id="btnDoc"><i class="fa fa-file-word"></i> Export DOCX</button>
+      <button type="button" class="btn danger" id="btnClear"><i class="fa fa-trash"></i> Clear</button>
     </div>
   </div>
-  <div class="preview-col">
+  <div class="hint">Format: <b>Q.7 Question…</b> then answer · 9 boxes/page · last box = Covered Ques summary</div>
+</header>
+
+<button type="button" class="side-tab" id="sideTab" aria-controls="editor" aria-expanded="false">
+  <i class="fa fa-angle-right tab-chev" aria-hidden="true"></i>
+  <span class="tab-label">Editor</span>
+</button>
+
+<div class="scrim" id="scrim"></div>
+
+<div class="workspace">
+  <aside class="editor-col">
+    <div class="editor" id="editor">
+      <div class="panel">
+        <div class="panel-head">
+          <div class="head-row">
+            <h1><i class="fa fa-table-cells"></i> Microsheet Filler</h1>
+            <button type="button" class="panel-close" id="panelClose" aria-label="Close editor">
+              <i class="fa fa-xmark"></i>
+            </button>
+          </div>
+          <div class="status" id="status">Ready</div>
+        </div>
+
+        <div class="panel-body">
+
+          <div class="acc" id="accHelp">
+            <button type="button" class="acc-head" data-acc>
+              <span class="left"><i class="fa fa-circle-info"></i> How it works</span>
+              <i class="fa fa-angle-down chev"></i>
+            </button>
+            <div class="acc-body">
+              <p>
+                Naya box <strong>sirf</strong> <code>Q.7</code> se banega. Numbered points usi box me rahenge.
+                Markdown code marks (triple backticks) answer se auto hata diye jate hain.
+                Sabse last box me saare questions ki list <strong>"Subject Covered Ques"</strong> heading ke sath auto ban jayegi.
+                DOC export name: <code>SubjectName_imp-ques.docx</code>
+              </p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="subjectInput">Subject name</label>
+            <input id="subjectInput" type="text" placeholder="Subject name (DOC file name)" value="Project Management">
+          </div>
+
+          <div class="acc open" id="accInput">
+            <button type="button" class="acc-head" data-acc>
+              <span class="left"><i class="fa fa-pen-to-square"></i> Questions &amp; Answers</span>
+              <i class="fa fa-angle-down chev"></i>
+            </button>
+            <div class="acc-body">
+              <textarea id="rawInput" spellcheck="false" placeholder="Q.1 Question here…&#10;Answer lines here…"></textarea>
+            </div>
+          </div>
+
+          <div class="acc open" id="accList">
+            <button type="button" class="acc-head" data-acc>
+              <span class="left"><i class="fa fa-list-ol"></i> Questions <span class="chip" id="qCount">0</span></span>
+              <i class="fa fa-angle-down chev"></i>
+            </button>
+            <div class="acc-body">
+              <div class="qlist" id="qList"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="preview-col">
     <div class="stage" id="stage"></div>
     <div class="meta" id="meta"></div>
-  </div>
+  </main>
 </div>
 
 <script>
@@ -956,7 +1347,7 @@
   /** Cell content -> one or more Word paragraphs (multiple for the summary box: heading + list) */
   function wParagraphsFromCell(cell) {
     if (!cell || cell.empty) {
-      return wParagraph(wText(" ", false), "both");
+      return wParagraph(wText(" ", false), "left");
     }
 
     var lines = cell.lines || [];
@@ -969,7 +1360,7 @@
         listRuns += wLineRuns(lines[i]);
       }
       if (!listRuns) listRuns = wText(" ", false);
-      return heading + wParagraph(listRuns, "both");
+      return heading + wParagraph(listRuns, "left");
     }
 
     var runs = "";
@@ -979,15 +1370,18 @@
       runs += wLineRuns(lines[j]);
     }
     if (!cell.q && !lines.length) runs = wText(" ", false);
-    return wParagraph(runs, "both");
+    return wParagraph(runs, "left");
   }
 
   // A4 twips — same as microtemp.docx (10mm margins, equal 3×3)
   var DXA_PAGE_W = 11906;
   var DXA_PAGE_H = 16838;
-  var DXA_MARGIN = 567; // 10mm
-  var DXA_COL = 3591;   // ~equal thirds of usable width
-  var DXA_ROW = 5200;   // slightly under usable/3 so Word never spills a row
+  // Word "Narrow" preset — 1.27cm (0.5in = 720 twips) on all four sides
+  // original default — 10mm (567 twips) on all four sides
+  var DXA_MARGIN_X = 567;
+  var DXA_MARGIN_Y = 567;
+  var DXA_COL = 3591;       // (11906 - 2*567) / 3
+  var DXA_ROW = 5200;       // just under (16838 - 2*567)/3 so Word never spills a row
 
   function wTableCell(cell) {
     return (
@@ -1068,8 +1462,8 @@
     body +=
       "<w:sectPr>" +
       '<w:pgSz w:w="' + DXA_PAGE_W + '" w:h="' + DXA_PAGE_H + '"/>' +
-      '<w:pgMar w:top="' + DXA_MARGIN + '" w:right="' + DXA_MARGIN +
-      '" w:bottom="' + DXA_MARGIN + '" w:left="' + DXA_MARGIN +
+      '<w:pgMar w:top="' + DXA_MARGIN_Y + '" w:right="' + DXA_MARGIN_X +
+      '" w:bottom="' + DXA_MARGIN_Y + '" w:left="' + DXA_MARGIN_X +
       '" w:header="0" w:footer="0" w:gutter="0"/>' +
       "<\/w:sectPr>";
 
@@ -1114,7 +1508,7 @@
         '<w:sz w:val="10"/><w:szCs w:val="10"/>' +
         "<\/w:rPr><\/w:rPrDefault>" +
         "<w:pPrDefault><w:pPr>" +
-        '<w:jc w:val="both"/>' +
+        '<w:jc w:val="left"/>' +
         '<w:spacing w:after="0" w:line="120" w:lineRule="atLeast"/>' +
         "<\/w:pPr><\/w:pPrDefault><\/w:docDefaults>" +
         "<\/w:styles>"
@@ -1172,6 +1566,7 @@
 
   function applyFill() {
     fillBoxes(withCoveredSummary(parseQA(rawInput.value)));
+    renderQuestionList();
   }
 
   var fillTimer = null;
@@ -1182,12 +1577,106 @@
     }, 350);
   }
 
-  document.getElementById("btnFill").addEventListener("click", function () {
-    if (fillTimer) clearTimeout(fillTimer);
-    applyFill();
-    // Editor open hi rahe taaki naya add kar sako
-    editor.classList.remove("hidden");
-    document.getElementById("btnToggle").textContent = "Hide Editor";
+  /* ---------------- editor drawer ---------------- */
+
+  var sideTab = document.getElementById("sideTab");
+  var scrim = document.getElementById("scrim");
+
+  function setDrawer(open) {
+    document.body.classList.toggle("drawer-open", open);
+    sideTab.setAttribute("aria-expanded", open ? "true" : "false");
+    // sheet scale depends on the space left over, so recompute after the slide
+    setTimeout(updateMobileScale, 400);
+  }
+
+  function isDrawerOpen() { return document.body.classList.contains("drawer-open"); }
+  function toggleDrawer() { setDrawer(!isDrawerOpen()); }
+
+  sideTab.addEventListener("click", toggleDrawer);
+  scrim.addEventListener("click", function () { setDrawer(false); });
+  document.getElementById("panelClose").addEventListener("click", function () { setDrawer(false); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && isDrawerOpen()) setDrawer(false);
+  });
+
+  /* ---------------- accordions ---------------- */
+
+  document.querySelectorAll("[data-acc]").forEach(function (head) {
+    head.addEventListener("click", function () {
+      head.closest(".acc").classList.toggle("open");
+    });
+  });
+
+  /* ---------------- question jump list ----------------
+     Scans the raw text (not the parsed items) so every entry keeps the
+     exact character offset needed to jump the caret there. */
+
+  var qListEl = document.getElementById("qList");
+  var qCountEl = document.getElementById("qCount");
+
+  function scanQuestions() {
+    var lines = rawInput.value.split("\n");
+    var out = [];
+    var pos = 0;
+    for (var i = 0; i < lines.length; i++) {
+      var t = lines[i].trim();
+      if (t && isQuestionLine(t)) {
+        out.push({ text: t, start: pos, end: pos + lines[i].length, line: i });
+      }
+      pos += lines[i].length + 1;   // +1 for the newline
+    }
+    return out;
+  }
+
+  function renderQuestionList() {
+    var qs = scanQuestions();
+    qCountEl.textContent = qs.length;
+
+    if (!qs.length) {
+      qListEl.innerHTML = '<div class="qlist-empty">Koi question nahi mila.<br>' +
+        "<b>Q.1</b> / <b>Q.2</b> se line shuru karo.</div>";
+      return;
+    }
+
+    var html = "";
+    for (var i = 0; i < qs.length; i++) {
+      var label = qs[i].text.replace(/^(Q\.?\s*\d+|Question\s*\d+)\s*[\-—–:.]*\s*/i, "");
+      html += '<button type="button" class="qitem" data-start="' + qs[i].start +
+              '" data-end="' + qs[i].end + '" data-line="' + qs[i].line + '">' +
+                '<span class="qnum">' + (i + 1) + ".</span>" +
+                '<span class="qtext">' + escapeHtml(label || qs[i].text) + "</span>" +
+              "</button>";
+    }
+    qListEl.innerHTML = html;
+  }
+
+  /** Jump the textarea caret to a question and reveal it. */
+  function jumpTo(start, end, line) {
+    var accInput = document.getElementById("accInput");
+    if (!accInput.classList.contains("open")) accInput.classList.add("open");
+
+    rawInput.focus();
+
+    // estimate the scroll position from the line number, then let the
+    // caret selection nudge it the rest of the way
+    var lh = parseFloat(getComputedStyle(rawInput).lineHeight) || 20;
+    rawInput.scrollTop = Math.max(0, line * lh - rawInput.clientHeight / 3);
+    rawInput.setSelectionRange(start, end);
+  }
+
+  qListEl.addEventListener("click", function (e) {
+    var item = e.target.closest(".qitem");
+    if (!item) return;
+
+    jumpTo(
+      parseInt(item.getAttribute("data-start"), 10),
+      parseInt(item.getAttribute("data-end"), 10),
+      parseInt(item.getAttribute("data-line"), 10)
+    );
+
+    qListEl.querySelectorAll(".qitem.flash").forEach(function (n) { n.classList.remove("flash"); });
+    item.classList.add("flash");
   });
 
   rawInput.addEventListener("input", scheduleFill);
@@ -1210,11 +1699,6 @@
     exportDoc();
   });
 
-  document.getElementById("btnToggle").addEventListener("click", function () {
-    editor.classList.toggle("hidden");
-    this.textContent = editor.classList.contains("hidden") ? "Edit Text" : "Hide Editor";
-  });
-
   document.getElementById("btnClear").addEventListener("click", function () {
     if (fillTimer) clearTimeout(fillTimer);
     rawInput.value = "";
@@ -1222,8 +1706,7 @@
     stage.appendChild(createSheet(1, 1));
     metaEl.textContent = "";
     setStatus("Cleared. Naya Q&A paste/type karo — boxes auto update honge.");
-    editor.classList.remove("hidden");
-    document.getElementById("btnToggle").textContent = "Hide Editor";
+    setDrawer(true);
     rawInput.focus();
   });
 
@@ -1233,8 +1716,16 @@
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(updateToolbarOffset);
   }
+  document.body.classList.add("booting");
+  setDrawer(true);       // start with the editor open
   applyFill();
+  // rAF is throttled in background tabs, so time out as well
+  function endBoot() { document.body.classList.remove("booting"); }
+  requestAnimationFrame(function () { requestAnimationFrame(endBoot); });
+  setTimeout(endBoot, 300);
 })();
 </script>
 </body>
 </html>
+
+<!-- hi -->
