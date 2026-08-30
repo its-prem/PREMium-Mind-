@@ -70,6 +70,7 @@
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--line);
     box-shadow: 0 5px 20px rgba(0,0,0,.5);
+    transition: transform .3s var(--ease);
   }
 
   .bar-inner {
@@ -482,6 +483,9 @@
     gap: 20px;
   }
 
+  /* --sheet-scale = (phone fit factor) x (user zoom). The negative margins
+     shrink the layout box to match the painted size, so a scaled sheet never
+     reserves the full 210x297mm and pushes the page sideways. */
   .sheet {
     width: 210mm;
     height: 297mm;
@@ -493,6 +497,11 @@
     page-break-after: always;
     break-after: page;
     flex: none;
+    transform-origin: top center;
+    transform: scale(var(--sheet-scale, 1));
+    margin-bottom: calc((297mm * var(--sheet-scale, 1)) - 297mm);
+    margin-left: calc(((210mm * var(--sheet-scale, 1)) - 210mm) / 2);
+    margin-right: calc(((210mm * var(--sheet-scale, 1)) - 210mm) / 2);
   }
 
   .grid {
@@ -576,6 +585,26 @@
     color: #666;
   }
 
+  .zoom-badge {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 950;
+    padding: 7px 14px;
+    border-radius: 99px;
+    background: rgba(20,20,20,.94);
+    border: 1px solid var(--line-2);
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-size: .8rem;
+    letter-spacing: 1px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .zoom-badge.show { opacity: 1; transform: translateY(0); }
+
   .meta {
     width: 100%;
     font-size: .76rem;
@@ -632,7 +661,10 @@
   /* Phones: no side-by-side and no drawer — the editor simply sits on top
      and the sheet below it, with the whole page scrolling normally. */
   @media screen and (max-width: 900px) {
-    body { height: auto; overflow: visible; overflow-x: hidden; }
+    /* overflow-x on body would compute overflow-y to auto and make BODY the
+       scroller, which breaks window scroll events — keep it on html */
+    html { overflow-x: hidden; }
+    body { height: auto; overflow: visible; }
 
     .workspace {
       display: block;
@@ -672,15 +704,9 @@
     .side-tab, .scrim, .panel-close { display: none !important; }
 
     .stage { overflow-x: hidden; }
-    .sheet {
-      transform-origin: top center;
-      transform: scale(var(--mobile-scale, 0.45));
-      /* the scaled sheet still reserves its full 210×297mm box, so pull the
-         layout box back in on all sides or the page overflows sideways */
-      margin-bottom: calc((297mm * var(--mobile-scale, 0.45)) - 297mm);
-      margin-left: calc(((210mm * var(--mobile-scale, 0.45)) - 210mm) / 2);
-      margin-right: calc(((210mm * var(--mobile-scale, 0.45)) - 210mm) / 2);
-    }
+
+    /* toolbar slides away while scrolling down, comes back on scroll up */
+    body.bar-hidden .toolbar { transform: translateY(-100%); }
   }
 
   @media screen and (max-width: 640px) {
@@ -798,6 +824,8 @@
       </div>
     </div>
   </aside>
+
+  <div class="zoom-badge" id="zoomBadge" aria-hidden="true">100%</div>
 
   <main class="preview-col">
     <div class="stage" id="stage"></div>
@@ -1211,15 +1239,52 @@
     setStatus(allowShrink ? "Auto-Fit done (extra text box ke andar hi chhup jayega)." : "Ready.");
   }
 
-  function updateMobileScale() {
-    if (window.innerWidth > 900) {
-      document.documentElement.style.removeProperty("--mobile-scale");
-      return;
-    }
+  /* ---------------- sheet scale = phone fit x user zoom ---------------- */
+
+  var ZOOM_MIN = 0.3, ZOOM_MAX = 3;
+  var sheetZoom = 1;
+
+  /** how much the sheet must shrink to fit the column on a narrow screen */
+  function fitScale() {
+    if (window.innerWidth > 900) return 1;
     var available = Math.max(stage.clientWidth || window.innerWidth, 1) - 16;
-    var scale = Math.min(1, available / (210 * 3.7795275591));
-    document.documentElement.style.setProperty("--mobile-scale", String(Math.max(0.24, scale)));
+    return Math.max(0.24, Math.min(1, available / (210 * 3.7795275591)));
   }
+
+  function updateMobileScale() {
+    document.documentElement.style.setProperty("--sheet-scale", String(fitScale() * sheetZoom));
+  }
+
+  function setZoom(next, showBadge) {
+    sheetZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, next));
+    updateMobileScale();
+    if (showBadge !== false) flashZoom();
+  }
+
+  var zoomBadgeTimer = null;
+  function flashZoom() {
+    var el = document.getElementById("zoomBadge");
+    if (!el) return;
+    el.textContent = Math.round(sheetZoom * 100) + "%";
+    el.classList.add("show");
+    if (zoomBadgeTimer) clearTimeout(zoomBadgeTimer);
+    zoomBadgeTimer = setTimeout(function () { el.classList.remove("show"); }, 1100);
+  }
+
+  /* Ctrl/Cmd + wheel and Ctrl/Cmd +/-/0 zoom the sheet only, never the UI.
+     passive:false so the browser's own page zoom can be suppressed. */
+  document.addEventListener("wheel", function (e) {
+    if (!e.ctrlKey && !e.metaKey) return;
+    e.preventDefault();
+    setZoom(sheetZoom * (e.deltaY < 0 ? 1.12 : 1 / 1.12));
+  }, { passive: false });
+
+  document.addEventListener("keydown", function (e) {
+    if (!e.ctrlKey && !e.metaKey) return;
+    if (e.key === "+" || e.key === "=") { e.preventDefault(); setZoom(sheetZoom * 1.15); }
+    else if (e.key === "-" || e.key === "_") { e.preventDefault(); setZoom(sheetZoom / 1.15); }
+    else if (e.key === "0") { e.preventDefault(); setZoom(1); }
+  });
 
   var toolbarEl = document.querySelector(".toolbar");
   function updateToolbarOffset() {
@@ -1709,6 +1774,34 @@
     setDrawer(true);
     rawInput.focus();
   });
+
+  /* Phone only: hide the toolbar while scrolling down, bring it back on the
+     way up. Desktop columns scroll internally, so the bar always stays. */
+  (function () {
+    var lastY = 0;
+    var lastRun = 0;
+
+    function onScroll() {
+      var now = Date.now();
+      if (now - lastRun < 60) return;       // cheap throttle, no rAF dependency
+      lastRun = now;
+
+      if (window.innerWidth > 900) {
+        document.body.classList.remove("bar-hidden");
+        lastY = 0;
+        return;
+      }
+
+      var y = window.scrollY || document.documentElement.scrollTop || 0;
+      var dy = y - lastY;
+      if (Math.abs(dy) < 6) return;          // ignore jitter
+      if (dy > 0 && y > 70) document.body.classList.add("bar-hidden");
+      else if (dy < 0) document.body.classList.remove("bar-hidden");
+      lastY = y;
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+  })();
 
   window.addEventListener("resize", updateMobileScale);
   window.addEventListener("resize", updateToolbarOffset);
