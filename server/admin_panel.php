@@ -377,6 +377,16 @@ if ($colSort && $colSort->num_rows === 0) {
 if (isset($_GET['fetch_table'])) {
     pm_require_admin(false);
     $result = $conn->query("SELECT * FROM courses ORDER BY sort_order ASC, id DESC");
+    // db_connect.php now sets MYSQLI_REPORT_OFF, so a failed query returns
+    // false instead of throwing — calling ->num_rows on that is a fatal
+    // (blank 500), which is indistinguishable from a network error in the
+    // browser. Fail with a readable message instead.
+    if (!$result) {
+        http_response_code(500);
+        echo "<tr><td colspan='5' style='text-align:center;padding:24px;color:#991b1b;'>Query failed: "
+            . pm_h($conn->error) . "</td></tr>";
+        exit;
+    }
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $json = htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8');
@@ -508,7 +518,10 @@ if (isset($_GET['fetch_students'])) {
     
     $courses = $conn->query("SELECT id, title FROM courses WHERE is_deleted=0 ORDER BY id ASC");
     $courseList = [];
-    while ($c = $courses->fetch_assoc()) $courseList[] = $c;
+    // Same MYSQLI_REPORT_OFF caveat as fetch_table — guard against false.
+    if ($courses) {
+        while ($c = $courses->fetch_assoc()) $courseList[] = $c;
+    }
 
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
@@ -2018,13 +2031,31 @@ input:checked + .slider:before { transform: translateX(20px); }
             try {
                 const r = await fetch('?fetch_table=1', { credentials: 'same-origin' });
                 if (r.status === 403) { showToast('Session expired. Please login again.', 'error'); return; }
-                tbody.innerHTML = await r.text();
-                // Rows (and their dropdowns) were just replaced with fresh
+
+                const html = await r.text();
+                if (!r.ok) {
+                    // A server-side error used to land here silently as row
+                    // markup; surface the status instead of pretending the
+                    // response was a table.
+                    throw new Error('Server returned ' + r.status + (html ? (': ' + html.slice(0, 200)) : ''));
+                }
+                tbody.innerHTML = html;
+
+                // Rows (and their controls) were just replaced with fresh
                 // server values, so any staged edits no longer apply.
                 window.pmDirtyFlags = {};
-                updateAssetSaveBar();
-                refreshCopySelect();
-            } catch(e) { showToast("Failed to load courses", "error"); }
+                // Don't let a post-render helper failure look like a failed
+                // fetch — the rows are already on screen at this point.
+                try { updateAssetSaveBar(); } catch (e) { console.error('updateAssetSaveBar failed', e); }
+                try { refreshCopySelect(); } catch (e) { console.error('refreshCopySelect failed', e); }
+            } catch(e) {
+                console.error('loadCourses failed:', e);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#991b1b;">'
+                    + 'Could not load courses.<br><span style="font-size:0.8rem;color:var(--dark-muted);">'
+                    + String(e && e.message ? e.message : e).replace(/[<>]/g, '')
+                    + '</span></td></tr>';
+                showToast('Failed to load courses: ' + (e && e.message ? e.message : 'unknown error'), 'error');
+            }
         }
 
         // ==========================================
