@@ -87,9 +87,10 @@ $pmAdminEmail = pm_auth_admin_email();
   /* ---------------- app chrome ---------------- */
   .toolbar { position: relative; flex: none; z-index: 1000; background: #ffffff; border-bottom: 1px solid var(--line); box-shadow: 0 2px 5px rgba(0,0,0,0.03); transition: transform .3s var(--ease); }
   body.nav-hidden .toolbar { display: none; }
-  .nav-show { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1001; display: none; align-items: center; gap: 6px; padding: 6px 14px; background: #ffffff; border: 1px solid var(--line); border-radius: 99px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); color: var(--text-main); font-family: "Oswald", sans-serif; font-size: .74rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; opacity: .55; transition: opacity .2s; }
+  .nav-show { position: fixed; top: 10px; left: 12px; z-index: 1001; display: none; align-items: center; gap: 6px; padding: 6px 14px; background: #ffffff; border: 1px solid var(--line); border-radius: 99px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); color: var(--text-main); font-family: "Oswald", sans-serif; font-size: .74rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; opacity: .55; transition: opacity .2s; }
   .nav-show:hover { opacity: 1; }
   body.nav-hidden .nav-show { display: inline-flex; }
+  body.nav-hidden .preview-col { padding-top: 54px; }
   .bar-inner { width: 96%; max-width: 1600px; margin: 0 auto; padding: 10px 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .logo a { font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; color: var(--text-main); text-decoration: none; }
   .logo a span { color: var(--primary); }
@@ -262,6 +263,10 @@ $pmAdminEmail = pm_auth_admin_email();
   .imgc .r2 > * { flex: 1; min-width: 0; }
   .imgc .ins { background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 8px 12px; font-family: 'Oswald', sans-serif; font-size: .78rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
   .imgc .ins:hover { background: var(--primary-hover); }
+  .imgc.used { border-left: 4px solid var(--primary); }
+  .imgc .used-note { font-size: .72rem; color: var(--primary-hover); background: var(--primary-light); border-radius: 6px; padding: 5px 8px; line-height: 1.4; }
+  .imgc .ins.again { background: #fff; color: var(--text-main); border: 1px solid var(--line-2); }
+  .imgc .ins.again:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
   .imgs-empty { color: var(--text-muted); font-size: .82rem; padding: 10px 6px; text-align: center; }
 
   .olist { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; padding-right: 6px; }
@@ -672,6 +677,11 @@ $pmAdminEmail = pm_auth_admin_email();
             <textarea id="rawInput" spellcheck="false" placeholder="# Introduction&#10;Atoms hi chemistry ki foundation hain …&#10;&#10;## Atom&#10;- Atom kisi element ka **smallest particle** hota hai&#10;&#10;> Note: Atom free state me exist nahi karta.&#10;Yeh usi box me dusri line hai.&#10;&#10;$ A = p + n"></textarea>
           </div>
 
+          <div class="acc open" id="accOutline">
+            <button type="button" class="acc-head" data-acc><span><i class="fa fa-list-tree"></i>&nbsp; Outline <span class="chip" id="oCount">0</span></span><i class="fa fa-angle-down chev"></i></button>
+            <div class="acc-body"><div class="olist" id="oList"></div></div>
+          </div>
+
           <div class="acc" id="accImages">
             <button type="button" class="acc-head" data-acc><span><i class="fa fa-image"></i>&nbsp; Images <span class="chip" id="imgCount">0</span></span><i class="fa fa-angle-down chev"></i></button>
             <div class="acc-body">
@@ -680,11 +690,6 @@ $pmAdminEmail = pm_auth_admin_email();
               <div class="imgs" id="imgList"></div>
               <p style="margin-top:8px">Har image ke niche <b>"Insert after"</b> dropdown se position chuno → <b>Insert</b>. Text me line banti hai: <code style="color:var(--primary)">[img: name | 60% | center | caption]</code> — ise kahin bhi move kar sakte ho. Poori page width ke liye upar <code style="color:var(--primary)">[Wide]</code> likho.</p>
             </div>
-          </div>
-
-          <div class="acc open" id="accOutline">
-            <button type="button" class="acc-head" data-acc><span><i class="fa fa-list-tree"></i>&nbsp; Outline <span class="chip" id="oCount">0</span></span><i class="fa fa-angle-down chev"></i></button>
-            <div class="acc-body"><div class="olist" id="oList"></div></div>
           </div>
         </div>
       </div>
@@ -849,6 +854,7 @@ $pmAdminEmail = pm_auth_admin_email();
   }
   function inline(t, inFormula) {
     var s = esc(t), maths = [];
+    if (inFormula && /\$[^$\n]+?\$/.test(s)) inFormula = false; /* line mixes text + $math$ → treat like prose */
     if (!inFormula) s = s.replace(/\$([^$\n]+?)\$/g, function (_, m) { maths.push('<span class="mi">' + mathify(m) + "</span>"); return "\u0001" + (maths.length - 1) + "\u0001"; });
     s = inFormula ? mathify(s) : smartText(s);
     s = markers(s);
@@ -1294,7 +1300,7 @@ $pmAdminEmail = pm_auth_admin_email();
     document.documentElement.style.setProperty("--nf", (parseFloat($("optFont").value) || 10) + "pt");
     var blocks = parse(ta.value); lastBlocks = blocks;
     var pages = paginate(buildNodes(blocks));
-    renderOutline(blocks); refreshPosSelects();
+    renderOutline(blocks); refreshPosSelects(); syncImgCards();
     var c = { h1: 0, h2: 0, formula: 0, table: 0, callout: 0 }; blocks.forEach(function (b) { if (c.hasOwnProperty(b.type)) c[b.type]++; });
     metaEl.textContent = c.h1 + " sections · " + c.h2 + " sub · " + c.callout + " boxes · " + c.formula + " formulas · " + c.table + " tables → " + pages + " page" + (pages === 1 ? "" : "s");
     setStatus(blocks.length ? "Rendered on " + pages + " A4 page" + (pages === 1 ? "" : "s") + ". Print / PDF ready." : "Paste notes to begin.");
@@ -1847,6 +1853,22 @@ $pmAdminEmail = pm_auth_admin_email();
     list.reduce(function (p, f) { return p.then(function () { return compressFile(f).then(function (r) { var nm = uniqueName(slug(f.name)); images.push({ name: nm, data: r.data, w: r.w, h: r.h }); added.push(nm); }, function () { toast(f.name + " load nahi hui"); }); }); }, Promise.resolve())
       .then(function () { saveImages(); renderImages(); render(); if (added.length) toast(added.length + " image add ho gayi"); if (then) then(added); });
   }
+  var IMG_TAG_RE = /^\s*\[(?:img|image)\s*:\s*([^\]|]+?)\s*(?:\|[^\]]*)?\]\s*$/i;
+  function findImgTag(name) {
+    var lines = ta.value.split("\n"), nm = String(name || "").toLowerCase();
+    for (var i = 0; i < lines.length; i++) { var m = lines[i].match(IMG_TAG_RE); if (m && m[1].trim().toLowerCase() === nm) return { line: i, wide: i > 0 && /^\s*\[wide\]\s*$/i.test(lines[i - 1]), tag: parseImgLine(lines[i].trim()) }; }
+    return null;
+  }
+  function updateImgTag(name, newLine, wide) {
+    var hit = findImgTag(name); if (!hit) return false;
+    var lines = ta.value.split("\n"), at = hit.line;
+    lines[at] = newLine;
+    if (wide && !hit.wide) { lines.splice(at, 0, "[Wide]"); at++; }
+    else if (!wide && hit.wide) { lines.splice(at - 1, 1); at--; }
+    var before = lines.slice(0, at).join("\n"), start = before.length + (at ? 1 : 0);
+    setText(lines.join("\n"), start, start + newLine.length);
+    return true;
+  }
   function imgLine(nm, w, al, cap) { return "[img: " + nm + (w && w !== "100%" ? " | " + w : "") + (al && al !== "center" ? " | " + al : "") + (cap ? " | " + cap.replace(/[\[\]|]/g, "") : "") + "]"; }
   
   function insertLineAt(after, text) {
@@ -1873,6 +1895,11 @@ $pmAdminEmail = pm_auth_admin_email();
     });
     return o;
   }
+  function syncImgCards() {
+    var cards = document.querySelectorAll("#imgList .imgc"), stale = false;
+    cards.forEach(function (c) { var im = images[parseInt(c.dataset.k, 10)]; if (im && (!!findImgTag(im.name)) !== c.classList.contains("used")) stale = true; });
+    if (stale) renderImages();
+  }
   function refreshPosSelects() {
     var html = posOptions();
     document.querySelectorAll(".imgPos").forEach(function (sel) { var v = sel.value; sel.innerHTML = html; if ([].some.call(sel.options, function (op) { return op.value === v; })) sel.value = v; });
@@ -1881,13 +1908,18 @@ $pmAdminEmail = pm_auth_admin_email();
     var host = $("imgList"); $("imgCount").textContent = images.length;
     if (!images.length) { host.innerHTML = '<div class="imgs-empty">Abhi koi image nahi. Upar se add karo.</div>'; return; }
     host.innerHTML = images.map(function (im, k) {
-      return '<div class="imgc" data-k="' + k + '"><img class="th" src="' + im.data + '" alt=""><div class="bd">' +
+      var hit = findImgTag(im.name), tg = hit && hit.tag;
+      var curW = tg ? (hit.wide ? "wide" : (tg.w || "100%")) : "60%", curAl = tg ? tg.align : "center", curCap = tg ? tg.cap : "";
+      var W = ["100%","75%","60%","50%","40%","33%","wide"], AL = [["center","Center Block"],["float-left","Wrap Text (Left)"],["float-right","Wrap Text (Right)"],["left","Left Block"],["right","Right Block"]];
+      if (W.indexOf(curW) < 0) W.splice(1, 0, curW);
+      return '<div class="imgc' + (hit ? " used" : "") + '" data-k="' + k + '"><img class="th" src="' + im.data + '" alt=""><div class="bd">' +
         '<div class="nm"><code title="' + esc(im.name) + '">' + esc(im.name) + '</code><small>' + im.w + "×" + im.h + '</small><button type="button" class="del" title="Delete"><i class="fa fa-trash"></i></button></div>' +
-        '<select class="inp imgPos" title="Insert after"></select>' +
-        '<div class="r2"><select class="inp imgW"><option value="100%">Width 100%</option><option value="75%">75%</option><option value="60%" selected>60%</option><option value="50%">50%</option><option value="40%">40%</option><option value="33%">33%</option><option value="wide">Wide (full page)</option></select>' +
-        '<select class="inp imgAl"><option value="center">Center Block</option><option value="float-left">Wrap Text (Left)</option><option value="float-right">Wrap Text (Right)</option><option value="left">Left Block</option><option value="right">Right Block</option></select></div>' +
-        '<input class="inp imgCap" placeholder="Caption (optional)">' +
-        '<button type="button" class="ins"><i class="fa fa-arrow-turn-down"></i> Insert</button></div></div>';
+        (hit ? '<div class="used-note"><i class="fa fa-link"></i> Notes me line ' + (hit.line + 1) + ' pe lagi hai — niche change karke <b>Update</b> dabao</div>' : '<select class="inp imgPos" title="Insert after"></select>') +
+        '<div class="r2"><select class="inp imgW">' + W.map(function (x) { return '<option value="' + x + '"' + (x === curW ? " selected" : "") + '>' + (x === "wide" ? "Wide (full page)" : (x === "100%" ? "Width 100%" : x)) + "</option>"; }).join("") + '</select>' +
+        '<select class="inp imgAl">' + AL.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === curAl ? " selected" : "") + '>' + x[1] + "</option>"; }).join("") + '</select></div>' +
+        '<input class="inp imgCap" placeholder="Caption (optional)" value="' + esc(curCap) + '">' +
+        (hit ? '<div class="r2"><button type="button" class="ins upd"><i class="fa fa-pen"></i> Update</button><button type="button" class="ins again" title="Same image ek aur jagah insert karo"><i class="fa fa-plus"></i> Insert again</button></div>'
+             : '<button type="button" class="ins"><i class="fa fa-arrow-turn-down"></i> Insert</button>') + '</div></div>';
     }).join("");
     refreshPosSelects();
   }
@@ -1898,11 +1930,18 @@ $pmAdminEmail = pm_auth_admin_email();
       if (!confirm("Image \"" + im.name + "\" delete karein?")) return;
       images.splice(images.indexOf(im), 1); saveImages(); renderImages(); render(); return;
     }
-    if (e.target.closest(".ins")) {
-      var w = card.querySelector(".imgW").value, al = card.querySelector(".imgAl").value, cap = card.querySelector(".imgCap").value.trim(), pos = card.querySelector(".imgPos").value;
+    var btn = e.target.closest(".ins");
+    if (btn) {
+      var w = card.querySelector(".imgW").value, al = card.querySelector(".imgAl").value, cap = card.querySelector(".imgCap").value.trim();
+      var posSel = card.querySelector(".imgPos"), pos = posSel ? posSel.value : "cursor";
       var line = imgLine(im.name, w === "wide" ? "" : w, al, cap);
+      if (btn.classList.contains("upd")) {
+        if (updateImgTag(im.name, line, w === "wide")) { toast("Image update ho gayi"); renderImages(); }
+        else toast("Tag nahi mila — Insert karo");
+        return;
+      }
       if (w === "wide") line = "[Wide]\n" + line;
-      insertLineAt(pos, line); toast("Image insert ho gayi"); ta.focus();
+      insertLineAt(pos, line); toast("Image insert ho gayi"); ta.focus(); renderImages();
     }
   });
   $("imgDrop").addEventListener("click", function () { $("imgFile").click(); });
