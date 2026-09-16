@@ -2,10 +2,6 @@
 /**
  * D2D Notes — chapter-wise short-notes editor, backed by MySQL.
  * Upload to Hostinger premind/ as: d2d_notes.php  (with d2d_notes_api.php + pm_admin_auth.php)
- *
- * Same-origin with admin_panel.php on purpose: it reuses that login session,
- * so there is no second login to build or maintain. Sign in on the admin panel
- * once, then open this page.
  */
 require_once __DIR__ . '/pm_admin_auth.php';
 
@@ -16,11 +12,13 @@ if (!pm_auth_admin_ok()):
 <title>Notes D2D — Login required</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0a0a0a;color:#fff;font-family:Poppins,sans-serif}
-  .box{max-width:420px;width:92%;background:#141414;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:32px 28px;text-align:center}
-  h1{font-family:Oswald,sans-serif;text-transform:uppercase;letter-spacing:2px;font-size:1.4rem;margin:0 0 10px}
-  h1 span{color:#ff5722} p{color:#a0a0a0;font-size:.9rem;line-height:1.6;margin:0 0 22px}
-  a{display:inline-block;background:#ff5722;color:#fff;text-decoration:none;font-family:Oswald,sans-serif;text-transform:uppercase;letter-spacing:1px;padding:12px 22px;border-radius:5px;font-weight:600}
+  body { margin:0; min-height:100vh; display:grid; place-items:center; background: #f1f5f9; color: #1e293b; font-family: Poppins, sans-serif; }
+  .box { max-width:420px; width:92%; background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); border-radius: 12px; padding: 36px 32px; text-align:center; }
+  h1 { font-family: Oswald, sans-serif; text-transform: uppercase; letter-spacing: 2px; font-size: 1.6rem; margin: 0 0 10px; color: #0f172a; }
+  h1 span { color: #8e1b2a; } 
+  p { color: #475569; font-size: .95rem; line-height: 1.6; margin: 0 0 26px; }
+  a { display:inline-block; background: #8e1b2a; color: #fff; text-decoration:none; font-family: Oswald, sans-serif; text-transform:uppercase; letter-spacing:1px; padding:12px 26px; border-radius: 6px; font-weight:600; box-shadow: 0 4px 6px rgba(142, 27, 42, 0.2); transition: all 0.2s ease; }
+  a:hover { background: #6f1220; transform: translateY(-1px); }
 </style></head><body>
 <div class="box"><h1>Notes <span>D2D</span></h1>
 <p>Ye tool admin ke liye hai. Pehle Admin Panel me Google se login karo, phir is page ko dobara kholo.</p>
@@ -36,7 +34,7 @@ $pmAdminEmail = pm_auth_admin_email();
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Notes D2D — Short Notes Maker</title>
+<title>Notes D2D — Workspace</title>
 <script>window.PM_D2D = { admin: <?= json_encode($pmAdminEmail) ?>, api: 'd2d_notes_api.php' };</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,9 +44,20 @@ $pmAdminEmail = pm_auth_admin_email();
   @page { size: A4 portrait; margin: 0; }
 
   :root {
-    --primary: #ff5722; --bg-dark: #0a0a0a; --bg-light: #141414; --text-muted: #a0a0a0;
-    --line: rgba(255,255,255,.08); --line-2: rgba(255,255,255,.16);
+    /* Integrated Maroon Theme matching the Paper */
+    --primary: #8e1b2a;          
+    --primary-hover: #6f1220;
+    --primary-light: #fbecef;
+    --bg-dark: #f1f5f9;          
+    --bg-light: #ffffff;         
+    --text-main: #0f172a;        
+    --text-muted: #64748b;       
+    
+    --line: #e2e8f0;
+    --line-2: #cbd5e1;
     --ease: cubic-bezier(.4,0,.2,1); --toolbar-h: 64px;
+    
+    /* Paper Variables */
     --maroon: #8e1b2a; --maroon-dark: #6f1220;
     --pink: #f7e1e5; --pink-2: #fbecef; --cream: #fff3dd; --cream-2: #fff8ea;
     --ink: #1a1a1a; --paper-pad: 7mm; --col-gap: 6mm; --sheet-scale: 1; --nf: 10.5pt;
@@ -57,186 +66,215 @@ $pmAdminEmail = pm_auth_admin_email();
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body.booting, body.booting * { transition: none !important; }
   html { -webkit-text-size-adjust: 100%; }
-  body { font-family: 'Poppins', sans-serif; background: var(--bg-dark); color: #fff; line-height: 1.6; height: 100dvh; overflow: hidden; }
+  
+  body { 
+    font-family: 'Poppins', sans-serif; 
+    background: var(--bg-dark); 
+    color: var(--text-main); 
+    line-height: 1.6; 
+    height: 100dvh; 
+    overflow: hidden; 
+  }
   h1, h2, h3, .logo { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
 
+  /* ---------------- Scrollbars ---------------- */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
   /* ---------------- app chrome ---------------- */
-  .toolbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(10,10,10,.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); box-shadow: 0 5px 20px rgba(0,0,0,.5); transition: transform .3s var(--ease); }
-  .bar-inner { width: 94%; max-width: 1500px; margin: 0 auto; padding: 12px 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  .logo a { font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; color: #fff; text-decoration: none; }
+  .toolbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: #ffffff; border-bottom: 1px solid var(--line); box-shadow: 0 2px 5px rgba(0,0,0,0.03); transition: transform .3s var(--ease); }
+  .bar-inner { width: 96%; max-width: 1600px; margin: 0 auto; padding: 10px 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .logo a { font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; color: var(--text-main); text-decoration: none; }
   .logo a span { color: var(--primary); }
-  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--primary); color: #fff; font-family: 'Oswald', sans-serif; font-weight: 500; font-size: .84rem; text-transform: uppercase; letter-spacing: 1px; border: 2px solid var(--primary); border-radius: 4px; cursor: pointer; transition: all .3s ease; white-space: nowrap; }
-  .btn:hover { background: transparent; color: var(--primary); }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; background: var(--primary); color: #fff; font-family: 'Oswald', sans-serif; font-weight: 500; font-size: .84rem; text-transform: uppercase; letter-spacing: 1px; border: 1px solid var(--primary); border-radius: 6px; cursor: pointer; transition: all .2s ease; white-space: nowrap; box-shadow: 0 2px 4px rgba(142,27,42,0.15); }
+  .btn:hover { background: var(--primary-hover); border-color: var(--primary-hover); transform: translateY(-1px); }
   .btn:active { transform: scale(.97); }
-  .btn.ghost { background: transparent; color: #fff; border-color: var(--line-2); }
-  .btn.ghost:hover { border-color: var(--primary); color: var(--primary); }
-  .btn.danger { background: transparent; color: var(--text-muted); border-color: var(--line-2); }
-  .btn.danger:hover { border-color: #c62828; color: #ef5350; }
-  .hint { width: 100%; text-align: center; font-size: .74rem; color: var(--text-muted); padding-bottom: 10px; margin-top: -4px; }
+  
+  .btn.ghost { background: #f8fafc; color: #334155; box-shadow: none; border: 1px solid var(--line); }
+  .btn.ghost:hover { background: var(--bg-dark); color: var(--text-main); border-color: var(--line-2); }
+  
+  .btn.danger { background: #fef2f2; color: #ef4444; box-shadow: none; border: 1px solid #fecaca; }
+  .btn.danger:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+
+  .hint { width: 100%; text-align: center; font-size: .74rem; color: var(--text-muted); padding-bottom: 8px; margin-top: -2px; font-weight: 500; }
   .hint b { color: var(--primary); }
 
-  .side-tab { position: fixed; left: 0; top: 50%; transform: translateY(-50%); z-index: 900; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 9px; background: var(--bg-light); border: 1px solid var(--line-2); border-left: none; border-radius: 0 6px 6px 0; color: #fff; cursor: pointer; transition: all .3s ease; }
-  .side-tab:hover { background: var(--primary); border-color: var(--primary); }
+  /* SIDE TAB TO OPEN EDITOR (ON THE RIGHT) */
+  .side-tab { position: fixed; right: 0; left: auto; top: 50%; transform: translateY(-50%); z-index: 900; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 9px; background: #ffffff; border: 1px solid var(--line); border-right: none; border-radius: 8px 0 0 8px; color: var(--text-main); cursor: pointer; transition: all .3s ease; box-shadow: -2px 4px 12px rgba(0,0,0,0.06); }
+  .side-tab:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary-light); }
   .side-tab .tab-label { font-family: 'Oswald', sans-serif; font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; writing-mode: vertical-rl; transform: rotate(180deg); }
-  .side-tab .tab-chev { font-size: .8rem; transition: transform .34s var(--ease); }
-  body.drawer-open .side-tab .tab-chev { transform: rotate(180deg); }
+  .side-tab .tab-chev { font-size: .8rem; transform: rotate(180deg); transition: transform .34s var(--ease); }
+  body.drawer-open .side-tab { opacity: 0; visibility: hidden; pointer-events: none; }
   .scrim { display: none; }
 
-  .workspace { display: flex; align-items: stretch; height: calc(100dvh - var(--toolbar-h)); margin-top: var(--toolbar-h); }
-  .editor-col { flex: 0 0 clamp(360px, 37%, 580px); width: clamp(360px, 37%, 580px); display: flex; align-items: flex-start; justify-content: center; padding: 22px 16px 40px 58px; height: 100%; overflow-y: auto; overscroll-behavior: contain; transition: flex-basis .38s var(--ease), width .38s var(--ease), padding .38s var(--ease), opacity .26s ease, transform .38s var(--ease); }
-  body:not(.drawer-open) .editor-col { flex-basis: 0; width: 0; min-width: 0; padding: 0; opacity: 0; transform: translateX(-20px); overflow: hidden; pointer-events: none; }
-  .editor-col::-webkit-scrollbar { width: 7px; }
-  .editor-col::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 99px; }
-  .preview-col { flex: 1 1 auto; min-width: 0; max-width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; padding: 22px 12px 60px; overflow: auto; overscroll-behavior: contain; background: #e9e6e6; position: relative; }
-  .preview-col::-webkit-scrollbar { width: 9px; height: 9px; }
-  .preview-col::-webkit-scrollbar-thumb { background: #b9b3b3; border-radius: 99px; }
+  /* ---------------- WORKSPACE (Swapped Order via Row-Reverse) ---------------- */
+  .workspace { display: flex; align-items: stretch; height: calc(100dvh - var(--toolbar-h)); margin-top: var(--toolbar-h); flex-direction: row-reverse; }
+  
+  .editor-col { flex: 0 0 clamp(360px, 37%, 580px); width: clamp(360px, 37%, 580px); display: flex; align-items: flex-start; justify-content: center; padding: 20px 16px 40px 16px; height: 100%; overflow-y: auto; overscroll-behavior: contain; transition: flex-basis .38s var(--ease), width .38s var(--ease), padding .38s var(--ease), opacity .26s ease, transform .38s var(--ease); background: #ffffff; border-left: 1px solid var(--line); box-shadow: -4px 0 15px rgba(0,0,0,0.03); z-index: 10; }
+  
+  body:not(.drawer-open) .editor-col { flex-basis: 0; width: 0; min-width: 0; padding: 0; opacity: 0; border-left-width: 0; overflow: hidden; pointer-events: none; }
+  
+  .preview-col { flex: 1 1 auto; min-width: 0; max-width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; padding: 22px 12px 60px; overflow: auto; overscroll-behavior: contain; background: transparent; position: relative; z-index: 5; }
 
   .editor { width: 100%; }
-  .panel { background: var(--bg-light); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-  .panel-head { padding: 14px 18px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg,#181818,#131313); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .panel-head h1 { font-size: 1.1rem; letter-spacing: 1.5px; display: flex; align-items: center; gap: 10px; }
+  
+  /* ---- Clean Panels ---- */
+  .panel { background: var(--bg-light); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05); }
+  .panel-head { padding: 14px 18px; border-bottom: 1px solid var(--line); background: #f8fafc; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .panel-head h1 { font-size: 1.1rem; letter-spacing: 1.2px; display: flex; align-items: center; gap: 10px; color: var(--text-main); margin: 0; }
   .panel-head h1 i { color: var(--primary); }
-  .panel-close { width: 30px; height: 30px; display: grid; place-items: center; background: transparent; border: 1px solid var(--line-2); border-radius: 4px; color: var(--text-muted); cursor: pointer; }
-  .panel-close:hover { border-color: var(--primary); color: var(--primary); }
-  .panel-body { padding: 14px; }
-  .status { font-size: .74rem; color: var(--text-muted); border-left: 2px solid var(--primary); padding-left: 9px; margin-bottom: 12px; }
+  .panel-close { width: 30px; height: 30px; display: grid; place-items: center; background: #fff; border: 1px solid var(--line-2); border-radius: 6px; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+  .panel-close:hover { background: #f1f5f9; border-color: var(--text-main); color: var(--text-main); }
+  .panel-body { padding: 16px; }
+  .status { font-size: .78rem; font-weight: 500; color: var(--primary); border-left: 3px solid var(--primary); padding-left: 9px; margin-bottom: 12px; background: var(--primary-light); padding-top: 4px; padding-bottom: 4px; border-radius: 0 4px 4px 0; }
 
-  .field { margin-bottom: 10px; }
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .row3 { display: grid; grid-template-columns: 72px 1fr; gap: 10px; }
-  .field-label { display: block; font-family: 'Oswald', sans-serif; font-size: .7rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
-  .inp, textarea { width: 100%; background: var(--bg-dark); border: 1px solid var(--line-2); color: #fff; border-radius: 4px; outline: none; transition: border-color .2s; font-family: 'Poppins', sans-serif; font-size: .84rem; padding: 10px 12px; }
-  .inp:focus, textarea:focus { border-color: var(--primary); }
-  textarea#rawInput { min-height: 340px; resize: vertical; font-family: Consolas, "Courier New", monospace; font-size: .78rem; line-height: 1.6; border-top-left-radius: 0; border-top-right-radius: 0; tab-size: 2; }
-  .checks { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 2px 0 12px; }
-  .chk { display: flex; align-items: center; gap: 7px; font-size: .78rem; color: var(--text-muted); cursor: pointer; }
-  .chk input { accent-color: var(--primary); width: 15px; height: 15px; }
-  .chk input.num { width: 56px; height: auto; padding: 4px 6px; font-size: .78rem; text-align: center; }
-  .pal { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .pal input[type=color] { width: 34px; height: 28px; padding: 2px; border: 1px solid var(--line-2); border-radius: 4px; background: var(--bg-dark); cursor: pointer; }
-  .pal select { flex: 1; min-width: 120px; padding: 6px 8px; font-size: .78rem; }
+  .field { margin-bottom: 12px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row3 { display: grid; grid-template-columns: 72px 1fr; gap: 12px; }
+  .field-label { display: block; font-family: 'Oswald', sans-serif; font-size: .75rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; font-weight: 500; }
+  
+  /* ---- Clean Inputs ---- */
+  .inp, textarea { width: 100%; background: #ffffff; border: 1px solid var(--line-2); color: var(--text-main); border-radius: 6px; outline: none; transition: all .2s ease; font-family: 'Poppins', sans-serif; font-size: .88rem; padding: 10px 12px; box-shadow: inset 0 1px 2px 0 rgba(0,0,0,0.02); }
+  .inp:hover, textarea:hover { border-color: #94a3b8; }
+  .inp:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(142, 27, 42, 0.15); }
+  
+  textarea#rawInput { min-height: 360px; resize: vertical; font-family: Consolas, "Courier New", monospace; font-size: .84rem; line-height: 1.6; border-top-left-radius: 0; border-top-right-radius: 0; tab-size: 2; border-top: none; }
+  
+  .checks { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 4px 0 16px; }
+  .chk { display: flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--text-main); cursor: pointer; font-weight: 500; }
+  .chk input { accent-color: var(--primary); width: 16px; height: 16px; cursor: pointer; }
+  .chk input.num { width: 60px; height: auto; padding: 4px 6px; font-size: .82rem; text-align: center; }
+  .pal { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .pal input[type=color] { width: 36px; height: 32px; padding: 2px; border: 1px solid var(--line-2); border-radius: 6px; background: #fff; cursor: pointer; }
+  .pal select { flex: 1; min-width: 120px; padding: 8px 10px; font-size: .82rem; }
 
   /* ---- formatting toolbar ---- */
-  .fmt { display: flex; flex-wrap: wrap; gap: 3px; padding: 6px; background: #0f0f0f; border: 1px solid var(--line-2); border-bottom: none; border-radius: 4px 4px 0 0; }
-  .fmt button { background: transparent; border: 1px solid transparent; color: #ddd; border-radius: 3px; padding: 5px 8px; font-size: .74rem; font-family: 'Poppins', sans-serif; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all .15s; min-width: 30px; justify-content: center; }
-  .fmt button:hover { border-color: var(--primary); color: var(--primary); }
-  .fmt button.on { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .fmt { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; background: #f8fafc; border: 1px solid var(--line-2); border-bottom: none; border-radius: 6px 6px 0 0; }
+  .fmt button { background: transparent; border: 1px solid transparent; color: var(--text-muted); border-radius: 4px; padding: 6px 10px; font-size: .78rem; font-family: 'Poppins', sans-serif; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all .2s ease; min-width: 32px; justify-content: center; font-weight: 500; }
+  .fmt button:hover { background: #e2e8f0; color: var(--text-main); }
+  .fmt button.on { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 1px 3px rgba(142, 27, 42, 0.3); }
   .fmt button:disabled { opacity: .35; cursor: default; }
   .fmt button b { font-family: Tinos, serif; }
-  .fmt .sep { width: 1px; background: var(--line-2); margin: 3px 3px; }
-  .fmt .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-  .fmt .grp-label { font-size: .62rem; color: #666; letter-spacing: 1px; text-transform: uppercase; align-self: center; padding: 0 4px; }
+  .fmt .sep { width: 1px; background: var(--line-2); margin: 4px 4px; }
+  .fmt .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
 
   /* ---- floating toolbar over a selection in the preview ---- */
-  .floatbar { position: fixed; z-index: 1200; display: none; gap: 3px; padding: 5px; background: rgba(16,16,16,.97); border: 1px solid var(--line-2); border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,.55); flex-wrap: wrap; max-width: 420px; }
+  .floatbar { position: fixed; z-index: 1200; display: none; gap: 4px; padding: 6px; background: #ffffff; border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); flex-wrap: wrap; max-width: 420px; }
   .floatbar.show { display: flex; }
-  .floatbar button { background: transparent; border: 1px solid transparent; color: #eee; border-radius: 3px; padding: 5px 8px; font-size: .74rem; font-family: 'Poppins', sans-serif; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; min-width: 28px; justify-content: center; }
-  .floatbar button:hover { border-color: var(--primary); color: var(--primary); }
+  .floatbar button { background: transparent; border: 1px solid transparent; color: var(--text-main); border-radius: 4px; padding: 6px 10px; font-size: .78rem; font-family: 'Poppins', sans-serif; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; min-width: 30px; justify-content: center; transition: all 0.2s; }
+  .floatbar button:hover { background: var(--primary-light); color: var(--primary); }
   .floatbar button.on { background: var(--primary); border-color: var(--primary); color: #fff; }
   .floatbar button b { font-family: Tinos, serif; }
-  .floatbar .sep { width: 1px; background: var(--line-2); margin: 2px 2px; }
-  .floatbar .sw { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
-  .floatbar::after { content: ""; position: absolute; left: 50%; bottom: -6px; width: 10px; height: 10px; background: rgba(16,16,16,.97); border-right: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); transform: translateX(-50%) rotate(45deg); }
+  .floatbar .sep { width: 1px; background: var(--line-2); margin: 2px 4px; }
+  .floatbar .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
+  .floatbar::after { content: ""; position: absolute; left: 50%; bottom: -6px; width: 12px; height: 12px; background: #ffffff; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); transform: translateX(-50%) rotate(45deg); box-shadow: 4px 4px 10px rgba(0,0,0,0.03); }
 
   /* ---------------- library / sync (DB-backed) ---------------- */
-  .sync { display: flex; align-items: center; gap: 8px; font-size: .72rem; color: var(--text-muted); padding: 6px 10px; border: 1px solid var(--line-2); border-radius: 4px; background: #0f0f0f; margin-bottom: 12px; min-height: 32px; }
-  .sync .dot { width: 8px; height: 8px; border-radius: 50%; background: #666; flex-shrink: 0; transition: background .25s; }
-  .sync.saved .dot { background: #43a047; } .sync.saved { color: #9ccc65; }
-  .sync.saving .dot { background: #ffb300; animation: syncPulse 1s ease-in-out infinite; } .sync.saving { color: #ffd54f; }
-  .sync.dirty .dot { background: #ff9800; } .sync.dirty { color: #ffb74d; }
-  .sync.offline .dot { background: #e53935; } .sync.offline { color: #ef9a9a; }
-  .sync.error .dot { background: #e53935; } .sync.error { color: #ef9a9a; }
+  .sync { display: flex; align-items: center; gap: 10px; font-size: .78rem; font-weight: 500; color: var(--text-main); padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: #f8fafc; margin-bottom: 14px; min-height: 36px; }
+  .sync .dot { width: 10px; height: 10px; border-radius: 50%; background: #94a3b8; flex-shrink: 0; transition: background .25s; }
+  .sync.saved .dot { background: #10b981; } .sync.saved { color: #047857; background: #ecfdf5; border-color: #a7f3d0; }
+  .sync.saving .dot { background: #f59e0b; animation: syncPulse 1s ease-in-out infinite; } .sync.saving { color: #b45309; background: #fffbeb; border-color: #fde68a; }
+  .sync.dirty .dot { background: #f97316; } .sync.dirty { color: #c2410c; background: #fff7ed; border-color: #fed7aa; }
+  .sync.offline .dot { background: #ef4444; } .sync.offline { color: #b91c1c; background: #fef2f2; border-color: #fecaca; }
+  .sync.error .dot { background: #ef4444; } .sync.error { color: #b91c1c; background: #fef2f2; border-color: #fecaca; }
   .sync .txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .sync button { background: transparent; border: 1px solid var(--line-2); color: #ddd; border-radius: 3px; padding: 3px 8px; font-size: .68rem; cursor: pointer; font-family: 'Oswald', sans-serif; letter-spacing: .8px; text-transform: uppercase; white-space: nowrap; }
-  .sync button:hover { border-color: var(--primary); color: var(--primary); }
+  .sync button { background: #fff; border: 1px solid var(--line-2); color: var(--text-main); border-radius: 4px; padding: 4px 10px; font-size: .72rem; cursor: pointer; font-family: 'Oswald', sans-serif; letter-spacing: .8px; text-transform: uppercase; white-space: nowrap; transition: all 0.2s; }
+  .sync button:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
   @keyframes syncPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .45; transform: scale(.8); } }
 
-  .lib-top { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 8px; }
+  .lib-top { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 10px; }
   .lib-top .inp { margin: 0; }
-  .lib-new { background: var(--primary); border: 2px solid var(--primary); color: #fff; border-radius: 4px; padding: 0 12px; font-family: 'Oswald', sans-serif; font-size: .72rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
-  .lib-new:hover { background: transparent; color: var(--primary); }
-  .lib-list { display: flex; flex-direction: column; gap: 6px; max-height: 320px; overflow-y: auto; padding-right: 2px; }
-  .lib-list::-webkit-scrollbar { width: 6px; } .lib-list::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 99px; }
-  .lib-subj { font-family: 'Oswald', sans-serif; font-size: .68rem; letter-spacing: 1.4px; text-transform: uppercase; color: var(--primary); padding: 8px 4px 2px; display: flex; align-items: center; justify-content: space-between; }
-  .lib-subj small { color: #666; letter-spacing: 0; font-family: 'Poppins', sans-serif; text-transform: none; }
-  .lib-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #0f0f0f; border: 1px solid var(--line); border-left: 3px solid transparent; border-radius: 4px; cursor: pointer; transition: all .18s; text-align: left; color: #ddd; font-family: 'Poppins', sans-serif; width: 100%; }
-  .lib-item:hover { border-color: var(--line-2); border-left-color: var(--primary); background: #151515; }
-  .lib-item.cur { border-left-color: var(--primary); background: #1a1410; color: #fff; }
-  .lib-item .no { width: 30px; height: 30px; border-radius: 4px; background: #1c1c1c; display: grid; place-items: center; font-family: 'Oswald', sans-serif; font-size: .8rem; color: var(--primary); flex-shrink: 0; }
+  .lib-new { background: var(--primary); border: none; color: #fff; border-radius: 6px; padding: 0 14px; font-family: 'Oswald', sans-serif; font-size: .76rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(142,27,42,0.2); transition: all 0.2s; }
+  .lib-new:hover { background: var(--primary-hover); transform: translateY(-1px); }
+  .lib-list { display: flex; flex-direction: column; gap: 6px; max-height: 320px; overflow-y: auto; padding-right: 4px; }
+  .lib-subj { font-family: 'Oswald', sans-serif; font-size: .72rem; letter-spacing: 1.4px; text-transform: uppercase; color: var(--primary); padding: 10px 4px 2px; display: flex; align-items: center; justify-content: space-between; }
+  .lib-subj small { color: var(--text-muted); letter-spacing: 0; font-family: 'Poppins', sans-serif; text-transform: none; font-weight: 500; }
+  .lib-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: #ffffff; border: 1px solid var(--line); border-left: 4px solid transparent; border-radius: 8px; cursor: pointer; transition: all .2s ease; text-align: left; color: var(--text-main); font-family: 'Poppins', sans-serif; width: 100%; }
+  .lib-item:hover { background: #f8fafc; border-color: var(--line-2); border-left-color: var(--primary-light); }
+  .lib-item.cur { border-left-color: var(--primary); background: #f8fafc; color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+  .lib-item .no { width: 34px; height: 34px; border-radius: 6px; background: var(--primary-light); display: grid; place-items: center; font-family: 'Oswald', sans-serif; font-size: .85rem; color: var(--primary); flex-shrink: 0; }
   .lib-item .ti { flex: 1; min-width: 0; }
-  .lib-item .ti b { display: block; font-size: .8rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .lib-item .ti small { display: block; font-size: .66rem; color: #777; margin-top: 1px; }
-  .lib-item .del { background: transparent; border: none; color: #555; cursor: pointer; padding: 4px 6px; border-radius: 3px; flex-shrink: 0; font-size: .8rem; }
-  .lib-item .del:hover { color: #ef5350; background: rgba(239,83,80,.1); }
-  .lib-empty { color: #555; font-size: .76rem; padding: 14px 6px; text-align: center; }
-  .lib-tools { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-  .lib-tools button { background: transparent; border: 1px solid var(--line-2); color: #bbb; border-radius: 3px; padding: 5px 9px; font-size: .68rem; cursor: pointer; font-family: 'Oswald', sans-serif; letter-spacing: .8px; text-transform: uppercase; display: inline-flex; align-items: center; gap: 5px; }
-  .lib-tools button:hover { border-color: var(--primary); color: var(--primary); }
+  .lib-item .ti b { display: block; font-size: .85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lib-item .ti small { display: block; font-size: .7rem; color: var(--text-muted); margin-top: 2px; }
+  .lib-item .del { background: transparent; border: none; color: #94a3b8; cursor: pointer; padding: 6px 8px; border-radius: 6px; flex-shrink: 0; font-size: .85rem; transition: all 0.2s; }
+  .lib-item .del:hover { color: #ef4444; background: #fef2f2; }
+  .lib-empty { color: var(--text-muted); font-size: .82rem; padding: 16px 6px; text-align: center; }
+  
+  .lib-tools { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .lib-tools button { background: #ffffff; border: 1px solid var(--line-2); color: var(--text-main); border-radius: 6px; padding: 6px 12px; font-size: .72rem; cursor: pointer; font-family: 'Oswald', sans-serif; letter-spacing: .8px; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+  .lib-tools button:hover { background: #f8fafc; border-color: var(--primary); color: var(--primary); }
 
-  textarea#srcInput { min-height: 200px; resize: vertical; font-family: 'Poppins', sans-serif; font-size: .8rem; line-height: 1.6; }
-  .src-tools { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; align-items: center; }
-  .src-tools small { color: #666; font-size: .68rem; flex: 1; }
+  textarea#srcInput { min-height: 200px; resize: vertical; font-family: 'Poppins', sans-serif; font-size: .84rem; line-height: 1.6; }
+  .src-tools { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
+  .src-tools small { color: var(--text-muted); font-size: .72rem; flex: 1; font-weight: 500; }
 
-  .modal-scrim { position: fixed; inset: 0; background: rgba(0,0,0,.72); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(3px); }
+  /* ---- Modals ---- */
+  .modal-scrim { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
   .modal-scrim.show { display: flex; }
-  .modal { background: var(--bg-light); border: 1px solid var(--line-2); border-radius: 8px; max-width: 440px; width: 100%; padding: 22px; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
-  .modal h3 { font-size: 1rem; letter-spacing: 1.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-  .modal h3 i { color: #ffb300; }
-  .modal p { color: var(--text-muted); font-size: .82rem; line-height: 1.65; margin-bottom: 16px; }
-  .modal .row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-  .modal .btn { padding: 9px 16px; font-size: .78rem; }
+  .modal { background: #ffffff; border: 1px solid var(--line); border-radius: 12px; max-width: 440px; width: 100%; padding: 26px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); color: var(--text-main); }
+  .modal h3 { font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; font-family: 'Oswald', sans-serif; text-transform: uppercase; }
+  .modal h3 i { color: #f59e0b; }
+  .modal p { color: var(--text-muted); font-size: .88rem; line-height: 1.65; margin-bottom: 20px; }
+  .modal .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+  .modal .btn { padding: 10px 18px; font-size: .8rem; }
 
-  .acc { background: var(--bg-dark); border: 1px solid var(--line); border-left: 3px solid transparent; border-radius: 4px; margin-bottom: 12px; }
-  .acc.open { border-left-color: var(--primary); }
-  .acc-head { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 14px; background: transparent; border: none; color: #fff; cursor: pointer; font-family: 'Oswald', sans-serif; font-size: .78rem; letter-spacing: 1.2px; text-transform: uppercase; }
+  /* ---- Accordions ---- */
+  .acc { background: #ffffff; border: 1px solid var(--line); border-left: 4px solid transparent; border-radius: 8px; margin-bottom: 12px; transition: all 0.2s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+  .acc:hover { border-color: var(--line-2); }
+  .acc.open { border-left-color: var(--primary); background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .acc-head { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; background: transparent; border: none; color: var(--text-main); cursor: pointer; font-family: 'Oswald', sans-serif; font-size: .82rem; letter-spacing: 1.2px; text-transform: uppercase; }
   .acc.open .acc-head { color: var(--primary); }
-  .acc-head .chev { transition: transform .32s var(--ease); font-size: .78rem; }
+  .acc-head .chev { transition: transform .32s var(--ease); font-size: .85rem; }
   .acc.open .acc-head .chev { transform: rotate(180deg); }
-  .acc-body { max-height: 0; overflow: hidden; padding: 0 14px; transition: max-height .36s var(--ease), padding .36s var(--ease); }
-  .acc.open .acc-body { max-height: 1400px; padding: 0 14px 14px; }
-  .acc-body p { font-size: .76rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 6px; }
-  .acc-body table { width: 100%; border-collapse: collapse; font-size: .74rem; color: #ccc; margin-top: 6px; }
-  .acc-body td { padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  .btn-copy { display: inline-flex; align-items: center; gap: 7px; background: var(--primary); color: #fff; border: none; border-radius: 4px; padding: 8px 14px; font-family: 'Oswald', sans-serif; font-size: .78rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; margin-bottom: 8px; }
-  .btn-copy.done { background: #2e7d32; }
-  .prompt-box { width: 100%; height: 160px; background: #0d0d0d; color: #bbb; border: 1px solid var(--line); border-radius: 4px; padding: 8px; font: 11px/1.5 Consolas, monospace; resize: vertical; white-space: pre; overflow: auto; }
-  .acc-body td:first-child { color: var(--primary); font-family: Consolas, monospace; white-space: nowrap; }
-  .chip { background: var(--primary); color: #fff; font-size: .66rem; font-weight: 600; padding: 1px 8px; border-radius: 99px; letter-spacing: 0; }
+  .acc-body { max-height: 0; overflow: hidden; padding: 0 16px; transition: max-height .4s var(--ease), padding .4s var(--ease); }
+  .acc.open .acc-body { max-height: 1400px; padding: 0 16px 16px; }
+  .acc-body p { font-size: .8rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 8px; }
+  .acc-body table { width: 100%; border-collapse: collapse; font-size: .78rem; color: var(--text-main); margin-top: 8px; background: #f8fafc; border-radius: 6px; overflow: hidden; }
+  .acc-body td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .btn-copy { display: inline-flex; align-items: center; gap: 8px; background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 10px 16px; font-family: 'Oswald', sans-serif; font-size: .8rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; margin-bottom: 10px; transition: all 0.2s; }
+  .btn-copy:hover { background: var(--primary-hover); transform: translateY(-1px); }
+  .btn-copy.done { background: #10b981; }
+  .prompt-box { width: 100%; height: 160px; background: #f8fafc; color: var(--text-main); border: 1px solid var(--line); border-radius: 6px; padding: 12px; font: 12px/1.6 Consolas, monospace; resize: vertical; white-space: pre; overflow: auto; }
+  .acc-body td:first-child { color: var(--primary-hover); font-family: Consolas, monospace; white-space: nowrap; font-weight: 600; }
+  .chip { background: var(--primary-light); color: var(--primary); font-size: .7rem; font-weight: 600; padding: 2px 10px; border-radius: 99px; letter-spacing: 0; font-family: 'Poppins', sans-serif; text-transform: none; }
 
   /* images panel */
-  .drop { border: 1px dashed var(--line-2); border-radius: 4px; padding: 12px; text-align: center; color: var(--text-muted); font-size: .76rem; cursor: pointer; transition: all .2s; margin-bottom: 8px; }
-  .drop:hover, .drop.over { border-color: var(--primary); color: #fff; background: rgba(255,106,0,.06); }
-  .drop b { color: var(--primary); }
-  .imgs { display: flex; flex-direction: column; gap: 8px; }
-  .imgc { display: flex; gap: 10px; background: var(--bg-light); border: 1px solid var(--line); border-radius: 4px; padding: 8px; }
-  .imgc .th { width: 64px; height: 64px; flex: none; object-fit: cover; border-radius: 3px; background: #000; border: 1px solid var(--line-2); }
-  .imgc .bd { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
-  .imgc .nm { display: flex; align-items: center; gap: 6px; font-size: .74rem; color: #fff; }
-  .imgc .nm code { color: var(--primary); font-family: Consolas, monospace; font-size: .74rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
-  .imgc .nm small { color: #777; }
-  .imgc .del { background: transparent; border: none; color: #888; cursor: pointer; font-size: .8rem; padding: 2px 4px; }
-  .imgc .del:hover { color: #e53935; }
-  .imgc select.inp, .imgc input.inp { padding: 5px 8px; font-size: .74rem; }
-  .imgc .r2 { display: flex; gap: 5px; }
+  .drop { background: #f8fafc; border: 2px dashed var(--line-2); border-radius: 8px; padding: 16px; text-align: center; color: var(--text-muted); font-size: .8rem; cursor: pointer; transition: all .2s; margin-bottom: 12px; }
+  .drop:hover, .drop.over { border-color: var(--primary); color: var(--primary-hover); background: var(--primary-light); }
+  .drop b { color: var(--primary); font-weight: 600; }
+  .imgs { display: flex; flex-direction: column; gap: 10px; }
+  .imgc { display: flex; gap: 12px; background: #ffffff; border: 1px solid var(--line); border-radius: 8px; padding: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+  .imgc .th { width: 68px; height: 68px; flex: none; object-fit: cover; border-radius: 6px; background: #f1f5f9; border: 1px solid var(--line); }
+  .imgc .bd { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+  .imgc .nm { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--text-main); }
+  .imgc .nm code { color: var(--primary-hover); font-family: Consolas, monospace; font-size: .78rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+  .imgc .nm small { color: var(--text-muted); font-weight: 500; }
+  .imgc .del { background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: .85rem; padding: 4px 6px; border-radius: 4px; transition: all 0.2s; }
+  .imgc .del:hover { color: #ef4444; background: #fef2f2; }
+  .imgc select.inp, .imgc input.inp { padding: 6px 10px; font-size: .78rem; background: #fff; }
+  .imgc .r2 { display: flex; gap: 8px; }
   .imgc .r2 > * { flex: 1; min-width: 0; }
-  .imgc .ins { background: var(--primary); color: #fff; border: none; border-radius: 3px; padding: 6px 10px; font-family: 'Oswald', sans-serif; font-size: .74rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
-  .imgc .ins:hover { filter: brightness(1.1); }
-  .imgs-empty { color: #555; font-size: .76rem; padding: 6px 4px; text-align: center; }
+  .imgc .ins { background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 8px 12px; font-family: 'Oswald', sans-serif; font-size: .78rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .imgc .ins:hover { background: var(--primary-hover); }
+  .imgs-empty { color: var(--text-muted); font-size: .82rem; padding: 10px 6px; text-align: center; }
 
-  .olist { display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow-y: auto; padding-right: 4px; }
-  .oitem { display: flex; gap: 8px; width: 100%; padding: 7px 10px; background: var(--bg-light); border: 1px solid var(--line); border-left: 3px solid transparent; border-radius: 4px; color: var(--text-muted); font-size: .76rem; text-align: left; cursor: pointer; transition: all .2s; }
-  .oitem:hover, .oitem.flash { color: #fff; border-left-color: var(--primary); }
-  .oitem .n { color: var(--primary); font-family: 'Oswald', sans-serif; font-weight: 700; min-width: 34px; }
-  .oitem .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .oitem.sub { padding-left: 22px; }
+  .olist { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; padding-right: 6px; }
+  .oitem { display: flex; gap: 10px; width: 100%; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--line); border-left: 4px solid transparent; border-radius: 6px; color: var(--text-main); font-size: .82rem; text-align: left; cursor: pointer; transition: all .2s; }
+  .oitem:hover, .oitem.flash { background: #ffffff; border-left-color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+  .oitem .n { color: var(--primary); font-family: 'Oswald', sans-serif; font-weight: 700; min-width: 36px; }
+  .oitem .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+  .oitem.sub { padding-left: 26px; }
 
   /* =======================================================
      PAPER
   ======================================================= */
-  .stage { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+  .stage { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 28px; }
   .stage.no-wm .wm { display: none; }
-  .page { width: 210mm; height: 297mm; flex: none; background: #fff; color: var(--ink); font-family: Tinos, "Times New Roman", Times, serif; font-size: var(--nf); line-height: 1.38; padding: var(--paper-pad) var(--paper-pad) 5mm; display: flex; flex-direction: column; position: relative; overflow: hidden; border-radius: 3mm; box-shadow: 0 14px 40px rgba(0,0,0,.28); page-break-after: always; break-after: page; transform-origin: top center; transform: scale(var(--sheet-scale)); margin-bottom: calc((297mm * var(--sheet-scale)) - 297mm); margin-left: calc(((210mm * var(--sheet-scale)) - 210mm) / 2); margin-right: calc(((210mm * var(--sheet-scale)) - 210mm) / 2); }
+  .page { width: 210mm; height: 297mm; flex: none; background: #fff; color: var(--ink); font-family: Tinos, "Times New Roman", Times, serif; font-size: var(--nf); line-height: 1.38; padding: var(--paper-pad) var(--paper-pad) 5mm; display: flex; flex-direction: column; position: relative; overflow: hidden; border-radius: 2mm; box-shadow: 0 8px 30px rgba(0,0,0,.08); page-break-after: always; break-after: page; transform-origin: top center; transform: scale(var(--sheet-scale)); margin-bottom: calc((297mm * var(--sheet-scale)) - 297mm); margin-left: calc(((210mm * var(--sheet-scale)) - 210mm) / 2); margin-right: calc(((210mm * var(--sheet-scale)) - 210mm) / 2); }
   .page ::selection { background: rgba(142,27,42,.28); }
   .wm { position: absolute; left: 50%; top: 50%; width: 125mm; height: auto; transform: translate(-50%,-50%); opacity: .06; pointer-events: none; z-index: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .page > .hdr, .page > .body, .page > .foot { position: relative; z-index: 1; }
@@ -286,7 +324,6 @@ $pmAdminEmail = pm_auth_admin_email();
   .h1 { display: flex; align-items: stretch; background: var(--pink); border-radius: 2.2mm; overflow: hidden; margin: 1mm 0 2.6mm; }
   .h1 .num { flex: none; background: var(--maroon); color: #fff; font-weight: 700; font-size: 12.5pt; padding: 1.6mm 3.2mm; display: flex; align-items: center; border-radius: 2.2mm; box-shadow: 0 .8mm 2mm rgba(110,18,32,.3); }
   .h1 .tt { flex: 1; padding: 1.6mm 4mm; color: var(--maroon); font-weight: 700; font-size: 14pt; line-height: 1.15; }
-  /* sub-topic: ❖ + text, coloured only as wide as the text, no numbering */
   .h2 { display: inline-flex; align-items: center; gap: 2.2mm; max-width: 100%; background: linear-gradient(90deg, var(--pink) 0%, var(--pink-2) 100%); border-left: 1.4mm solid var(--maroon); color: var(--maroon); font-weight: 700; font-size: 12pt; line-height: 1.15; padding: 1.1mm 4.5mm 1.1mm 3mm; border-radius: 0 2mm 2mm 0; margin: .6mm 0 2mm; box-shadow: 0 .5mm 1.5mm rgba(110,18,32,.12); }
   .h2 .dia { font-size: 9.5pt; line-height: 1; transform: translateY(-.2mm); }
   .h3 { font-weight: 700; font-size: 11pt; color: var(--maroon); margin: .8mm 0 1.4mm; padding-bottom: .5mm; border-bottom: .3mm dashed #d9b7bd; }
@@ -322,12 +359,7 @@ $pmAdminEmail = pm_auth_admin_email();
   .mac.bar { text-decoration: overline; text-decoration-thickness: .08em; }
   .mac.bar::before { content: none; }
   .fx .mac, .frac .mac { margin-top: .35em; }
-  /* break-word (not anywhere): wrap at spaces, split a word only if it can't fit
-     alone — keeps "10⁻²⁷" and its superscript together */
-  /* --tf / --tpy / --tpx are set per table by fitTable() so any table, however
-     wide, shrinks (font + padding) until it fits its column without broken words */
-  /* auto layout: each column gets at least its longest word, extra space is shared —
-     fixed layout would split width equally and break words in narrow columns */
+  
   table.tb { width: 100%; max-width: 100%; table-layout: auto; border-collapse: separate; border-spacing: 0; font-size: var(--tf, calc(var(--nf) - .5pt)); line-height: 1.3; border: .35mm solid #c9b9bc; border-radius: 2mm; overflow: hidden; word-break: normal; overflow-wrap: break-word; }
   table.tb.force { word-break: break-word; overflow-wrap: anywhere; }
   table.tb sup, table.tb sub { white-space: nowrap; }
@@ -338,21 +370,27 @@ $pmAdminEmail = pm_auth_admin_email();
   table.tb td:first-child { background: var(--cream); font-weight: 700; }
   table.tb tr:nth-child(even) td:not(:first-child) { background: #fdf7f8; }
   .cap { font-weight: 700; font-size: 11pt; margin: 0 0 1.4mm; }
-  /* images: [img: name | 60% | center | caption] */
-  .blk.img { display: flex; justify-content: center; }
-  .blk.img.al-left { justify-content: flex-start; }
-  .blk.img.al-right { justify-content: flex-end; }
-  .fig { margin: 0; max-width: 100%; }
+  
+  /* ---- Images Floating Logic ---- */
+  .blk.img { display: block; clear: both; } /* block default */
+  .blk.img .fig { margin: 0 auto; max-width: 100%; }
+  .blk.img.al-center .fig { margin: 0 auto; text-align: center; }
+  .blk.img.al-left .fig { margin: 0 auto 0 0; }
+  .blk.img.al-right .fig { margin: 0 0 0 auto; }
+  
+  /* float specific */
+  .blk.img.float-left { float: left; clear: none; margin: 1mm 4mm 2mm 0; }
+  .blk.img.float-right { float: right; clear: none; margin: 1mm 0 2mm 4mm; }
+  .blk.img.float-left .fig, .blk.img.float-right .fig { width: 100% !important; margin: 0; }
+
   .fig img { display: block; width: 100%; height: auto; max-height: 130mm; object-fit: contain; border: .25mm solid #e6d6c6; border-radius: 1.2mm; background: #fff; }
   .fig figcaption { font-size: .86em; color: #5a4a4a; text-align: center; margin-top: 1.2mm; font-style: italic; line-height: 1.3; }
   .fig.missing { border: .4mm dashed #c9a9a9; border-radius: 1.5mm; padding: 4mm 3mm; text-align: center; color: #9a5a5a; font-size: .85em; background: #fff8f8; }
   .fig.missing b { font-family: Consolas, monospace; color: var(--maroon); }
-  /* table heading: a folder-tab that sits on the table's top edge */
   .banner { display: inline-flex; align-items: center; gap: 2mm; max-width: 100%; background: linear-gradient(180deg, #a3233a 0%, var(--maroon) 100%); color: #fff; font-weight: 700; font-size: 10.5pt; letter-spacing: .4pt; padding: 1.5mm 4.5mm 1.5mm 3.2mm; border-radius: 2mm 2mm 0 0; position: relative; top: .35mm; box-shadow: 0 -.4mm 1.5mm rgba(110,18,32,.15); }
   .banner::before { content: "❖"; font-size: 8.5pt; opacity: .9; }
   .banner + .blk > table.tb { border-top-left-radius: 0; border-top: .7mm solid var(--maroon); }
 
-  /* ---- question block (MCQ / numerical / any Q) ---- */
   .qb { background: #fff; border: .35mm solid #e3cfd3; border-radius: 2.2mm; padding: 2mm 2.6mm 2.2mm; }
   .qb .q-head { display: flex; gap: 2.6mm; align-items: flex-start; }
   .qb .q-badge { flex: none; background: var(--maroon); color: #fff; font-weight: 700; font-size: 9.5pt; border-radius: 1.6mm; padding: 1mm 2.2mm; line-height: 1; margin-top: .4mm; box-shadow: 0 .6mm 1.6mm rgba(110,18,32,.3); }
@@ -366,7 +404,6 @@ $pmAdminEmail = pm_auth_admin_email();
   .qb .q-sol .lbl { font-weight: 700; color: #9a6b00; }
   .qb.numerical .q-badge { background: #1d4ed8; box-shadow: 0 .6mm 1.6mm rgba(29,78,216,.3); }
 
-  /* reaction arrow with a condition written above:  ->[heat] */
   .arr { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1; margin: 0 1mm; }
   .arr small { font-size: .62em; font-style: italic; color: var(--maroon); margin-bottom: -.2mm; }
   .qt { font-family: Caveat, cursive; font-weight: 700; font-size: 15pt; color: var(--maroon); transform: rotate(-2deg); transform-origin: left; padding: 1mm 2mm; }
@@ -374,8 +411,6 @@ $pmAdminEmail = pm_auth_admin_email();
   .ln { display: block; }
   .ln.i1 { padding-left: 4mm; } .ln.i2 { padding-left: 8mm; }
 
-  /* highlight palette — five slots, each a CSS variable so changing a colour
-     re-colours every use of that marker at once */
   :root { --hl1: #fff176; --hl2: #b3e5fc; --hl3: #c5e1a5; --hl4: #f8bbd0; --hl5: #ffcc80; }
   mark { color: inherit; font-weight: 700; padding: 0 .5mm; border-radius: .7mm; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
   mark.hl1 { background: var(--hl1); }
@@ -385,44 +420,43 @@ $pmAdminEmail = pm_auth_admin_email();
   mark.hl5 { background: var(--hl5); }
   .em { color: var(--maroon); font-weight: 700; }
   sup, sub { font-size: .72em; line-height: 0; }
-  /* nuclide notation  ^A_Z X  →  mass number over atomic number, both before the symbol */
   .nuc { display: inline-flex; align-items: center; white-space: nowrap; vertical-align: baseline; }
   .nuc .ms { display: inline-flex; flex-direction: column; align-items: flex-end; line-height: 1; font-size: .6em; margin-right: .25mm; }
   .nuc .ms span + span { margin-top: .2em; }
   .nuc .el { font-weight: 700; }
 
-  .empty-paper { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; color: #9a8f91; font-size: 12pt; line-height: 1.8; padding: 10mm; }
-  .empty-paper b { color: var(--maroon); }
-  .meta { font-size: .76rem; color: #6b6363; text-align: center; padding: 14px 10px 0; }
-  .zoom-badge { position: fixed; right: 18px; bottom: 18px; z-index: 950; padding: 7px 14px; border-radius: 99px; background: rgba(20,20,20,.94); border: 1px solid var(--line-2); color: #fff; font-family: 'Oswald', sans-serif; font-size: .8rem; letter-spacing: 1px; pointer-events: none; opacity: 0; transform: translateY(6px); transition: all .2s ease; }
+  .empty-paper { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; color: var(--text-muted); font-size: 12pt; line-height: 1.8; padding: 10mm; }
+  .empty-paper b { color: var(--primary); }
+  .meta { font-size: .8rem; color: var(--text-muted); font-weight: 500; text-align: center; padding: 16px 10px 0; }
+  
+  .zoom-badge { position: fixed; right: 24px; bottom: 24px; z-index: 950; padding: 8px 16px; border-radius: 99px; background: #ffffff; border: 1px solid var(--line); box-shadow: 0 4px 10px rgba(0,0,0,0.08); color: var(--text-main); font-family: 'Oswald', sans-serif; font-size: .85rem; letter-spacing: 1px; pointer-events: none; opacity: 0; transform: translateY(10px); transition: all .3s ease; }
   .zoom-badge.show { opacity: 1; transform: translateY(0); }
-  .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(10px); z-index: 1300; background: rgba(16,16,16,.96); border: 1px solid var(--line-2); color: #fff; padding: 9px 16px; border-radius: 8px; font-size: .8rem; opacity: 0; transition: all .25s; pointer-events: none; }
+  
+  .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(15px); z-index: 1300; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px 20px; border-radius: 8px; font-size: .85rem; font-weight: 500; opacity: 0; transition: all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   /* ---------------- responsive ---------------- */
   @media screen and (max-width: 1240px) {
-    .editor-col { position: fixed; left: 0; top: var(--toolbar-h); z-index: 895; flex-basis: auto; width: min(480px, 94vw); height: calc(100dvh - var(--toolbar-h)); max-height: none; padding: 14px; background: var(--bg-dark); border-right: 1px solid var(--line-2); box-shadow: 8px 0 30px rgba(0,0,0,.6); transform: translateX(-100%); opacity: 1; transition: transform .34s var(--ease); }
+    .workspace { flex-direction: row; }
+    .editor-col { position: fixed; right: 0; top: var(--toolbar-h); z-index: 895; flex-basis: auto; width: min(480px, 94vw); height: calc(100dvh - var(--toolbar-h)); max-height: none; padding: 16px; background: #ffffff; border-left: 1px solid var(--line); box-shadow: -8px 0 30px rgba(0,0,0,0.05); transform: translateX(100%); opacity: 1; transition: transform .34s var(--ease); }
     body.drawer-open .editor-col { transform: translateX(0); }
-    body:not(.drawer-open) .editor-col { flex-basis: auto; width: min(480px, 94vw); padding: 14px; opacity: 1; transform: translateX(-100%); }
+    body:not(.drawer-open) .editor-col { flex-basis: auto; width: min(480px, 94vw); padding: 16px; opacity: 1; transform: translateX(100%); }
     body.drawer-open .side-tab { opacity: 0; visibility: hidden; pointer-events: none; }
-    .scrim { display: block; position: fixed; inset: 0; z-index: 890; background: rgba(0,0,0,.7); opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
+    .scrim { display: block; position: fixed; inset: 0; z-index: 890; background: rgba(15, 23, 42, 0.4); opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
     body.drawer-open .scrim { opacity: 1; visibility: visible; }
     .preview-col { flex: 1 1 100%; width: 100%; }
   }
   @media screen and (max-width: 900px) {
     html { overflow-x: hidden; }
-    body { height: auto; overflow: visible; }
-    .workspace { display: block; height: auto; margin-top: var(--toolbar-h); }
-    .editor-col, body:not(.drawer-open) .editor-col, body.drawer-open .editor-col { position: static; width: 100%; flex-basis: auto; min-width: 0; height: auto; max-height: none; padding: 16px 12px 4px; opacity: 1; visibility: visible; overflow: visible; pointer-events: auto; transform: none; background: transparent; border-right: none; box-shadow: none; }
-    .preview-col { width: 100%; height: auto; padding: 8px 10px 70px; overflow: visible; }
-    .side-tab, .scrim, .panel-close { display: none !important; }
+    body { height: auto; overflow: visible; background: var(--bg-dark); }
+    .preview-col { width: 100%; height: auto; padding: 12px 10px 70px; overflow: visible; }
     .stage { overflow-x: hidden; }
     body.bar-hidden .toolbar { transform: translateY(-100%); }
     .row2 { grid-template-columns: 1fr; }
   }
   @media screen and (max-width: 640px) {
-    .bar-inner { width: 96%; } .logo a { font-size: 1.25rem; } .actions { width: 100%; }
-    .btn { flex: 1 1 auto; justify-content: center; padding: 10px 12px; font-size: .76rem; } .hint { font-size: .68rem; }
+    .bar-inner { width: 96%; } .logo a { font-size: 1.25rem; } .actions { width: 100%; justify-content: space-between;}
+    .btn { flex: 1 1 auto; justify-content: center; padding: 8px 10px; font-size: .76rem; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; } }
   @media print {
@@ -442,16 +476,16 @@ $pmAdminEmail = pm_auth_admin_email();
   <div class="bar-inner">
     <div class="logo"><a href="javascript:void(0)">NOTES <span>D2D</span></a></div>
     <div class="actions">
+      <button type="button" class="btn ghost" id="btnHeaderLib"><i class="fa fa-folder-open"></i> Library</button>
       <a class="btn ghost" href="admin_panel.php" title="Back to Admin Panel"><i class="fa fa-arrow-left"></i> Admin</a>
       <button type="button" class="btn ghost" id="btnSample"><i class="fa fa-wand-magic-sparkles"></i> Sample</button>
       <button type="button" class="btn" id="btnPrint"><i class="fa fa-print"></i> Print / PDF</button>
       <button type="button" class="btn danger" id="btnClear"><i class="fa fa-trash"></i> Clear</button>
     </div>
   </div>
-  <div class="hint">Har chapter <b>auto-save</b> hota hai DB me (<b>Ctrl+S</b> = save now) · Left me <b>Library</b> se chapter switch karo · <b>Ctrl+Z / Ctrl+Y</b> undo-redo · <b>$…$</b> math <span style="opacity:.45">v3.0 · <?= htmlspecialchars($pmAdminEmail, ENT_QUOTES, 'UTF-8') ?></span></div>
 </header>
 
-<button type="button" class="side-tab" id="sideTab" aria-expanded="true"><i class="fa fa-angle-right tab-chev"></i><span class="tab-label">Editor</span></button>
+<button type="button" class="side-tab" id="sideTab" aria-expanded="true" title="Open Editor"><i class="fa fa-angle-right tab-chev"></i><span class="tab-label">Editor</span></button>
 <div class="scrim" id="scrim"></div>
 
 <!-- floating toolbar for selections made on the page itself -->
@@ -464,7 +498,7 @@ $pmAdminEmail = pm_auth_admin_email();
   <button type="button" data-wrap="^^" title="Highlight 3"><span class="sw" style="background:var(--hl3)"></span></button>
   <button type="button" data-wrap="!!" title="Highlight 4"><span class="sw" style="background:var(--hl4)"></span></button>
   <button type="button" data-wrap="::" title="Highlight 5"><span class="sw" style="background:var(--hl5)"></span></button>
-  <button type="button" data-unwrap="hl" title="Remove highlight"><span class="sw" style="background:var(--hl1);position:relative"><i class="fa fa-slash" style="position:absolute;inset:0;font-size:11px;color:#c62828;line-height:11px"></i></span></button>
+  <button type="button" data-unwrap="hl" title="Remove highlight"><span class="sw" style="background:var(--hl1);position:relative"><i class="fa fa-slash" style="position:absolute;inset:0;font-size:11px;color:#ef4444;line-height:11px"></i></span></button>
   <button type="button" data-wrap="@@" title="Maroon text"><span class="sw" style="background:#8e1b2a"></span></button>
   <button type="button" data-wrap="$" title="Inline math">ƒ</button>
   <button type="button" data-clear="1" title="Remove ALL formatting"><i class="fa fa-eraser"></i></button>
@@ -480,12 +514,18 @@ $pmAdminEmail = pm_auth_admin_email();
 </div>
 
 <div class="workspace">
+  <!-- PREVIEW NOW COMES FIRST IN DOM, BUT EDITOR SHOWS ON RIGHT VIA ROW-REVERSE -->
+  <main class="preview-col" id="previewCol">
+    <div class="stage" id="stage"></div>
+    <div class="meta" id="meta"></div>
+  </main>
+
   <aside class="editor-col">
     <div class="editor" id="editor">
       <div class="panel">
         <div class="panel-head">
           <h1><i class="fa fa-book-open"></i> Notes D2D</h1>
-          <button type="button" class="panel-close" id="panelClose" aria-label="Close editor"><i class="fa fa-xmark"></i></button>
+          <button type="button" class="panel-close" id="panelClose" aria-label="Close editor" title="Close Panel"><i class="fa fa-xmark"></i></button>
         </div>
         <div class="panel-body">
           <div class="status" id="status">Ready</div>
@@ -511,198 +551,27 @@ $pmAdminEmail = pm_auth_admin_email();
           <div class="acc" id="accHelp">
             <button type="button" class="acc-head" data-acc><span><i class="fa fa-circle-info"></i>&nbsp; Formatting guide</span><i class="fa fa-angle-down chev"></i></button>
             <div class="acc-body">
-              <p><b style="color:#fff">Do tarike:</b> (1) page par text select karo → chhota toolbar aayega → style lagao/hatao. (2) Neeche textarea me markup likho ya toolbar use karo. Har button <b style="color:#fff">toggle</b> hai — dobara dabane se style hat jata hai, aur cursor jahan hai wahan ka style button par highlight dikhta hai.</p>
+              <p><b>Do tarike:</b> (1) page par text select karo → chhota toolbar aayega → style lagao/hatao. (2) Neeche textarea me markup likho ya toolbar use karo. Har button <b>toggle</b> hai.</p>
               <table>
                 <tr><td># Heading</td><td>Section band (1.1, 1.2 … auto-number)</td></tr>
                 <tr><td>## Sub-topic</td><td>Sub-section band (1.2.1 …)</td></tr>
                 <tr><td>### Small heading</td><td>Maroon dashed-underline heading</td></tr>
                 <tr><td>- item</td><td>Bullet (2 spaces + - = sub-bullet)</td></tr>
                 <tr><td>1. item</td><td>Maroon circle numbered item</td></tr>
-                <tr><td>&gt; Note: text</td><td>Cream box. Agli lines (blank line tak) usi box me — har Enter = nayi line</td></tr>
-                <tr><td>$ E = mc^2</td><td>Formula box. <b>$…$</b> inline math. LaTeX: \frac{a}{b} \sqrt{x} \sqrt[3]{x} \left( \right) \times \cdot \pm \lambda ^{2} _{0} 60^\circ \therefore</td></tr>
-                <tr><td>\cos\theta  \sin^2\theta<br>\log_{10} x  \lim_{x \to 0}</td><td>Functions roman me: cos θ, sin²θ, log₁₀ x — hamesha backslash ke saath</td></tr>
-                <tr><td>\vec{F}  \hat{n}  \bar{v}<br>\dot{x}  \overline{AB}  \overrightarrow{AB}</td><td>Vector arrow, hat, bar, dot upar aata hai. \mathbf{F} = bold. e.g. <code>W = F \times S \times \cos\theta = \vec{F} \cdot \vec{S}</code></td></tr>
-                <tr><td>Q1. text (a) .. (b) ..<br>Ans: b</td><td>MCQ block — options ek line me ya alag lines me. <b>Solution:</b> ke baad steps (numerical). Bina number ke bhi <code>Q.</code> chalega, auto-number hota hai</td></tr>
-                <tr><td>H2SO4  Ca^2+  SO4^2-<br>2H2 + O2 ->[heat] 2H2O<br>N2 + 3H2 &lt;=&gt; 2NH3</td><td>Chemistry: H₂SO₄, Ca²⁺, SO₄²⁻, arrow ke upar condition, ⇌ equilibrium — sab auto</td></tr>
-                <tr><td>| a | b |</td><td>Table (pehli row header). Tab-separated bhi. Kitni bhi badi ho, font/padding khud ghat ke <b>ek column me fit</b> hoti hai. Lambi table agle column me header ke saath continue. Poori page width chahiye to table ke upar <code>[Wide]</code> likho</td></tr>
+                <tr><td>&gt; Note: text</td><td>Cream box. Agli lines (blank line tak) usi box me</td></tr>
+                <tr><td>$ E = mc^2</td><td>Formula box. <b>$…$</b> inline math. LaTeX: \frac{a}{b} \sqrt{x}</td></tr>
+                <tr><td>\cos\theta  \sin^2\theta</td><td>Functions roman me: cos θ, sin²θ, log₁₀ x — backslash ke saath</td></tr>
+                <tr><td>\vec{F}  \hat{n}  \bar{v}</td><td>Vector arrow, hat, bar. \mathbf{F} = bold.</td></tr>
+                <tr><td>Q1. text (a) .. (b) ..<br>Ans: b</td><td>MCQ block. <b>Solution:</b> ke baad steps.</td></tr>
+                <tr><td>H2SO4  Ca^2+</td><td>Chemistry: H₂SO₄, Ca²⁺, SO₄²⁻, arrow condition auto</td></tr>
+                <tr><td>| a | b |</td><td>Table (pehli row header). Tab-separated bhi.</td></tr>
                 <tr><td>[Banner] text</td><td>Maroon banner (table ke upar)</td></tr>
-                <tr><td>~ text</td><td>Handwritten line</td></tr>
-                <tr><td>^1_1H  ^235_92U  ^14_6C</td><td>Isotope / nuclide: mass number upar, atomic number neeche, symbol se pehle (¹₁H)</td></tr>
+                <tr><td>^1_1H  ^235_92U</td><td>Isotope / nuclide: mass number upar, atomic number neeche</td></tr>
                 <tr><td>**b** *i* __u__</td><td>Bold / italic / underline</td></tr>
-                <tr><td>==t== %%t%% ^^t^^ !!t!! ::t::</td><td>Highlight 1–5 (colours upar palette se — ek badlo, sab jagah badlega). <code>@@t@@</code> maroon text</td></tr>
-                <tr><td>[img: name | 60% | center | caption]</td><td>Image (Images panel se add karo). Width %, left/center/right, caption — sab optional. Upar <code>[Wide]</code> = poori page width</td></tr>
+                <tr><td>==t== %%t%% ^^t^^ !!t!! ::t::</td><td>Highlight 1–5 (colours upar palette se). <code>@@t@@</code> maroon text</td></tr>
+                <tr><td>[img: name | 60% | float-left | cap]</td><td>Image wrap (<b>Text ke thik upar image tag rakhein</b>). Normal display block ke liye 'center', 'left', 'right' chunein.</td></tr>
                 <tr><td>---col--- / ---page---</td><td>Column / page break</td></tr>
               </table>
-              <p style="margin-top:8px">Enter = nayi line (paragraph me bhi). Leading spaces indent bante hain.</p>
-            </div>
-          </div>
-
-          <div class="acc" id="accPrompt">
-            <button type="button" class="acc-head" data-acc><span><i class="fa fa-robot"></i>&nbsp; AI prompt (ChatGPT / Claude)</span><i class="fa fa-angle-down chev"></i></button>
-            <div class="acc-body">
-              <p>Ye prompt copy karke ChatGPT / Claude me paste karo, neeche apna topic likho — output seedha yahan paste karne par sahi format me render hoga.</p>
-              <button type="button" class="btn-copy" id="btnCopyPrompt"><i class="fa fa-copy"></i> Copy prompt</button>
-              <textarea id="aiPrompt" class="prompt-box" readonly spellcheck="false">You are a study-notes writer for Indian diploma/engineering students. Convert the material I give you into SHORT NOTES written in Hinglish (Hindi in Roman script mixed with English technical terms, same style as: "Atom kisi element ka smallest particle hota hai jo chemical reaction me part leta hai."). Keep sentences short and exam-oriented.
-
-Your output will be pasted into a renderer that understands ONLY the lightweight markup below. Follow it EXACTLY. Output ONLY the notes text inside one plain code block — no explanations before or after.
-
-════════════════════ MARKUP RULES ════════════════════
-
-HEADER (first lines only, one per line):
-Title: &lt;chapter title, e.g. Atomic Structure&gt;
-Chapter: &lt;number, e.g. 1&gt;
-Subtitle: &lt;optional — omit this line if not needed&gt;
-
-STRUCTURE (each on its own line, blank line between blocks):
-# Section title              → main section band (auto-numbered 1.1, 1.2 …)
-## Sub-topic title           → sub-topic band with a ❖ mark (not numbered)
-### Small heading            → small underlined heading (e.g. "Jahan:", "Types:")
-Plain text                   → paragraph. Enter = new line inside the paragraph. Blank line = new block.
-- point                      → bullet point
-  - sub point                → sub-bullet (2 spaces before the dash)
-1. point                     → numbered item (maroon circle)  (use 1. 2. 3. …)
-
-BOXES (label decides the style):
-&gt; Note: text                 → cream note box
-&gt; Key Idea: text             → note box
-&gt; Important: text            → note box
-&gt; Definition: text           → bordered definition box
-&gt; Statement: text            → bordered box (laws / principles)
-&gt; Tip: text                  → lightbulb box
-&gt; Example: text              → lightbulb box
-&gt; Remember: text             → lightbulb box
-&gt; Interesting Fact: text     → lightbulb box
-Lines written directly after a "&gt;" line (until a blank line) stay inside the same box, each on its own line.
-
-FORMULAS:
-$ E = mc^2                   → formula box (one formula per line, starts with "$ ")
-$ Formula: v = u + at        → formula box with a label
-Inline math inside text: $2n^2$  $\frac{h}{p}$  $\lambda$
-Allowed LaTeX-lite: \frac{a}{b}  \sqrt{x}  \sqrt[3]{x}  \left(  \right)  \times  \cdot  \pm  \ge  \le  \ne  \approx  \propto  \to  \infty  \therefore  \because  \quad
-Greek: \lambda \Delta \psi \pi \theta \mu \nu \sigma \omega \alpha \beta \gamma \varepsilon \rho \tau \phi \Omega
-Superscript ^2 or ^{-27}, subscript _0 or _{max}.  10^8, H_2O also work.  Degrees: 60^\circ
-Trig / log functions: \sin\theta  \cos\theta  \tan\theta  \sin^2\theta  \log_{10} x  \ln x  \lim_{x \to 0}  (always with backslash, e.g. W = F \times S \times \cos\theta)
-Vectors / accents: \vec{F}  \vec{v}  \hat{n}  \bar{v}  \dot{x}  \overline{AB}  \overrightarrow{AB}  \mathbf{F}
-Example: $ Formula: W = F \times S \times \cos\theta = \vec{F} \cdot \vec{S}
-Sum / integral: \sum_{n=1}^{\infty}  \int_0^t  \partial  \nabla
-
-CHEMISTRY (write plainly — the renderer formats it):
-H2SO4  CO2  Ca(OH)2          → subscripts are automatic (H₂SO₄)
-Na^+  Cl^-  Ca^2+  SO4^2-    → ionic charges as superscript
-2H2 + O2 -&gt; 2H2O             → reaction arrow;  -&gt;[heat] or -&gt;[catalyst] writes the condition above the arrow
-N2 + 3H2 &lt;=&gt; 2NH3            → equilibrium arrow ⇌
-Put every reaction on its own line starting with "$ " so it appears as a formula box.
-
-QUESTIONS (MCQ / numerical / short answer):
-Q1. Question text (a) option (b) option (c) option (d) option
-Ans: c
-Q2. Numerical question text
-Solution: step 1 on this line
-= step 2 on its own line
-= final value with unit
-Ans: 7.28 Å
-(Options can also be written one per line as "(a) text". Leave a blank line after each question. Numbering is automatic if you write just "Q.")
-
-TABLES:
-[Banner] Table title         → maroon tab heading on the table (optional, put right above the table)
-| Header 1 | Header 2 | Header 3 |
-| cell | cell | cell |
-| cell | cell | cell |
-First row = header. First column is shown bold. Use tables for comparisons (Atom vs Molecule, Bohr vs Quantum, etc.).
-Any table, however wide, is shrunk to fit one column. Write "[Wide]" on the line above a table only if it must span the full page width.
-Greek letters: \varepsilon_0 \epsilon \lambda \Delta etc. all work (E_n = -\frac{1}{8} \times \frac{m e^4}{\varepsilon_0^2 h^2 n^2}).
-
-ISOTOPES / NUCLIDES:
-^1_1H  ^2_1H  ^235_92U  ^14_6C  → mass number over atomic number, in front of the symbol (¹₁H)
-
-INLINE STYLING (use generously on key terms, like a highlighted textbook):
-**bold**   *italic*   __underline__
-==yellow highlight==         → use ONLY this yellow highlight for key terms, definitions, values and results
-@@maroon text@@              → coloured text (rare — for a warning word or an exception)
-Do NOT use %% ^^ !! :: markers.
-
-IMAGES (placeholders only — I will attach the real pictures later):
-[img: short-name | 60% | center | caption]   → put this line where a diagram/figure would genuinely help (max 1 per topic). short-name = lowercase-with-hyphens.
-
-OTHER:
-~ text                       → handwritten-style line (use once, as a closing quote)
----col---                    → force new column
----page---                   → force new page
-
-════════════════════ HARD RULES ════════════════════
-1. Never use markdown headings beyond ### (no ####). Never put the chapter title as "# …" — use "Title:".
-2. Never use "|" inside normal sentences (it would be read as a table). Never use "$" for money.
-3. Do not write lines in ALL CAPS unless they are headings. Do not start a sentence with a number + dot unless it is a list item.
-4. Every formula on its own line with "$ ". Do not write formulas in plain text.
-5. Keep bullets to 1–2 lines. Bold the key term in each bullet with **…**.
-6. Prefer explicit markup (#, ##, -, &gt;, $) over relying on auto-detection.
-7. No emojis, no HTML, no markdown links/images.
-8. Language: Hinglish. Technical terms, units, symbols and formulas in English.
-
-════════════════════ CONTENT GUIDELINES ════════════════════
-- Order: Introduction → concepts in logical sequence → comparisons (tables) → formulas → key points / quick revision.
-- For each concept: 1 short definition (&gt; Definition:), 2–5 bullets, formula if any, 1 table if there is a comparison, 1 tip/trick if useful.
-- End with "## Quick Revision" containing 5–10 one-line bullets.
-- No length limit: cover the topic completely — every concept, formula, derivation step, comparison and typical question that an exam can ask. Do not shorten to fit a page count.
-
-════════════════════ EXAMPLE OF CORRECT OUTPUT ════════════════════
-Title: Atomic Structure
-Chapter: 1
-Subtitle: Chemistry Short Notes
-
-# Introduction
-Atoms hi chemistry ki foundation hain — universe me jitna bhi matter hai, sab atoms se bana hai. **Atom** word Greek word **"atomos"** se aaya hai jiska matlab hai "jo divide nahi kiya ja sakta".
-
-# Atom and Molecules
-
-## Atom
-- Atom kisi element ka **smallest particle** hota hai jo chemical reaction me part leta hai.
-- Chemical reaction me sirf atoms ka **rearrangement** hota hai.
-- Atom free state me exist nahi karta (except ==noble gases==).
-
-## Molecule
-&gt; Definition: **Molecule** kisi element ya compound ka **smallest stable particle** hota hai jo independently exist kar sakta hai.
-
-- Molecule me jitne atoms hote hain, use uski **atomicity** kehte hain.
-
-[Banner] Atomicity ke types
-| Atomicity | Example |
-| One (Monatomic) | Noble gases (He, Ne) |
-| Two (Diatomic) | H_2, N_2, O_2, Cl_2 |
-| Three (Triatomic) | Ozone (O_3) |
-
-# Atomic Number and Mass Number
-- Nucleus me jitne protons, wahi **atomic number (Z)** hai. Isotopes: ^1_1H, ^2_1H, ^3_1H — ==same Z==, ==different A==.
-- Protons + neutrons ka total = **mass number (A)**.
-
-$ A = p + n
-
-$ Z = protons ki sankhya = electrons ki sankhya
-
-&gt; Tip: Neutral atom me hamesha ==protons = electrons== hote hain.
-
-$ 2H2 + O2 -&gt;[spark] 2H2O
-
-## Practice Questions
-Q1. Nucleus me kaun se particles hote hain? (a) electron, proton (b) proton, neutron (c) electron, neutron (d) sirf proton
-Ans: b
-
-Q2. Ek atom me 11 protons aur 12 neutrons hain. Mass number nikalo.
-Solution: A = p + n
-= 11 + 12
-= 23
-Ans: 23
-
-## Quick Revision
-- Atom = smallest particle, molecule = smallest **stable** particle
-- Atomicity = molecule me atoms ki sankhya
-- A = p + n, Z = p = e
-
-~ Atoms — The Building Blocks of Everything
-
-════════════════════ NOW WRITE ════════════════════
-Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt;&gt;
-</textarea>
             </div>
           </div>
 
@@ -712,7 +581,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
             <div class="field"><label class="field-label">Title</label><input class="inp" id="titleInput" type="text" value="Atomic Structure" autocomplete="off"></div>
           </div>
           <div class="row2">
-            <div class="field"><label class="field-label">Subtitle (optional)</label><input class="inp" id="subInput" type="text" value="" placeholder="e.g. Chemistry Notes — khali chhodo to nahi dikhega" autocomplete="off"></div>
+            <div class="field"><label class="field-label">Subtitle (optional)</label><input class="inp" id="subInput" type="text" value="" placeholder="e.g. Chemistry Notes" autocomplete="off"></div>
             <div class="field"><label class="field-label">Corner badge</label><input class="inp" id="badgeInput" type="text" value="Small Notes / Big Results" autocomplete="off"></div>
           </div>
           <div class="field"><label class="field-label">Header tagline</label><input class="inp" id="tagInput" type="text" value="Study | Practice | Score High" autocomplete="off"></div>
@@ -729,7 +598,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
           </div>
 
           <div class="field pal-row">
-            <label class="field-label">Highlight colours <span style="color:#666;text-transform:none;letter-spacing:0">(== %% ^^ !! ::)</span></label>
+            <label class="field-label">Highlight colours <span style="color:var(--text-muted);text-transform:none;letter-spacing:0">(== %% ^^ !! ::)</span></label>
             <div class="pal" id="pal">
               <input type="color" data-hl="1" title="Highlight 1  ==text==">
               <input type="color" data-hl="2" title="Highlight 2  %%text%%">
@@ -750,12 +619,12 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
           <div class="acc" id="accSource">
             <button type="button" class="acc-head" data-acc><span><i class="fa fa-file-lines"></i>&nbsp; Chapter content (source) <span class="chip" id="srcCount">0</span></span><i class="fa fa-angle-down chev"></i></button>
             <div class="acc-body">
-              <p style="margin-top:8px">Yahan chapter ka <b style="color:#fff">raw material</b> rakho — syllabus points, book ka text, AI prompt ka input. Ye <b style="color:#fff">notes se alag</b> save hota hai, print me nahi aata.</p>
+              <p style="margin-top:8px">Yahan chapter ka <b>raw material</b> rakho. Ye <b>notes se alag</b> save hota hai, print me nahi aata.</p>
               <textarea id="srcInput" class="inp" spellcheck="false" placeholder="Chapter ka original content / syllabus / reference text yahan paste karo…"></textarea>
               <div class="src-tools">
                 <small id="srcMeta">0 words</small>
-                <button type="button" class="lib-tools-btn" id="btnSrcToNotes" style="background:transparent;border:1px solid var(--line-2);color:#bbb;border-radius:3px;padding:5px 9px;font-size:.68rem;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:.8px;text-transform:uppercase" title="Append source into notes editor at cursor"><i class="fa fa-arrow-turn-down"></i> Send to notes</button>
-                <button type="button" id="btnSrcCopy" style="background:transparent;border:1px solid var(--line-2);color:#bbb;border-radius:3px;padding:5px 9px;font-size:.68rem;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:.8px;text-transform:uppercase" title="Copy source to clipboard"><i class="fa fa-copy"></i> Copy</button>
+                <button type="button" class="lib-tools-btn" id="btnSrcToNotes" style="background:#ffffff;border:1px solid var(--line-2);color:var(--text-main);border-radius:6px;padding:6px 10px;font-size:.72rem;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:.8px;text-transform:uppercase" title="Append source into notes editor at cursor"><i class="fa fa-arrow-turn-down"></i> Send to notes</button>
+                <button type="button" id="btnSrcCopy" style="background:#ffffff;border:1px solid var(--line-2);color:var(--text-main);border-radius:6px;padding:6px 10px;font-size:.72rem;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:.8px;text-transform:uppercase" title="Copy source to clipboard"><i class="fa fa-copy"></i> Copy</button>
               </div>
             </div>
           </div>
@@ -774,7 +643,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
               <button type="button" data-wrap="^^" title="Highlight 3"><span class="sw" style="background:var(--hl3)"></span></button>
               <button type="button" data-wrap="!!" title="Highlight 4"><span class="sw" style="background:var(--hl4)"></span></button>
               <button type="button" data-wrap="::" title="Highlight 5"><span class="sw" style="background:var(--hl5)"></span></button>
-              <button type="button" data-unwrap="hl" title="Remove highlight from selection"><span class="sw" style="background:var(--hl1);position:relative"><i class="fa fa-slash" style="position:absolute;inset:0;font-size:12px;color:#c62828;line-height:12px"></i></span></button>
+              <button type="button" data-unwrap="hl" title="Remove highlight from selection"><span class="sw" style="background:var(--hl1);position:relative"><i class="fa fa-slash" style="position:absolute;inset:0;font-size:12px;color:#ef4444;line-height:12px"></i></span></button>
               <button type="button" data-wrap="@@" title="Maroon text"><span class="sw" style="background:#8e1b2a"></span></button>
               <button type="button" data-wrap="$" title="Inline math">ƒ</button>
               <button type="button" data-clear="1" title="Remove ALL formatting"><i class="fa fa-eraser"></i></button>
@@ -803,7 +672,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
               <input type="file" id="imgFile" accept="image/*" multiple hidden>
               <div class="drop" id="imgDrop"><b><i class="fa fa-plus"></i> Add image</b> — click karo ya photo yahan drop karo<br><span style="font-size:.7rem">PNG / JPG / screenshot · auto-compress hoti hai</span></div>
               <div class="imgs" id="imgList"></div>
-              <p style="margin-top:8px">Har image ke niche <b style="color:#fff">"Insert after"</b> dropdown se position chuno → <b style="color:#fff">Insert</b>. Text me line banti hai: <code style="color:var(--primary)">[img: name | 60% | center | caption]</code> — ise kahin bhi move kar sakte ho. Poori page width ke liye upar <code style="color:var(--primary)">[Wide]</code> likho.</p>
+              <p style="margin-top:8px">Har image ke niche <b>"Insert after"</b> dropdown se position chuno → <b>Insert</b>. Text me line banti hai: <code style="color:var(--primary)">[img: name | 60% | center | caption]</code> — ise kahin bhi move kar sakte ho. Poori page width ke liye upar <code style="color:var(--primary)">[Wide]</code> likho.</p>
             </div>
           </div>
 
@@ -818,20 +687,8 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
 
   <div class="zoom-badge" id="zoomBadge">100%</div>
   <div class="toast" id="toast"></div>
+  <div class="modal-scrim" id="modalScrim"><div class="modal"><h3><i class="fa fa-triangle-exclamation"></i> <span id="modalTitle">Unsaved draft mila</span></h3><p id="modalBody"></p><div class="row" id="modalRow"></div></div></div>
 
-  <!-- shown when a local draft is newer than the server copy, or the server has a newer version -->
-  <div class="modal-scrim" id="modalScrim">
-    <div class="modal">
-      <h3><i class="fa fa-triangle-exclamation"></i> <span id="modalTitle">Unsaved draft mila</span></h3>
-      <p id="modalBody"></p>
-      <div class="row" id="modalRow"></div>
-    </div>
-  </div>
-
-  <main class="preview-col" id="previewCol">
-    <div class="stage" id="stage"></div>
-    <div class="meta" id="meta"></div>
-  </main>
 </div>
 
 <script>
@@ -848,9 +705,13 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   var WA_LINK = "https://wa.me/91" + WA_NUMBER + "?text=" + encodeURIComponent("Hi, I want to join the D2D batch");
 
   var SAMPLE = [
-"de Broglie Hypothesis (1924)","",
-"1924 mein Louis de Broglie ne ek paper likha jisme describe kiya ki electron jaise particles bhi wave ki tarah behave kar sakte hain.","",
-"Key Idea: Har matter (jo particles se bani hai), jab motion mein hota hai, to woh wave-like properties dikhata hai. Yeh waves **matter waves** ya **de Broglie waves** kehlati hain.","",
+"## Work done example","",
+"Q1. Ek force $F = (10+0.5x)$ N particle par x-direction me act karta hai. $x=0$ se $x=2$ tak displacement me kiya gaya work nikalo.",
+"Solution: $W = \\int_0^2 (10+0.5x)\\,dx$",
+"= $\\left[10x+\\frac{0.5x^2}{2}\\right]_0^2$",
+"= $10(2)+0.25(4)$",
+"= $20 + 1 = 21$ J",
+"Ans: 21 J","",
 "## Context (Till Now We Knew)","",
 "- Light wave ki tarah behave karti hai (interference, diffraction)",
 "- Light particle ki tarah bhi behave karti hai (photoelectric effect)",
@@ -867,7 +728,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
 "Heisenberg's Uncertainty Principle (1927)","",
 "Statement: Yeh impossible hai ki hum ek electron ki exact position aur exact momentum ek saath simultaneously determine kar sakein.","",
 "$ \\Delta x \\cdot \\Delta p \\ge \\frac{h}{4\\pi}","",
-"Max electrons in a shell: $2n^2$, in a subshell: $2\\left(2l+1\\right)$","",
 "Comparison:","",
 "| Bohr Model | Quantum Mechanical Model |",
 "| Electron fixed circular orbits mein move karta hai | Electron probability cloud mein hota hai |",
@@ -877,12 +737,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
 "| Proton | p | +1 | 1.0073 | 1.67 × 10^-27 | Nucleus |",
 "| Neutron | n | 0 | 1.0087 | 1.67 × 10^-27 | Nucleus |",
 "| Electron | e | −1 | 1/1836 | 9.11 × 10^-31 | Around nucleus |","",
-"1. 's' subshell — highest shielding effect",
-"2. 'f' subshell — poorest shielding effect","",
-"Tip: Order yaad rakho — ==s > p > d > f==","",
 "## Practice Questions","",
-"Q1. Which quantum number describes the orientation of an orbital? (a) Principal (b) Azimuthal (c) Magnetic (d) Spin",
-"Ans: c","",
 "Q2. Calculate the de Broglie wavelength of an electron (m = 9.1 x 10^-31 kg) moving at 10^6 m/s. (h = 6.63 x 10^-34 Js)",
 "Solution: lambda = h / (m v)",
 "= 6.63 x 10^-34 / (9.1 x 10^-31 x 10^6)",
@@ -891,7 +746,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
 "$ 2H_2 + O_2 ->[spark] 2H_2O",
 "$ CaCO3 ->[heat] CaO + CO2",
 "$ N2 + 3H2 <=> 2NH3","",
-"Ionic compounds like Na^+ Cl^- aur Ca^2+ SO4^2- water me dissolve hote hain; H2SO4 strong acid hai.","",
 "## Isotopes of Hydrogen","",
 "| Isotope | Notation | Protons | Neutrons |",
 "| Protium | ^1_1H | 1 | 0 |",
@@ -915,7 +769,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   var FUNCS = "sin|cos|tan|cot|sec|csc|cosec|sinh|cosh|tanh|coth|arcsin|arccos|arctan|log|ln|lg|exp|lim|max|min|sup|inf|det|dim|deg|mod|gcd|arg|ker|Re|Im";
   var ACCENTS = { vec:"arr", overrightarrow:"warr", hat:"^", bar:"bar", overline:"bar", dot:"˙", ddot:"¨", tilde:"~", breve:"˘", check:"ˇ" };
 
-  /** ^1_1H  _1^1H  ^{235}_{92}U  {}^{14}_{6}C  →  stacked pre-scripts before the symbol */
   function nuclide(s) {
     return s.replace(/(?<=^|[\s(\[,;:>])(?:\{\})?(?:\^\{?([^\s{}^_<>]+)\}?\s*_\{?([^\s{}^_<>]+)\}?|_\{?([^\s{}^_<>]+)\}?\s*\^\{?([^\s{}^_<>]+)\}?)\s*([A-Z][a-z]?)(?![a-z])/g,
       function (m, a1, z1, z2, a2, el) {
@@ -924,12 +777,10 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
       });
   }
   function texify(s) {
-    // s is already HTML-escaped
     s = nuclide(s);
     s = s.replace(/\\left\s*|\\right\s*/g, "").replace(/\\,|\\;|\\ /g, " ").replace(/\\%/g, "%");
     s = s.replace(/\\(?:text|mathrm|textrm|operatorname)\{([^{}]*)\}/g, "$1").replace(/\\(?:mathbf|textbf|boldsymbol|bm)\{([^{}]*)\}/g, "<b>$1</b>");
     s = s.replace(/\\(?:dfrac|tfrac)\{/g, "\\frac{").replace(/\\qquad/g, " &emsp;&emsp; ").replace(/\\quad/g, " &emsp; ").replace(/\^\\circ|\^\{\\circ\}|\\degree/g, "°").replace(/\\\{/g, "&#123;").replace(/\\\}/g, "&#125;").replace(/\\\|/g, "‖");
-    // accents: \vec{F} \hat{x} \bar{v} \overline{AB} \dot{x} \ddot{x} \tilde{a}  (also \vec F without braces)
     for (var a = 0; a < 3; a++) s = s.replace(/\\(vec|overrightarrow|hat|bar|overline|dot|ddot|tilde|breve|check)\s*(?:\{([^{}]*)\}|([A-Za-z0-9]|\\[A-Za-z]+))/g, function (m, w, g1, g2) {
       var t = ACCENTS[w], body = g1 != null ? g1 : g2;
       if (t === "arr" || t === "warr") return '<span class="mac ' + t + '">' + body + "</span>";
@@ -938,33 +789,28 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     });
     for (var k = 0; k < 4; k++) s = s.replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g, '<span class="frac"><span>$1</span><span>$2</span></span>');
     s = s.replace(/\\sqrt\[([^\]]+)\]\{([^{}]*)\}/g, '<sup>$1</sup>√<span class="rad">$2</span>');
-    // function names: \cos\theta -> cos θ,  \sin^2\theta -> sin²θ,  \log_{10} x
     s = s.replace(new RegExp("\\\\(" + FUNCS + ")(?![A-Za-z])((?:\\^|_)(?:\\{[^{}]*\\}|\\S))?\\s*", "g"), function (m, f, sc) { return '<span class="fn">' + f + "</span>" + (sc || "") + "&thinsp;"; });
     s = s.replace(/\\sqrt\{([^{}]*)\}/g, '√<span class="rad">$1</span>').replace(/\\sqrt\s*([A-Za-z0-9]+)/g, '√<span class="rad">$1</span>');
     s = s.replace(/\\([A-Za-z]+)/g, function (m, w) { return TEX.hasOwnProperty(w) ? TEX[w] : (GREEK.hasOwnProperty(w) ? GREEK[w] : m); });
     s = s.replace(/\^\{([^{}]*)\}/g, "<sup>$1</sup>").replace(/_\{([^{}]*)\}/g, "<sub>$1</sub>");
     s = s.replace(/\^\(([^)]+)\)/g, "<sup>$1</sup>").replace(/\^(-?[0-9A-Za-z]+)/g, "<sup>$1</sup>");
-    // H_2O -> digits only; v_max -> the word. Never swallow the next element (H_2O ≠ H₂ₒ).
-    // The char before "_" may be a Greek letter (ε_0), so anything except whitespace/markup.
     s = s.replace(/([^\s_^{}<>;&])_(\d+|[A-Za-z]+)/g, "$1<sub>$2</sub>");
     s = s.replace(/\{|\}/g, "");
     return s;
   }
   function symbolize(s) {
     return s.replace(/&lt;=&gt;/g, "⇌").replace(/&lt;-&gt;/g, "↔").replace(/=&gt;/g, "⇒").replace(/&gt;=/g, "≥").replace(/&lt;=/g, "≤").replace(/!=/g, "≠")
-            .replace(/-&gt;\[([^\]]+)\]/g, '<span class="arr"><small>$1</small>→</span>')        // ->[heat]
+            .replace(/-&gt;\[([^\]]+)\]/g, '<span class="arr"><small>$1</small>→</span>')
             .replace(/-&gt;/g, "→").replace(/&lt;-/g, "←").replace(/\+\/-/g, "±")
             .replace(/\b([A-Za-z]+)\b/g, function (w) { return GREEK.hasOwnProperty(w) ? GREEK[w] : w; });
   }
-  /** chemistry: H2SO4 -> H₂SO₄, Ca(OH)2 -> Ca(OH)₂, Na^+ / SO4^2- / Fe^{3+} -> charges as superscript */
   function chemify(s) {
     if (!$("optChem").checked) return s;
     s = s.replace(/\^\{([^{}]*)\}/g, "<sup>$1</sup>").replace(/_\{([^{}]*)\}/g, "<sub>$1</sub>");
-    s = s.replace(/\^(\d*[+\-−]{1,2})(?![\w])/g, "<sup>$1</sup>");                                  // charges
-    // element symbol (anywhere in a formula: H2SO4, CaCO3, 3H2) or ")" followed by digits -> subscript
+    s = s.replace(/\^(\d*[+\-−]{1,2})(?![\w])/g, "<sup>$1</sup>");
     s = s.replace(/([A-Z][a-z]?|\))(\d{1,3})(?![\d.:%])/g, function (m, el, d, off, str) {
       var before = str.slice(Math.max(0, off - 1), off);
-      if (before === "^" || before === "_" || before === "$" || before === "<" || before === "/") return m;   // not inside tags / math
+      if (before === "^" || before === "_" || before === "$" || before === "<" || before === "/") return m;
       return el + "<sub>" + d + "</sub>";
     });
     return s;
@@ -984,8 +830,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     s = chemify(s);
     return s;
   }
-  /* content may contain single "=", "_", "!" etc. — only the doubled delimiter ends the run.
-     ==  %%  ^^  !!  ::  → highlight slots 1–5 (colours from the palette);  @@ → maroon text */
   function markers(s) {
     return s.replace(/\*\*(\S(?:(?:(?!\*\*)[\s\S])*?\S)?)\*\*/g, "<b>$1</b>")
             .replace(/(^|[^*])\*(\S(?:[^*]*?\S)?)\*(?!\*)/g, "$1<i>$2</i>")
@@ -1005,7 +849,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     s = s.replace(/\u0001(\d+)\u0001/g, function (_, i) { return maths[+i]; });
     return s;
   }
-  /** a run of lines -> one block, every Enter kept, leading spaces -> indent */
   function linesHtml(arr, asMath) {
     return arr.map(function (l) {
       var ind = (l.match(/^\s*/)[0].length / 2) | 0;
@@ -1019,7 +862,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   var LABELS = /^(Note|Notes|Key Idea|Key Point|Key Points|Important|Interesting Fact|Fact|Definition|Statement|Why\??|Remember|Tip|Example|Examples|Context[^:]{0,40}|Short form|Formula|Result|Conclusion|Order|Key Relations?|Reason|Meaning|Significance|Application|Applications|Assumptions?|Limitations?|Advantages?|Disadvantages?|Postulates?|Observation|Explanation|Concept|Trick|Shortcut|Caution|Warning|Law)\s*[:：]\s*(.*)$/i;
   var HEADING_WORD = /^(LECTURE|CHAPTER|UNIT|TOPIC|SECTION|PART|MODULE)\b/i;
   var BLOCK_START = /^(#{1,3}\s|>\s?|\$\s|\$\$|[-•*·▪→]\s|\d{1,2}[\.\)]\s|\||~\s|\[(Banner|Caption)\]|\[(?:img|image)\s*:|-{3,}|={3,})/;
-  /** [img: name | 60% | center | caption text]  → parts in any order after the name */
+  
   function parseImgLine(t) {
     var m = t.match(/^\[(?:img|image)\s*:\s*([^\]|]+?)\s*(?:\|([^\]]*))?\]$/i);
     if (!m) return null;
@@ -1027,7 +870,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     (m[2] || "").split("|").forEach(function (p) {
       p = p.trim(); if (!p) return;
       if (/^\d{1,3}\s*%$/.test(p)) b.w = p.replace(/\s/g, "");
-      else if (/^(left|right|center|centre)$/i.test(p)) b.align = p.toLowerCase().replace("centre", "center");
+      else if (/^(left|right|center|centre|float-left|float-right)$/i.test(p)) b.align = p.toLowerCase().replace("centre", "center");
       else if (/^wide$/i.test(p)) b.wide = true;
       else b.cap = b.cap ? b.cap + " | " + p : p;
     });
@@ -1040,7 +883,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     if (/\|/.test(t) && t.split("|").length >= 3) { var s = t.trim().replace(/^\|/, "").replace(/\|$/, ""); return s.split("|").map(function (c) { return c.trim(); }); }
     return null;
   }
-  /* short line, no sentence punctuation, no math, no mid-line ", " / ": " (those read as prose) */
   function headingLike(t) { if (t.length > 72 || /[.!]$/.test(t) || t.split(/\s+/).length > 11 || /[=$\\]/.test(t) || /,\s|:\s\S/.test(t)) return false; return t.replace(/[^A-Za-z]/g, "").length >= 3; }
   function isCapsLine(t) { var u = t.replace(/[^A-Za-z]/g, ""); return u.length >= 4 && u === u.toUpperCase() && t.length <= 72; }
   function formulaLike(t) { if (t.length > 80 || !/(=|>=|<=|≥|≤|∝|→|\\frac)/.test(t)) return false; var long = t.replace(/\\[a-z]+/g, "").replace(/[^A-Za-z' ]/g, " ").split(/\s+/).filter(function (w) { return w.length > 6; }); return long.length <= 1; }
@@ -1059,8 +901,8 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
       if (!t) { flushAll(); i++; continue; }
       var m;
 
-      if (/^-{3,}\s*page\s*-{3,}$|^={3,}$/i.test(t)) { push({ type: "break", kind: "page", line: i }); i++; continue; }
-      if (/^-{3,}\s*col\s*-{3,}$|^-{3,}$/i.test(t)) { push({ type: "break", kind: "col", line: i }); i++; continue; }
+      if (/^-{3,}\s*page\s*-{3,}$\vert{}^={3,}$/i.test(t)) { push({ type: "break", kind: "page", line: i }); i++; continue; }
+      if (/^-{3,}\s*col\s*-{3,}$\vert{}^-{3,}$/i.test(t)) { push({ type: "break", kind: "col", line: i }); i++; continue; }
 
       if ((m = t.match(/^(Title|Chapter|Subtitle|Tagline|Badge)\s*:\s*(.+)$/i)) && blocks.length === 0 && !para && !list) {
         var map = { title: "titleInput", chapter: "chapInput", subtitle: "subInput", tagline: "tagInput", badge: "badgeInput" };
@@ -1069,7 +911,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
 
       if ((m = t.match(/^(#{1,3})\s+(.+)$/))) { push({ type: "h" + m[1].length, text: m[2].trim(), line: i, count: 1 }); i++; continue; }
 
-      // ---- question: "Q1. text" / "Q. text" / "Question 3: text", then options, Ans:, Solution: (until blank line)
       if ((m = t.match(/^(?:Q|Que|Ques|Question)\.?\s*(\d*)\s*[\.\):\-–]?\s+(.+)$/i))) {
         flushAll();
         var q = { type: "q", num: m[1], text: m[2].trim(), opts: [], ans: "", sol: [], line: i, count: 1 };
@@ -1083,10 +924,9 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
           if (!inSol && (qm = qs.match(/^(Solution|Soln|Sol|Explanation|Hint)\s*[:\-–]?\s*(.*)$/i))) { inSol = true; q.solLabel = /^hint/i.test(qm[1]) ? "Hint" : (/^expl/i.test(qm[1]) ? "Explanation" : "Solution"); if (qm[2]) q.sol.push(qm[2]); i++; continue; }
           if (!inSol && (qm = qs.match(/^\(?([A-Da-d1-4])[\)\.]\s+(.+)$/))) { q.opts.push({ l: qm[1].toUpperCase(), t: qm[2] }); i++; continue; }
           if (inSol) { q.sol.push(qt); i++; continue; }
-          if (!q.opts.length) { q.text += " " + qs; i++; continue; }        // wrapped question text
+          if (!q.opts.length) { q.text += " " + qs; i++; continue; }
           q.opts[q.opts.length - 1].t += " " + qs; i++;
         }
-        // inline options inside the question line: "… (a) x (b) y (c) z (d) w"
         if (!q.opts.length) {
           var re = /(?:^|\s)\(?([A-Da-d1-4])\)\s*/g, found = [], fm;
           while ((fm = re.exec(q.text))) found.push({ l: fm[1].toUpperCase(), at: fm.index, end: fm.index + fm[0].length });
@@ -1104,10 +944,9 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
       var ib = parseImgLine(t);
       if (ib) { ib.line = i; ib.count = 1; if (wideNext) { ib.wide = true; wideNext = false; } push(ib); i++; continue; }
       if ((m = t.match(/^\[(Banner|Caption)\]\s*(.+)$/i))) { push({ type: m[1].toLowerCase() === "banner" ? "banner" : "cap", html: inline(m[2]), line: i, count: 1 }); i++; continue; }
-      if (/^\[wide\]$/i.test(t)) { flushAll(); wideNext = true; i++; continue; }      // next table spans both columns
+      if (/^\[wide\]$/i.test(t)) { flushAll(); wideNext = true; i++; continue; }
       if ((m = t.match(/^~\s+(.+)$/))) { push({ type: "qt", html: inline(m[1]), line: i, count: 1 }); i++; continue; }
 
-      // ---- box: "> text" plus every following line until a blank / new block
       if ((m = t.match(/^>\s?(.*)$/))) {
         flushAll();
         var bl = [m[1]], start = i; i++;
@@ -1187,7 +1026,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
      BLOCKS -> DOM
   ===================================================================== */
   function el(cls, html) { var d = document.createElement("div"); d.className = cls; if (html != null) d.innerHTML = html; return d; }
-  /** put a "Label:" inside the first line so the text continues on the same line */
   function withLabel(lblHtml, html) {
     if (!lblHtml) return html;
     return /^<span class="ln[^"]*">/.test(html) ? html.replace(/^(<span class="ln[^"]*">)/, "$1" + lblHtml) : lblHtml + html;
@@ -1230,7 +1068,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
         case "formula": node = el("blk formula" + (b.label ? "" : " center"), (b.label ? '<span class="lbl">' + esc(b.label) + ":</span>" : "") + '<span class="fx">' + b.html + "</span>"); break;
         case "table":
           node = el("blk"); var tb = document.createElement("table"); tb.className = "tb";
-          if (b.wide) node.dataset.wide = "1";                     // only when the user wrote [Wide] above it
+          if (b.wide) node.dataset.wide = "1";
           var cols = b.head.length;
           tb.innerHTML = "<thead><tr>" + b.head.map(function (h) { return "<th>" + inline(h) + "</th>"; }).join("") + "</tr></thead><tbody>" +
             b.rows.map(function (r) { var c = r.slice(0, cols); while (c.length < cols) c.push(""); return "<tr>" + c.map(function (x) { return "<td>" + inline(x) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody>";
@@ -1239,10 +1077,14 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
         case "cap": node = el("blk cap", b.html); break;
         case "img":
           var im = findImage(b.name);
-          node = el("blk img al-" + b.align);
+          var isFloat = b.align.indexOf("float-") === 0;
+          node = el("blk img " + (isFloat ? b.align : "al-" + b.align));
           if (b.wide) node.dataset.wide = "1";
           if (im) {
-            var fg = document.createElement("figure"); fg.className = "fig"; fg.style.width = b.w || (b.wide ? "70%" : "100%");
+            var fg = document.createElement("figure"); fg.className = "fig";
+            var w = b.w || (b.wide ? "70%" : "100%");
+            if(isFloat && !b.w) w = "40%"; 
+            if(isFloat) { node.style.width = w; fg.style.width = "100%"; } else { fg.style.width = w; }
             var ig = document.createElement("img"); ig.src = im.data; ig.width = im.w; ig.height = im.h; ig.alt = b.name; fg.appendChild(ig);
             if (b.cap) { var fc = document.createElement("figcaption"); fc.innerHTML = inline(b.cap); fg.appendChild(fc); }
             node.appendChild(fg);
@@ -1278,10 +1120,8 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     d.innerHTML = left + '<span class="pno">Page <span class="dot">' + no + '</span><span class="of">/ ' + no + "</span></span>";
     return d;
   }
-  /* A page body is a vertical stack of "bands": two-column bands for normal
-     flow, and full-width blocks (wide tables) that span both columns. */
   function newBand(page) {
-    if (page.band) page.band.style.flex = "0 0 auto";           // freeze the finished band at its content height
+    if (page.band) page.band.style.flex = "0 0 auto";
     var band = el("cols" + ($("optTwoCol").checked ? "" : " single"));
     var c1 = el("col"), c2 = el("col"); band.appendChild(c1); band.appendChild(c2);
     page.body.appendChild(band);
@@ -1303,13 +1143,8 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     if (t.scrollWidth > t.clientWidth + 1) t.style.whiteSpace = "normal";
   }
   function fits(col) { return col.scrollHeight <= col.clientHeight + 0.5; }
-
   function bodyFits(page) { return page.body.scrollHeight <= page.body.clientHeight + 0.5; }
 
-  /* ---- fit a table into one column ----
-     Measures the table's min-content width (= no word broken) at decreasing
-     font/padding steps and applies the first step that fits. If even the
-     smallest step is too wide, words are allowed to break as a last resort. */
   var TSTEPS = [
     [0, 1.4, 2.2], [0.5, 1.3, 2.0], [1.0, 1.2, 1.8], [1.5, 1.1, 1.5], [2.0, 1.0, 1.3],
     [2.5, 0.9, 1.1], [3.0, 0.8, 1.0], [3.5, 0.7, 0.9], [4.0, 0.6, 0.8], [4.5, 0.5, 0.7]
@@ -1334,9 +1169,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     tb.classList.toggle("force", !ok);
   }
 
-  /* ---- splitting a block that doesn't fit the rest of a column ----
-     tables split by rows (header repeated), lists by items, paragraphs and
-     boxes by lines. The remainder becomes a new node placed next. */
   function splitUnits(nd) {
     var t = nd.dataset.type;
     if (t === "table") { var tb = nd.querySelector("tbody"); return tb ? [].slice.call(tb.children) : []; }
@@ -1355,7 +1187,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     } else if (t === "ul" || t === "ol") {
       var l = nd.querySelector(":scope > ul, :scope > ol"), nl = l.cloneNode(false);
       moved.forEach(function (u) { nl.appendChild(u); });
-      if (t === "ol") nl.style.counterReset = "c " + keptCount;          // numbering continues
+      if (t === "ol") nl.style.counterReset = "c " + keptCount;
       rest.appendChild(nl);
     } else if (t === "callout" && nd.classList.contains("tip")) {
       rest.innerHTML = '<span class="bulb"><i class="fa fa-lightbulb"></i></span><div class="body-t"></div>';
@@ -1365,7 +1197,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     }
     return rest;
   }
-  /** try to keep the head of `nd` in `col` (already appended, overflowing). Returns remainder node or null. */
   function trySplit(nd, col) {
     var units = splitUnits(nd), n = units.length;
     if (n < 2) return null;
@@ -1373,14 +1204,11 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     var moved = [];
     while (!fits(col) && n - moved.length > minKeep) { var u = units[n - 1 - moved.length]; u.parentNode.removeChild(u); moved.unshift(u); }
     if (fits(col) && moved.length >= minRest) return buildRemainder(nd, moved, n - moved.length);
-    // couldn't make it fit — restore
     var host = nd.dataset.type === "table" ? nd.querySelector("tbody") : nd.dataset.type === "ul" || nd.dataset.type === "ol" ? nd.querySelector(":scope > ul, :scope > ol") : (nd.querySelector(":scope > .body-t") || nd);
     moved.forEach(function (u) { host.appendChild(u); });
     return null;
   }
 
-  /** even out a band whose right column is still empty (called before a full-width block) */
-  /* real content height of a column (scrollHeight is never smaller than the box) */
   function contentH(col) {
     var h = 0;
     for (var k = 0; k < col.children.length; k++) { var c = col.children[k]; h += c.getBoundingClientRect().height + parseFloat(getComputedStyle(c).marginBottom || 0); }
@@ -1396,15 +1224,13 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
       var lh = last.getBoundingClientRect().height + parseFloat(getComputedStyle(last).marginBottom || 0);
       if (Math.max(h1 - lh, h2 + lh) < Math.max(h1, h2) - 1) c2.insertBefore(last, c2.firstChild); else break;
     }
-    // never strand a heading at the bottom of the left column
     while (c1.childElementCount > 1 && /^(h1|h2|h3|banner|cap)$/.test(c1.lastElementChild.dataset.type)) c2.insertBefore(c1.lastElementChild, c2.firstChild);
-    // …and if the only thing left on the left is a heading, pull one block back so it isn't alone
     if (c1.childElementCount === 1 && /^(h1|h2|h3|banner|cap)$/.test(c1.firstElementChild.dataset.type) && c2.childElementCount > 1) c1.appendChild(c2.firstElementChild);
   }
 
   function paginate(nodes) {
     stage.innerHTML = "";
-    if (!nodes.length) { var p0 = newPage(1, false); p0.body.innerHTML = '<div class="empty-paper">Left panel me notes paste karo.<br><b>Plain text</b> bhi chalega.</div>'; return 1; }
+    if (!nodes.length) { var p0 = newPage(1, false); p0.body.innerHTML = '<div class="empty-paper">Yahan apne notes paste karein.<br><b>Plain text</b> bhi chalega.</div>'; return 1; }
     var pageNo = 1, page = newPage(1, false), carry = [];
     function advance(toPage) { if (!toPage && page.ci < page.cols.length - 1) { page.ci++; return; } pageNo++; page = newPage(pageNo, true); }
     function isHeading(nd) { return /^(h1|h2|h3|banner|cap)$/.test(nd.dataset.type); }
@@ -1417,16 +1243,14 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
       if (isHeading(nd)) { carry.push(nd); continue; }
       var group = carry.concat([nd]); carry = [];
 
-      // every table is shrunk to its column (or the page, when [Wide]) before placing
       if (nd.dataset.type === "table" && !nd.dataset.cont) {
         var target = isWide(nd) ? page.body.clientWidth : page.cols[0].clientWidth;
         fitTable(nd.querySelector("table"), page.body, target);
       }
 
       if (isWide(nd)) {
-        // full-width block: even out the band above it, close it, append across both columns
         for (var w = 0; w < 3; w++) {
-          if (bandEmpty()) page.band.remove();                      // don't leave an empty band above it
+          if (bandEmpty()) page.band.remove();
           else { balanceBand(page); page.band.style.flex = "0 0 auto"; }
           var wrap = el("wide"); group.forEach(function (g) { wrap.appendChild(g); }); page.body.appendChild(wrap);
           var only = page.body.childElementCount === 1;
@@ -1443,15 +1267,14 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
         var col = page.cols[page.ci], wasEmpty = col.childElementCount === 0;
         group.forEach(function (g) { col.appendChild(g); });
         if (fits(col)) { placed = true; break; }
-        // doesn't fit: keep as much of the block here as possible, carry the rest over
         var rest = trySplit(nd, col);
         if (rest) { nodes.splice(i + 1, 0, rest); placed = true; break; }
-        if (wasEmpty) { placed = true; break; }          // over-tall and unsplittable — let it clip rather than loop
+        if (wasEmpty) { placed = true; break; }
         group.forEach(function (g) { col.removeChild(g); }); advance(false);
       }
     }
     if (carry.length) { var last = page.cols[page.ci]; carry.forEach(function (g) { last.appendChild(g); }); }
-    if (bandEmpty() && page.body.childElementCount > 1) page.band.remove();   // trailing empty band after a wide block
+    if (bandEmpty() && page.body.childElementCount > 1) page.band.remove();
     var pages = stage.querySelectorAll(".page");
     pages.forEach(function (pg) { var of = pg.querySelector(".pno .of"); if (of) of.textContent = "/ " + pages.length; });
     return pages.length;
@@ -1475,7 +1298,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     var hs = blocks.filter(function (b) { return b.type === "h1" || b.type === "h2"; });
     $("oCount").textContent = hs.length;
     $("oList").innerHTML = hs.length ? hs.map(function (b) { return '<button type="button" class="oitem' + (b.type === "h2" ? " sub" : "") + '" data-line="' + b.line + '"><span class="n">' + (b.type === "h2" ? "❖" : esc(b.num || "")) + '</span><span class="t">' + esc(b.text) + "</span></button>"; }).join("")
-      : '<div style="color:#555;font-size:.76rem;padding:10px 4px;text-align:center">Koi heading nahi.</div>';
+      : '<div style="color:var(--text-muted);font-size:.82rem;padding:10px 4px;text-align:center">Koi heading nahi.</div>';
   }
   function caretTopIn(pos) {
     var cs = getComputedStyle(ta), m = document.createElement("div");
@@ -1491,10 +1314,26 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     ta.scrollTop = Math.max(0, caretTopIn(b.start) - Math.round(ta.clientHeight * 0.3));
     ta.setSelectionRange(b.start, selectAll ? b.end : b.start); updateActive();
   }
-  $("oList").addEventListener("click", function (e) { var b = e.target.closest(".oitem"); if (!b) return; jumpToLine(parseInt(b.getAttribute("data-line"), 10), true); $("oList").querySelectorAll(".flash").forEach(function (n) { n.classList.remove("flash"); }); b.classList.add("flash"); });
+  $("oList").addEventListener("click", function (e) { 
+    var b = e.target.closest(".oitem"); if (!b) return; 
+    var lineNo = parseInt(b.getAttribute("data-line"), 10);
+    jumpToLine(lineNo, true); 
+    
+    // Page outline smooth scrolling fix (ES5)
+    var targetBlk = stage.querySelector('[data-line="'+lineNo+'"]');
+    if(targetBlk) {
+        targetBlk.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        targetBlk.style.transition = "background 0.5s";
+        targetBlk.style.background = "rgba(142, 27, 42, 0.1)"; // highlight in maroon theme
+        setTimeout(function() { targetBlk.style.background = ""; }, 800);
+    }
+    
+    $("oList").querySelectorAll(".flash").forEach(function (n) { n.classList.remove("flash"); }); 
+    b.classList.add("flash"); 
+  });
 
   /* =====================================================================
-     UNDO / REDO  (own stack — programmatic edits keep history)
+     UNDO / REDO
   ===================================================================== */
   var hist = [], hidx = -1, histT = null;
   function snap(force) {
@@ -1508,23 +1347,15 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   function updateUndoButtons() { $("btnUndo").disabled = hidx <= 0; $("btnRedo").disabled = hidx >= hist.length - 1; }
   $("btnUndo").addEventListener("click", undo); $("btnRedo").addEventListener("click", redo);
 
-  /** set the textarea text as one undoable step */
-  $("btnCopyPrompt").addEventListener("click", function () {
-    var b = this, txt = $("aiPrompt").value;
-    function done() { b.classList.add("done"); b.innerHTML = '<i class="fa fa-check"></i> Copied'; setTimeout(function () { b.classList.remove("done"); b.innerHTML = '<i class="fa fa-copy"></i> Copy prompt'; }, 1800); }
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, function () { $("aiPrompt").select(); document.execCommand("copy"); done(); });
-    else { $("aiPrompt").select(); document.execCommand("copy"); done(); }
-  });
   function setText(v, a, b) { snap(); ta.value = v; ta.setSelectionRange(a, b == null ? a : b); snap(true); render(); saveState(); }
 
   /* =====================================================================
-     STYLE TOGGLES (shared by editor toolbar + page floating toolbar)
+     STYLE TOGGLES
   ===================================================================== */
   var WRAPS = ["**", "*", "__", "==", "%%", "^^", "!!", "::", "@@", "$"];
   var LINE_PREFIX = /^(#{1,3} |- |\d{1,2}\. |> |\$ |~ )/;
   function rx(w) { return w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
 
-  /** ranges [start,end) on a line covered by marker w (indices relative to line) */
   function markerRanges(line, w) {
     var out = [], re = new RegExp(rx(w) + "(\\S(?:[\\s\\S]*?\\S)?)" + rx(w), "g"), m;
     if (w === "*") re = /(^|[^*])\*(\S(?:[^*]*?\S)?)\*(?!\*)/g;
@@ -1539,15 +1370,11 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   }
   function wordAt(v, pos) { var s = pos, e = pos; while (s > 0 && /\S/.test(v[s - 1])) s--; while (e < v.length && /\S/.test(v[e])) e++; return { s: s, e: e }; }
 
-  /** all ranges of marker w on the line containing pos, as absolute [s,e) */
   function absRanges(v, pos, w) {
     var ls = v.lastIndexOf("\n", pos - 1) + 1, le = v.indexOf("\n", pos); if (le < 0) le = v.length;
     return markerRanges(v.slice(ls, le), w).map(function (r) { return { s: ls + r.s, e: ls + r.e }; });
   }
 
-  /** Remove marker w from the selection [s,e). Handles: selection inside a
-      styled run (splits it), selection covering runs (strips them), or a
-      caret inside a run (unwraps it). Returns true if something changed. */
   function removeWrap(w, s, e) {
     var v = ta.value, L = w.length;
     var ranges = absRanges(v, s, w).filter(function (r) { return r.s < e && r.e > s || (s === e && s >= r.s && s <= r.e); });
@@ -1557,7 +1384,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
       var rs = r.s + shift, re = r.e + shift, inner = out.slice(rs + L, re - L);
       var a = Math.max(0, s + shift - (rs + L)), b = Math.min(inner.length, e + shift - (rs + L));
       var rebuilt;
-      if (s === e || (a <= 0 && b >= inner.length)) rebuilt = inner;                        // whole run
+      if (s === e || (a <= 0 && b >= inner.length)) rebuilt = inner;
       else {
         var left = inner.slice(0, a), mid = inner.slice(a, b), right = inner.slice(b);
         var lt = left.replace(/\s+$/, ""), rt = right.replace(/^\s+/, "");
@@ -1573,12 +1400,10 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
 
   function toggleWrap(w) {
     var v = ta.value, s = ta.selectionStart, e = ta.selectionEnd, L = w.length;
-    // anything of this style touching the selection / caret → remove it
     if (removeWrap(w, s, e)) return;
     if (s === e) { var wd = wordAt(v, s); if (wd.s === wd.e) { toast("Pehle text select karo"); return; } s = wd.s; e = wd.e; }
     var sel = v.slice(s, e);
     if (sel.length >= 2 * L && sel.slice(0, L) === w && sel.slice(-L) === w) { setText(v.slice(0, s) + sel.slice(L, -L) + v.slice(e), s, e - 2 * L); return; }
-    // trim the selection to its non-space core so markers hug the text
     var lead = sel.match(/^\s*/)[0].length, trail = sel.match(/\s*$/)[0].length; s += lead; e -= trail; sel = v.slice(s, e);
     if (!sel) return;
     setText(v.slice(0, s) + w + sel + w + v.slice(e), s + L, e + L);
@@ -1587,7 +1412,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     var v = ta.value, s = ta.selectionStart, e = ta.selectionEnd;
     if (s === e) { var info = activeWrapsAt(s), best = null; WRAPS.forEach(function (w) { if (info.act[w]) best = info.act[w]; }); if (!best) { toast("Cursor kisi styled text par rakho"); return; } s = info.ls + best.s; e = info.ls + best.e; }
     var sel = v.slice(s, e), before = v.slice(0, s), after = v.slice(e);
-    // markers immediately around the selection
     WRAPS.forEach(function (w) { var L = w.length; if (before.slice(-L) === w && after.slice(0, L) === w) { before = before.slice(0, -L); after = after.slice(L); } });
     var cleaned = sel.replace(/\*\*|==|!!|%%|\^\^|::|@@|__|(?<!\*)\*(?!\*)|\$/g, "");
     setText(before + cleaned + after, before.length, before.length + cleaned.length);
@@ -1619,7 +1443,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   }
   $("fmt").addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b || b.id) return; runAction(b); });
 
-  /** highlight the buttons whose style is active at the caret / current line */
   function updateActive() {
     var pos = ta.selectionStart, info = activeWrapsAt(pos);
     var lineHas = function (p) { return p === "1. " ? /^\d{1,2}\. /.test(info.line) : (p ? info.line.indexOf(p) === 0 : !LINE_PREFIX.test(info.line)); };
@@ -1634,19 +1457,18 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   document.addEventListener("selectionchange", function () { if (document.activeElement === ta) updateActive(); });
 
   /* =====================================================================
-     PAGE SELECTION → floating toolbar (Word-like)
+     PAGE SELECTION → floating toolbar
   ===================================================================== */
   var fb = $("floatbar"), pendingSel = null;
   function hideFloat() { fb.classList.remove("show"); pendingSel = null; }
   function blockOf(node) { while (node && node.nodeType !== 1) node = node.parentNode; return node ? node.closest(".blk, .ul li, .ol li") : null; }
-  function reverseSmart(s) {   // page text -> what the source most likely contains
+  function reverseSmart(s) {
     var out = s;
     Object.keys(GREEK).forEach(function (k) { out = out.split(GREEK[k]).join(k); });
     return out.replace(/×/g, "x").replace(/·/g, ".").replace(/≥/g, ">=").replace(/≤/g, "<=").replace(/≠/g, "!=").replace(/→/g, "->").replace(/\s+/g, " ").trim();
   }
   function stripMarkers(s) { return s.replace(/\*\*|==|!!|%%|\^\^|::|@@|__|\$|(?<!\*)\*(?!\*)/g, ""); }
 
-  /** find the page-selected text in the source lines of its block; returns {s,e} absolute or null */
   function locateInSource(blk, text) {
     var line = parseInt(blk.dataset.line, 10), count = parseInt(blk.closest(".blk").dataset.count, 10) || 1;
     if (blk.dataset.line && blk.matches("li")) count = 1;
@@ -1658,9 +1480,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     var cands = [wanted, reverseSmart(wanted)];
     for (var c = 0; c < cands.length; c++) {
       var w = cands[c];
-      // 1) plain match
       var k = region.indexOf(w); if (k >= 0) return { s: start + k, e: start + k + w.length };
-      // 2) match ignoring markers: walk the region skipping marker chars
       var plain = "", map = [];
       for (var p = 0; p < region.length; p++) {
         var two = region.substr(p, 2), one = region[p];
@@ -1687,7 +1507,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     var x = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width / 2 - w / 2));
     var y = r.top - h - 12; if (y < 8) y = r.bottom + 12;
     fb.style.left = x + "px"; fb.style.top = y + "px";
-    // reflect the styles present in the source at that spot
     var loc = locateInSource(blk, text);
     fb.querySelectorAll("button").forEach(function (b) {
       var on = false;
@@ -1703,8 +1522,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   $("previewCol").addEventListener("keyup", function () { setTimeout(onPageSelect, 10); });
   document.addEventListener("mousedown", function (e) { if (!fb.contains(e.target) && !stage.contains(e.target)) hideFloat(); });
   $("previewCol").addEventListener("scroll", hideFloat, { passive: true });
-
-  fb.addEventListener("mousedown", function (e) { e.preventDefault(); });   // keep the page selection alive
+  fb.addEventListener("mousedown", function (e) { e.preventDefault(); });
   fb.addEventListener("click", function (e) {
     var b = e.target.closest("button"); if (!b || !pendingSel) return;
     var loc = locateInSource(pendingSel.blk, pendingSel.text);
@@ -1717,7 +1535,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   });
 
   /* =====================================================================
-     HIGHLIGHT PALETTE — five slots, CSS variables, presets
+     HIGHLIGHT PALETTE
   ===================================================================== */
   var PRESETS = {
     textbook: ["#fff176", "#b3e5fc", "#c5e1a5", "#f8bbd0", "#ffcc80"],
@@ -1743,25 +1561,18 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   });
 
   /* =====================================================================
-     PERSISTENCE — MySQL via d2d_notes_api.php, with a local draft safety net
-
-     Flow on every edit:
-       saveState()  →  saveLocal()   (instant, localStorage, per-note key)
-                    →  scheduleSave() (1.5s debounce → saveToServer)
-     If the network is down, the draft stays in localStorage and a retry
-     loop keeps trying; on reload, a draft newer than the server copy is
-     offered for restore. Nothing typed is ever only-in-memory.
+     PERSISTENCE
   ===================================================================== */
   var API = (window.PM_D2D && window.PM_D2D.api) || "d2d_notes_api.php";
   var FIELDS = ["subjInput","chapInput","titleInput","subInput","tagInput","badgeInput"], OPTS = ["optAuto","optBullets","optMath","optChem","optTwoCol","optWM","optBrand"];
   var FIELD_MAP = { subjInput: "subject", chapInput: "chapter_no", titleInput: "title", subInput: "subtitle", tagInput: "tagline", badgeInput: "badge" };
   var srcTa = $("srcInput");
 
-  var cur = { id: 0, version: 0, updated_at: null };   // identity of the note currently in the editor
+  var cur = { id: 0, version: 0, updated_at: null };
   var dirty = false, saving = false, pendingSave = false, saveTimer = null, retryTimer = null, retryDelay = 2000;
   var online = navigator.onLine !== false;
   var libNotes = [], libFilter = "", showingTrash = false;
-  var suppressSave = false;   // true while programmatically filling the form (loading a note)
+  var suppressSave = false;
 
   function syncUI(state, text) {
     var el = $("sync"); el.className = "sync " + state; $("syncTxt").textContent = text;
@@ -1774,7 +1585,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     var h = Math.floor(m / 60); if (h < 24) return h + "h ago"; return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
   }
 
-  /* ---- snapshot of everything in the editor ---- */
   function collect() {
     var n = { id: cur.id, version: cur.version, notes_text: ta.value, source_content: srcTa.value, settings: { o: {}, font: $("optFont").value, pal: palette.slice() } };
     FIELDS.forEach(function (id) { n[FIELD_MAP[id]] = $(id).value; });
@@ -1798,7 +1608,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     } finally { suppressSave = false; }
   }
 
-  /* ---- local draft (survives tab close / crash / offline) ---- */
   function draftKey(id) { return "d2d_draft_" + (id || "new"); }
   function draftImgKey(id) { return "d2d_draftimg_" + (id || "new"); }
   function saveLocal() {
@@ -1806,7 +1615,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
       var c = collect(); c.note.savedAt = Date.now(); c.note.dirty = dirty;
       localStorage.setItem(draftKey(cur.id), JSON.stringify(c.note));
       localStorage.setItem("d2d_last_id", String(cur.id || 0));
-    } catch (e) { /* quota — server save still runs */ }
+    } catch (e) {}
   }
   function saveLocalImages() {
     try { localStorage.setItem(draftImgKey(cur.id), JSON.stringify(images)); return true; }
@@ -1817,7 +1626,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   }
   function clearDraft(id) { try { localStorage.removeItem(draftKey(id)); localStorage.removeItem(draftImgKey(id)); } catch (e) {} }
 
-  /* ---- what every edit calls (kept the old name so all call sites still work) ---- */
   function saveState() {
     if (suppressSave) return;
     dirty = true; saveLocal();
@@ -1829,7 +1637,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     saveTimer = setTimeout(function () { saveToServer("auto"); }, 1500);
   }
 
-  /* ---- server I/O ---- */
   function api(action, body, method) {
     var opt = { method: method || "POST", credentials: "same-origin", headers: {} };
     if (body !== undefined) { opt.headers["Content-Type"] = "application/json"; opt.body = JSON.stringify(body); }
@@ -1851,9 +1658,8 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
       if (r.ok && r.json && r.json.status === "success") {
         var wasNew = !cur.id;
         cur.id = r.json.id; cur.version = r.json.version; cur.updated_at = r.json.updated_at;
-        if (cur.version !== snapVersion + 1 && !wasNew) { /* tolerate */ }
         dirty = false; retryDelay = 2000;
-        clearDraft(wasNew ? 0 : cur.id); clearDraft(cur.id); saveLocal();  // keep a clean draft for crash-restore
+        clearDraft(wasNew ? 0 : cur.id); clearDraft(cur.id); saveLocal(); 
         syncUI("saved", "Saved · " + fmtAgo(cur.updated_at) + (reason === "manual" ? " (manual)" : ""));
         touchLibEntry(); if (wasNew) loadList(false);
         if (pendingSave) { pendingSave = false; dirty = true; return saveToServer("auto"); }
@@ -1880,7 +1686,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   window.addEventListener("beforeunload", function (e) { if (dirty) { saveLocal(); e.preventDefault(); e.returnValue = ""; } });
   document.addEventListener("visibilitychange", function () { if (document.hidden && dirty) { saveLocal(); saveToServer("blur"); } });
 
-  /* ---- modal helpers ---- */
   function showModal(title, body, buttons) {
     $("modalTitle").textContent = title; $("modalBody").innerHTML = body;
     var row = $("modalRow"); row.innerHTML = "";
@@ -1891,14 +1696,13 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   function showConflict(serverVersion) {
     syncUI("error", "Conflict — server pe nayi copy hai");
     showModal("Server pe nayi version hai",
-      "Is chapter ko kisi doosre tab/device se save kiya gaya (v" + serverVersion + "). Aap kya rakhna chahte ho?<br><br><b style='color:#fff'>Mera rakho</b> — server wali overwrite hogi.<br><b style='color:#fff'>Server wala lo</b> — aapke abhi ke changes local draft me rahenge.",
+      "Is chapter ko kisi doosre tab/device se save kiya gaya (v" + serverVersion + "). Aap kya rakhna chahte ho?<br><br><b>Mera rakho</b> — server wali overwrite hogi.<br><b>Server wala lo</b> — aapke abhi ke changes local draft me rahenge.",
       [
         { html: '<i class="fa fa-cloud-arrow-down"></i> Server wala lo', ghost: true, fn: function () { var keep = collect(); try { localStorage.setItem("d2d_conflict_backup_" + cur.id + "_" + Date.now(), JSON.stringify(keep)); } catch (e) {} loadNote(cur.id, { ignoreDraft: true }); } },
         { html: '<i class="fa fa-cloud-arrow-up"></i> Mera rakho', fn: function () { cur.version = serverVersion; dirty = true; saveToServer("force"); } }
       ]);
   }
 
-  /* ---- load / new / delete ---- */
   function loadNote(id, opts) {
     opts = opts || {};
     if (dirty && cur.id !== id) saveLocal();
@@ -1908,14 +1712,10 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
       var note = r.json.note, imgs = r.json.images || [];
       cur = { id: note.id, version: note.version, updated_at: note.updated_at };
       var draft = opts.ignoreDraft ? null : readDraft(note.id);
-      // Version-based, not clock-based: MySQL DATETIME has no timezone and
-      // the browser would parse it as local time, so comparing timestamps
-      // across server/browser zones is unreliable. A draft is "unsaved work"
-      // iff it was written on top of the same server version we just got.
       if (draft && draft.dirty && draft.version === note.version && (draft.notes_text !== note.notes_text || draft.source_content !== note.source_content)) {
         applyNote(note, imgs); dirty = false; syncUI("saved", "Loaded · server copy");
         showModal("Unsaved draft mila",
-          "Is chapter ka ek <b style='color:#fff'>local draft</b> hai jo server copy se naya hai (" + fmtAgo(new Date(draft.savedAt).toISOString()) + "). Shayad pichli baar net kat gaya tha ya tab band ho gaya tha.",
+          "Is chapter ka ek <b>local draft</b> hai jo server copy se naya hai (" + fmtAgo(new Date(draft.savedAt).toISOString()) + "). Shayad pichli baar net kat gaya tha ya tab band ho gaya tha.",
           [
             { html: '<i class="fa fa-trash"></i> Draft hatao', ghost: true, fn: function () { clearDraft(note.id); } },
             { html: '<i class="fa fa-rotate-left"></i> Draft restore karo', fn: function () { var d = draft; applyNote(d, d._images || imgs); dirty = true; syncUI("dirty", "Draft restored — saving…"); saveToServer("restore"); } }
@@ -1951,7 +1751,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   }
   function restoreNote(id) { api("restore", { id: id }).then(function (r) { if (r.ok) { toast("Restore ho gaya"); loadList(false); } }); }
 
-  /* ---- library list ---- */
   function loadList(quiet) {
     if (!quiet) $("libList").innerHTML = '<div class="lib-empty">Loading…</div>';
     return api(showingTrash ? "trash" : "list", undefined, "GET").then(function (r) {
@@ -1969,7 +1768,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     var host = $("libList"), q = libFilter.toLowerCase();
     var list = libNotes.filter(function (n) { return !q || ((n.subject || "") + " " + (n.chapter_no || "") + " " + (n.title || "") + " " + (n.subtitle || "")).toLowerCase().indexOf(q) >= 0; });
     $("libCount").textContent = libNotes.length;
-    if (!list.length) { host.innerHTML = '<div class="lib-empty">' + (showingTrash ? "Trash khali hai." : (libNotes.length ? "Kuch match nahi hua." : "Abhi koi chapter nahi. <b style='color:#fff'>New</b> dabao.")) + "</div>"; return; }
+    if (!list.length) { host.innerHTML = '<div class="lib-empty">' + (showingTrash ? "Trash khali hai." : (libNotes.length ? "Kuch match nahi hua." : "Abhi koi chapter nahi. <b>New</b> dabao.")) + "</div>"; return; }
     var groups = {}, order = [];
     list.forEach(function (n) { var s = (n.subject || "General").trim() || "General"; if (!groups[s]) { groups[s] = []; order.push(s); } groups[s].push(n); });
     host.innerHTML = order.map(function (s) {
@@ -2006,23 +1805,20 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   $("btnSaveNow").addEventListener("click", function () { dirty = true; saveToServer("manual"); });
   document.addEventListener("keydown", function (e) { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") { e.preventDefault(); dirty = true; saveToServer("manual"); } });
 
-  /* ---- chapter content (source) box ---- */
   function updateSrcMeta() { var w = srcTa.value.trim() ? srcTa.value.trim().split(/\s+/).length : 0; $("srcMeta").textContent = w + " words · " + srcTa.value.length + " chars"; $("srcCount").textContent = w ? Math.round(w / 100) / 10 + "k" : "0"; }
   srcTa.addEventListener("input", function () { updateSrcMeta(); saveState(); });
   $("btnSrcToNotes").addEventListener("click", function () { if (!srcTa.value.trim()) { toast("Source khali hai"); return; } insertLineAt("cursor", srcTa.value.trim()); toast("Notes me add ho gaya"); });
   $("btnSrcCopy").addEventListener("click", function () { var t = srcTa.value; if (navigator.clipboard) navigator.clipboard.writeText(t).then(function () { toast("Copied"); }); else { srcTa.select(); document.execCommand("copy"); toast("Copied"); } });
 
-
   /* =====================================================================
-     IMAGES  — part of the note (saved to DB with it), placed with [img: name]
+     IMAGES
   ===================================================================== */
   var images = [];
   function findImage(name) { name = String(name || "").toLowerCase(); for (var i = 0; i < images.length; i++) if (images[i].name.toLowerCase() === name) return images[i]; return null; }
-  function loadImages() { /* images arrive with the note via loadNote() */ }
   function saveImages() { saveLocalImages(); saveState(); return true; }
   function slug(fn) { return (fn || "img").replace(/\.[a-z0-9]+$/i, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 24) || "img"; }
   function uniqueName(base) { var n = base, k = 2; while (findImage(n)) n = base + "-" + (k++); return n; }
-  /** downscale to max 1400px and re-encode so localStorage stays small */
+  
   function compressFile(file) {
     return new Promise(function (res, rej) {
       var url = URL.createObjectURL(file), im = new Image();
@@ -2046,7 +1842,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
       .then(function () { saveImages(); renderImages(); render(); if (added.length) toast(added.length + " image add ho gayi"); if (then) then(added); });
   }
   function imgLine(nm, w, al, cap) { return "[img: " + nm + (w && w !== "100%" ? " | " + w : "") + (al && al !== "center" ? " | " + al : "") + (cap ? " | " + cap.replace(/[\[\]|]/g, "") : "") + "]"; }
-  /** insert a line after source line index `after` (-1 = start, null = at cursor, "end" = end) with blank lines around */
+  
   function insertLineAt(after, text) {
     var v = ta.value, lines = v.split("\n"), at;
     if (after === "cursor" || after == null) { var pos = ta.selectionEnd, cnt = 0; for (at = 0; at < lines.length; at++) { cnt += lines[at].length + 1; if (cnt > pos) break; } at = Math.min(at + 1, lines.length); }
@@ -2062,11 +1858,11 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   }
   function posOptions() {
     var src = ta.value.split("\n"), ICON = { h1: "#", h2: "❖", h3: "###", p: "¶", ul: "•", ol: "1.", callout: "▭", formula: "ƒ", table: "▦", q: "Q", banner: "▬", cap: "▬", qt: "~", img: "🖼", break: "—" };
-    var o = '<option value="cursor">⌖ Cursor ke baad (editor me jahan cursor hai)</option><option value="end">⤓ Notes ke end me</option><option value="-1">⤒ Sabse upar</option>';
+    var o = '<option value="cursor">⌖ Cursor ke baad</option><option value="end">⤓ Notes ke end me</option><option value="-1">⤒ Sabse upar</option>';
     lastBlocks.forEach(function (b) {
       var last = b.line + (b.count || 1) - 1, txt = (src[b.line] || "").replace(/^(#{1,3}\s+|>\s?|\$\s+|[-•*]\s+|\d{1,2}[\.\)]\s+|\[(?:Banner|Caption)\]\s*|~\s+)/, "").replace(/[*_=%^!:@]{2}|\|/g, " ").trim();
       if (txt.length > 46) txt = txt.slice(0, 44) + "…";
-      var ind = (b.type === "h1" || b.type === "h2" || b.type === "h3") ? "" : " ";
+      var ind = (b.type === "h1" || b.type === "h2" || b.type === "h3") ? "" : " ";
       o += '<option value="' + last + '">' + ind + (ICON[b.type] || "¶") + " " + esc(txt || b.type) + "</option>";
     });
     return o;
@@ -2083,7 +1879,7 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
         '<div class="nm"><code title="' + esc(im.name) + '">' + esc(im.name) + '</code><small>' + im.w + "×" + im.h + '</small><button type="button" class="del" title="Delete"><i class="fa fa-trash"></i></button></div>' +
         '<select class="inp imgPos" title="Insert after"></select>' +
         '<div class="r2"><select class="inp imgW"><option value="100%">Width 100%</option><option value="75%">75%</option><option value="60%" selected>60%</option><option value="50%">50%</option><option value="40%">40%</option><option value="33%">33%</option><option value="wide">Wide (full page)</option></select>' +
-        '<select class="inp imgAl"><option value="center">Center</option><option value="left">Left</option><option value="right">Right</option></select></div>' +
+        '<select class="inp imgAl"><option value="center">Center Block</option><option value="float-left">Wrap Text (Left)</option><option value="float-right">Wrap Text (Right)</option><option value="left">Left Block</option><option value="right">Right Block</option></select></div>' +
         '<input class="inp imgCap" placeholder="Caption (optional)">' +
         '<button type="button" class="ins"><i class="fa fa-arrow-turn-down"></i> Insert</button></div></div>';
     }).join("");
@@ -2108,7 +1904,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   ["dragenter", "dragover"].forEach(function (ev) { $("imgDrop").addEventListener(ev, function (e) { e.preventDefault(); this.classList.add("over"); }); });
   ["dragleave", "drop"].forEach(function (ev) { $("imgDrop").addEventListener(ev, function (e) { e.preventDefault(); this.classList.remove("over"); }); });
   $("imgDrop").addEventListener("drop", function (e) { addImageFiles(e.dataTransfer.files); });
-  // drop a picture straight onto the text: it is added and placed at the cursor
   ta.addEventListener("dragover", function (e) { if (e.dataTransfer && [].some.call(e.dataTransfer.items || [], function (it) { return /^image\//.test(it.type); })) e.preventDefault(); });
   ta.addEventListener("drop", function (e) {
     var fs = [].slice.call(e.dataTransfer.files || []).filter(function (f) { return /^image\//.test(f.type); });
@@ -2116,7 +1911,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     addImageFiles(fs, function (names) { names.forEach(function (nm) { insertLineAt("cursor", imgLine(nm, "60%", "center", "")); }); });
   });
   $("btnImgTool").addEventListener("click", function () { $("accImages").classList.add("open"); $("imgFile").click(); });
-  // paste a screenshot (Ctrl+V) into the editor
   ta.addEventListener("paste", function (e) {
     var its = (e.clipboardData && e.clipboardData.items) || [], fs = [];
     for (var i = 0; i < its.length; i++) if (its[i].kind === "file" && /^image\//.test(its[i].type)) fs.push(its[i].getAsFile());
@@ -2154,6 +1948,14 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   $("sideTab").addEventListener("click", function () { setDrawer(!document.body.classList.contains("drawer-open")); });
   $("scrim").addEventListener("click", function () { setDrawer(false); });
   $("panelClose").addEventListener("click", function () { setDrawer(false); });
+  
+  // Library Header Button Logic (ES5 safe timeout)
+  $("btnHeaderLib").addEventListener("click", function () { 
+      setDrawer(true); 
+      $("accLib").classList.add("open");
+      setTimeout(function() { $("accLib").scrollIntoView({behavior: 'smooth', block: 'start'}); }, 300);
+  });
+  
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") { setDrawer(false); hideFloat(); } });
 
   function updateToolbarOffset() { document.documentElement.style.setProperty("--toolbar-h", $("topbar").offsetHeight + "px"); }
@@ -2183,9 +1985,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
   stage.classList.toggle("no-wm", !$("optWM").checked);
   snap(true); render();
 
-  // One-time migration: if the old single-document localStorage version of
-  // this tool left work behind, bring it in as the first chapter so nothing
-  // written before the DB version is lost.
   function migrateLegacy() {
     var s = null, im = null;
     try { s = JSON.parse(localStorage.getItem("notesd2d_v2") || "null"); im = JSON.parse(localStorage.getItem("notesd2d_imgs") || "null"); } catch (e) {}
@@ -2203,8 +2002,6 @@ Topic / material: &lt;&lt;PASTE YOUR TOPIC, SYLLABUS POINTS, OR RAW TEXT HERE&gt
     var last = parseInt(localStorage.getItem("d2d_last_id") || "0", 10);
     var exists = libNotes.some(function (n) { return n.id === last; });
     if (last > 0 && exists) return loadNote(last);
-    // Was in the middle of a brand-new (never saved) chapter when the tab
-    // closed / net died → newNote() finds that draft and offers restore.
     var nd = readDraft(0);
     if (last === 0 && nd && nd.dirty && (nd.notes_text || nd.source_content)) return newNote();
     if (migrateLegacy()) return;
