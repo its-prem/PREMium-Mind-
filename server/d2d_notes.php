@@ -74,6 +74,7 @@ $pmAdminEmail = pm_auth_admin_email();
     line-height: 1.6; 
     height: 100dvh; 
     overflow: hidden; 
+    display: flex; flex-direction: column;
   }
   h1, h2, h3, .logo { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
 
@@ -84,7 +85,11 @@ $pmAdminEmail = pm_auth_admin_email();
   ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
   /* ---------------- app chrome ---------------- */
-  .toolbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: #ffffff; border-bottom: 1px solid var(--line); box-shadow: 0 2px 5px rgba(0,0,0,0.03); transition: transform .3s var(--ease); }
+  .toolbar { position: relative; flex: none; z-index: 1000; background: #ffffff; border-bottom: 1px solid var(--line); box-shadow: 0 2px 5px rgba(0,0,0,0.03); transition: transform .3s var(--ease); }
+  body.nav-hidden .toolbar { display: none; }
+  .nav-show { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1001; display: none; align-items: center; gap: 6px; padding: 6px 14px; background: #ffffff; border: 1px solid var(--line); border-radius: 99px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); color: var(--text-main); font-family: "Oswald", sans-serif; font-size: .74rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; opacity: .55; transition: opacity .2s; }
+  .nav-show:hover { opacity: 1; }
+  body.nav-hidden .nav-show { display: inline-flex; }
   .bar-inner { width: 96%; max-width: 1600px; margin: 0 auto; padding: 10px 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .logo a { font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; color: var(--text-main); text-decoration: none; }
   .logo a span { color: var(--primary); }
@@ -109,7 +114,7 @@ $pmAdminEmail = pm_auth_admin_email();
   .scrim { display: none; }
 
   /* ---------------- WORKSPACE (Swapped Order via Row-Reverse) ---------------- */
-  .workspace { display: flex; align-items: stretch; height: calc(100dvh - var(--toolbar-h)); margin-top: var(--toolbar-h); flex-direction: row-reverse; }
+  .workspace { display: flex; align-items: stretch; flex: 1 1 auto; min-height: 0; height: auto; margin: 0; flex-direction: row; position: relative; }
   
   .editor-col { flex: 0 0 clamp(360px, 37%, 580px); width: clamp(360px, 37%, 580px); display: flex; align-items: flex-start; justify-content: center; padding: 20px 16px 40px 16px; height: 100%; overflow-y: auto; overscroll-behavior: contain; transition: flex-basis .38s var(--ease), width .38s var(--ease), padding .38s var(--ease), opacity .26s ease, transform .38s var(--ease); background: #ffffff; border-left: 1px solid var(--line); box-shadow: -4px 0 15px rgba(0,0,0,0.03); z-index: 10; }
   
@@ -435,17 +440,19 @@ $pmAdminEmail = pm_auth_admin_email();
   /* ---------------- responsive ---------------- */
   @media screen and (max-width: 1240px) {
     .workspace { flex-direction: row; }
-    .editor-col { position: fixed; right: 0; top: var(--toolbar-h); z-index: 895; flex-basis: auto; width: min(480px, 94vw); height: calc(100dvh - var(--toolbar-h)); max-height: none; padding: 16px; background: #ffffff; border-left: 1px solid var(--line); box-shadow: -8px 0 30px rgba(0,0,0,0.05); transform: translateX(100%); opacity: 1; transition: transform .34s var(--ease); }
+    .editor-col { position: fixed; right: 0; top: 0; bottom: 0; z-index: 1100; flex-basis: auto; width: min(480px, 94vw); height: auto; max-height: none; padding: 16px; background: #ffffff; border-left: 1px solid var(--line); box-shadow: -8px 0 30px rgba(0,0,0,0.05); transform: translateX(100%); opacity: 1; transition: transform .34s var(--ease); }
     body.drawer-open .editor-col { transform: translateX(0); }
     body:not(.drawer-open) .editor-col { flex-basis: auto; width: min(480px, 94vw); padding: 16px; opacity: 1; transform: translateX(100%); }
     body.drawer-open .side-tab { opacity: 0; visibility: hidden; pointer-events: none; }
-    .scrim { display: block; position: fixed; inset: 0; z-index: 890; background: rgba(15, 23, 42, 0.4); opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
+    .scrim { display: block; position: fixed; inset: 0; z-index: 1090; background: rgba(15, 23, 42, 0.4); opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
     body.drawer-open .scrim { opacity: 1; visibility: visible; }
     .preview-col { flex: 1 1 100%; width: 100%; }
   }
   @media screen and (max-width: 900px) {
     html { overflow-x: hidden; }
-    body { height: auto; overflow: visible; background: var(--bg-dark); }
+    body { height: auto; overflow: visible; background: var(--bg-dark); display: block; }
+    .toolbar { position: sticky; top: 0; }
+    .workspace { height: auto; }
     .preview-col { width: 100%; height: auto; padding: 12px 10px 70px; overflow: visible; }
     .stage { overflow-x: hidden; }
     body.bar-hidden .toolbar { transform: translateY(-100%); }
@@ -458,7 +465,7 @@ $pmAdminEmail = pm_auth_admin_email();
   @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; } }
   @media print {
     html, body { background: #fff; height: auto; overflow: visible; }
-    .toolbar, .editor-col, .side-tab, .scrim, .meta, .zoom-badge, .floatbar, .toast { display: none !important; }
+    .toolbar, .nav-show, .editor-col, .side-tab, .scrim, .meta, .zoom-badge, .floatbar, .toast { display: none !important; }
     .workspace { display: block; margin: 0; height: auto; }
     .preview-col { padding: 0; overflow: visible; background: #fff; height: auto; }
     .stage { gap: 0; }
@@ -474,6 +481,7 @@ $pmAdminEmail = pm_auth_admin_email();
     <div class="logo"><a href="javascript:void(0)">NOTES <span>D2D</span></a></div>
     <div class="actions">
       <button type="button" class="btn ghost" id="btnHeaderLib"><i class="fa fa-folder-open"></i> Library</button>
+      <button type="button" class="btn ghost" id="btnNavHide" title="Hide top bar (more space)"><i class="fa fa-angle-up"></i> Hide bar</button>
       <a class="btn ghost" href="admin_panel.php" title="Back to Admin Panel"><i class="fa fa-arrow-left"></i> Admin</a>
       <button type="button" class="btn ghost" id="btnSample"><i class="fa fa-wand-magic-sparkles"></i> Sample</button>
       <button type="button" class="btn" id="btnPrint"><i class="fa fa-print"></i> Print / PDF</button>
@@ -482,6 +490,7 @@ $pmAdminEmail = pm_auth_admin_email();
   </div>
 </header>
 
+<button type="button" class="nav-show" id="btnNavShow" title="Show top bar"><i class="fa fa-angle-down"></i> Menu</button>
 <button type="button" class="side-tab" id="sideTab" aria-expanded="true" title="Open Editor"><i class="fa fa-angle-right tab-chev"></i><span class="tab-label">Editor</span></button>
 <div class="scrim" id="scrim"></div>
 
@@ -1956,6 +1965,14 @@ $pmAdminEmail = pm_auth_admin_email();
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") { setDrawer(false); hideFloat(); } });
 
   function updateToolbarOffset() { document.documentElement.style.setProperty("--toolbar-h", $("topbar").offsetHeight + "px"); }
+  function setNav(hidden) {
+    document.body.classList.toggle("nav-hidden", hidden);
+    try { localStorage.setItem("d2d_nav_hidden", hidden ? "1" : "0"); } catch (e) {}
+    setTimeout(function () { updateScale(); hideFloat(); }, 50);
+  }
+  $("btnNavHide").addEventListener("click", function () { setNav(true); toast("Top bar hidden — upar \"Menu\" se wapas lao"); });
+  $("btnNavShow").addEventListener("click", function () { setNav(false); });
+  try { if (localStorage.getItem("d2d_nav_hidden") === "1") document.body.classList.add("nav-hidden"); } catch (e) {}
   var zoom = 1;
   function fitScale() { if (window.innerWidth > 900) return 1; var avail = Math.max(stage.clientWidth || window.innerWidth, 1) - 16; return Math.max(0.24, Math.min(1, avail / (210 * 3.7795275591))); }
   function updateScale() { document.documentElement.style.setProperty("--sheet-scale", String(fitScale() * zoom)); }
