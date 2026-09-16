@@ -16,6 +16,13 @@ UPLOAD / REPLACE to public_html/premind/:
 
 Requires the Imagick PHP extension (already used for preview_pdf.php).
 
+D2D NOTES (chapter-wise short-notes editor, DB-backed):
+  d2d_notes.php           ← the editor. Login on admin_panel.php first, then open this.
+  d2d_notes_api.php       ← its storage API (creates d2d_notes / d2d_note_images tables on first call)
+  pm_admin_auth.php       ← shared admin-session check used by the two above
+  Open at: https://premind.diplomawallah.in/d2d_notes.php
+  Replaces the old standalone "D2D PYQ/d2dmasterpage.html" (that one saved only in the browser).
+
 SECRETS: prefer .env now (server/.env.example has the two keys needed).
 pm_secrets.php still works as a fallback if .env isn't uploaded — you
 don't need both, .env takes priority when present.
