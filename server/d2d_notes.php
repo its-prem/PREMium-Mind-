@@ -100,9 +100,6 @@ $pmAdminEmail = pm_auth_admin_email();
   .btn.danger { background: #fef2f2; color: #ef4444; box-shadow: none; border: 1px solid #fecaca; }
   .btn.danger:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
 
-  .hint { width: 100%; text-align: center; font-size: .74rem; color: var(--text-muted); padding-bottom: 8px; margin-top: -2px; font-weight: 500; }
-  .hint b { color: var(--primary); }
-
   /* SIDE TAB TO OPEN EDITOR (ON THE RIGHT) */
   .side-tab { position: fixed; right: 0; left: auto; top: 50%; transform: translateY(-50%); z-index: 900; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 9px; background: #ffffff; border: 1px solid var(--line); border-right: none; border-radius: 8px 0 0 8px; color: var(--text-main); cursor: pointer; transition: all .3s ease; box-shadow: -2px 4px 12px rgba(0,0,0,0.06); }
   .side-tab:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary-light); }
