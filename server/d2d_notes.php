@@ -103,6 +103,9 @@ $pmAdminEmail = pm_auth_admin_email();
   .btn.ghost { background: #f8fafc; color: #334155; box-shadow: none; border: 1px solid var(--line); }
   .btn.ghost:hover { background: var(--bg-dark); color: var(--text-main); border-color: var(--line-2); }
   
+  #btnRefreshPreview.stale { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+  #btnRefreshPreview.stale i { animation: syncPulse 1.2s ease-in-out infinite; }
+  body:not(.live-off) #btnRefreshPreview { display: none; }
   .btn.danger { background: #fef2f2; color: #ef4444; box-shadow: none; border: 1px solid #fecaca; }
   .btn.danger:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
 
@@ -280,8 +283,12 @@ $pmAdminEmail = pm_auth_admin_email();
      PAPER
   ======================================================= */
   .stage { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 28px; }
-  .stage.no-wm .wm { display: none; }
-  .page { width: 210mm; height: 297mm; flex: none; background: #fff; color: var(--ink); font-family: Tinos, "Times New Roman", Times, serif; font-size: var(--nf); line-height: 1.38; padding: var(--paper-pad) var(--paper-pad) 5mm; display: flex; flex-direction: column; position: relative; overflow: hidden; border-radius: 2mm; box-shadow: 0 8px 30px rgba(0,0,0,.08); page-break-after: always; break-after: page; transform-origin: top center; transform: scale(var(--sheet-scale)); margin-bottom: calc((297mm * var(--sheet-scale)) - 297mm); margin-left: calc(((210mm * var(--sheet-scale)) - 210mm) / 2); margin-right: calc(((210mm * var(--sheet-scale)) - 210mm) / 2); }
+  .measure { position: fixed; left: -99999px; top: 0; width: 210mm; visibility: hidden; pointer-events: none; contain: layout style; }
+  .measure .page { transform: none; margin: 0; }
+  .stage .page { content-visibility: auto; contain-intrinsic-size: 210mm 297mm; }
+  .editor-col, .toolbar { contain: layout style; }
+  .stage.no-wm .wm, .stage.no-wm ~ .measure .wm, body.no-wm .measure .wm { display: none; }
+  .page { width: 210mm; height: 297mm; flex: none; contain: strict; background: #fff; color: var(--ink); font-family: Tinos, "Times New Roman", Times, serif; font-size: var(--nf); line-height: 1.38; padding: var(--paper-pad) var(--paper-pad) 5mm; display: flex; flex-direction: column; position: relative; overflow: hidden; border-radius: 2mm; box-shadow: 0 8px 30px rgba(0,0,0,.08); page-break-after: always; break-after: page; transform-origin: top center; transform: scale(var(--sheet-scale)); margin-bottom: calc((297mm * var(--sheet-scale)) - 297mm); margin-left: calc(((210mm * var(--sheet-scale)) - 210mm) / 2); margin-right: calc(((210mm * var(--sheet-scale)) - 210mm) / 2); }
   .page ::selection { background: rgba(142,27,42,.28); }
   .wm { position: absolute; left: 50%; top: 50%; width: 125mm; height: auto; transform: translate(-50%,-50%); opacity: .06; pointer-events: none; z-index: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .page > .hdr, .page > .body, .page > .foot { position: relative; z-index: 1; }
@@ -474,7 +481,7 @@ $pmAdminEmail = pm_auth_admin_email();
     .workspace { display: block; margin: 0; height: auto; }
     .preview-col { padding: 0; overflow: visible; background: #fff; height: auto; }
     .stage { gap: 0; }
-    .page { border-radius: 0; box-shadow: none; margin: 0 !important; transform: none !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { border-radius: 0; box-shadow: none; margin: 0 !important; transform: none !important; content-visibility: visible; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .page * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
@@ -486,6 +493,8 @@ $pmAdminEmail = pm_auth_admin_email();
     <div class="logo"><a href="javascript:void(0)">NOTES <span>D2D</span></a></div>
     <div class="actions">
       <button type="button" class="btn ghost" id="btnHeaderLib"><i class="fa fa-folder-open"></i> Library</button>
+      <button type="button" class="btn" id="btnHeaderNew" title="New chapter (Ctrl+Alt+N)"><i class="fa fa-plus"></i> New chapter</button>
+      <button type="button" class="btn ghost" id="btnRefreshPreview" title="Re-render preview (Ctrl+Enter)"><i class="fa fa-rotate"></i> Refresh</button>
       <button type="button" class="btn ghost" id="btnNavHide" title="Hide top bar (more space)"><i class="fa fa-angle-up"></i> Hide bar</button>
       <a class="btn ghost" href="admin_panel.php" title="Back to Admin Panel"><i class="fa fa-arrow-left"></i> Admin</a>
       <button type="button" class="btn ghost" id="btnSample"><i class="fa fa-wand-magic-sparkles"></i> Sample</button>
@@ -527,6 +536,7 @@ $pmAdminEmail = pm_auth_admin_email();
 <div class="workspace">
   <!-- PREVIEW NOW COMES FIRST IN DOM, BUT EDITOR SHOWS ON RIGHT VIA ROW-REVERSE -->
   <main class="preview-col" id="previewCol">
+    <div class="measure" id="measure" aria-hidden="true"></div>
     <div class="stage" id="stage"></div>
     <div class="meta" id="meta"></div>
   </main>
@@ -605,6 +615,7 @@ $pmAdminEmail = pm_auth_admin_email();
             <label class="chk"><input type="checkbox" id="optTwoCol" checked> 2 columns</label>
             <label class="chk"><input type="checkbox" id="optWM" checked> Watermark</label>
             <label class="chk"><input type="checkbox" id="optBrand" checked> Brand footer</label>
+            <label class="chk" title="Off karo to bade text pe typing fast rahegi; preview Refresh se banega"><input type="checkbox" id="optLive" checked> Live preview</label>
             <label class="chk">Font <input type="number" id="optFont" class="inp num" value="10.5" min="8" max="13" step="0.5"> pt</label>
           </div>
 
@@ -1143,18 +1154,29 @@ $pmAdminEmail = pm_auth_admin_email();
     var p = document.createElement("section"); p.className = "page";
     var wm = document.createElement("img"); wm.className = "wm"; wm.src = "diplomawallah-logo.png"; wm.alt = ""; p.appendChild(wm);
     p.appendChild(headerNode(slim));
-    var body = el("body"); p.appendChild(body); p.appendChild(footNode(no)); stage.appendChild(p); fitTitle(p.querySelector(".hdr"));
+    var body = el("body"); p.appendChild(body); p.appendChild(footNode(no)); $("measure").appendChild(p); fitTitle(p.querySelector(".hdr"));
     var page = { el: p, body: body, band: null, cols: [], ci: 0 };
     newBand(page);
     return page;
   }
+  var titleFitCache = {};
   function fitTitle(hdr) {
-    var t = hdr.querySelector(".hdr-title"), slim = hdr.classList.contains("slim"), size = slim ? 14 : 25, min = slim ? 10 : 15;
+    var t = hdr.querySelector(".hdr-title"), slim = hdr.classList.contains("slim"), key = (slim ? "s:" : "b:") + t.textContent;
+    var c = titleFitCache[key];
+    if (c) { t.style.whiteSpace = c.ws; t.style.fontSize = c.fs; return; }
+    var size = slim ? 14 : 25, min = slim ? 10 : 15;
     t.style.whiteSpace = "nowrap"; t.style.fontSize = size + "pt";
     while (size > min && t.scrollWidth > t.clientWidth + 1) { size -= 0.5; t.style.fontSize = size + "pt"; }
     if (t.scrollWidth > t.clientWidth + 1) t.style.whiteSpace = "normal";
+    titleFitCache[key] = { ws: t.style.whiteSpace, fs: t.style.fontSize };
   }
   function fits(col) { return col.scrollHeight <= col.clientHeight + 0.5; }
+  /* index of the first element whose bottom edge falls outside the column (elements.length = all fit); costs one layout */
+  function firstOverflow(col, els) {
+    var cb = col.getBoundingClientRect().bottom + 0.5;
+    for (var i = 0; i < els.length; i++) if (els[i].getBoundingClientRect().bottom > cb) return i;
+    return els.length;
+  }
   function bodyFits(page) { return page.body.scrollHeight <= page.body.clientHeight + 0.5; }
 
   var TSTEPS = [
@@ -1169,11 +1191,14 @@ $pmAdminEmail = pm_auth_admin_email();
     probe.style.cssText = "position:absolute;left:-99999px;top:0;visibility:hidden;table-layout:auto;width:min-content;max-width:none;";
     host.appendChild(probe);
     var chosen = TSTEPS[TSTEPS.length - 1], ok = false;
-    for (var k = 0; k < TSTEPS.length; k++) {
-      var st = TSTEPS[k];
-      probe.style.setProperty("--tf", (base - st[0]) + "pt");
-      probe.style.setProperty("--tpy", st[1] + "mm"); probe.style.setProperty("--tpx", st[2] + "mm");
-      if (probe.offsetWidth <= colW) { chosen = st; ok = true; break; }
+    function tryStep(k) { var st = TSTEPS[k]; probe.style.setProperty("--tf", (base - st[0]) + "pt"); probe.style.setProperty("--tpy", st[1] + "mm"); probe.style.setProperty("--tpx", st[2] + "mm"); return probe.offsetWidth; }
+    var w0 = tryStep(0);
+    if (w0 <= colW) { chosen = TSTEPS[0]; ok = true; }
+    else {
+      /* width scales ~linearly with font size: jump straight to the step that should fit, then verify (1-3 reflows, not 10) */
+      var ratio = colW / w0, k = 1;
+      while (k < TSTEPS.length - 1 && (base - TSTEPS[k][0]) / base > ratio) k++;
+      for (; k < TSTEPS.length; k++) { if (tryStep(k) <= colW) { chosen = TSTEPS[k]; ok = true; break; } }
     }
     host.removeChild(probe);
     tb.style.setProperty("--tf", (base - chosen[0]) + "pt");
@@ -1213,12 +1238,12 @@ $pmAdminEmail = pm_auth_admin_email();
     var units = splitUnits(nd), n = units.length;
     if (n < 2) return null;
     var minKeep = nd.dataset.type === "table" ? 2 : (n >= 4 ? 2 : 1), minRest = nd.dataset.type === "table" ? 1 : 1;
-    var moved = [];
-    while (!fits(col) && n - moved.length > minKeep) { var u = units[n - 1 - moved.length]; u.parentNode.removeChild(u); moved.unshift(u); }
-    if (fits(col) && moved.length >= minRest) return buildRemainder(nd, moved, n - moved.length);
     var host = nd.dataset.type === "table" ? nd.querySelector("tbody") : nd.dataset.type === "ul" || nd.dataset.type === "ol" ? nd.querySelector(":scope > ul, :scope > ol") : (nd.querySelector(":scope > .body-t") || nd);
-    moved.forEach(function (u) { host.appendChild(u); });
-    return null;
+    /* all units are in place: one layout, then read where each one ends (no further reflows) */
+    var k = firstOverflow(col, units);
+    if (k >= n || k < minKeep || n - k < minRest) return null;
+    for (var d = n - 1; d >= k; d--) host.removeChild(units[d]);
+    return buildRemainder(nd, units.slice(k), k);
   }
 
   function contentH(col) {
@@ -1241,26 +1266,29 @@ $pmAdminEmail = pm_auth_admin_email();
   }
 
   function paginate(nodes) {
-    stage.innerHTML = "";
-    if (!nodes.length) { var p0 = newPage(1, false); p0.body.innerHTML = '<div class="empty-paper">Yahan apne notes paste karein.<br><b>Plain text</b> bhi chalega.</div>'; return 1; }
-    var pageNo = 1, page = newPage(1, false), carry = [];
-    function advance(toPage) { if (!toPage && page.ci < page.cols.length - 1) { page.ci++; return; } pageNo++; page = newPage(pageNo, true); }
+    stage.innerHTML = ""; $("measure").innerHTML = "";
+    var done = document.createDocumentFragment();
+    function finish(pg) { if (pg && pg.el.parentNode !== done) done.appendChild(pg.el); }
+    if (!nodes.length) { var p0 = newPage(1, false); p0.body.innerHTML = '<div class="empty-paper">Yahan apne notes paste karein.<br><b>Plain text</b> bhi chalega.</div>'; finish(p0); stage.appendChild(done); return 1; }
+    var pageNo = 1, page = newPage(1, false), carry = [], colW = 0;
+    function measureColW() { colW = page.cols[0].clientWidth; }
+    measureColW();
+    function advance(toPage) { if (!toPage && page.ci < page.cols.length - 1) { page.ci++; return; } finish(page); pageNo++; page = newPage(pageNo, true); measureColW(); }
     function isHeading(nd) { return /^(h1|h2|h3|banner|cap)$/.test(nd.dataset.type); }
     function isWide(nd) { return nd.dataset.wide === "1"; }
     function bandEmpty() { return page.cols.every(function (c) { return c.childElementCount === 0; }); }
+    function prepTable(nd) { if (nd.dataset.type === "table" && !nd.dataset.cont && !nd.dataset.fitted) { nd.dataset.fitted = "1"; fitTable(nd.querySelector("table"), page.body, isWide(nd) ? page.body.clientWidth : colW); } }
+    var BATCH = 40;
 
-    for (var i = 0; i < nodes.length; i++) {
+    var i = 0;
+    while (i < nodes.length) {
       var nd = nodes[i];
-      if (nd.dataset.type === "break") { carry = []; advance(nd.dataset.kind === "page"); continue; }
-      if (isHeading(nd)) { carry.push(nd); continue; }
-      var group = carry.concat([nd]); carry = [];
-
-      if (nd.dataset.type === "table" && !nd.dataset.cont) {
-        var target = isWide(nd) ? page.body.clientWidth : page.cols[0].clientWidth;
-        fitTable(nd.querySelector("table"), page.body, target);
-      }
+      if (nd.dataset.type === "break") { carry = []; advance(nd.dataset.kind === "page"); i++; continue; }
+      if (isHeading(nd)) { carry.push(nd); i++; continue; }
 
       if (isWide(nd)) {
+        prepTable(nd);
+        var group = carry.concat([nd]); carry = []; i++;
         for (var w = 0; w < 3; w++) {
           if (bandEmpty()) page.band.remove();
           else { balanceBand(page); page.band.style.flex = "0 0 auto"; }
@@ -1268,25 +1296,41 @@ $pmAdminEmail = pm_auth_admin_email();
           var only = page.body.childElementCount === 1;
           if (bodyFits(page) || only) break;
           wrap.remove();
-          pageNo++; page = newPage(pageNo, true);
+          finish(page); pageNo++; page = newPage(pageNo, true); measureColW();
         }
         page.band = null; newBand(page);
         continue;
       }
 
-      var placed = false;
-      for (var tries = 0; tries < 6 && !placed; tries++) {
-        var col = page.cols[page.ci], wasEmpty = col.childElementCount === 0;
-        group.forEach(function (g) { col.appendChild(g); });
-        if (fits(col)) { placed = true; break; }
-        var rest = trySplit(nd, col);
-        if (rest) { nodes.splice(i + 1, 0, rest); placed = true; break; }
-        if (wasEmpty) { placed = true; break; }
-        group.forEach(function (g) { col.removeChild(g); }); advance(false);
-      }
+      /* gather a run of ordinary blocks (never ending on a heading) */
+      var run = [], j = i;
+      while (j < nodes.length && run.length < BATCH && nodes[j].dataset.type !== "break" && !isWide(nodes[j])) { prepTable(nodes[j]); run.push(nodes[j]); j++; }
+      while (run.length > 1 && isHeading(run[run.length - 1])) { run.pop(); j--; }
+      var items = carry.concat(run), col = page.cols[page.ci], wasEmpty = col.childElementCount === 0;
+      items.forEach(function (g) { col.appendChild(g); });
+      var best = firstOverflow(col, items);
+      if (best === items.length) { i = j; carry = []; continue; }
+
+      /* overflow: keep the prefix that fits, but never end a column on a heading */
+      while (best > 0 && isHeading(items[best - 1])) best--;
+      for (var d = items.length - 1; d >= best; d--) col.removeChild(items[d]);
+      var placedRun = Math.max(0, best - carry.length);
+      if (best > 0) { i += placedRun; carry = []; }
+      /* next block = any headings right after the cut + the first non-heading */
+      var heads = best > 0 ? [] : carry.slice(); carry = [];
+      while (i < nodes.length && isHeading(nodes[i])) { heads.push(nodes[i]); i++; }
+      if (i >= nodes.length || nodes[i].dataset.type === "break" || isWide(nodes[i])) { carry = heads; continue; }
+      nd = nodes[i]; prepTable(nd);
+      var g2 = heads.concat([nd]); g2.forEach(function (g) { col.appendChild(g); });
+      var rest = trySplit(nd, col);
+      if (rest) { nodes.splice(i + 1, 0, rest); i++; continue; }
+      if (wasEmpty && best === 0) { i++; continue; }              /* alone in an empty column and still too tall: let it overflow */
+      g2.forEach(function (g) { col.removeChild(g); });
+      carry = heads; advance(false);
     }
     if (carry.length) { var last = page.cols[page.ci]; carry.forEach(function (g) { last.appendChild(g); }); }
     if (bandEmpty() && page.body.childElementCount > 1) page.band.remove();
+    finish(page); stage.appendChild(done);
     var pages = stage.querySelectorAll(".page");
     pages.forEach(function (pg) { var of = pg.querySelector(".pno .of"); if (of) of.textContent = "/ " + pages.length; });
     return pages.length;
@@ -1296,7 +1340,15 @@ $pmAdminEmail = pm_auth_admin_email();
      RENDER
   ===================================================================== */
   var lastBlocks = [];
+  var renderBusy = false, renderAgain = false;
   function render() {
+    if (renderBusy) { renderAgain = true; return; }
+    renderBusy = true;
+    try { renderNow(); } finally { renderBusy = false; }
+    if (renderAgain) { renderAgain = false; schedule(); }
+  }
+  function renderNow() {
+    titleFitCache = {};
     document.documentElement.style.setProperty("--nf", (parseFloat($("optFont").value) || 10) + "pt");
     var blocks = parse(ta.value); lastBlocks = blocks;
     var pages = paginate(buildNodes(blocks));
@@ -1351,7 +1403,9 @@ $pmAdminEmail = pm_auth_admin_email();
   function snap(force) {
     var s = { v: ta.value, a: ta.selectionStart, b: ta.selectionEnd };
     if (!force && hidx >= 0 && hist[hidx].v === s.v) { hist[hidx] = s; return; }
-    hist = hist.slice(0, hidx + 1); hist.push(s); if (hist.length > 300) hist.shift(); hidx = hist.length - 1; updateUndoButtons();
+    hist = hist.slice(0, hidx + 1); hist.push(s);
+    var bytes = 0; for (var i = hist.length - 1; i >= 0; i--) { bytes += hist[i].v.length; if (i < hist.length - 1 && (bytes > 12000000 || hist.length - i > 200)) { hist = hist.slice(i + 1); break; } }
+    hidx = hist.length - 1; updateUndoButtons();
   }
   function applyHist(s) { ta.value = s.v; ta.focus(); ta.setSelectionRange(s.a, s.b); render(); saveState(); updateUndoButtons(); }
   function undo() { if (hidx > 0) { hidx--; applyHist(hist[hidx]); } }
@@ -1465,8 +1519,10 @@ $pmAdminEmail = pm_auth_admin_email();
       b.classList.toggle("on", on);
     });
   }
-  ["keyup", "click", "select"].forEach(function (ev) { ta.addEventListener(ev, updateActive); });
-  document.addEventListener("selectionchange", function () { if (document.activeElement === ta) updateActive(); });
+  var uaRaf = 0;
+  function updateActiveSoon() { if (uaRaf) return; uaRaf = requestAnimationFrame(function () { uaRaf = 0; updateActive(); }); }
+  ["keyup", "click", "select"].forEach(function (ev) { ta.addEventListener(ev, updateActiveSoon); });
+  document.addEventListener("selectionchange", function () { if (document.activeElement === ta) updateActiveSoon(); });
 
   /* =====================================================================
      PAGE SELECTION → floating toolbar
@@ -1597,11 +1653,14 @@ $pmAdminEmail = pm_auth_admin_email();
     var h = Math.floor(m / 60); if (h < 24) return h + "h ago"; return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
   }
 
-  function collect() {
-    var n = { id: cur.id, version: cur.version, notes_text: ta.value, source_content: srcTa.value, settings: { o: {}, font: $("optFont").value, pal: palette.slice() } };
+  var imagesDirty = false;
+  function collect(forServer) {
+    var n = { id: cur.id, version: cur.version, notes_text: ta.value, source_content: srcTa.value, settings: { o: {}, font: $("optFont").value, pal: palette.slice(), live: $("optLive").checked } };
     FIELDS.forEach(function (id) { n[FIELD_MAP[id]] = $(id).value; });
     OPTS.forEach(function (id) { n.settings.o[id] = $(id).checked; });
-    return { note: n, images: images };
+    var out = { note: n };
+    if (!forServer || imagesDirty || !cur.id) out.images = images;
+    return out;
   }
   function applyNote(note, imgs) {
     suppressSave = true;
@@ -1612,9 +1671,10 @@ $pmAdminEmail = pm_auth_admin_email();
       var st = (note && note.settings) || {};
       OPTS.forEach(function (id) { $(id).checked = (st.o && typeof st.o[id] === "boolean") ? st.o[id] : $(id).defaultChecked; });
       $("optFont").value = st.font || $("optFont").defaultValue;
+      $("optLive").checked = st.live !== false; document.body.classList.toggle("live-off", st.live === false);
       palette = (Array.isArray(st.pal) && st.pal.length === 5) ? st.pal.slice() : PRESETS.textbook.slice();
-      images = Array.isArray(imgs) ? imgs.filter(function (x) { return x && x.name && x.data; }) : [];
-      applyPalette(); stage.classList.toggle("no-wm", !$("optWM").checked);
+      images = Array.isArray(imgs) ? imgs.filter(function (x) { return x && x.name && x.data; }) : []; imagesDirty = false;
+      applyPalette(); stage.classList.toggle("no-wm", !$("optWM").checked); document.body.classList.toggle("no-wm", !$("optWM").checked);
       renderImages(); updateSrcMeta();
       hist = []; hidx = -1; snap(true); render();
     } finally { suppressSave = false; }
@@ -1664,11 +1724,12 @@ $pmAdminEmail = pm_auth_admin_email();
     if (!online) { syncUI("offline", "Offline — draft local me safe hai, net aate hi save hoga"); armRetry(); return Promise.resolve(false); }
 
     saving = true; syncUI("saving", "Saving…");
-    var snapVersion = cur.version, payload = collect();
+    var snapVersion = cur.version, payload = collect(true), sentImages = "images" in payload;
     return api("save", payload).then(function (r) {
       saving = false;
       if (r.ok && r.json && r.json.status === "success") {
         var wasNew = !cur.id;
+        if (sentImages) imagesDirty = false;
         cur.id = r.json.id; cur.version = r.json.version; cur.updated_at = r.json.updated_at;
         dirty = false; retryDelay = 2000;
         clearDraft(wasNew ? 0 : cur.id); clearDraft(cur.id); saveLocal(); 
@@ -1711,7 +1772,7 @@ $pmAdminEmail = pm_auth_admin_email();
       "Is chapter ko kisi doosre tab/device se save kiya gaya (v" + serverVersion + "). Aap kya rakhna chahte ho?<br><br><b>Mera rakho</b> — server wali overwrite hogi.<br><b>Server wala lo</b> — aapke abhi ke changes local draft me rahenge.",
       [
         { html: '<i class="fa fa-cloud-arrow-down"></i> Server wala lo', ghost: true, fn: function () { var keep = collect(); try { localStorage.setItem("d2d_conflict_backup_" + cur.id + "_" + Date.now(), JSON.stringify(keep)); } catch (e) {} loadNote(cur.id, { ignoreDraft: true }); } },
-        { html: '<i class="fa fa-cloud-arrow-up"></i> Mera rakho', fn: function () { cur.version = serverVersion; dirty = true; saveToServer("force"); } }
+        { html: '<i class="fa fa-cloud-arrow-up"></i> Mera rakho', fn: function () { cur.version = serverVersion; dirty = true; imagesDirty = true; saveToServer("force"); } }
       ]);
   }
 
@@ -1730,7 +1791,7 @@ $pmAdminEmail = pm_auth_admin_email();
           "Is chapter ka ek <b>local draft</b> hai jo server copy se naya hai (" + fmtAgo(new Date(draft.savedAt).toISOString()) + "). Shayad pichli baar net kat gaya tha ya tab band ho gaya tha.",
           [
             { html: '<i class="fa fa-trash"></i> Draft hatao', ghost: true, fn: function () { clearDraft(note.id); } },
-            { html: '<i class="fa fa-rotate-left"></i> Draft restore karo', fn: function () { var d = draft; applyNote(d, d._images || imgs); dirty = true; syncUI("dirty", "Draft restored — saving…"); saveToServer("restore"); } }
+            { html: '<i class="fa fa-rotate-left"></i> Draft restore karo', fn: function () { var d = draft; applyNote(d, d._images || imgs); imagesDirty = !!d._images; dirty = true; syncUI("dirty", "Draft restored — saving…"); saveToServer("restore"); } }
           ]);
       } else {
         applyNote(note, imgs); dirty = false; clearDraft(note.id); saveLocal();
@@ -1749,7 +1810,7 @@ $pmAdminEmail = pm_auth_admin_email();
     var d = readDraft(0);
     if (!prefill && d && d.dirty && (d.notes_text || d.source_content)) {
       showModal("Naya chapter — unsaved draft mila", "Pichli baar ek naya chapter likhte waqt save nahi hua tha. Restore karein?",
-        [{ html: "Nahi, blank", ghost: true, fn: function () { clearDraft(0); } }, { html: '<i class="fa fa-rotate-left"></i> Restore', fn: function () { applyNote(d, d._images || []); dirty = true; syncUI("dirty", "Draft restored"); scheduleSave(); } }]);
+        [{ html: "Nahi, blank", ghost: true, fn: function () { clearDraft(0); } }, { html: '<i class="fa fa-rotate-left"></i> Restore', fn: function () { applyNote(d, d._images || []); imagesDirty = true; dirty = true; syncUI("dirty", "Draft restored"); scheduleSave(); } }]);
     }
     dirty = !!prefill; if (prefill) { syncUI("dirty", "Duplicate ready — saving…"); scheduleSave(); } else syncUI("saved", "New chapter — likhna shuru karo, auto-save ON");
     highlightLib(); $("titleInput").focus(); setStatus("New chapter.");
@@ -1807,7 +1868,13 @@ $pmAdminEmail = pm_auth_admin_email();
     loadNote(id);
   });
   $("libSearch").addEventListener("input", function () { libFilter = this.value.trim(); renderLib(); });
-  $("btnNewNote").addEventListener("click", function () { newNote(); });
+  function startNewChapter() { if (dirty) { saveLocal(); saveToServer("switch"); } newNote(); setDrawer(true); $("titleInput").focus(); toast("Naya chapter — title likho, text paste karo"); }
+  $("btnNewNote").addEventListener("click", startNewChapter);
+  $("btnHeaderNew").addEventListener("click", startNewChapter);
+  document.addEventListener("keydown", function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === "n") { e.preventDefault(); startNewChapter(); }
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); refreshPreview(); }
+  });
   $("btnLibRefresh").addEventListener("click", function () { loadList(false); toast("List refreshed"); });
   $("btnTrash").addEventListener("click", function () { showingTrash = !showingTrash; this.innerHTML = showingTrash ? '<i class="fa fa-folder"></i> Library' : '<i class="fa fa-trash-can"></i> Trash'; loadList(false); });
   $("btnDuplicate").addEventListener("click", function () {
@@ -1827,7 +1894,7 @@ $pmAdminEmail = pm_auth_admin_email();
   ===================================================================== */
   var images = [];
   function findImage(name) { name = String(name || "").toLowerCase(); for (var i = 0; i < images.length; i++) if (images[i].name.toLowerCase() === name) return images[i]; return null; }
-  function saveImages() { saveLocalImages(); saveState(); return true; }
+  function saveImages() { imagesDirty = true; saveLocalImages(); saveState(); return true; }
   function slug(fn) { return (fn || "img").replace(/\.[a-z0-9]+$/i, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 24) || "img"; }
   function uniqueName(base) { var n = base, k = 2; while (findImage(n)) n = base + "-" + (k++); return n; }
   
@@ -1854,8 +1921,10 @@ $pmAdminEmail = pm_auth_admin_email();
       .then(function () { saveImages(); renderImages(); render(); if (added.length) toast(added.length + " image add ho gayi"); if (then) then(added); });
   }
   var IMG_TAG_RE = /^\s*\[(?:img|image)\s*:\s*([^\]|]+?)\s*(?:\|[^\]]*)?\]\s*$/i;
+  var linesCache = { v: null, lines: null };
+  function taLines() { var v = ta.value; if (linesCache.v !== v) { linesCache.v = v; linesCache.lines = v.split("\n"); } return linesCache.lines; }
   function findImgTag(name) {
-    var lines = ta.value.split("\n"), nm = String(name || "").toLowerCase();
+    var lines = taLines(), nm = String(name || "").toLowerCase();
     for (var i = 0; i < lines.length; i++) { var m = lines[i].match(IMG_TAG_RE); if (m && m[1].trim().toLowerCase() === nm) return { line: i, wide: i > 0 && /^\s*\[wide\]\s*$/i.test(lines[i - 1]), tag: parseImgLine(lines[i].trim()) }; }
     return null;
   }
@@ -1900,10 +1969,15 @@ $pmAdminEmail = pm_auth_admin_email();
     cards.forEach(function (c) { var im = images[parseInt(c.dataset.k, 10)]; if (im && (!!findImgTag(im.name)) !== c.classList.contains("used")) stale = true; });
     if (stale) renderImages();
   }
-  function refreshPosSelects() {
-    var html = posOptions();
-    document.querySelectorAll(".imgPos").forEach(function (sel) { var v = sel.value; sel.innerHTML = html; if ([].some.call(sel.options, function (op) { return op.value === v; })) sel.value = v; });
+  var posHtmlStale = true;
+  function refreshPosSelects() { posHtmlStale = true; }
+  function fillPosSelect(sel) {
+    if (!posHtmlStale && sel.options.length > 3) return;
+    var v = sel.value; sel.innerHTML = posOptions(); if ([].some.call(sel.options, function (op) { return op.value === v; })) sel.value = v;
+    sel.dataset.filled = "1";
   }
+  $("imgList").addEventListener("mousedown", function (e) { var sel = e.target.closest(".imgPos"); if (sel) fillPosSelect(sel); }, true);
+  $("imgList").addEventListener("focusin", function (e) { var sel = e.target.closest(".imgPos"); if (sel) fillPosSelect(sel); });
   function renderImages() {
     var host = $("imgList"); $("imgCount").textContent = images.length;
     if (!images.length) { host.innerHTML = '<div class="imgs-empty">Abhi koi image nahi. Upar se add karo.</div>'; return; }
@@ -1914,7 +1988,7 @@ $pmAdminEmail = pm_auth_admin_email();
       if (W.indexOf(curW) < 0) W.splice(1, 0, curW);
       return '<div class="imgc' + (hit ? " used" : "") + '" data-k="' + k + '"><img class="th" src="' + im.data + '" alt=""><div class="bd">' +
         '<div class="nm"><code title="' + esc(im.name) + '">' + esc(im.name) + '</code><small>' + im.w + "×" + im.h + '</small><button type="button" class="del" title="Delete"><i class="fa fa-trash"></i></button></div>' +
-        (hit ? '<div class="used-note"><i class="fa fa-link"></i> Notes me line ' + (hit.line + 1) + ' pe lagi hai — niche change karke <b>Update</b> dabao</div>' : '<select class="inp imgPos" title="Insert after"></select>') +
+        (hit ? '<div class="used-note"><i class="fa fa-link"></i> Notes me line ' + (hit.line + 1) + ' pe lagi hai — niche change karke <b>Update</b> dabao</div>' : '<select class="inp imgPos" title="Insert after"><option value="cursor">⌖ Cursor ke baad</option><option value="end">⤓ Notes ke end me</option><option value="-1">⤒ Sabse upar</option></select>') +
         '<div class="r2"><select class="inp imgW">' + W.map(function (x) { return '<option value="' + x + '"' + (x === curW ? " selected" : "") + '>' + (x === "wide" ? "Wide (full page)" : (x === "100%" ? "Width 100%" : x)) + "</option>"; }).join("") + '</select>' +
         '<select class="inp imgAl">' + AL.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === curAl ? " selected" : "") + '>' + x[1] + "</option>"; }).join("") + '</select></div>' +
         '<input class="inp imgCap" placeholder="Caption (optional)" value="' + esc(curCap) + '">' +
@@ -1955,24 +2029,52 @@ $pmAdminEmail = pm_auth_admin_email();
     if (!fs.length) return; e.preventDefault();
     addImageFiles(fs, function (names) { names.forEach(function (nm) { insertLineAt("cursor", imgLine(nm, "60%", "center", "")); }); });
   });
+  function autoTitleFrom(txt) {
+    var lines = txt.replace(/\r/g, "").split("\n"), pick = "";
+    for (var i = 0; i < lines.length && i < 40; i++) {
+      var t = lines[i].trim(); if (!t) continue;
+      var m = t.match(/^(Title|Chapter)\s*:\s*(.+)$/i); if (m) { if (/^chapter$/i.test(m[1]) && !$("chapInput").value.trim() && /^\d+$/.test(m[2].trim())) { $("chapInput").value = m[2].trim(); continue; } pick = m[2]; break; }
+      m = t.match(/^#{1,3}\s+(.+)$/); if (m) { pick = m[1]; break; }
+      m = t.match(/^(?:CHAPTER|UNIT|LECTURE)\s*(\d+)\s*[:\-–.]?\s*(.+)$/i); if (m) { if (!$("chapInput").value.trim()) $("chapInput").value = m[1]; pick = m[2]; break; }
+      if (t.length <= 70 && !/[.!?]$/.test(t)) { pick = t; break; }
+    }
+    pick = pick.replace(/[*_=%^!:@#]{2}|\$/g, "").trim();
+    if (pick) { $("titleInput").value = pick.slice(0, 80); toast("Title set: " + pick.slice(0, 40)); }
+  }
   $("btnImgTool").addEventListener("click", function () { $("accImages").classList.add("open"); $("imgFile").click(); });
   ta.addEventListener("paste", function (e) {
     var its = (e.clipboardData && e.clipboardData.items) || [], fs = [];
     for (var i = 0; i < its.length; i++) if (its[i].kind === "file" && /^image\//.test(its[i].type)) fs.push(its[i].getAsFile());
-    if (!fs.length) return; e.preventDefault();
+    if (!fs.length) {
+      var txt = e.clipboardData ? e.clipboardData.getData("text/plain") : "";
+      if (txt && txt.length > 8000) { bigPaste = true; setStatus("Bada text paste hua (" + Math.round(txt.length / 1000) + "k) — render ho raha hai…"); }
+      if (txt && !$("titleInput").value.trim()) setTimeout(function () { autoTitleFrom(txt); }, 0);
+      return;
+    }
+    e.preventDefault();
     addImageFiles(fs, function (names) { names.forEach(function (nm) { insertLineAt("cursor", imgLine(nm, "60%", "center", "")); }); });
   });
 
   /* =====================================================================
      CONTROLS / CHROME
   ===================================================================== */
-  var timer = null;
-  function schedule() { if (timer) clearTimeout(timer); timer = setTimeout(function () { render(); saveState(); }, 320); }
+  var timer = null, previewStale = false, bigPaste = false;
+  function renderDelay() { var L = ta.value.length; return bigPaste ? 900 : (L < 40000 ? 320 : L < 150000 ? 650 : 1100); }
+  function schedule() {
+    if (timer) clearTimeout(timer);
+    if (!$("optLive").checked) { previewStale = true; setStatus("Preview paused — Refresh dabao (Ctrl+Enter)"); $("btnRefreshPreview").classList.add("stale"); timer = setTimeout(function () { saveState(); }, 600); return; }
+    var big = ta.value.length > 40000;
+    if (big) setStatus("Rendering " + Math.round(ta.value.length / 1000) + "k chars…");
+    timer = setTimeout(function () { bigPaste = false; render(); saveState(); }, renderDelay());
+  }
+  function refreshPreview() { if (timer) clearTimeout(timer); previewStale = false; $("btnRefreshPreview").classList.remove("stale"); render(); saveState(); }
+  $("btnRefreshPreview").addEventListener("click", refreshPreview);
+  $("optLive").addEventListener("change", function () { document.body.classList.toggle("live-off", !this.checked); if (this.checked && previewStale) refreshPreview(); saveState(); });
   ta.addEventListener("input", function () { schedule(); if (histT) clearTimeout(histT); histT = setTimeout(function () { snap(); }, 450); });
   FIELDS.forEach(function (id) { $(id).addEventListener("input", schedule); });
   OPTS.concat(["optFont"]).forEach(function (id) { $(id).addEventListener("change", function () { render(); saveState(); }); });
   $("optFont").addEventListener("input", schedule);
-  $("optWM").addEventListener("change", function () { stage.classList.toggle("no-wm", !$("optWM").checked); });
+  $("optWM").addEventListener("change", function () { stage.classList.toggle("no-wm", !$("optWM").checked); document.body.classList.toggle("no-wm", !$("optWM").checked); });
 
   ta.addEventListener("keydown", function (e) {
     var k = e.key.toLowerCase(), mod = e.ctrlKey || e.metaKey;
@@ -2035,7 +2137,7 @@ $pmAdminEmail = pm_auth_admin_email();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { updateToolbarOffset(); render(); });
   setDrawer(true);
   applyPalette(); renderImages(); updateSrcMeta();
-  stage.classList.toggle("no-wm", !$("optWM").checked);
+  stage.classList.toggle("no-wm", !$("optWM").checked); document.body.classList.toggle("no-wm", !$("optWM").checked);
   snap(true); render();
 
   function migrateLegacy() {
@@ -2044,7 +2146,7 @@ $pmAdminEmail = pm_auth_admin_email();
     if (!s || typeof s.text !== "string" || !s.text.trim()) return false;
     var f = s.f || {};
     var note = { subject: "Imported", chapter_no: f.chapInput || "", title: f.titleInput || "Imported notes", subtitle: f.subInput || "", tagline: f.tagInput || "", badge: f.badgeInput || "", notes_text: s.text, source_content: "", settings: { o: s.o || {}, font: s.font, pal: s.pal } };
-    newNote(note); if (Array.isArray(im)) { images = im.filter(function (x) { return x && x.name && x.data; }); renderImages(); render(); }
+    newNote(note); if (Array.isArray(im)) { images = im.filter(function (x) { return x && x.name && x.data; }); imagesDirty = true; renderImages(); render(); }
     try { localStorage.removeItem("notesd2d_v2"); localStorage.removeItem("notesd2d_imgs"); } catch (e) {}
     toast("Purana kaam import ho gaya — save ho raha hai");
     return true;

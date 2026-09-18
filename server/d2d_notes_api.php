@@ -142,7 +142,9 @@ if ($action === 'get') {
 
 if ($action === 'save') {
     $n = is_array($body['note'] ?? null) ? $body['note'] : [];
-    $images = is_array($body['images'] ?? null) ? $body['images'] : [];
+    // images omitted → leave the stored set untouched (editor only sends them when they changed)
+    $imagesSent = array_key_exists('images', $body) && is_array($body['images']);
+    $images = $imagesSent ? $body['images'] : [];
 
     $id         = (int)($n['id'] ?? 0);
     $clientVer  = (int)($n['version'] ?? 0);
@@ -211,14 +213,16 @@ if ($action === 'save') {
             $ins->close();
         }
 
-        // Replace the image set wholesale — the client always sends the full
-        // current list, so this keeps DB and editor exactly in step.
+        // When the client sends images it sends the full current list, so
+        // replace the set wholesale; when it omits them nothing changed.
+        if ($imagesSent) {
         $del = $conn->prepare("DELETE FROM d2d_note_images WHERE note_id = ?");
         $del->bind_param('i', $id);
         if (!$del->execute()) throw new RuntimeException($del->error);
         $del->close();
+        }
 
-        if (!empty($images)) {
+        if ($imagesSent && !empty($images)) {
             $insImg = $conn->prepare("INSERT INTO d2d_note_images (note_id, name, data, w, h) VALUES (?,?,?,?,?)");
             foreach ($images as $im) {
                 if (!is_array($im)) continue;
