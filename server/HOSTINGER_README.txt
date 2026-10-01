@@ -23,6 +23,12 @@ D2D NOTES (chapter-wise short-notes editor, DB-backed):
   Open at: https://premind.diplomawallah.in/d2d_notes.php
   Replaces the old standalone "D2D PYQ/d2dmasterpage.html" (that one saved only in the browser).
 
+D2D MCQ (PYQ practice-sheet maker, DB-backed):
+  d2d_mcq.php             <- the sheet maker. Login on admin_panel.php first, then open this.
+  d2d_mcq_api.php         <- its storage API (creates d2d_mcq_sheets / d2d_mcq_images on first call)
+  Open at: https://premind.diplomawallah.in/d2d_mcq.php
+  Same login, same Library/auto-save/images as d2d_notes.php.
+
 SECRETS: prefer .env now (server/.env.example has the two keys needed).
 pm_secrets.php still works as a fallback if .env isn't uploaded — you
 don't need both, .env takes priority when present.
