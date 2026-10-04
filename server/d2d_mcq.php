@@ -367,6 +367,54 @@ $pmAdminEmail = pm_auth_admin_email();
     .bar-inner { width: 96%; } .logo a { font-size: 1.25rem; } .actions { width: 100%; justify-content: space-between; }
     .btn { flex: 1 1 auto; justify-content: center; padding: 8px 10px; font-size: .76rem; }
   }
+
+  /* ---- top-bar Library menu (Notes ⇄ MCQ) ---- */
+  .menu-wrap { position: relative; display: inline-flex; }
+  .menu-pop { position: absolute; top: calc(100% + 8px); left: 0; min-width: 248px; background: #fff; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 12px 28px rgba(0,0,0,.13); padding: 6px; z-index: 1200; display: none; }
+  .menu-pop.show { display: block; }
+  .menu-pop a, .menu-pop button { display: flex; width: 100%; align-items: center; gap: 10px; padding: 9px 10px; background: transparent; border: none; border-radius: 7px; color: var(--text-main); font-family: 'Poppins', sans-serif; font-size: .84rem; text-align: left; text-decoration: none; cursor: pointer; }
+  .menu-pop a:hover, .menu-pop button:hover { background: var(--primary-light); color: var(--primary); }
+  .menu-pop .ic { width: 32px; height: 32px; flex: none; border-radius: 8px; display: grid; place-items: center; background: var(--primary-light); color: var(--primary); }
+  .menu-pop .tx { flex: 1; min-width: 0; }
+  .menu-pop b { display: block; font-weight: 600; font-size: .85rem; }
+  .menu-pop small { display: block; color: var(--text-muted); font-size: .71rem; line-height: 1.35; }
+  .menu-pop .cur-mark { flex: none; color: var(--primary); font-size: .68rem; font-weight: 600; }
+  .menu-sep { height: 1px; background: var(--line); margin: 5px 4px; }
+
+  /* ---- library folder tree ---- */
+  .lib-tree { display: flex; flex-direction: column; gap: 5px; }
+  .lib-fold { border: 1px solid var(--line); border-radius: 8px; background: #fff; overflow: hidden; }
+  .lib-fold.open { border-color: var(--line-2); }
+  .lib-fold-head { display: flex; align-items: center; gap: 9px; padding: 9px 10px; background: #f8fafc; cursor: pointer; user-select: none; }
+  .lib-fold-head:hover { background: var(--primary-light); }
+  .lib-fold-head .fchev { transition: transform .25s var(--ease); font-size: .75rem; color: var(--text-muted); width: 9px; }
+  .lib-fold.open .lib-fold-head .fchev { transform: rotate(90deg); }
+  .lib-fold-head .fi { color: var(--primary); font-size: .88rem; }
+  .lib-fold-head .fname { flex: 1; min-width: 0; font-weight: 600; font-size: .83rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lib-fold-head .fcount { font-size: .68rem; color: var(--text-muted); background: #fff; border: 1px solid var(--line); border-radius: 99px; padding: 1px 8px; }
+  .lib-fold-body { display: none; flex-direction: column; gap: 5px; padding: 7px; }
+  .lib-fold.open .lib-fold-body { display: flex; }
+  .fold-act { background: transparent; border: none; color: #94a3b8; cursor: pointer; padding: 3px 5px; border-radius: 5px; font-size: .74rem; }
+  .fold-act:hover { color: var(--primary); background: #fff; }
+  .lib-fold-empty { color: var(--text-muted); font-size: .76rem; padding: 7px 4px; text-align: center; }
+
+  /* ---- image slots + insert feedback ---- */
+  .imgc .r3b { display: flex; gap: 6px; flex-wrap: wrap; }
+  .imgc .r3b .ins { flex: 1 1 auto; }
+  .imgc .ins.mv { background: #fff; color: var(--text-main); border: 1px solid var(--line-2); }
+  .imgc .ins.mv:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+  .slot-hint { font-size: .72rem; color: var(--primary-hover); background: var(--primary-light); border-radius: 6px; padding: 5px 8px; line-height: 1.45; }
+  .fig.slot { border: .4mm dashed var(--maroon); border-radius: 1.5mm; padding: 5mm 3mm; text-align: center; color: var(--maroon); font-size: .85em; background: #fff8f8; }
+  .fig.slot b { font-family: Consolas, monospace; }
+  .fig.slot small { display: block; margin-top: 1mm; color: #9a5a5a; font-size: .8em; }
+  .flash-img { outline: 2.5px solid var(--maroon); outline-offset: 3px; border-radius: 2px; }
+
+  .btn-copy { display: inline-flex; align-items: center; gap: 8px; background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 10px 16px; font-family: 'Oswald', sans-serif; font-size: .8rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; margin-bottom: 10px; transition: all 0.2s; }
+  .btn-copy:hover { background: var(--primary-hover); transform: translateY(-1px); }
+  .btn-copy.done { background: #10b981; }
+  .prompt-box { width: 100%; height: 170px; background: #f8fafc; color: var(--text-main); border: 1px solid var(--line); border-radius: 6px; padding: 12px; font: 12px/1.6 Consolas, monospace; resize: vertical; white-space: pre; overflow: auto; }
+  .fig.slot { border: .4mm dashed var(--maroon); border-radius: 1.5mm; padding: 4mm 2mm; text-align: center; color: var(--maroon); font-size: 9pt; background: #fff8f8; }
+
   @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; } }
   @media print {
     html, body { background: #fff; height: auto; overflow: visible; display: block; }
@@ -385,9 +433,16 @@ $pmAdminEmail = pm_auth_admin_email();
   <div class="bar-inner">
     <div class="logo"><a href="javascript:void(0)">MCQ <span>D2D</span></a></div>
     <div class="actions">
-      <button type="button" class="btn ghost" id="btnHeaderLib"><i class="fa fa-folder-open"></i> Library</button>
+      <div class="menu-wrap">
+        <button type="button" class="btn ghost" id="btnHeaderLib" aria-haspopup="true" aria-expanded="false"><i class="fa fa-folder-open"></i> Library <i class="fa fa-angle-down" style="font-size:.68rem"></i></button>
+        <div class="menu-pop" id="libMenu">
+          <a href="d2d_notes.php" data-self="notes"><span class="ic"><i class="fa fa-book-open"></i></span><span class="tx"><b>Notes</b><small>Chapter-wise short notes</small></span><span class="cur-mark"></span></a>
+          <a href="d2d_mcq.php" data-self="mcq"><span class="ic"><i class="fa fa-list-check"></i></span><span class="tx"><b>MCQ</b><small>PYQ practice sheets</small></span><span class="cur-mark"></span></a>
+          <div class="menu-sep"></div>
+          <button type="button" id="menuNewFolder"><span class="ic"><i class="fa fa-folder-plus"></i></span><span class="tx"><b>Naya folder</b><small>Dono jagah dikhega</small></span></button>
+        </div>
+      </div>
       <button type="button" class="btn" id="btnHeaderNew" title="New sheet (Ctrl+Alt+N)"><i class="fa fa-plus"></i> New sheet</button>
-      <a class="btn ghost" href="d2d_notes.php" title="Notes editor"><i class="fa fa-book-open"></i> Notes</a>
       <a class="btn ghost" href="admin_panel.php" title="Back to Admin Panel"><i class="fa fa-arrow-left"></i> Admin</a>
       <button type="button" class="btn ghost" id="btnRefreshPreview" title="Re-render preview (Ctrl+Enter)"><i class="fa fa-rotate"></i> Refresh</button>
       <button type="button" class="btn ghost" id="btnSample"><i class="fa fa-wand-magic-sparkles"></i> Sample</button>
@@ -430,6 +485,7 @@ $pmAdminEmail = pm_auth_admin_email();
               </div>
               <div class="lib-list" id="libList"><div class="lib-empty">Loading…</div></div>
               <div class="lib-tools">
+                <button type="button" id="btnNewFolder" title="Naya folder banao"><i class="fa fa-folder-plus"></i> Folder</button>
                 <button type="button" id="btnLibRefresh" title="Reload list from server"><i class="fa fa-rotate"></i> Refresh</button>
                 <button type="button" id="btnDuplicate" title="Copy current sheet as a new one"><i class="fa fa-copy"></i> Duplicate</button>
                 <button type="button" id="btnTrash" title="Show deleted sheets"><i class="fa fa-trash-can"></i> Trash</button>
@@ -460,7 +516,16 @@ Ans: 2</pre>
             </div>
           </div>
 
-          <div class="field"><label class="field-label" for="subjInput">Subject</label><input class="inp" id="subjInput" type="text" value="" placeholder="e.g. Chemistry — library isse group karti hai" autocomplete="off" list="subjList"><datalist id="subjList"></datalist></div>
+          <div class="acc" id="accPrompt">
+            <button type="button" class="acc-head" data-acc><span><i class="fa fa-robot"></i>&nbsp; AI prompt <span class="chip">copy</span></span><i class="fa fa-angle-down chev"></i></button>
+            <div class="acc-body">
+              <p style="margin-top:8px">Ye prompt AI ko do + apna PYQ text. Output yahan <b>MCQ text</b> me paste karo — diagram wale question me AI <code style="color:var(--primary)">image: name</code> line likhega, wahi Images panel me slot ban jayegi.</p>
+              <button type="button" class="btn-copy" id="btnCopyPrompt"><i class="fa fa-copy"></i> Copy prompt</button>
+              <textarea class="prompt-box" id="aiPrompt" spellcheck="false" readonly></textarea>
+            </div>
+          </div>
+
+          <div class="field"><label class="field-label" for="subjInput">Folder (subject)</label><input class="inp" id="subjInput" type="text" value="" placeholder="e.g. Chemistry — library isi folder me rakhegi" autocomplete="off" list="subjList"><datalist id="subjList"></datalist></div>
           <div class="row3">
             <div class="field"><label class="field-label" for="chapInput">Chapter</label><input class="inp" id="chapInput" type="text" value="1" autocomplete="off"></div>
             <div class="field"><label class="field-label" for="titleInput">Sheet title</label><input class="inp" id="titleInput" type="text" value="Atomic Structure" autocomplete="off"></div>
@@ -608,10 +673,12 @@ Ans: 2</pre>
     if (/^[A-D]$/.test(l)) return l.charCodeAt(0) - 65;
     return -1;
   }
+  /** "[img: name | 60% | center]" = lagi hui image · "image: name" = khali slot */
+  var RE_IMG_SLOT = /^\s*(?:img|image)\s*:\s*([^|\n]+?)\s*(?:\|([^\n]*))?$/i;
   function parseImgLine(t) {
-    var m = t.match(RE_IMG);
-    if (!m) return null;
-    var b = { name: m[1].trim(), w: "", align: "center", cap: "" };
+    var slot = false, m = t.match(RE_IMG);
+    if (!m) { m = t.match(RE_IMG_SLOT); if (!m) return null; slot = true; }
+    var b = { name: m[1].trim(), w: "", align: "center", cap: "", slot: slot };
     (m[2] || "").split("|").forEach(function (p) {
       p = p.trim(); if (!p) return;
       if (/^\d{1,3}\s*%$/.test(p)) b.w = p.replace(/\s/g, "");
@@ -740,6 +807,7 @@ Ans: 2</pre>
 
   function figHtml(b) {
     var im = findImage(b.name);
+    if (!im && b.slot) return '<figure class="fig slot"><i class="fa fa-image"></i> Image slot: <b>' + esc(b.name) + "</b></figure>";
     if (!im) return '<figure class="fig missing"><i class="fa fa-image"></i> Image <b>' + esc(b.name) + "</b> nahi mili</figure>";
     var w = b.w || "100%";
     return '<figure class="fig al-' + esc(b.align) + '" style="width:' + esc(w) + '">' +
@@ -1248,32 +1316,64 @@ Ans: 2</pre>
     return api(showingTrash ? "trash" : "list", undefined, "GET").then(function (r) {
       if (r.status === 401) { syncUI("error", "Login required — admin_panel.php me login karo"); $("libList").innerHTML = '<div class="lib-empty">Login required</div>'; return; }
       if (!r.ok || !r.json) { $("libList").innerHTML = '<div class="lib-empty">List load nahi hui</div>'; return; }
-      libSheets = r.json.sheets || []; renderLib(); fillSubjectList();
+      libSheets = r.json.sheets || []; if (r.json.folders) folders = r.json.folders; renderLib(); fillSubjectList();
       if (!showingTrash && !quiet) { online = true; if (!dirty) syncUI("saved", cur.id ? "Saved · " + fmtAgo(cur.updated_at) : "Ready · DB connected"); }
     }).catch(function () { $("libList").innerHTML = '<div class="lib-empty">Offline — list unavailable</div>'; online = false; });
   }
   function fillSubjectList() {
     var seen = {}, dl = $("subjList"); dl.innerHTML = "";
-    libSheets.forEach(function (n) { var s = (n.subject || "").trim(); if (s && !seen[s]) { seen[s] = 1; var o = document.createElement("option"); o.value = s; dl.appendChild(o); } });
+    function add(x) { x = (x || "").trim(); if (!x || seen[x]) return; seen[x] = 1; var o = document.createElement("option"); o.value = x; dl.appendChild(o); }
+    folderNames().forEach(add);
+    libSheets.forEach(function (n) { add(n.subject); });
+  }
+  function libItemHtml(n) {
+    var meta = (n.image_count ? n.image_count + " img · " : "") + (n.text_len ? Math.round(n.text_len / 120) + " Q approx · " : "") + fmtAgo(n.updated_at);
+    return '<button type="button" class="lib-item' + (n.id === cur.id ? " cur" : "") + '" data-id="' + n.id + '">' +
+      '<span class="no">' + esc(n.chapter_no || "•") + '</span><span class="ti"><b>' + esc(n.title || "Untitled") + '</b><small>' + esc(meta) + '</small></span>' +
+      (showingTrash ? '<span class="del" data-restore="' + n.id + '" title="Restore"><i class="fa fa-rotate-left"></i></span>'
+                    : '<span class="del" data-del="' + n.id + '" title="Trash"><i class="fa fa-trash"></i></span>') + '</button>';
   }
   function renderLib() {
     var host = $("libList"), q = libFilter.toLowerCase();
     var list = libSheets.filter(function (n) { return !q || ((n.subject || "") + " " + (n.chapter_no || "") + " " + (n.title || "")).toLowerCase().indexOf(q) >= 0; });
     $("libCount").textContent = libSheets.length;
-    if (!list.length) { host.innerHTML = '<div class="lib-empty">' + (showingTrash ? "Trash khali hai." : (libSheets.length ? "Kuch match nahi hua." : "Abhi koi sheet nahi. <b>New</b> dabao.")) + "</div>"; return; }
     var groups = {}, order = [];
-    list.forEach(function (n) { var s = (n.subject || "General").trim() || "General"; if (!groups[s]) { groups[s] = []; order.push(s); } groups[s].push(n); });
-    host.innerHTML = order.map(function (s) {
-      return '<div class="lib-subj"><span>' + esc(s) + '</span><small>' + groups[s].length + ' sheet</small></div>' + groups[s].map(function (n) {
-        var meta = (n.image_count ? n.image_count + " img · " : "") + (n.text_len ? Math.round(n.text_len / 120) + " Q approx · " : "") + fmtAgo(n.updated_at);
-        return '<button type="button" class="lib-item' + (n.id === cur.id ? " cur" : "") + '" data-id="' + n.id + '">' +
-          '<span class="no">' + esc(n.chapter_no || "•") + '</span><span class="ti"><b>' + esc(n.title || "Untitled") + '</b><small>' + esc(meta) + '</small></span>' +
-          (showingTrash ? '<span class="del" data-restore="' + n.id + '" title="Restore"><i class="fa fa-rotate-left"></i></span>'
-                        : '<span class="del" data-del="' + n.id + '" title="Trash"><i class="fa fa-trash"></i></span>') + '</button>';
-      }).join("");
+    function bucket(name) { if (!groups[name]) { groups[name] = []; order.push(name); } return groups[name]; }
+    if (!showingTrash && !q) folderNames().forEach(bucket);            /* khali folder bhi dikhe */
+    list.forEach(function (n) { bucket(((n.subject || "General").trim() || "General")).push(n); });
+    if (!order.length) {
+      host.className = "lib-list";
+      host.innerHTML = '<div class="lib-empty">' + (showingTrash ? "Trash khali hai." : "Abhi kuch nahi. <b>Folder</b> banao, phir <b>New</b> dabao.") + "</div>";
+      return;
+    }
+    host.className = "lib-list lib-tree";
+    host.innerHTML = order.map(function (name) {
+      var items = groups[name], key = name.toLowerCase();
+      var open = q ? true : (typeof foldOpen[key] === "boolean" ? foldOpen[key] : items.some(function (n) { return n.id === cur.id; }));
+      return '<div class="lib-fold' + (open ? " open" : "") + '" data-fold="' + esc(name) + '">' +
+        '<div class="lib-fold-head" data-foldtoggle>' +
+          '<i class="fa fa-angle-right fchev"></i><i class="fa fa-folder' + (open ? "-open" : "") + ' fi"></i>' +
+          '<span class="fname">' + esc(name) + '</span><span class="fcount">' + items.length + '</span>' +
+          (showingTrash ? "" :
+            '<button type="button" class="fold-act" data-frename="' + esc(name) + '" title="Rename folder"><i class="fa fa-pen"></i></button>' +
+            '<button type="button" class="fold-act" data-fdel="' + esc(name) + '" title="Delete folder"><i class="fa fa-trash"></i></button>') +
+        '</div>' +
+        '<div class="lib-fold-body">' + (items.length ? items.map(libItemHtml).join("") : '<div class="lib-fold-empty">Khali folder — yahan nayi sheet banao</div>') + '</div>' +
+      '</div>';
     }).join("");
   }
-  function highlightLib() { document.querySelectorAll(".lib-item").forEach(function (e) { e.classList.toggle("cur", parseInt(e.dataset.id, 10) === cur.id); }); }
+  function highlightLib() {
+    document.querySelectorAll(".lib-item").forEach(function (e) {
+      var isCur = parseInt(e.dataset.id, 10) === cur.id;
+      e.classList.toggle("cur", isCur);
+      if (!isCur) return;
+      var box = e.closest(".lib-fold");
+      if (box && !box.classList.contains("open")) {
+        box.classList.add("open");
+        var ic = box.querySelector(".lib-fold-head .fi"); if (ic) ic.className = "fa fa-folder-open fi";
+      }
+    });
+  }
   function touchLibEntry() {
     var c = collect().sheet, found = false;
     libSheets.forEach(function (n) {
@@ -1282,6 +1382,17 @@ Ans: 2</pre>
     if (found) { renderLib(); fillSubjectList(); }
   }
   $("libList").addEventListener("click", function (e) {
+    var fr = e.target.closest("[data-frename]"); if (fr) { e.stopPropagation(); renameFolder(fr.getAttribute("data-frename")); return; }
+    var fd = e.target.closest("[data-fdel]"); if (fd) { e.stopPropagation(); removeFolder(fd.getAttribute("data-fdel")); return; }
+    var fh = e.target.closest("[data-foldtoggle]");
+    if (fh) {
+      var box = fh.closest(".lib-fold"), key = (box.getAttribute("data-fold") || "").toLowerCase();
+      var nowOpen = !box.classList.contains("open");
+      box.classList.toggle("open", nowOpen);
+      var ic = fh.querySelector(".fi"); if (ic) ic.className = "fa fa-folder" + (nowOpen ? "-open" : "") + " fi";
+      foldOpen[key] = nowOpen; saveFoldOpen();
+      return;
+    }
     var del = e.target.closest("[data-del]");
     if (del) { e.stopPropagation(); var id = parseInt(del.dataset.del, 10); var n = libSheets.filter(function (x) { return x.id === id; })[0]; deleteSheet(id, n && n.title); return; }
     var rs = e.target.closest("[data-restore]");
@@ -1294,6 +1405,7 @@ Ans: 2</pre>
   $("libSearch").addEventListener("input", function () { libFilter = this.value.trim(); renderLib(); });
   $("btnNewSheet").addEventListener("click", startNewSheet);
   $("btnHeaderNew").addEventListener("click", startNewSheet);
+  $("btnNewFolder").addEventListener("click", function () { newFolder(); });
   $("btnLibRefresh").addEventListener("click", function () { loadList(false); toast("List refreshed"); });
   $("btnTrash").addEventListener("click", function () { showingTrash = !showingTrash; this.innerHTML = showingTrash ? '<i class="fa fa-folder"></i> Library' : '<i class="fa fa-trash-can"></i> Trash'; loadList(false); });
   $("btnDuplicate").addEventListener("click", function () {
@@ -1301,10 +1413,7 @@ Ans: 2</pre>
     newSheet(c); toast("Duplicate bana — chapter number set karo");
   });
   $("btnSaveNow").addEventListener("click", function () { dirty = true; saveToServer("manual"); });
-  $("btnHeaderLib").addEventListener("click", function () {
-    setDrawer(true); $("accLib").classList.add("open");
-    setTimeout(function () { $("accLib").scrollIntoView({ behavior: "smooth", block: "start" }); }, 300);
-  });
+  /* Library button ab menu kholta hai - dekho TOP-BAR LIBRARY MENU */
 
   /* =====================================================================
      IMAGES
@@ -1378,20 +1487,82 @@ Ans: 2</pre>
     setText(lines.join("\n"), start, start + text.length);
   }
 
+  function imageSlots() {
+    var lines = ta.value.split("\n"), out = [];
+    for (var i = 0; i < lines.length; i++) {
+      var t = lines[i].trim();
+      if (!t || t.charAt(0) === "[") continue;
+      var m = t.match(RE_IMG_SLOT);
+      if (m) out.push({ line: i, name: m[1].trim() });
+    }
+    return out;
+  }
+  function slotOptionsHtml() {
+    var sl = imageSlots();
+    if (!sl.length) return "";
+    return '<optgroup label="Text ke image slots">' + sl.map(function (x) {
+      var t = x.name.length > 42 ? x.name.slice(0, 40) + "…" : x.name;
+      return '<option value="slot:' + x.line + '">🖼 ' + esc(t) + "</option>";
+    }).join("") + "</optgroup>";
+  }
+  /** insert / move an image; pos = "slot:N" | "end" | "cursor" | question line no */
+  function putImage(name, pos, w, al, cap, opts) {
+    opts = opts || {};
+    var lines = ta.value.split("\n"), isSlot = String(pos).indexOf("slot:") === 0;
+    var tag = imgLine(name, w, al, cap);
+
+    if (opts.move) {
+      var hit = findImgTag(name);
+      if (hit) {
+        lines.splice(hit.line, 1);
+        if (isSlot) { var sl = parseInt(String(pos).slice(5), 10); pos = "slot:" + (sl > hit.line ? sl - 1 : sl); }
+        else if (pos !== "cursor" && pos !== "end" && parseInt(pos, 10) > hit.line) pos = String(parseInt(pos, 10) - 1);
+      }
+    }
+
+    var at;
+    if (isSlot) {
+      at = Math.max(0, Math.min(parseInt(String(pos).slice(5), 10), lines.length - 1));
+      if (!cap) { var sm = (lines[at] || "").trim().match(RE_IMG_SLOT); if (sm) { cap = sm[1].trim(); tag = imgLine(name, w, al, cap); } }
+      lines[at] = tag;
+    } else {
+      var k = parseInt(pos, 10);
+      at = (pos === "end" || pos == null || (isNaN(k) && pos !== "cursor")) ? lines.length : (pos === "cursor" ? Math.min(curLineNo() + 1, lines.length) : Math.min(k + 1, lines.length));
+      lines.splice(at, 0, tag);
+    }
+    var before = lines.slice(0, at).join("\n"), start = before.length + (at ? 1 : 0);
+    setText(lines.join("\n"), start, start + tag.length);
+    focusImageInPreview(name);
+    return true;
+  }
+  /** jahan image gayi hai wahin preview ko le jao */
+  function focusImageInPreview(name) {
+    setTimeout(function () {
+      var hit = null;
+      [].forEach.call(document.querySelectorAll(".stage .fig img"), function (im) {
+        if (!hit && im.getAttribute("alt") === name) hit = im.closest(".fig");
+      });
+      if (!hit) return;
+      try { hit.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) { hit.scrollIntoView(); }
+      hit.classList.add("flash-img");
+      setTimeout(function () { hit.classList.remove("flash-img"); }, 1300);
+    }, 30);
+  }
   function qOptions() {
-    var o = '<option value="end">⤓ Sheet ke end me</option>';
+    var o = slotOptionsHtml() + '<optgroup label="Position"><option value="end">⤓ Sheet ke end me</option><option value="cursor">⌖ Cursor ke baad</option></optgroup><optgroup label="Kis question me">';
     lastItems.forEach(function (b) {
       if (b.type !== "q") return;
       var txt = String(b.text || "").trim();
       if (txt.length > 44) txt = txt.slice(0, 42) + "…";
       o += '<option value="' + b.srcLine + '">' + esc((b.label || "Q") + " — " + (txt || "untitled")) + "</option>";
     });
-    return o;
+    return o + "</optgroup>";
   }
   var posHtmlStale = true;
   function refreshPosSelects() { posHtmlStale = true; }
   function fillPosSelect(sel) {
-    if (!posHtmlStale && sel.options.length > 1) return;
+    if (sel.dataset.filled === "1" && !posHtmlStale) return;
+    sel.dataset.filled = "1";
     var v = sel.value; sel.innerHTML = qOptions();
     if ([].some.call(sel.options, function (op) { return op.value === v; })) sel.value = v;
   }
@@ -1414,12 +1585,12 @@ Ans: 2</pre>
       if (W.indexOf(curW) < 0) W.splice(1, 0, curW);
       return '<div class="imgc' + (hit ? " used" : "") + '" data-k="' + k + '"><img class="th" src="' + im.data + '" alt=""><div class="bd">' +
         '<div class="nm"><code title="' + esc(im.name) + '">' + esc(im.name) + '</code><small>' + im.w + "×" + im.h + '</small><button type="button" class="del" title="Delete"><i class="fa fa-trash"></i></button></div>' +
-        (hit ? '<div class="used-note"><i class="fa fa-link"></i> Line ' + (hit.line + 1) + ' pe lagi hai — niche change karke <b>Update</b> dabao</div>'
-             : '<select class="inp imgPos" title="Kis question me daalni hai"><option value="end">⤓ Sheet ke end me</option></select>') +
+        (hit ? '<div class="used-note"><i class="fa fa-link"></i> Line ' + (hit.line + 1) + ' pe lagi hai — <b>Update</b> = size/caption, <b>Move</b> = nayi jagah</div>' : "") +
+        '<select class="inp imgPos" title="' + (hit ? "Nayi position" : "Kahan daalni hai") + '">' + slotOptionsHtml() + '<optgroup label="Position"><option value="end">⤓ Sheet ke end me</option><option value="cursor">⌖ Cursor ke baad</option></optgroup></select>' +
         '<div class="r2"><select class="inp imgW">' + W.map(function (x) { return '<option value="' + x + '"' + (x === curW ? " selected" : "") + '>' + (x === "100%" ? "Width 100%" : x) + "</option>"; }).join("") + '</select>' +
         '<select class="inp imgAl">' + AL.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === curAl ? " selected" : "") + '>' + x[1] + "</option>"; }).join("") + '</select></div>' +
         '<input class="inp imgCap" placeholder="Caption (optional)" value="' + esc(curCap) + '">' +
-        (hit ? '<div class="r2"><button type="button" class="ins upd"><i class="fa fa-pen"></i> Update</button><button type="button" class="ins again" title="Same image ek aur jagah"><i class="fa fa-plus"></i> Insert again</button></div>'
+        (hit ? '<div class="r3b"><button type="button" class="ins upd"><i class="fa fa-pen"></i> Update</button><button type="button" class="ins mv" title="Upar chuni position par le jao"><i class="fa fa-arrows-up-down-left-right"></i> Move</button><button type="button" class="ins again" title="Same image ek aur jagah"><i class="fa fa-plus"></i> Insert again</button></div>'
              : '<button type="button" class="ins"><i class="fa fa-arrow-turn-down"></i> Insert</button>') +
         '</div></div>';
     }).join("");
@@ -1436,13 +1607,14 @@ Ans: 2</pre>
       var w = card.querySelector(".imgW").value, al = card.querySelector(".imgAl").value, cap = card.querySelector(".imgCap").value.trim();
       var line = imgLine(im.name, w, al, cap);
       if (btn.classList.contains("upd")) {
-        if (updateImgTag(im.name, line)) { toast("Image update ho gayi"); renderImages(); }
+        if (updateImgTag(im.name, line)) { toast("Image update ho gayi"); focusImageInPreview(im.name); renderImages(); }
         else toast("Tag nahi mila — Insert karo");
         return;
       }
       var sel = card.querySelector(".imgPos");
-      insertImgTag(sel ? sel.value : "end", line);
-      toast("Image insert ho gayi"); renderImages();
+      putImage(im.name, sel ? sel.value : "end", w, al, cap, { move: btn.classList.contains("mv") });
+      toast(btn.classList.contains("mv") ? "Image shift ho gayi" : "Image insert ho gayi");
+      renderImages();
     }
   });
   $("imgDrop").addEventListener("click", function () { $("imgFile").click(); });
@@ -1582,6 +1754,139 @@ Ans: 2</pre>
     }, { passive: true });
   })();
   window.addEventListener("resize", function () { updateToolbarOffset(); updateScale(); schedule(); });
+
+  /* =====================================================================
+     AI PROMPT
+  ===================================================================== */
+  var AI_PROMPT = [
+    "Tum ek diploma (polytechnic) ke teacher ho. Niche diye PYQ / chapter text se MCQ practice sheet banao.",
+    "Output sirf plain text me do — ye format exactly follow karo, koi extra commentary nahi.",
+    "",
+    "FORMAT",
+    "[2023]                       (year ka header, optional)",
+    "Topic: Work and Energy       (topic ka header, optional)",
+    "Q1. Question ka text yahan",
+    "(a) option one (b) option two (c) option three (d) option four",
+    "Ans: b",
+    "",
+    "IMAGES — ye zaroori hai",
+    "Jis question ke saath diagram / circuit / graph / figure chahiye, us question ki line ke theek niche",
+    "EXACTLY aisi ek line likho:",
+    "image: short name of the figure",
+    "Example:",
+    "Q7. Niche diye circuit me current nikalo.",
+    "image: series parallel resistor circuit",
+    "(a) 1 A (b) 2 A (c) 3 A (d) 4 A",
+    "Ans: b",
+    "Rules: line 'image:' se shuru ho, naam chhota aur saaf (5-8 shabd), ek line me ek image.",
+    "Image khud mat banao — sirf slot chhodo, mai apni image uss slot me daal dunga.",
+    "",
+    "STYLE",
+    "- Question Hinglish me, options short.",
+    "- Har question ka Ans: zaroor do.",
+    "- Numerical me seedha sawaal, lamba theory nahi.",
+    "- Repeat question mat banao.",
+    "",
+    "PYQ TEXT:",
+    "<<< yahan apna question text paste karo >>>"
+  ].join("\n");
+  $("aiPrompt").value = AI_PROMPT;
+  $("btnCopyPrompt").addEventListener("click", function () {
+    var b = this, txt = $("aiPrompt").value;
+    function done() { b.classList.add("done"); b.innerHTML = '<i class="fa fa-check"></i> Copied'; setTimeout(function () { b.classList.remove("done"); b.innerHTML = '<i class="fa fa-copy"></i> Copy prompt'; }, 1800); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, function () { $("aiPrompt").select(); document.execCommand("copy"); done(); });
+    else { $("aiPrompt").select(); document.execCommand("copy"); done(); }
+  });
+
+
+  /* =====================================================================
+     TOP-BAR LIBRARY MENU  (Notes ⇄ MCQ)
+  ===================================================================== */
+  (function () {
+    var pop = $("libMenu"), btn = $("btnHeaderLib"), PAGE = "mcq";
+    function closeMenu() { pop.classList.remove("show"); btn.setAttribute("aria-expanded", "false"); }
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var open = !pop.classList.contains("show");
+      pop.classList.toggle("show", open); btn.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    document.addEventListener("click", function (e) { if (!pop.contains(e.target) && !btn.contains(e.target)) closeMenu(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeMenu(); });
+    [].forEach.call(pop.querySelectorAll("[data-self]"), function (a) {
+      if (a.getAttribute("data-self") === PAGE) {
+        a.querySelector(".cur-mark").innerHTML = '<i class="fa fa-check"></i> abhi yahi';
+        a.addEventListener("click", function (e) { e.preventDefault(); closeMenu(); setDrawer(true); $("accLib").classList.add("open"); touchAcc($("accLib")); setTimeout(function () { $("accLib").scrollIntoView({ behavior: "smooth", block: "start" }); }, 260); });
+      } else {
+        a.addEventListener("click", function () { closeMenu(); if (dirty) { saveLocal(); saveToServer("switch"); } });
+      }
+    });
+    $("menuNewFolder").addEventListener("click", function () { closeMenu(); newFolder(); });
+  })();
+
+  /* =====================================================================
+     FOLDERS  (shared list — same folders in Notes and MCQ)
+  ===================================================================== */
+  var folders = [], foldOpen = {};
+  try { foldOpen = JSON.parse(localStorage.getItem("d2d_fold_open") || "{}") || {}; } catch (e) { foldOpen = {}; }
+  function saveFoldOpen() { try { localStorage.setItem("d2d_fold_open", JSON.stringify(foldOpen)); } catch (e) {} }
+  function folderNames() {
+    var out = [], seen = {};
+    folders.forEach(function (f) { var n = (f && f.name || "").trim(); if (n && !seen[n.toLowerCase()]) { seen[n.toLowerCase()] = 1; out.push(n); } });
+    return out;
+  }
+  function folderApi(action, name, extra) {
+    var body = { name: name };
+    if (extra) for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) body[k] = extra[k];
+    return api(action, body).then(function (r) {
+      if (r.ok && r.json && r.json.status === "success") { folders = r.json.folders || folders; renderLib(); fillSubjectList(); return r.json; }
+      toast((r.json && r.json.msg) || "Folder action fail");
+      return null;
+    });
+  }
+  function newFolder() {
+    var n = prompt("Naye folder ka naam (subject):", "");
+    if (n == null) return; n = n.trim(); if (!n) return;
+    folderApi("folder_add", n).then(function (j) {
+      if (!j) return;
+      foldOpen[n.toLowerCase()] = true; saveFoldOpen(); renderLib();
+      $("subjInput").value = n; saveState();
+      toast("Folder bana: " + n);
+    });
+  }
+  function renameFolder(old) {
+    var n = prompt("Folder ka naya naam:", old);
+    if (n == null) return; n = n.trim(); if (!n || n === old) return;
+    folderApi("folder_rename", n, { old: old }).then(function (j) {
+      if (!j) return;
+      if (($("subjInput").value || "").trim() === old) { $("subjInput").value = n; saveState(); }
+      loadList(true); toast("Folder rename ho gaya");
+    });
+  }
+  function removeFolder(name) {
+    if (!confirm('Folder "' + name + '" delete karein? (khali hona chahiye)')) return;
+    folderApi("folder_delete", name).then(function (j) { if (j) toast("Folder hat gaya"); });
+  }
+
+  /* =====================================================================
+     ACCORDIONS — jo khula chhoot gaya aur use nahi ho raha, khud band ho jaye
+  ===================================================================== */
+  var ACC_IDLE = 75000;
+  function touchAcc(acc) { if (acc) acc.dataset.used = String(Date.now()); }
+  [].forEach.call(document.querySelectorAll(".acc"), function (a) { touchAcc(a); });
+  ["click", "keydown", "input", "focusin"].forEach(function (ev) {
+    document.addEventListener(ev, function (e) {
+      var t = e.target, a = t && t.closest ? t.closest(".acc") : null;
+      if (a) touchAcc(a);
+    }, true);
+  });
+  setInterval(function () {
+    var now = Date.now();
+    [].forEach.call(document.querySelectorAll(".acc.open"), function (a) {
+      if (a.contains(document.activeElement)) { touchAcc(a); return; }
+      var used = parseInt(a.dataset.used, 10) || now;
+      if (now - used > ACC_IDLE) a.classList.remove("open");
+    });
+  }, 10000);
 
   /* ---- boot ---- */
   document.body.classList.add("booting");

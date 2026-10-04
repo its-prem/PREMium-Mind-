@@ -29,6 +29,8 @@ pm_auth_require_admin_json();
 require_once __DIR__ . '/db_connect.php';
 $conn->set_charset('utf8mb4');
 
+require_once __DIR__ . '/d2d_folders.php';   // shared folder list (same folders in Notes + MCQ)
+
 function d2d_out(array $payload, int $status = 200): void {
     http_response_code($status);
     echo json_encode($payload, JSON_UNESCAPED_UNICODE);
@@ -71,6 +73,8 @@ $conn->query("CREATE TABLE IF NOT EXISTS d2d_note_images (
     INDEX idx_note (note_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
+d2d_folders_init($conn);
+
 // ── Input ──
 $action = (string)($_GET['action'] ?? $_POST['action'] ?? '');
 $raw = file_get_contents('php://input');
@@ -80,6 +84,8 @@ if (!is_array($body)) $body = [];
 $s = function ($v, int $max) { return mb_substr(trim((string)($v ?? '')), 0, $max); };
 
 // ── Actions ──
+d2d_folders_dispatch($conn, $action, $body);   // handles folder_* and exits; falls through otherwise
+
 if ($action === 'ping') {
     d2d_out(['status' => 'success', 'ok' => true, 'ts' => time()]);
 }
@@ -107,7 +113,7 @@ if ($action === 'list' || $action === 'trash') {
         $rows[] = $r;
     }
     $stmt->close();
-    d2d_out(['status' => 'success', 'notes' => $rows]);
+    d2d_out(['status' => 'success', 'notes' => $rows, 'folders' => d2d_folders_list($conn)]);
 }
 
 if ($action === 'get') {

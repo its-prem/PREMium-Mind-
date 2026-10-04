@@ -29,6 +29,11 @@ D2D MCQ (PYQ practice-sheet maker, DB-backed):
   Open at: https://premind.diplomawallah.in/d2d_mcq.php
   Same login, same Library/auto-save/images as d2d_notes.php.
 
+D2D SHARED FOLDERS:
+  d2d_folders.php         <- one folder list for BOTH editors (creates d2d_folders table)
+  Notes aur MCQ dono isi file ko use karte hain, isliye ise bhi upload karna zaroori hai.
+  Folder = subject. Rename karoge to dono taraf ke chapters/sheets ka subject badal jayega.
+
 SECRETS: prefer .env now (server/.env.example has the two keys needed).
 pm_secrets.php still works as a fallback if .env isn't uploaded — you
 don't need both, .env takes priority when present.
