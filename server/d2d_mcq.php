@@ -281,6 +281,8 @@ $pmAdminEmail = pm_auth_admin_email();
   .body { flex: 1 1 auto; min-height: 0; overflow: hidden; display: flex; flex-direction: column; position: relative; }
   .body::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: .35mm; background: #b9b0b2; transform: translateX(-50%); }
   .rows { flex: none; display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--col-gap); row-gap: 3mm; align-items: start; }
+  /* bhari hui page: questions ko poore page me faila do, niche khali jagah na bache */
+  .body.fill .rows { flex: 1 1 auto; align-content: space-between; }
   .body.one-col .rows { grid-template-columns: 1fr; }
   .body.one-col::before { display: none; }
   .cell { min-width: 0; }
@@ -415,6 +417,14 @@ $pmAdminEmail = pm_auth_admin_email();
   .prompt-box { width: 100%; height: 170px; background: #f8fafc; color: var(--text-main); border: 1px solid var(--line); border-radius: 6px; padding: 12px; font: 12px/1.6 Consolas, monospace; resize: vertical; white-space: pre; overflow: auto; }
   .fig.slot { border: .4mm dashed var(--maroon); border-radius: 1.5mm; padding: 4mm 2mm; text-align: center; color: var(--maroon); font-size: 9pt; background: #fff8f8; }
 
+
+  .wm.wm-icon { display: flex; align-items: center; justify-content: center; }
+  .wm .wm-svg { width: 100%; height: auto; stroke: var(--maroon); }
+  .wm .wm-svg text { fill: var(--maroon); }
+  .wm .wm-svg [fill="#fff"] { fill: var(--maroon); }
+  .wm .wm-svg [fill="#8e1b2a"] { fill: #fff; }
+  .icon-pick { width: auto; min-width: 118px; padding: 4px 8px; font-size: .8rem; }
+
   @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; } }
   @media print {
     html, body { background: #fff; height: auto; overflow: visible; display: block; }
@@ -544,6 +554,7 @@ Ans: 2</pre>
             <label class="chk"><input type="checkbox" id="optWM" checked> Watermark</label>
             <label class="chk" title="Off karo to bade sheet pe typing fast rahegi; preview Refresh se banega"><input type="checkbox" id="optLive" checked> Live preview</label>
             <label class="chk">Questions / page <input type="number" id="optPerPage" class="inp num" value="10" min="2" max="20" step="1"></label>
+            <label class="chk">Logo <select id="optIcon" class="inp icon-pick" title="Header ka icon — background sabka same maroon rahega"><option value="auto">Auto (folder se)</option><option value="math">Maths &#960;</option><option value="physics">Physics &#9883;</option><option value="chem">Chemistry &#9879;</option></select></label>
           </div>
 
           <div class="field">
@@ -780,18 +791,79 @@ Ans: 2</pre>
   /* =====================================================================
      BLOCK BUILDERS
   ===================================================================== */
-  var ATOM = '<svg class="hdr-icon" viewBox="0 0 64 64" fill="none" stroke="#fff" stroke-width="2.6" aria-hidden="true">' +
-    '<circle cx="32" cy="32" r="4.2" fill="#fff" stroke="none"/>' +
-    '<ellipse cx="32" cy="32" rx="26" ry="10"/>' +
-    '<ellipse cx="32" cy="32" rx="26" ry="10" transform="rotate(60 32 32)"/>' +
-    '<ellipse cx="32" cy="32" rx="26" ry="10" transform="rotate(120 32 32)"/></svg>';
+
+  /* =====================================================================
+     SUBJECT LOGO  (maths / physics / chemistry — header + watermark)
+  ===================================================================== */
+  var ICON_ART = {
+    math:
+      '<g stroke-width="1.7">' +
+        '<circle cx="32" cy="32" r="24" stroke-dasharray="3 3.4" opacity=".8"/>' +
+        '<line x1="4" y1="32" x2="60" y2="32"/><polyline points="55.5,28 60,32 55.5,36"/><polyline points="8.5,28 4,32 8.5,36"/>' +
+        '<line x1="32" y1="60" x2="32" y2="4"/><polyline points="28,8.5 32,4 36,8.5"/><polyline points="28,55.5 32,60 36,55.5"/>' +
+        '<path d="M11 48 C 17 14, 27 13, 31 32 C 35 51, 45 49, 53 17" opacity=".85"/>' +
+      '</g>' +
+      '<text x="32" y="47" text-anchor="middle" font-family="Tinos, Georgia, serif" font-size="46" font-weight="700" ' +
+        'fill="#fff" stroke="#8e1b2a" stroke-width="3.4" paint-order="stroke">&#960;</text>',
+    physics:
+      '<circle cx="32" cy="32" r="4.6" fill="#fff" stroke="none"/>' +
+      '<ellipse cx="32" cy="32" rx="25" ry="10"/>' +
+      '<ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(60 32 32)"/>' +
+      '<ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(120 32 32)"/>' +
+      '<circle cx="54" cy="21" r="3.1" fill="#fff" stroke="none"/>' +
+      '<circle cx="12" cy="40" r="3.1" fill="#fff" stroke="none"/>' +
+      '<circle cx="41" cy="52" r="3.1" fill="#fff" stroke="none"/>',
+    chem:
+      '<path d="M25 7 h14"/>' +
+      '<path d="M28.5 7 v15.5 L14.5 47.5 a4.5 4.5 0 0 0 3.9 6.8 h27.2 a4.5 4.5 0 0 0 3.9 -6.8 L35.5 22.5 V7"/>' +
+      '<path d="M20.6 38 q3.4 -2.6 6.8 0 t6.8 0 t6.8 0 l7 12.4 a3 3 0 0 1 -2.6 4.4 h-29.2 a3 3 0 0 1 -2.6 -4.4 z" fill="#fff" stroke="none"/>' +
+      '<circle cx="25" cy="47" r="2.4" fill="#8e1b2a" stroke="none"/>' +
+      '<circle cx="35" cy="50" r="1.7" fill="#8e1b2a" stroke="none"/>' +
+      '<circle cx="41" cy="45.5" r="2.1" fill="#8e1b2a" stroke="none"/>' +
+      '<circle cx="42" cy="9" r="3.4" fill="#fff" stroke="none"/>' +
+      '<circle cx="35" cy="3.6" r="2.1" fill="#fff" stroke="none"/>'
+  };
+  function iconSvg(kind, cls) {
+    var art = ICON_ART[kind] || ICON_ART.physics;
+    return '<svg class="' + cls + '" viewBox="-2 -2 68 68" fill="none" stroke="#fff" stroke-width="2.5" ' +
+           'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + art + "</svg>";
+  }
+  /** which glyph to draw — explicit choice, else guessed from folder/title */
+  function iconKind() {
+    var pick = $("optIcon") ? $("optIcon").value : "auto";
+    if (pick && pick !== "auto") return pick;
+    var t = (($("subjInput") ? $("subjInput").value : "") + " " + ($("titleInput") ? $("titleInput").value : "")).toLowerCase();
+    if (/chem|rasayan|organic|inorganic|acid|salt|mole|reaction/.test(t)) return "chem";
+    if (/math|ganit|algebra|calculus|trigono|geometry|matrix|integra|differen|statistic/.test(t)) return "math";
+    return "physics";
+  }
+
+  var wmLogoOk = null;
+  (function () {
+    var probe = new Image();
+    probe.onload = function () { wmLogoOk = true; };
+    probe.onerror = function () { wmLogoOk = false; schedule(); };
+    probe.src = "diplomawallah-logo.png";
+  })();
+  function watermarkNode() {
+    if (wmLogoOk === false) {
+      var d = document.createElement("div");
+      d.className = "wm wm-icon"; d.setAttribute("aria-hidden", "true");
+      d.innerHTML = iconSvg(iconKind(), "wm-svg");
+      return d;
+    }
+    var im = document.createElement("img");
+    im.className = "wm"; im.src = "diplomawallah-logo.png"; im.alt = ""; im.setAttribute("aria-hidden", "true");
+    im.onerror = function () { if (wmLogoOk !== false) { wmLogoOk = false; schedule(); } };
+    return im;
+  }
 
   function el(cls, html) { var d = document.createElement("div"); d.className = cls; if (html != null) d.innerHTML = html; return d; }
 
   function headerNode(slim) {
     var d = el("hdr" + (slim ? " slim" : ""));
     d.innerHTML =
-      '<div class="hdr-l">' + ATOM + '<div class="hdr-title">' + esc($("titleInput").value || "MCQ Practice") + "</div></div>" +
+      '<div class="hdr-l">' + iconSvg(iconKind(), "hdr-icon") + '<div class="hdr-title">' + esc($("titleInput").value || "MCQ Practice") + "</div></div>" +
       '<div class="hdr-r"><div class="hdr-badge">' + esc($("badgeInput").value || "PYQ Practice") + "</div>" +
       '<div class="hdr-tag">' + esc($("tagInput").value || "") + "</div></div>";
     return d;
@@ -848,9 +920,7 @@ Ans: 2</pre>
     var p = document.createElement("section");
     p.className = "page";
 
-    var wm = document.createElement("img");
-    wm.className = "wm"; wm.src = "diplomawallah-logo.png"; wm.alt = ""; wm.setAttribute("aria-hidden", "true");
-    p.appendChild(wm);
+    p.appendChild(watermarkNode());
 
     p.appendChild(headerNode(slim));
     var body = el("body"); if (!$("optTwoCol").checked) body.classList.add("one-col");
@@ -968,19 +1038,13 @@ Ans: 2</pre>
       page = newPage(pageNo, pageNo > 1);
       fitTitle(page.el.querySelector(".hdr"));
       var slice = entries.slice(i, i + perPage);
-      i += fillPage(page, slice, twoCol);
+      var used = fillPage(page, slice, twoCol);
+      if (used >= perPage && i + used < entries.length) page.body.classList.add("fill");
+      i += used;
     }
 
-    // answer key: under the last grid if a chunk fits, then its own pages
+    // answer key: hamesha apne alag page(s) par — question wale page par kabhi nahi
     var rest = (keyEntries || []).slice();
-    if (rest.length && page) {
-      var r = fitKey(page, rest);
-      if (r.used) {
-        rest = rest.slice(r.used);
-        page.body.classList.add(page.rows.childElementCount ? "has-key" : "key-only");
-        if (page.rows.childElementCount) page.body.style.setProperty("--key-h", r.node.offsetHeight + "px");
-      }
-    }
     while (rest.length) {
       if (page) finish(page);
       pageNo++;
@@ -1124,7 +1188,7 @@ Ans: 2</pre>
 
   function collect(forServer) {
     var n = { id: cur.id, version: cur.version, mcq_text: ta.value,
-              settings: { o: {}, perPage: $("optPerPage").value, live: $("optLive").checked } };
+              settings: { o: {}, perPage: $("optPerPage").value, icon: $("optIcon").value, live: $("optLive").checked } };
     FIELDS.forEach(function (id) { n[FIELD_MAP[id]] = $(id).value; });
     OPTS.forEach(function (id) { n.settings.o[id] = $(id).checked; });
     var out = { sheet: n };
@@ -1139,6 +1203,7 @@ Ans: 2</pre>
       var st = (sheet && sheet.settings) || {};
       OPTS.forEach(function (id) { $(id).checked = (st.o && typeof st.o[id] === "boolean") ? st.o[id] : $(id).defaultChecked; });
       $("optPerPage").value = st.perPage || $("optPerPage").defaultValue;
+      $("optIcon").value = st.icon || "auto";
       $("optLive").checked = st.live !== false; document.body.classList.toggle("live-off", st.live === false);
       images = Array.isArray(imgs) ? imgs.filter(function (x) { return x && x.name && x.data; }) : [];
       imagesDirty = false;
@@ -1548,16 +1613,8 @@ Ans: 2</pre>
       setTimeout(function () { hit.classList.remove("flash-img"); }, 1300);
     }, 30);
   }
-  function qOptions() {
-    var o = slotOptionsHtml() + '<optgroup label="Position"><option value="end">⤓ Sheet ke end me</option><option value="cursor">⌖ Cursor ke baad</option></optgroup><optgroup label="Kis question me">';
-    lastItems.forEach(function (b) {
-      if (b.type !== "q") return;
-      var txt = String(b.text || "").trim();
-      if (txt.length > 44) txt = txt.slice(0, 42) + "…";
-      o += '<option value="' + b.srcLine + '">' + esc((b.label || "Q") + " — " + (txt || "untitled")) + "</option>";
-    });
-    return o + "</optgroup>";
-  }
+  /** sirf do cheezein: text me likhe image slots, aur cursor wali jagah */
+  function qOptions() { return slotOptionsHtml() + '<option value="cursor">⌖ Cursor ke baad</option>'; }
   var posHtmlStale = true;
   function refreshPosSelects() { posHtmlStale = true; }
   function fillPosSelect(sel) {
@@ -1586,7 +1643,7 @@ Ans: 2</pre>
       return '<div class="imgc' + (hit ? " used" : "") + '" data-k="' + k + '"><img class="th" src="' + im.data + '" alt=""><div class="bd">' +
         '<div class="nm"><code title="' + esc(im.name) + '">' + esc(im.name) + '</code><small>' + im.w + "×" + im.h + '</small><button type="button" class="del" title="Delete"><i class="fa fa-trash"></i></button></div>' +
         (hit ? '<div class="used-note"><i class="fa fa-link"></i> Line ' + (hit.line + 1) + ' pe lagi hai — <b>Update</b> = size/caption, <b>Move</b> = nayi jagah</div>' : "") +
-        '<select class="inp imgPos" title="' + (hit ? "Nayi position" : "Kahan daalni hai") + '">' + slotOptionsHtml() + '<optgroup label="Position"><option value="end">⤓ Sheet ke end me</option><option value="cursor">⌖ Cursor ke baad</option></optgroup></select>' +
+        '<select class="inp imgPos" title="' + (hit ? "Nayi position" : "Kahan daalni hai") + '">' + qOptions() + '</select>' +
         '<div class="r2"><select class="inp imgW">' + W.map(function (x) { return '<option value="' + x + '"' + (x === curW ? " selected" : "") + '>' + (x === "100%" ? "Width 100%" : x) + "</option>"; }).join("") + '</select>' +
         '<select class="inp imgAl">' + AL.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === curAl ? " selected" : "") + '>' + x[1] + "</option>"; }).join("") + '</select></div>' +
         '<input class="inp imgCap" placeholder="Caption (optional)" value="' + esc(curCap) + '">' +
@@ -1682,7 +1739,7 @@ Ans: 2</pre>
 
   ta.addEventListener("input", schedule);
   FIELDS.forEach(function (id) { $(id).addEventListener("input", schedule); });
-  OPTS.concat(["optPerPage"]).forEach(function (id) { $(id).addEventListener("change", function () { render(); saveState(); }); });
+  OPTS.concat(["optPerPage", "optIcon"]).forEach(function (id) { $(id).addEventListener("change", function () { render(); saveState(); }); });
   $("optPerPage").addEventListener("input", schedule);
   function applyWatermark() { stage.classList.toggle("no-wm", !$("optWM").checked); document.body.classList.toggle("no-wm", !$("optWM").checked); }
   $("optWM").addEventListener("change", applyWatermark);
@@ -1759,37 +1816,41 @@ Ans: 2</pre>
      AI PROMPT
   ===================================================================== */
   var AI_PROMPT = [
-    "Tum ek diploma (polytechnic) ke teacher ho. Niche diye PYQ / chapter text se MCQ practice sheet banao.",
-    "Output sirf plain text me do — ye format exactly follow karo, koi extra commentary nahi.",
+    "You are a polytechnic (diploma) teacher. From the text below, build an MCQ practice sheet.",
+    "Write EVERYTHING in English only — questions, options and topic headings. No Hindi, no Hinglish.",
+    "Reply with plain text in exactly this format. No preamble, no explanation, no markdown fences.",
     "",
     "FORMAT",
-    "[2023]                       (year ka header, optional)",
-    "Topic: Work and Energy       (topic ka header, optional)",
-    "Q1. Question ka text yahan",
-    "(a) option one (b) option two (c) option three (d) option four",
+    "[2023]                         <- exam year header, optional, before the questions of that year",
+    "Topic: Work and Energy         <- topic header, optional",
+    "Q1. Full question text in English",
+    "(a) first option (b) second option (c) third option (d) fourth option",
     "Ans: b",
     "",
-    "IMAGES — ye zaroori hai",
-    "Jis question ke saath diagram / circuit / graph / figure chahiye, us question ki line ke theek niche",
-    "EXACTLY aisi ek line likho:",
+    "RULES",
+    "- Number the questions continuously: Q1, Q2, Q3 ...",
+    "- Every question must have exactly four options and one 'Ans:' line.",
+    "- Keep each option short — a few words, not a sentence, so two fit per line.",
+    "- Keep the question to one or two lines; no long paragraphs.",
+    "- Use proper units and symbols (m/s, N, Omega, deg C). Write formulas inline, e.g. v = u + at.",
+    "- Do not repeat a question, and do not reveal the answer inside the question text.",
+    "- Cover the whole given text: definitions, formulas, numericals and one-liners.",
+    "- Finish the sheet completely — do not stop midway and do not write 'continued'.",
+    "",
+    "IMAGES",
+    "If a question needs a diagram, circuit, graph or figure, put EXACTLY one line",
+    "directly under that question's line:",
     "image: short name of the figure",
     "Example:",
-    "Q7. Niche diye circuit me current nikalo.",
+    "Q7. Find the current drawn from the supply in the circuit shown.",
     "image: series parallel resistor circuit",
     "(a) 1 A (b) 2 A (c) 3 A (d) 4 A",
     "Ans: b",
-    "Rules: line 'image:' se shuru ho, naam chhota aur saaf (5-8 shabd), ek line me ek image.",
-    "Image khud mat banao — sirf slot chhodo, mai apni image uss slot me daal dunga.",
+    "The line must start with 'image:', the name must be 3-8 plain English words, one image per line.",
+    "Do not draw or describe the figure anywhere else — just leave the slot; I will drop my own image into it.",
     "",
-    "STYLE",
-    "- Question Hinglish me, options short.",
-    "- Har question ka Ans: zaroor do.",
-    "- Numerical me seedha sawaal, lamba theory nahi.",
-    "- Repeat question mat banao.",
-    "",
-    "PYQ TEXT:",
-    "<<< yahan apna question text paste karo >>>"
-  ].join("\n");
+    "SOURCE TEXT:",
+    "<<< paste your question text / chapter here >>>"  ].join("\n");
   $("aiPrompt").value = AI_PROMPT;
   $("btnCopyPrompt").addEventListener("click", function () {
     var b = this, txt = $("aiPrompt").value;
