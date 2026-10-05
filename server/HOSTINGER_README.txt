@@ -29,6 +29,14 @@ D2D MCQ (PYQ practice-sheet maker, DB-backed):
   Open at: https://premind.diplomawallah.in/d2d_mcq.php
   Same login, same Library/auto-save/images as d2d_notes.php.
 
+D2D MCQ TEST (student-facing online test, no login, no DB):
+  d2d_mcq_test.php        <- khud chalne wala test page (20 question andar hi hain)
+  Open at: https://premind.diplomawallah.in/d2d_mcq_test.php
+  Naya test banane ke liye file ke upar wala $TEST array edit karo:
+    title / total_minutes / per_question_sec / mark / negative / questions
+  Watermark-wala logo (diplomawallah-logo.png) isi folder me ho to wahi dikhega,
+  warna page apne aap ek simple seal bana leta hai.
+
 D2D SHARED FOLDERS:
   d2d_folders.php         <- one folder list for BOTH editors (creates d2d_folders table)
   Notes aur MCQ dono isi file ko use karte hain, isliye ise bhi upload karna zaroori hai.
