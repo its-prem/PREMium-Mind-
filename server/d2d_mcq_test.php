@@ -1,17 +1,19 @@
 <?php
 /**
- * D2D MCQ Test — chapter-wise practice test (standalone, no DB, no login).
+ * D2D MCQ Test — chapter-wise online practice test (standalone, no DB, no login).
  * Upload to Hostinger premind/ as: d2d_mcq_test.php
+ * Needs diplomawallah-logo.png in the same folder (header + result logo).
  *
  * Sab kuch isi file me hai. Naya test banane ke liye sirf niche wala
  * $TEST array badlo — baaki page khud adjust ho jata hai.
  *
- *   title              sheet ka naam (badge me dikhta hai)
+ *   title              test ka naam (badge me dikhta hai)
  *   tags               chhote chips (Physics / D2D / Diploma)
  *   total_minutes      pura test kitne minute ka (overall countdown)
- *   per_question_sec   ek question ka time limit (0 = off)
+ *   per_question_sec   ek question ka time limit (0 = no per-question limit)
  *   mark               sahi answer ke marks
  *   negative           galat answer par kitna katega (0 = no negative)
+ *   home_url           result page ke "Back to Home" button ka link
  *   questions          q = sawaal, o = 4 options, a = sahi option ka index (0-3),
  *                      e = explanation (Review Answers me dikhta hai)
  */
@@ -24,6 +26,7 @@ $TEST = [
     'per_question_sec' => 60,
     'mark'             => 1,
     'negative'         => 0.25,
+    'home_url'         => 'https://diplomawallah.in/',
 
     'questions' => [
         ['q' => 'What is the atomic number of a carbon atom?',
@@ -111,8 +114,6 @@ $TEST = [
 $QN = count($TEST['questions']);
 $CLIENT = [
     'title'    => $TEST['title'],
-    'subtitle' => $TEST['subtitle'],
-    'tags'     => $TEST['tags'],
     'totalSec' => (int)$TEST['total_minutes'] * 60,
     'perQSec'  => (int)$TEST['per_question_sec'],
     'mark'     => (float)$TEST['mark'],
@@ -123,6 +124,7 @@ $CLIENT = [
     }, $TEST['questions']),
 ];
 $totalMarks = $QN * $TEST['mark'];
+$num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), '0'), '.'); };
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,6 +132,7 @@ $totalMarks = $QN * $TEST['mark'];
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#5b1668">
 <title>MCQ Test — <?= htmlspecialchars($TEST['title'], ENT_QUOTES) ?> | Diploma Wallah</title>
+<link rel="icon" href="diplomawallah-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -138,10 +141,8 @@ $totalMarks = $QN * $TEST['mark'];
   :root {
     --purple: #4c1565;
     --purple-2: #6b1b7a;
-    --maroon: #8e1b2a;
     --crimson: #a81d45;
     --grad: linear-gradient(135deg, #4c1565 0%, #7a1a5e 55%, #a81d45 100%);
-    --grad-soft: linear-gradient(135deg, #f3ecfa 0%, #fdeef2 100%);
     --ink: #1f1430;
     --muted: #6b6480;
     --line: #ece7f3;
@@ -151,8 +152,6 @@ $totalMarks = $QN * $TEST['mark'];
     --green: #16a34a;
     --green-bg: #e9f9ef;
     --red: #e11d48;
-    --red-bg: #fdecf1;
-    --amber: #d97706;
     --ease: cubic-bezier(.4, 0, .2, 1);
     --shadow: 0 6px 20px rgba(76, 21, 101, .08);
   }
@@ -161,8 +160,7 @@ $totalMarks = $QN * $TEST['mark'];
   html { -webkit-text-size-adjust: 100%; }
   body {
     font-family: 'Poppins', system-ui, sans-serif;
-    background: var(--bg); color: var(--ink);
-    line-height: 1.55; min-height: 100dvh;
+    background: var(--bg); color: var(--ink); line-height: 1.55; min-height: 100dvh;
   }
   body::before {
     content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
@@ -170,49 +168,44 @@ $totalMarks = $QN * $TEST['mark'];
       radial-gradient(60vw 40vw at 85% -5%, rgba(168, 29, 69, .10), transparent 65%),
       radial-gradient(55vw 40vw at -10% 8%, rgba(76, 21, 101, .10), transparent 65%);
   }
+  /* test chal raha ho to page khud scroll na ho — sirf question area scroll karega */
+  body.mode-test { overflow: hidden; height: 100dvh; }
   .wrap { width: 100%; max-width: 520px; margin: 0 auto; padding: 0 16px 34px; }
   button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  a { color: inherit; }
   .screen { display: none; }
-  .screen.show { display: block; animation: fade .3s var(--ease); }
+  .screen.show { display: block; animation: fade .28s var(--ease); }
   @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-  /* ============ shared bits ============ */
   .brand-logo { width: 100%; height: 100%; object-fit: contain; display: block; }
-  .logo-fallback {
-    width: 100%; height: 100%; border-radius: 50%; background: var(--grad);
-    display: grid; place-items: center; color: #fff; font-weight: 800; letter-spacing: .5px;
-  }
+  .logo-fallback { width: 100%; height: 100%; border-radius: 50%; background: var(--grad); display: grid; place-items: center; color: #fff; font-size: .9em; }
   .btn-primary {
     display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
     background: var(--grad); color: #fff; font-weight: 700; font-size: 1.02rem;
     padding: 16px 20px; border-radius: 14px; letter-spacing: .4px;
-    box-shadow: 0 8px 20px rgba(118, 24, 78, .32); transition: transform .15s var(--ease), box-shadow .15s var(--ease);
+    box-shadow: 0 8px 20px rgba(118, 24, 78, .32); transition: transform .15s var(--ease);
   }
-  .btn-primary:active { transform: scale(.985); box-shadow: 0 4px 12px rgba(118, 24, 78, .28); }
+  .btn-primary:active { transform: scale(.985); }
   .btn-ghost {
     display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
     background: #fff; color: var(--ink); font-weight: 600; font-size: .92rem;
-    padding: 13px 16px; border-radius: 12px; border: 1px solid var(--line-2);
+    padding: 13px 16px; border-radius: 12px; border: 1px solid var(--line-2); text-decoration: none;
   }
   .btn-ghost:active { background: #faf7fd; }
   .powered { text-align: center; color: var(--muted); font-size: .76rem; margin-top: 18px; display: flex; align-items: center; gap: 10px; justify-content: center; }
   .powered::before, .powered::after { content: ""; height: 1px; width: 26px; background: var(--line-2); }
 
-  /* ============ START SCREEN ============ */
+  /* ============ START ============ */
   .start-head { text-align: center; padding: 26px 0 6px; }
-  .start-logo { width: 118px; height: 118px; margin: 0 auto 10px; }
+  .start-logo { width: 122px; height: 122px; margin: 0 auto 10px; }
   .start-name { font-weight: 700; letter-spacing: 3px; font-size: .95rem; color: var(--purple); }
   .start-rule { width: 54px; height: 3px; border-radius: 3px; background: var(--grad); margin: 8px auto 16px; }
   .start-title { font-size: 2.5rem; font-weight: 800; letter-spacing: -.5px; line-height: 1.05; }
   .start-title span { color: var(--crimson); }
 
-  .chip-row { display: flex; gap: 7px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
   .chip { background: rgba(255, 255, 255, .18); border: 1px solid rgba(255, 255, 255, .3); color: #fff; font-size: .7rem; font-weight: 600; padding: 3px 11px; border-radius: 99px; }
-
-  .chapter-card {
-    background: var(--grad); color: #fff; border-radius: 16px; padding: 16px 18px; margin-top: 16px;
-    display: flex; align-items: center; gap: 14px; box-shadow: 0 10px 24px rgba(92, 22, 90, .28);
-  }
+  .chip-row { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 7px; }
+  .chapter-card { background: var(--grad); color: #fff; border-radius: 16px; padding: 16px 18px; margin-top: 16px; display: flex; align-items: center; gap: 14px; box-shadow: 0 10px 24px rgba(92, 22, 90, .28); }
   .chapter-card .ic { width: 42px; height: 42px; flex: none; opacity: .92; }
   .chapter-card .tx { min-width: 0; flex: 1; }
   .chapter-card h2 { font-size: 1.22rem; font-weight: 800; letter-spacing: .4px; line-height: 1.2; text-transform: uppercase; }
@@ -238,21 +231,12 @@ $totalMarks = $QN * $TEST['mark'];
   .rules li + li { border-top: 1px solid var(--line); }
   .rules li .n { width: 24px; height: 24px; flex: none; border-radius: 50%; background: #f3ecfa; color: var(--purple); font-size: .74rem; font-weight: 700; display: grid; place-items: center; margin-top: 1px; }
   .rules li b { color: var(--crimson); font-weight: 700; }
-
-  .opt-toggle { display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-top: 14px; box-shadow: var(--shadow); }
-  .opt-toggle .tx { flex: 1; min-width: 0; }
-  .opt-toggle .tx b { display: block; font-size: .88rem; font-weight: 600; }
-  .opt-toggle .tx small { color: var(--muted); font-size: .74rem; }
-  .switch { width: 46px; height: 26px; border-radius: 99px; background: var(--line-2); position: relative; flex: none; transition: background .2s var(--ease); }
-  .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s var(--ease); }
-  .switch.on { background: var(--purple-2); }
-  .switch.on::after { transform: translateX(20px); }
-
   .resume-note { margin-top: 14px; background: #fff8ea; border: 1px solid #f6e2bb; color: #8a5a00; border-radius: 12px; padding: 11px 14px; font-size: .82rem; display: flex; gap: 10px; align-items: flex-start; }
 
-  /* ============ TEST SCREEN ============ */
-  .topbar { position: sticky; top: 0; z-index: 40; background: var(--grad); color: #fff; box-shadow: 0 2px 14px rgba(76, 21, 101, .25); }
-  .topbar-in { max-width: 520px; margin: 0 auto; padding: 11px 14px; display: flex; align-items: center; gap: 12px; }
+  /* ============ TEST (fixed shell — only the question area moves) ============ */
+  .test-shell { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { flex: none; background: var(--grad); color: #fff; box-shadow: 0 2px 14px rgba(76, 21, 101, .25); }
+  .topbar-in { max-width: 520px; margin: 0 auto; padding: 10px 14px; display: flex; align-items: center; gap: 12px; }
   .icon-btn { width: 38px; height: 38px; flex: none; border-radius: 11px; display: grid; place-items: center; color: #fff; font-size: 1.05rem; background: rgba(255,255,255,.12); }
   .icon-btn:active { background: rgba(255,255,255,.22); }
   .topbar .bl { width: 36px; height: 36px; flex: none; border-radius: 50%; background: #fff; padding: 2px; overflow: hidden; }
@@ -260,61 +244,62 @@ $totalMarks = $QN * $TEST['mark'];
   .topbar .tt b { display: block; font-size: .95rem; font-weight: 700; letter-spacing: .6px; line-height: 1.2; }
   .topbar .tt small { display: block; font-size: .6rem; letter-spacing: 1.6px; opacity: .82; text-transform: uppercase; }
 
-  .qcard { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 14px; margin-top: 14px; }
+  .test-main { flex: 1 1 auto; min-height: 0; display: flex; justify-content: center; padding: 12px 16px 14px; }
+  .qcard { width: 100%; max-width: 520px; display: flex; flex-direction: column; min-height: 0;
+           background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+  .qfix { flex: none; padding: 13px 14px 0; }
+  .qmid { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 14px; }
+  .qbot { flex: none; padding: 10px 14px 13px; border-top: 1px solid var(--line); background: #fdfcfe; }
+
   .qtop { display: flex; align-items: center; gap: 10px; }
   .qtop .bk { width: 30px; height: 30px; flex: none; border-radius: 9px; background: #f3ecfa; color: var(--purple); display: grid; place-items: center; }
   .qtop .ch { flex: 1; min-width: 0; font-weight: 700; font-size: .98rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .qtop .cnt { font-weight: 700; color: var(--purple); font-size: .95rem; flex: none; }
+  .qtop .cnt { font-weight: 700; color: var(--purple); font-size: .95rem; flex: none; font-variant-numeric: tabular-nums; }
   .qtop .cnt span { color: var(--muted); font-weight: 500; }
 
-  .timers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-  .timer { display: flex; align-items: center; gap: 10px; border-radius: 13px; padding: 10px 12px; border: 1px solid var(--line); background: #faf8fd; }
-  .timer .ti { width: 34px; height: 34px; flex: none; border-radius: 50%; display: grid; place-items: center; font-size: .95rem; background: #f0e8f8; color: var(--purple); }
-  .timer .tl { font-size: .7rem; color: var(--muted); line-height: 1.2; }
-  .timer .tv { font-size: 1.12rem; font-weight: 700; color: var(--purple); font-variant-numeric: tabular-nums; letter-spacing: .5px; }
+  .timers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 11px; }
+  .timer { display: flex; align-items: center; gap: 10px; border-radius: 13px; padding: 9px 11px; border: 1px solid var(--line); background: #faf8fd; }
+  .timer .ti { width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center; font-size: .9rem; background: #f0e8f8; color: var(--purple); }
+  .timer .tl { font-size: .68rem; color: var(--muted); line-height: 1.2; }
+  .timer .tv { font-size: 1.1rem; font-weight: 700; color: var(--purple); font-variant-numeric: tabular-nums; letter-spacing: .5px; }
   .timer.q { background: #fff6f8; border-color: #f7dde4; }
   .timer.q .ti { background: #fde7ed; color: var(--crimson); }
   .timer.q .tv { color: var(--crimson); }
   .timer.warn { animation: pulse 1s infinite; }
-  @keyframes pulse { 50% { opacity: .55; } }
+  @keyframes pulse { 50% { opacity: .5; } }
   .timer.off { opacity: .45; }
 
-  .qhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; }
+  .qhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 2px; }
   .qnum { background: var(--grad); color: #fff; font-weight: 700; font-size: .86rem; padding: 8px 16px; border-radius: 10px; letter-spacing: .3px; }
   .bookmark { display: flex; align-items: center; gap: 7px; font-size: .84rem; font-weight: 600; color: var(--muted); padding: 7px 10px; border-radius: 9px; }
   .bookmark.on { color: var(--crimson); background: #fdeef2; }
 
-  .qtext { font-size: 1.04rem; font-weight: 600; line-height: 1.5; margin: 14px 0 4px; }
+  .qtext { font-size: 1.02rem; font-weight: 600; line-height: 1.5; margin: 12px 0 2px; }
   .timeover { display: inline-flex; align-items: center; gap: 7px; background: #fdecf1; color: var(--red); font-size: .76rem; font-weight: 600; padding: 5px 11px; border-radius: 99px; margin-top: 8px; }
-
-  .opts { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
-  .opt { display: flex; align-items: center; gap: 13px; width: 100%; text-align: left; background: #fff; border: 1.5px solid var(--line-2); border-radius: 13px; padding: 13px 14px; transition: all .15s var(--ease); }
-  .opt .k { width: 34px; height: 34px; flex: none; border-radius: 10px; background: #f3f1f7; color: #5b5370; font-weight: 700; display: grid; place-items: center; font-size: .88rem; transition: all .15s var(--ease); }
-  .opt .v { flex: 1; min-width: 0; font-size: .95rem; font-weight: 500; overflow-wrap: anywhere; }
-  .opt:active { transform: scale(.995); }
-  .opt.sel { border-color: var(--purple-2); background: #f8f3fc; box-shadow: 0 3px 12px rgba(107, 27, 122, .14); }
+  .opts { display: flex; flex-direction: column; gap: 9px; margin: 12px 0 14px; }
+  .opt { display: flex; align-items: center; gap: 13px; width: 100%; text-align: left; background: #fff; border: 1.5px solid var(--line-2); border-radius: 13px; padding: 12px 13px; transition: border-color .15s var(--ease), background .15s var(--ease); }
+  .opt .k { width: 33px; height: 33px; flex: none; border-radius: 10px; background: #f3f1f7; color: #5b5370; font-weight: 700; display: grid; place-items: center; font-size: .88rem; }
+  .opt .v { flex: 1; min-width: 0; font-size: .94rem; font-weight: 500; overflow-wrap: anywhere; }
+  .opt.sel { border-color: var(--purple-2); background: #f8f3fc; }
   .opt.sel .k { background: var(--grad); color: #fff; }
   .opt.sel .v { font-weight: 600; }
   .opt.dead { opacity: .62; pointer-events: none; }
 
-  .act-row { display: grid; grid-template-columns: 1fr 1.25fr; gap: 10px; margin-top: 16px; }
-  .act-row.two { grid-template-columns: 1fr 1fr; margin-top: 10px; }
-  .btn-sm { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 10px; border-radius: 12px; font-weight: 600; font-size: .9rem; border: 1px solid var(--line-2); background: #fff; color: var(--ink); }
+  .act-row { display: grid; grid-template-columns: 1fr 1.25fr; gap: 9px; }
+  .act-row.two { grid-template-columns: 1fr 1fr; margin-top: 9px; }
+  .btn-sm { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 10px; border-radius: 12px; font-weight: 600; font-size: .89rem; border: 1px solid var(--line-2); background: #fff; color: var(--ink); }
   .btn-sm:active { background: #f7f4fb; }
-  .btn-sm.grad { background: var(--grad); color: #fff; border-color: transparent; box-shadow: 0 6px 16px rgba(118, 24, 78, .26); }
+  .btn-sm.grad { background: var(--grad); color: #fff; border-color: transparent; box-shadow: 0 5px 14px rgba(118, 24, 78, .26); }
   .btn-sm:disabled { opacity: .45; pointer-events: none; }
 
-  .legend-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-top: 14px; box-shadow: var(--shadow); }
-  .legend-card .lh { display: flex; align-items: center; gap: 8px; font-size: .84rem; font-weight: 600; color: var(--muted); margin-bottom: 9px; }
-  .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; }
-  .legend span { display: flex; align-items: center; gap: 7px; font-size: .76rem; color: #50485f; }
-  .dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+  .statusbar { display: flex; align-items: center; gap: 12px; margin-top: 11px; padding-top: 10px; border-top: 1px dashed var(--line-2); flex-wrap: wrap; }
+  .statusbar span { display: flex; align-items: center; gap: 6px; font-size: .74rem; color: #50485f; }
+  .statusbar span b { font-weight: 700; color: var(--ink); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
   .dot.ans { background: var(--green); }
   .dot.not { background: #fff; border: 1.5px solid var(--line-2); }
-  .dot.cur { background: var(--purple-2); }
   .dot.mark { background: #f472b6; }
-
-  .submit-wrap { margin-top: 16px; }
+  .btn-submit { margin-left: auto; background: var(--grad); color: #fff; font-weight: 700; font-size: .8rem; letter-spacing: .5px; padding: 9px 18px; border-radius: 10px; display: flex; align-items: center; gap: 7px; box-shadow: 0 5px 14px rgba(118, 24, 78, .26); }
 
   /* ============ PALETTE SHEET ============ */
   .scrim { position: fixed; inset: 0; background: rgba(31, 20, 48, .55); backdrop-filter: blur(2px); z-index: 60; opacity: 0; visibility: hidden; transition: opacity .25s, visibility .25s; }
@@ -322,22 +307,22 @@ $totalMarks = $QN * $TEST['mark'];
   .sheet { position: fixed; left: 0; right: 0; top: 0; z-index: 70; transform: translateY(-104%); transition: transform .3s var(--ease); }
   .sheet.show { transform: none; }
   .sheet-in { max-width: 520px; margin: 0 auto; padding: 0 12px; }
-  .sheet-box { background: #fff; border-radius: 0 0 20px 20px; box-shadow: 0 16px 40px rgba(31, 20, 48, .3); overflow: hidden; }
-  .sheet-bar { background: var(--grad); color: #fff; padding: 11px 14px; display: flex; align-items: center; gap: 12px; }
+  .sheet-box { background: #fff; border-radius: 0 0 20px 20px; box-shadow: 0 16px 40px rgba(31, 20, 48, .3); overflow: hidden; max-height: 92dvh; display: flex; flex-direction: column; }
+  .sheet-bar { background: var(--grad); color: #fff; padding: 11px 14px; display: flex; align-items: center; gap: 12px; flex: none; }
   .sheet-bar .bl { width: 34px; height: 34px; border-radius: 50%; background: #fff; padding: 2px; flex: none; overflow: hidden; }
   .sheet-bar .tt { flex: 1; min-width: 0; }
   .sheet-bar .tt b { display: block; font-size: .92rem; font-weight: 700; letter-spacing: .6px; }
   .sheet-bar .tt small { font-size: .58rem; letter-spacing: 1.6px; opacity: .82; text-transform: uppercase; }
-  .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px 14px 0; }
+  .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px 14px 0; flex: none; }
   .tab { padding: 10px; border-radius: 10px; font-weight: 600; font-size: .86rem; background: #f4f1f8; color: var(--muted); }
   .tab.on { background: var(--grad); color: #fff; box-shadow: 0 5px 14px rgba(118, 24, 78, .24); }
-  .pal-body { padding: 14px; }
+  .pal-body { padding: 14px; overflow-y: auto; }
   .pal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 9px; }
   .pal-btn { aspect-ratio: 1 / 1; border-radius: 10px; font-weight: 700; font-size: .92rem; border: 1.5px solid var(--line-2); background: #fff; color: #4c4459; display: grid; place-items: center; }
   .pal-btn.ans { background: #dcfce7; border-color: #86efac; color: #15803d; }
   .pal-btn.mark { background: #fce7f3; border-color: #f9a8d4; color: #be185d; }
   .pal-btn.cur { border-color: var(--purple-2); border-width: 2px; color: var(--purple); background: #f6efff; }
-  .pal-note { display: flex; gap: 10px; align-items: flex-start; background: #f8f6fc; border: 1px solid var(--line); border-radius: 11px; padding: 11px 12px; margin-top: 14px; font-size: .78rem; color: var(--muted); line-height: 1.5; }
+  .pal-note { display: flex; gap: 10px; align-items: flex-start; background: #f8f6fc; border: 1px solid var(--line); border-radius: 11px; padding: 11px 12px; margin-top: 14px; font-size: .78rem; color: var(--muted); line-height: 1.55; }
   .pal-note i { color: var(--purple-2); margin-top: 2px; }
   .tab-pane { display: none; }
   .tab-pane.show { display: block; }
@@ -353,17 +338,15 @@ $totalMarks = $QN * $TEST['mark'];
   .res-hero h2 { font-size: 1.5rem; font-weight: 800; margin-top: 6px; position: relative; }
   .res-hero p { font-size: .83rem; opacity: .9; position: relative; }
   .res-hero p b { display: block; font-size: .96rem; margin-top: 2px; }
-
   .res-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-top: 14px; }
   .res-c { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 8px; text-align: center; box-shadow: var(--shadow); }
   .res-c i { font-size: 1.1rem; }
   .res-c .lb { font-size: .74rem; color: var(--muted); margin-top: 3px; }
   .res-c .vl { font-size: 1.4rem; font-weight: 800; line-height: 1.2; }
   .res-c .mk { font-size: .72rem; font-weight: 600; }
-  .res-c.ok i, .res-c.ok .vl { color: var(--green); } .res-c.ok .mk { color: var(--green); }
-  .res-c.no i, .res-c.no .vl { color: var(--red); } .res-c.no .mk { color: var(--red); }
-  .res-c.sk i, .res-c.sk .vl { color: #94a3b8; } .res-c.sk .mk { color: #94a3b8; }
-
+  .res-c.ok i, .res-c.ok .vl, .res-c.ok .mk { color: var(--green); }
+  .res-c.no i, .res-c.no .vl, .res-c.no .mk { color: var(--red); }
+  .res-c.sk i, .res-c.sk .vl, .res-c.sk .mk { color: #94a3b8; }
   .score-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; margin-top: 12px; text-align: center; box-shadow: var(--shadow); }
   .score-card .md { font-size: 2rem; }
   .score-card .lb { font-size: .84rem; color: var(--muted); }
@@ -372,7 +355,6 @@ $totalMarks = $QN * $TEST['mark'];
   .score-card .pc { font-size: .9rem; color: var(--muted); font-weight: 600; }
   .bar { height: 9px; border-radius: 99px; background: #f0ecf6; margin-top: 12px; overflow: hidden; }
   .bar i { display: block; height: 100%; border-radius: 99px; background: var(--grad); transition: width .8s var(--ease); }
-
   .sum-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-top: 12px; box-shadow: var(--shadow); }
   .sum-card h3 { font-size: .88rem; font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 8px; margin-bottom: 11px; }
   .sum-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
@@ -380,7 +362,6 @@ $totalMarks = $QN * $TEST['mark'];
   .sum-grid b.ok { background: #dcfce7; color: #15803d; }
   .sum-grid b.no { background: #fee2e2; color: #b91c1c; }
   .sum-grid b.sk { background: #f1f5f9; color: #64748b; }
-
   .rev { margin-top: 12px; display: none; }
   .rev.show { display: block; }
   .rev-q { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--line-2); border-radius: 13px; padding: 13px 14px; margin-bottom: 10px; box-shadow: var(--shadow); }
@@ -392,11 +373,15 @@ $totalMarks = $QN * $TEST['mark'];
   .rev-a { display: flex; gap: 8px; align-items: flex-start; font-size: .83rem; margin-top: 8px; }
   .rev-a .tag { flex: none; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 2px 8px; border-radius: 99px; margin-top: 2px; }
   .rev-a.you .tag { background: #fdecf1; color: var(--red); }
-  .rev-a.you.ok .tag { background: var(--green-bg); color: var(--green); }
-  .rev-a.cor .tag { background: var(--green-bg); color: var(--green); }
+  .rev-a.you.ok .tag, .rev-a.cor .tag { background: var(--green-bg); color: var(--green); }
   .rev-exp { margin-top: 9px; padding-top: 9px; border-top: 1px dashed var(--line-2); font-size: .8rem; color: var(--muted); line-height: 1.55; }
 
-  @media (min-width: 560px) { .wrap { padding-bottom: 44px; } }
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 200;
+    background: #1f1430; color: #fff; padding: 11px 18px; border-radius: 10px;
+    font-size: .84rem; box-shadow: 0 10px 24px rgba(0,0,0,.25); pointer-events: none;
+  }
+
   @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; animation: none !important; } }
 </style>
 </head>
@@ -423,7 +408,7 @@ $totalMarks = $QN * $TEST['mark'];
       </svg>
       <div class="tx">
         <h2><?= htmlspecialchars($TEST['title'], ENT_QUOTES) ?></h2>
-        <div class="chip-row" style="justify-content:flex-start;margin-top:7px">
+        <div class="chip-row">
           <?php foreach ($TEST['tags'] as $t): ?><span class="chip"><?= htmlspecialchars($t, ENT_QUOTES) ?></span><?php endforeach; ?>
         </div>
       </div>
@@ -434,51 +419,49 @@ $totalMarks = $QN * $TEST['mark'];
     <div class="stat-card">
       <div class="stat-row">
         <div class="stat"><div class="si"><i class="fa fa-file-lines"></i></div><div><div class="sl">Questions</div><div class="sv"><?= $QN ?></div></div></div>
-        <div class="stat rose"><div class="si"><i class="fa fa-trophy"></i></div><div><div class="sl">Total Marks</div><div class="sv"><?= rtrim(rtrim(number_format($totalMarks, 2, '.', ''), '0'), '.') ?></div></div></div>
+        <div class="stat rose"><div class="si"><i class="fa fa-trophy"></i></div><div><div class="sl">Total Marks</div><div class="sv"><?= $num($totalMarks) ?></div></div></div>
       </div>
       <div class="stat-row">
         <div class="stat"><div class="si"><i class="fa fa-clock"></i></div><div><div class="sl">Total Time</div><div class="sv"><?= (int)$TEST['total_minutes'] ?> Minutes</div></div></div>
-        <div class="stat rose"><div class="si"><i class="fa fa-star"></i></div><div><div class="sl">Per Question</div><div class="sv"><?= rtrim(rtrim(number_format($TEST['mark'], 2, '.', ''), '0'), '.') ?> Mark</div></div></div>
+        <div class="stat rose"><div class="si"><i class="fa fa-star"></i></div><div><div class="sl">Per Question</div><div class="sv"><?= $num($TEST['mark']) ?> Mark</div></div></div>
       </div>
+      <?php if ((int)$TEST['per_question_sec'] > 0): ?>
+      <div class="stat-row">
+        <div class="stat full"><div class="si"><i class="fa fa-stopwatch"></i></div><div><div class="sl">Time per Question</div><div class="sv"><?= (int)$TEST['per_question_sec'] ?> Seconds</div></div></div>
+      </div>
+      <?php endif; ?>
       <?php if ($TEST['negative'] > 0): ?>
       <div class="stat-row">
-        <div class="stat rose full"><div class="si"><i class="fa fa-circle-minus"></i></div><div><div class="sl">Negative Marking</div><div class="sv"><?= rtrim(rtrim(number_format($TEST['negative'], 2, '.', ''), '0'), '.') ?> Mark per wrong answer</div></div></div>
+        <div class="stat rose full"><div class="si"><i class="fa fa-circle-minus"></i></div><div><div class="sl">Negative Marking</div><div class="sv"><?= $num($TEST['negative']) ?> Mark per wrong answer</div></div></div>
       </div>
       <?php endif; ?>
     </div>
 
-    <?php if ((int)$TEST['per_question_sec'] > 0): ?>
-    <div class="opt-toggle" id="perQToggle" role="button" tabindex="0" aria-pressed="true">
-      <div class="si" style="width:38px;height:38px;flex:none;border-radius:11px;display:grid;place-items:center;background:#f3ecfa;color:var(--purple)"><i class="fa fa-stopwatch"></i></div>
-      <div class="tx">
-        <b>Per question time limit</b>
-        <small><?= (int)$TEST['per_question_sec'] ?> seconds har question ke liye — off karo to sirf overall timer chalega</small>
-      </div>
-      <div class="switch on" id="perQSwitch"></div>
-    </div>
-    <?php endif; ?>
-
     <div class="rules">
       <div class="rules-head"><i class="fa fa-list-check"></i> TEST RULES</div>
       <ol>
-        <li><span class="n">1</span><span>Each correct answer carries <b><?= rtrim(rtrim(number_format($TEST['mark'], 2, '.', ''), '0'), '.') ?> mark</b>.</span></li>
+        <?php $r = 0; ?>
+        <li><span class="n"><?= ++$r ?></span><span>Each correct answer carries <b><?= $num($TEST['mark']) ?> mark</b>.</span></li>
         <?php if ($TEST['negative'] > 0): ?>
-        <li><span class="n">2</span><span><b><?= rtrim(rtrim(number_format($TEST['negative'], 2, '.', ''), '0'), '.') ?> mark</b> will be deducted for every wrong answer.</span></li>
+        <li><span class="n"><?= ++$r ?></span><span><b><?= $num($TEST['negative']) ?> mark</b> is deducted for every wrong answer.</span></li>
         <?php endif; ?>
-        <li><span class="n"><?= $TEST['negative'] > 0 ? 3 : 2 ?></span><span>No marks will be awarded for unanswered questions.</span></li>
-        <li><span class="n"><?= $TEST['negative'] > 0 ? 4 : 3 ?></span><span id="ruleTime">Each question has a time limit of <b><?= (int)$TEST['per_question_sec'] ?> seconds</b>.</span></li>
-        <li><span class="n"><?= $TEST['negative'] > 0 ? 5 : 4 ?></span><span>Submit the test before the overall timer ends.</span></li>
+        <li><span class="n"><?= ++$r ?></span><span>Unanswered questions carry no marks and no penalty.</span></li>
+        <?php if ((int)$TEST['per_question_sec'] > 0): ?>
+        <li><span class="n"><?= ++$r ?></span><span>Each question has a time limit of <b><?= (int)$TEST['per_question_sec'] ?> seconds</b>. Once it ends, the question is closed.</span></li>
+        <?php endif; ?>
+        <li><span class="n"><?= ++$r ?></span><span>You may revisit and change any answered question before submitting.</span></li>
+        <li><span class="n"><?= ++$r ?></span><span>The test is submitted automatically when the overall timer reaches zero.</span></li>
       </ol>
     </div>
 
     <div class="resume-note" id="resumeNote" style="display:none">
       <i class="fa fa-rotate-left" style="margin-top:3px"></i>
-      <span>Pichla test adhura pada hai. <b id="resumeInfo"></b></span>
+      <span>You have an unfinished attempt. <b id="resumeInfo"></b></span>
     </div>
 
-    <div class="submit-wrap">
+    <div style="margin-top:16px">
       <button class="btn-primary" id="btnStart"><i class="fa fa-play"></i> START TEST <i class="fa fa-arrow-right"></i></button>
-      <button class="btn-ghost" id="btnResume" style="display:none;margin-top:10px"><i class="fa fa-rotate-left"></i> Resume previous test</button>
+      <button class="btn-ghost" id="btnResume" style="display:none;margin-top:10px"><i class="fa fa-rotate-left"></i> Resume previous attempt</button>
     </div>
 
     <div class="powered">Powered by DIPLOMA WALLAH</div>
@@ -487,67 +470,64 @@ $totalMarks = $QN * $TEST['mark'];
 
 <!-- ══════════════════ 2. TEST ══════════════════ -->
 <section class="screen" id="scrTest">
-  <header class="topbar">
-    <div class="topbar-in">
-      <button class="icon-btn" id="btnPalette" aria-label="Question palette"><i class="fa fa-bars"></i></button>
-      <div class="bl" data-logo></div>
-      <div class="tt"><b>DIPLOMA WALLAH</b><small>Learn • Practice • Grow</small></div>
-      <button class="icon-btn" id="btnInstr" aria-label="Instructions"><i class="fa fa-circle-info"></i></button>
-    </div>
-  </header>
-
-  <div class="wrap">
-    <div class="qcard">
-      <div class="qtop">
-        <div class="bk"><i class="fa fa-book-open"></i></div>
-        <div class="ch"><?= htmlspecialchars($TEST['title'], ENT_QUOTES) ?></div>
-        <div class="cnt"><span id="qNow">1</span><span> / <?= $QN ?></span></div>
+  <div class="test-shell">
+    <header class="topbar">
+      <div class="topbar-in">
+        <button class="icon-btn" id="btnPalette" aria-label="Question palette"><i class="fa fa-bars"></i></button>
+        <div class="bl" data-logo></div>
+        <div class="tt"><b>DIPLOMA WALLAH</b><small>Learn • Practice • Grow</small></div>
+        <button class="icon-btn" id="btnInstr" aria-label="Instructions"><i class="fa fa-circle-info"></i></button>
       </div>
+    </header>
 
-      <div class="timers">
-        <div class="timer" id="tOverall">
-          <div class="ti"><i class="fa fa-hourglass-half"></i></div>
-          <div><div class="tl">Overall Time</div><div class="tv" id="tOverallVal">20:00</div></div>
+    <div class="test-main">
+      <div class="qcard">
+        <div class="qfix">
+          <div class="qtop">
+            <div class="bk"><i class="fa fa-book-open"></i></div>
+            <div class="ch"><?= htmlspecialchars($TEST['title'], ENT_QUOTES) ?></div>
+            <div class="cnt"><span id="qNow">1</span><span> / <?= $QN ?></span></div>
+          </div>
+          <div class="timers">
+            <div class="timer" id="tOverall">
+              <div class="ti"><i class="fa fa-hourglass-half"></i></div>
+              <div><div class="tl">Overall Time</div><div class="tv" id="tOverallVal">20:00</div></div>
+            </div>
+            <div class="timer q" id="tQuestion">
+              <div class="ti"><i class="fa fa-stopwatch"></i></div>
+              <div><div class="tl">Question Time</div><div class="tv" id="tQuestionVal">01:00</div></div>
+            </div>
+          </div>
+          <div class="qhead">
+            <div class="qnum" id="qLabel">Question 1</div>
+            <button class="bookmark" id="btnMark"><i class="fa-regular fa-bookmark"></i> <span>Bookmark</span></button>
+          </div>
         </div>
-        <div class="timer q" id="tQuestion">
-          <div class="ti"><i class="fa fa-stopwatch"></i></div>
-          <div><div class="tl">Question Time</div><div class="tv" id="tQuestionVal">01:00</div></div>
+
+        <div class="qmid" id="qScroll">
+          <div class="qtext" id="qText">—</div>
+          <div id="qDead"></div>
+          <div class="opts" id="qOpts"></div>
+        </div>
+
+        <div class="qbot">
+          <div class="act-row">
+            <button class="btn-sm" id="btnClear"><i class="fa fa-eraser"></i> Clear</button>
+            <button class="btn-sm grad" id="btnSaveNext">Save &amp; Next <i class="fa fa-arrow-right"></i></button>
+          </div>
+          <div class="act-row two">
+            <button class="btn-sm" id="btnPrev"><i class="fa fa-arrow-left"></i> Previous</button>
+            <button class="btn-sm" id="btnNext">Next <i class="fa fa-arrow-right"></i></button>
+          </div>
+          <div class="statusbar">
+            <span><i class="dot ans"></i> Answered <b id="cAns">0</b></span>
+            <span><i class="dot not"></i> Left <b id="cNot"><?= $QN ?></b></span>
+            <span><i class="dot mark"></i> Marked <b id="cMark">0</b></span>
+            <button class="btn-submit" id="btnSubmit"><i class="fa fa-paper-plane"></i> SUBMIT</button>
+          </div>
         </div>
       </div>
-
-      <div class="qhead">
-        <div class="qnum" id="qLabel">Question 1</div>
-        <button class="bookmark" id="btnMark"><i class="fa-regular fa-bookmark"></i> <span>Bookmark</span></button>
-      </div>
-
-      <div class="qtext" id="qText">—</div>
-      <div id="qDead"></div>
-      <div class="opts" id="qOpts"></div>
-
-      <div class="act-row">
-        <button class="btn-sm" id="btnClear"><i class="fa fa-eraser"></i> Clear</button>
-        <button class="btn-sm grad" id="btnSaveNext">Save &amp; Next <i class="fa fa-arrow-right"></i></button>
-      </div>
-      <div class="act-row two">
-        <button class="btn-sm" id="btnPrev"><i class="fa fa-arrow-left"></i> Previous</button>
-        <button class="btn-sm" id="btnNext">Next <i class="fa fa-arrow-right"></i></button>
-      </div>
     </div>
-
-    <div class="legend-card">
-      <div class="lh"><i class="fa fa-circle-info"></i> Question Status</div>
-      <div class="legend">
-        <span><i class="dot ans"></i> Answered <b id="cAns" style="margin-left:2px">0</b></span>
-        <span><i class="dot not"></i> Not Answered <b id="cNot" style="margin-left:2px">0</b></span>
-        <span><i class="dot cur"></i> Current</span>
-        <span><i class="dot mark"></i> Marked <b id="cMark" style="margin-left:2px">0</b></span>
-      </div>
-    </div>
-
-    <div class="submit-wrap">
-      <button class="btn-primary" id="btnSubmit"><i class="fa fa-paper-plane"></i> SUBMIT TEST</button>
-    </div>
-    <div class="powered">Powered by DIPLOMA WALLAH</div>
   </div>
 </section>
 
@@ -568,17 +548,19 @@ $totalMarks = $QN * $TEST['mark'];
       <div class="pal-body">
         <div class="tab-pane show" id="paneP">
           <div class="pal-grid" id="palGrid"></div>
-          <div class="pal-note"><i class="fa fa-circle-info"></i><span>Kisi bhi number par click karke us question par jaa sakte ho. Answer kiye hue question final submit se pehle badle ja sakte hain.</span></div>
+          <div class="pal-note"><i class="fa fa-circle-info"></i><span>Select any question number to go directly to that question. Answered questions can be reviewed and changed at any time before you submit the test.</span></div>
         </div>
         <div class="tab-pane" id="paneI">
           <ul class="ins-list">
-            <li><i class="fa fa-circle-check"></i><span>Har sahi answer par <b><?= rtrim(rtrim(number_format($TEST['mark'], 2, '.', ''), '0'), '.') ?> mark</b> milega.</span></li>
+            <li><i class="fa fa-circle-check"></i><span>Every correct answer carries <b><?= $num($TEST['mark']) ?> mark</b>.</span></li>
             <?php if ($TEST['negative'] > 0): ?>
-            <li><i class="fa fa-circle-minus"></i><span>Har galat answer par <b><?= rtrim(rtrim(number_format($TEST['negative'], 2, '.', ''), '0'), '.') ?> mark</b> kat jayega.</span></li>
+            <li><i class="fa fa-circle-minus"></i><span><b><?= $num($TEST['negative']) ?> mark</b> is deducted for each wrong answer. Unanswered questions carry no penalty.</span></li>
             <?php endif; ?>
-            <li><i class="fa fa-stopwatch"></i><span id="insTime">Har question ka apna time limit hai; khatam hote hi agle question par chale jaoge.</span></li>
-            <li><i class="fa fa-bookmark"></i><span>Bookmark lagao to palette me gulabi dikhega — baad me wapas aakar answer kar sakte ho.</span></li>
-            <li><i class="fa fa-paper-plane"></i><span>Overall timer khatam hote hi test khud submit ho jayega.</span></li>
+            <?php if ((int)$TEST['per_question_sec'] > 0): ?>
+            <li><i class="fa fa-stopwatch"></i><span>Each question is open for <b><?= (int)$TEST['per_question_sec'] ?> seconds</b>. When that time ends the test moves to the next question and the previous one is closed.</span></li>
+            <?php endif; ?>
+            <li><i class="fa fa-bookmark"></i><span>Use Bookmark to flag a question for a second look. Bookmarked questions appear in pink in the palette.</span></li>
+            <li><i class="fa fa-paper-plane"></i><span>The test is submitted automatically once the overall timer reaches zero.</span></li>
           </ul>
         </div>
       </div>
@@ -611,7 +593,7 @@ $totalMarks = $QN * $TEST['mark'];
     <div class="score-card">
       <div class="md">🏅</div>
       <div class="lb">Your Score</div>
-      <div class="sc"><span id="rScore">0</span><small> / <?= rtrim(rtrim(number_format($totalMarks, 2, '.', ''), '0'), '.') ?></small></div>
+      <div class="sc"><span id="rScore">0</span><small> / <?= $num($totalMarks) ?></small></div>
       <div class="pc" id="rPct">(0%)</div>
       <div class="bar"><i id="rBar" style="width:0"></i></div>
       <div class="pc" style="margin-top:10px" id="rTime"></div>
@@ -622,10 +604,11 @@ $totalMarks = $QN * $TEST['mark'];
       <div class="sum-grid" id="sumGrid"></div>
     </div>
 
-    <div class="act-row" style="margin-top:14px">
+    <div class="act-row two" style="margin-top:14px">
       <button class="btn-sm" id="btnReview"><i class="fa fa-book-open"></i> Review Answers</button>
       <button class="btn-sm grad" id="btnAgain"><i class="fa fa-rotate-right"></i> Try Again</button>
     </div>
+    <a class="btn-ghost" style="margin-top:9px" href="<?= htmlspecialchars($TEST['home_url'], ENT_QUOTES) ?>"><i class="fa fa-house"></i> Back to Home</a>
 
     <div class="rev" id="revBox"></div>
     <div class="powered">Powered by DIPLOMA WALLAH</div>
@@ -639,27 +622,27 @@ $totalMarks = $QN * $TEST['mark'];
   var $ = function (id) { return document.getElementById(id); };
   var KEY = "d2d_mcqtest_" + (T.title || "test").toLowerCase().replace(/[^a-z0-9]+/g, "_");
   var LETTERS = ["A", "B", "C", "D", "E", "F"];
+  var PER_Q = T.perQSec > 0;
 
-  /* ---------- logo (PNG agar hai, warna seal fallback) ---------- */
+  /* ---------- logo ---------- */
   (function () {
     var holders = document.querySelectorAll("[data-logo]");
-    var fallback = '<div class="logo-fallback"><i class="fa fa-book-open"></i></div>';
     var probe = new Image();
     probe.onload = function () {
-      [].forEach.call(holders, function (h) {
-        h.innerHTML = '<img class="brand-logo" src="diplomawallah-logo.png" alt="Diploma Wallah">';
-      });
+      [].forEach.call(holders, function (h) { h.innerHTML = '<img class="brand-logo" src="diplomawallah-logo.png" alt="Diploma Wallah">'; });
     };
-    probe.onerror = function () { [].forEach.call(holders, function (h) { h.innerHTML = fallback; }); };
+    probe.onerror = function () {
+      [].forEach.call(holders, function (h) { h.innerHTML = '<div class="logo-fallback"><i class="fa fa-book-open"></i></div>'; });
+    };
     probe.src = "diplomawallah-logo.png";
   })();
 
   /* ---------- state ---------- */
   var st = null;
-  function freshState(perQ) {
+  function freshState() {
     var a = [], m = [], t = [];
     for (var i = 0; i < T.count; i++) { a.push(null); m.push(false); t.push(T.perQSec); }
-    return { i: 0, ans: a, mark: m, qt: t, left: T.totalSec, perQ: !!perQ, done: false, started: Date.now() };
+    return { i: 0, ans: a, mark: m, qt: t, left: T.totalSec, done: false };
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
   function clearSaved() { try { localStorage.removeItem(KEY); } catch (e) {} }
@@ -671,35 +654,24 @@ $totalMarks = $QN * $TEST['mark'];
     } catch (e) { return null; }
   }
 
-  /* ---------- screens ---------- */
   function show(id) {
     [].forEach.call(document.querySelectorAll(".screen"), function (s) { s.classList.toggle("show", s.id === id); });
-    window.scrollTo(0, 0);
+    document.body.classList.toggle("mode-test", id === "scrTest");
+    if (id !== "scrTest") window.scrollTo(0, 0);
   }
 
-  /* ---------- start screen ---------- */
-  var perQWanted = T.perQSec > 0;
-  if ($("perQToggle")) {
-    $("perQToggle").addEventListener("click", function () {
-      perQWanted = !perQWanted;
-      $("perQSwitch").classList.toggle("on", perQWanted);
-      this.setAttribute("aria-pressed", perQWanted ? "true" : "false");
-      if ($("ruleTime")) $("ruleTime").innerHTML = perQWanted
-        ? 'Each question has a time limit of <b>' + T.perQSec + ' seconds</b>.'
-        : 'No per-question limit — manage the overall time yourself.';
-    });
-  }
+  /* ---------- start ---------- */
   (function () {
     var s = loadSaved();
     if (!s) return;
     var answered = s.ans.filter(function (x) { return x !== null; }).length;
     $("resumeNote").style.display = "flex";
-    $("resumeInfo").textContent = answered + " / " + T.count + " answered, " + fmt(s.left) + " time left.";
+    $("resumeInfo").textContent = answered + " of " + T.count + " answered, " + fmt(s.left) + " remaining.";
     $("btnResume").style.display = "flex";
     $("btnResume").addEventListener("click", function () { st = s; show("scrTest"); startTimer(); renderQ(); });
   })();
   $("btnStart").addEventListener("click", function () {
-    clearSaved(); st = freshState(perQWanted); show("scrTest"); startTimer(); renderQ();
+    clearSaved(); st = freshState(); show("scrTest"); startTimer(); renderQ();
   });
 
   /* ---------- timers ---------- */
@@ -716,13 +688,13 @@ $totalMarks = $QN * $TEST['mark'];
       st.left--;
       /* sirf us tick par react karo jab timer abhi-abhi 0 hua ho — warna
          khatam ho chuke question par wapas aate hi baar baar aage phenk dega */
-      var wasRunning = st.perQ && T.perQSec > 0 && st.qt[st.i] > 0;
+      var wasRunning = PER_Q && st.qt[st.i] > 0;
       if (wasRunning) st.qt[st.i]--;
       paintTimers();
-      if (st.left <= 0) { finish("Time over — test auto submit ho gaya."); return; }
+      if (st.left <= 0) { finish("Time over — the test was submitted automatically."); return; }
       if (wasRunning && st.qt[st.i] <= 0) {
         renderQ();
-        if (st.i < T.count - 1) { go(st.i + 1); toastish("Question ka time khatam — agla question."); }
+        if (st.i < T.count - 1) { go(st.i + 1); toast("Time up for this question."); }
       }
       if (st.left % 5 === 0) save();
     }, 1000);
@@ -731,26 +703,21 @@ $totalMarks = $QN * $TEST['mark'];
   function paintTimers() {
     $("tOverallVal").textContent = fmt(st.left);
     $("tOverall").classList.toggle("warn", st.left <= 60);
-    var qbox = $("tQuestion");
-    if (!st.perQ || T.perQSec <= 0) {
-      qbox.classList.add("off"); qbox.classList.remove("warn");
-      $("tQuestionVal").textContent = "--:--";
-    } else {
-      qbox.classList.remove("off");
-      $("tQuestionVal").textContent = fmt(st.qt[st.i]);
-      qbox.classList.toggle("warn", st.qt[st.i] <= 10);
-    }
+    var box = $("tQuestion");
+    if (!PER_Q) { box.classList.add("off"); $("tQuestionVal").textContent = "--:--"; return; }
+    $("tQuestionVal").textContent = fmt(st.qt[st.i]);
+    box.classList.toggle("warn", st.qt[st.i] <= 10);
   }
 
-  /* ---------- question render ---------- */
+  /* ---------- question ---------- */
   function renderQ() {
     var i = st.i, q = T.questions[i];
     $("qNow").textContent = i + 1;
     $("qLabel").textContent = "Question " + (i + 1);
     $("qText").textContent = q.q;
 
-    var dead = st.perQ && T.perQSec > 0 && st.qt[i] <= 0;
-    $("qDead").innerHTML = dead ? '<div class="timeover"><i class="fa fa-hourglass-end"></i> Is question ka time khatam ho gaya</div>' : "";
+    var dead = PER_Q && st.qt[i] <= 0;
+    $("qDead").innerHTML = dead ? '<div class="timeover"><i class="fa fa-hourglass-end"></i> Time is up for this question</div>' : "";
 
     var html = "";
     for (var k = 0; k < q.o.length; k++) {
@@ -762,7 +729,9 @@ $totalMarks = $QN * $TEST['mark'];
 
     var mk = $("btnMark");
     mk.classList.toggle("on", !!st.mark[i]);
-    mk.innerHTML = (st.mark[i] ? '<i class="fa-solid fa-bookmark"></i> <span>Bookmarked</span>' : '<i class="fa-regular fa-bookmark"></i> <span>Bookmark</span>');
+    mk.innerHTML = st.mark[i]
+      ? '<i class="fa-solid fa-bookmark"></i> <span>Bookmarked</span>'
+      : '<i class="fa-regular fa-bookmark"></i> <span>Bookmark</span>';
 
     $("btnPrev").disabled = i === 0;
     $("btnNext").disabled = i === T.count - 1;
@@ -780,7 +749,7 @@ $totalMarks = $QN * $TEST['mark'];
   function go(i) {
     if (i < 0 || i >= T.count) return;
     st.i = i; save(); renderQ();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    $("qScroll").scrollTop = 0;          /* sirf question area reset — baaki screen hilegi nahi */
   }
 
   $("qOpts").addEventListener("click", function (e) {
@@ -800,7 +769,7 @@ $totalMarks = $QN * $TEST['mark'];
   function askSubmit() {
     var left = 0;
     for (var i = 0; i < T.count; i++) if (st.ans[i] === null) left++;
-    var msg = left ? (left + " question abhi tak answer nahi kiye. Phir bhi submit karein?") : "Test submit karein?";
+    var msg = left ? (left + " question" + (left > 1 ? "s are" : " is") + " unanswered. Submit anyway?") : "Submit the test?";
     if (confirm(msg)) finish("");
   }
 
@@ -815,11 +784,7 @@ $totalMarks = $QN * $TEST['mark'];
     }
     $("palGrid").innerHTML = h;
   }
-  function openSheet(tab) {
-    paintPalette();
-    switchTab(tab || "pal");
-    $("sheet").classList.add("show"); $("scrim").classList.add("show");
-  }
+  function openSheet(tab) { paintPalette(); switchTab(tab); $("sheet").classList.add("show"); $("scrim").classList.add("show"); }
   function closeSheet() { $("sheet").classList.remove("show"); $("scrim").classList.remove("show"); }
   function switchTab(which) {
     [].forEach.call(document.querySelectorAll(".tab"), function (t) { t.classList.toggle("on", t.getAttribute("data-tab") === which); });
@@ -839,12 +804,13 @@ $totalMarks = $QN * $TEST['mark'];
     closeSheet(); go(parseInt(b.getAttribute("data-i"), 10));
   });
 
-  function toastish(msg) {
-    var d = document.createElement("div");
+  var toastT = null;
+  function toast(msg) {
+    var d = document.querySelector(".toast");
+    if (!d) { d = document.createElement("div"); d.className = "toast"; document.body.appendChild(d); }
     d.textContent = msg;
-    d.style.cssText = "position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:200;background:#1f1430;color:#fff;padding:11px 18px;border-radius:10px;font-size:.84rem;box-shadow:0 10px 24px rgba(0,0,0,.25)";
-    document.body.appendChild(d);
-    setTimeout(function () { d.remove(); }, 1900);
+    if (toastT) clearTimeout(toastT);
+    toastT = setTimeout(function () { d.remove(); }, 1900);
   }
 
   /* ---------- result ---------- */
@@ -852,11 +818,10 @@ $totalMarks = $QN * $TEST['mark'];
     if (st.done) return;
     st.done = true;
     if (tick) clearInterval(tick);
-    closeSheet();
-    clearSaved();
+    closeSheet(); clearSaved();
 
-    var ok = 0, no = 0, sk = 0;
-    for (var i = 0; i < T.count; i++) {
+    var ok = 0, no = 0, sk = 0, i;
+    for (i = 0; i < T.count; i++) {
       if (st.ans[i] === null) sk++;
       else if (st.ans[i] === T.questions[i].a) ok++;
       else no++;
@@ -872,9 +837,7 @@ $totalMarks = $QN * $TEST['mark'];
     $("rScore").textContent = n(score);
     $("rPct").textContent = "(" + n(Math.max(0, pct)) + "%)";
     $("rBar").style.width = Math.max(0, Math.min(100, pct)) + "%";
-
-    var used = T.totalSec - Math.max(0, st.left);
-    $("rTime").textContent = (note ? note + " · " : "") + "Time used: " + fmt(used) + " / " + fmt(T.totalSec);
+    $("rTime").textContent = (note ? note + " " : "") + "Time used: " + fmt(T.totalSec - Math.max(0, st.left)) + " of " + fmt(T.totalSec) + ".";
 
     var g = "";
     for (i = 0; i < T.count; i++) {
@@ -894,11 +857,11 @@ $totalMarks = $QN * $TEST['mark'];
       h += '<div class="rev-q ' + cls + '">' +
              '<div class="rq"><span>Q' + (i + 1) + '.</span> ' + esc(q.q) + "</div>" +
              '<div class="rev-a you' + (you !== null && you === q.a ? " ok" : "") + '"><span class="tag">' +
-               (you === null ? "Skipped" : "Your answer") + '</span><span>' +
+               (you === null ? "Not answered" : "Your answer") + '</span><span>' +
                (you === null ? "—" : LETTERS[you] + ") " + esc(q.o[you])) + "</span></div>" +
              (you === q.a ? "" :
                '<div class="rev-a cor"><span class="tag">Correct</span><span>' + LETTERS[q.a] + ") " + esc(q.o[q.a]) + "</span></div>") +
-             (q.e ? '<div class="rev-exp"><b>Why:</b> ' + esc(q.e) + "</div>" : "") +
+             (q.e ? '<div class="rev-exp"><b>Explanation:</b> ' + esc(q.e) + "</div>" : "") +
            "</div>";
     }
     $("revBox").innerHTML = h;

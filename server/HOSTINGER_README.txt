@@ -33,9 +33,14 @@ D2D MCQ TEST (student-facing online test, no login, no DB):
   d2d_mcq_test.php        <- khud chalne wala test page (20 question andar hi hain)
   Open at: https://premind.diplomawallah.in/d2d_mcq_test.php
   Naya test banane ke liye file ke upar wala $TEST array edit karo:
-    title / total_minutes / per_question_sec / mark / negative / questions
-  Watermark-wala logo (diplomawallah-logo.png) isi folder me ho to wahi dikhega,
-  warna page apne aap ek simple seal bana leta hai.
+    title / total_minutes / per_question_sec / mark / negative / home_url / questions
+  per_question_sec hamesha lagta hai (0 karoge to sirf overall timer chalega).
+  home_url = result page ke "Back to Home" button ka link.
+
+LOGO (sab pages isi file ko use karte hain):
+  diplomawallah-logo.png  <- Diploma Wallah ka seal, transparent background
+  Notes/MCQ sheet ka watermark aur MCQ test page ka header logo yahi file hai.
+  premind/ folder me rakhna zaroori hai, warna watermark khali rahega.
 
 D2D SHARED FOLDERS:
   d2d_folders.php         <- one folder list for BOTH editors (creates d2d_folders table)
