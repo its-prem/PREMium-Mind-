@@ -35,6 +35,11 @@ D2D MCQ TEST (student-facing online test, no login, no DB):
   Naya test banane ke liye file ke upar wala $TEST array edit karo:
     title / total_minutes / per_question_sec / mark / negative / home_url / questions
   per_question_sec hamesha lagta hai (0 karoge to sirf overall timer chalega).
+  Time khatam hone par question band nahi hota — sirf notice aata hai, student
+  tab bhi answer kar sakta hai aur khud Next dabata hai.
+  3-line menu me "View all questions" = saare MCQ ek hi scroll me, MCQ sheet
+  jaisi print/PDF layout me (Print / PDF button se PDF bana sakte ho).
+  Answer key us view me sirf test submit hone ke baad dikhti hai.
   home_url = result page ke "Back to Home" button ka link.
 
 LOGO (sab pages isi file ko use karte hain):

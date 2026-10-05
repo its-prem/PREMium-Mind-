@@ -135,7 +135,7 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
 <link rel="icon" href="diplomawallah-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Tinos:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
   :root {
@@ -248,14 +248,17 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
   .qcard { width: 100%; max-width: 520px; display: flex; flex-direction: column; min-height: 0;
            background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
   .qfix { flex: none; padding: 13px 14px 0; }
-  .qmid { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 14px; }
+  .qmid { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 14px; display: flex; }
+  .qmid-in { width: 100%; margin: auto 0; padding: 8px 0 12px; }   /* question screen ke beech me rahe */
   .qbot { flex: none; padding: 10px 14px 13px; border-top: 1px solid var(--line); background: #fdfcfe; }
 
-  .qtop { display: flex; align-items: center; gap: 10px; }
-  .qtop .bk { width: 30px; height: 30px; flex: none; border-radius: 9px; background: #f3ecfa; color: var(--purple); display: grid; place-items: center; }
-  .qtop .ch { flex: 1; min-width: 0; font-weight: 700; font-size: .98rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .qtop .cnt { font-weight: 700; color: var(--purple); font-size: .95rem; flex: none; font-variant-numeric: tabular-nums; }
+  .qtop { display: flex; align-items: center; gap: 9px; }
+  .qnum { background: var(--grad); color: #fff; font-weight: 700; font-size: .8rem; padding: 6px 12px; border-radius: 9px; flex: none; letter-spacing: .3px; }
+  .qtop .ch { flex: 1; min-width: 0; font-weight: 600; font-size: .9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .qtop .cnt { font-weight: 700; color: var(--purple); font-size: .9rem; flex: none; font-variant-numeric: tabular-nums; }
   .qtop .cnt span { color: var(--muted); font-weight: 500; }
+  .bmk { width: 34px; height: 34px; flex: none; border-radius: 9px; display: grid; place-items: center; color: var(--muted); background: #f4f1f8; font-size: .9rem; }
+  .bmk.on { color: var(--crimson); background: #fdeef2; }
 
   .timers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 11px; }
   .timer { display: flex; align-items: center; gap: 10px; border-radius: 13px; padding: 9px 11px; border: 1px solid var(--line); background: #faf8fd; }
@@ -269,12 +272,7 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
   @keyframes pulse { 50% { opacity: .5; } }
   .timer.off { opacity: .45; }
 
-  .qhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 2px; }
-  .qnum { background: var(--grad); color: #fff; font-weight: 700; font-size: .86rem; padding: 8px 16px; border-radius: 10px; letter-spacing: .3px; }
-  .bookmark { display: flex; align-items: center; gap: 7px; font-size: .84rem; font-weight: 600; color: var(--muted); padding: 7px 10px; border-radius: 9px; }
-  .bookmark.on { color: var(--crimson); background: #fdeef2; }
-
-  .qtext { font-size: 1.02rem; font-weight: 600; line-height: 1.5; margin: 12px 0 2px; }
+  .qtext { font-size: 1.02rem; font-weight: 600; line-height: 1.5; margin: 0 0 2px; }
   .timeover { display: inline-flex; align-items: center; gap: 7px; background: #fdecf1; color: var(--red); font-size: .76rem; font-weight: 600; padding: 5px 11px; border-radius: 99px; margin-top: 8px; }
   .opts { display: flex; flex-direction: column; gap: 9px; margin: 12px 0 14px; }
   .opt { display: flex; align-items: center; gap: 13px; width: 100%; text-align: left; background: #fff; border: 1.5px solid var(--line-2); border-radius: 13px; padding: 12px 13px; transition: border-color .15s var(--ease), background .15s var(--ease); }
@@ -285,21 +283,24 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
   .opt.sel .v { font-weight: 600; }
   .opt.dead { opacity: .62; pointer-events: none; }
 
-  .act-row { display: grid; grid-template-columns: 1fr 1.25fr; gap: 9px; }
+  .act-row { display: grid; grid-template-columns: auto 1fr 1.55fr auto; gap: 8px; align-items: stretch; }
   .act-row.two { grid-template-columns: 1fr 1fr; margin-top: 9px; }
+  .btn-ico { border-radius: 12px; border: 1px solid var(--line-2); background: #fff; display: grid; place-items: center; color: var(--ink); width: 44px; }
+  .btn-ico:active { background: #f7f4fb; }
+  .btn-ico:disabled { opacity: .4; pointer-events: none; }
   .btn-sm { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 10px; border-radius: 12px; font-weight: 600; font-size: .89rem; border: 1px solid var(--line-2); background: #fff; color: var(--ink); }
   .btn-sm:active { background: #f7f4fb; }
   .btn-sm.grad { background: var(--grad); color: #fff; border-color: transparent; box-shadow: 0 5px 14px rgba(118, 24, 78, .26); }
   .btn-sm:disabled { opacity: .45; pointer-events: none; }
 
-  .statusbar { display: flex; align-items: center; gap: 12px; margin-top: 11px; padding-top: 10px; border-top: 1px dashed var(--line-2); flex-wrap: wrap; }
-  .statusbar span { display: flex; align-items: center; gap: 6px; font-size: .74rem; color: #50485f; }
+  .statusbar { display: flex; align-items: center; gap: 9px; margin-top: 9px; padding-top: 9px; border-top: 1px dashed var(--line-2); flex-wrap: wrap; }
+  .statusbar span { display: flex; align-items: center; gap: 5px; font-size: .71rem; color: #50485f; white-space: nowrap; }
   .statusbar span b { font-weight: 700; color: var(--ink); }
   .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
   .dot.ans { background: var(--green); }
   .dot.not { background: #fff; border: 1.5px solid var(--line-2); }
   .dot.mark { background: #f472b6; }
-  .btn-submit { margin-left: auto; background: var(--grad); color: #fff; font-weight: 700; font-size: .8rem; letter-spacing: .5px; padding: 9px 18px; border-radius: 10px; display: flex; align-items: center; gap: 7px; box-shadow: 0 5px 14px rgba(118, 24, 78, .26); }
+  .btn-submit { margin-left: auto; background: var(--grad); color: #fff; font-weight: 700; font-size: .76rem; letter-spacing: .4px; padding: 8px 15px; border-radius: 10px; display: flex; align-items: center; gap: 6px; box-shadow: 0 5px 14px rgba(118, 24, 78, .26); white-space: nowrap; }
 
   /* ============ PALETTE SHEET ============ */
   .scrim { position: fixed; inset: 0; background: rgba(31, 20, 48, .55); backdrop-filter: blur(2px); z-index: 60; opacity: 0; visibility: hidden; transition: opacity .25s, visibility .25s; }
@@ -375,6 +376,74 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
   .rev-a.you .tag { background: #fdecf1; color: var(--red); }
   .rev-a.you.ok .tag, .rev-a.cor .tag { background: var(--green-bg); color: var(--green); }
   .rev-exp { margin-top: 9px; padding-top: 9px; border-top: 1px dashed var(--line-2); font-size: .8rem; color: var(--muted); line-height: 1.55; }
+
+  /* chhoti / kam lambi screen par chrome ko sikodo taki poora question + 4 options dikhein */
+  @media (max-height: 760px), (max-width: 400px) {
+    .qfix { padding: 10px 12px 0; }
+    .timers { margin-top: 9px; gap: 8px; }
+    .timer { padding: 7px 9px; gap: 8px; }
+    .timer .ti { width: 28px; height: 28px; font-size: .82rem; }
+    .timer .tv { font-size: 1rem; }
+    .timer .tl { font-size: .64rem; }
+    .qtext { font-size: .95rem; }
+    .opts { gap: 7px; margin: 9px 0 10px; }
+    .opt { padding: 9px 11px; gap: 11px; }
+    .opt .k { width: 29px; height: 29px; font-size: .82rem; }
+    .opt .v { font-size: .9rem; }
+    .qmid { padding: 0 12px; }
+    .qmid-in { padding: 6px 0 8px; }
+    .qbot { padding: 8px 12px 10px; }
+    .act-row { grid-template-columns: auto 1fr 1.7fr auto; gap: 7px; }
+    .btn-sm { padding: 10px 7px; font-size: .83rem; white-space: nowrap; }
+    .btn-ico { width: 40px; }
+    .statusbar { margin-top: 7px; padding-top: 7px; }
+    .btn-submit { padding: 7px 13px; }
+  }
+
+  /* ============ ALL QUESTIONS — print/PDF style sheet ============ */
+  .btn-paper { display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; margin-top: 12px; padding: 12px; border-radius: 11px; background: var(--grad); color: #fff; font-weight: 600; font-size: .88rem; box-shadow: 0 5px 14px rgba(118,24,78,.26); }
+  .paper { position: fixed; inset: 0; z-index: 120; background: #eceaf2; display: none; flex-direction: column; }
+  .paper.show { display: flex; }
+  .paper-bar { flex: none; background: var(--grad); color: #fff; display: flex; align-items: center; gap: 10px; padding: 10px 14px; box-shadow: 0 2px 12px rgba(76,21,101,.25); }
+  .paper-bar b { flex: 1; min-width: 0; font-size: .95rem; font-weight: 700; letter-spacing: .5px; }
+  .paper-bar button { color: #fff; background: rgba(255,255,255,.14); border-radius: 10px; padding: 8px 13px; font-size: .82rem; font-weight: 600; display: flex; align-items: center; gap: 7px; }
+  .paper-bar button:active { background: rgba(255,255,255,.26); }
+  .paper-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 14px 10px 30px; }
+
+  .p-sheet { background: #fff; max-width: 860px; margin: 0 auto; border-radius: 10px; box-shadow: 0 8px 26px rgba(31,20,48,.12); padding: 14px; font-family: Tinos, "Times New Roman", serif; color: #1a1a1a; }
+  .p-hdr { background: linear-gradient(180deg, #9a1f2f 0%, #8e1b2a 55%, #7d1524 100%); color: #fff; border-radius: 8px; padding: 13px 16px; display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 12px rgba(110,18,32,.28); }
+  .p-hdr .pl { width: 46px; height: 46px; flex: none; background: #fff; border-radius: 50%; padding: 3px; overflow: hidden; }
+  .p-hdr .pt { flex: 1; min-width: 0; }
+  .p-hdr h2 { font-size: 1.35rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; line-height: 1.15; }
+  .p-hdr small { display: block; font-size: .7rem; letter-spacing: 2px; text-transform: uppercase; opacity: .9; margin-top: 2px; }
+  .p-hdr .pb { flex: none; background: rgba(0,0,0,.26); border: 1px solid rgba(255,255,255,.2); border-radius: 6px; padding: 6px 12px; font-size: .8rem; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; white-space: nowrap; }
+  .p-qs { margin-top: 12px; }
+  .p-q { break-inside: avoid; page-break-inside: avoid; margin: 0 0 9px; }
+  .p-qh { display: flex; gap: 8px; align-items: flex-start; }
+  .p-badge { flex: none; background: #8e1b2a; color: #fff; font-weight: 700; font-size: .82rem; border-radius: 5px; padding: 4px 8px; min-width: 34px; text-align: center; line-height: 1.2; }
+  .p-text { flex: 1; background: #fbecef; border-radius: 5px; padding: 5px 10px; font-weight: 700; font-size: .95rem; line-height: 1.35; }
+  .p-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 1px 14px; margin: 5px 0 0 42px; }
+  .p-o { font-size: .9rem; line-height: 1.4; }
+  .p-o b { color: #8e1b2a; }
+  .p-key { margin-top: 14px; border: 1px solid #8e1b2a; border-radius: 7px; padding: 10px 12px; }
+  .p-key h3 { text-align: center; text-transform: uppercase; color: #8e1b2a; font-size: .95rem; letter-spacing: 1px; margin-bottom: 7px; }
+  .p-key-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px 10px; font-size: .86rem; }
+  .p-key-grid b { color: #8e1b2a; }
+  .p-foot { margin-top: 14px; padding-top: 7px; border-top: 1px solid #8e1b2a; display: flex; justify-content: space-between; gap: 10px; font-size: .72rem; color: #6f6366; flex-wrap: wrap; }
+  .p-foot b { color: #8e1b2a; }
+  @media (max-width: 640px) { .p-opts { grid-template-columns: 1fr; margin-left: 8px; } .p-hdr h2 { font-size: 1.05rem; } .p-hdr .pb { display: none; } }
+
+  @media print {
+    @page { size: A4 portrait; margin: 12mm; }
+    body { background: #fff; }
+    body > *:not(.paper) { display: none !important; }
+    .paper { position: static; display: block; background: #fff; }
+    .paper-bar { display: none !important; }
+    .paper-scroll { overflow: visible; padding: 0; }
+    .p-sheet { box-shadow: none; border-radius: 0; max-width: none; padding: 0; }
+    .p-hdr, .p-badge, .p-text, .p-key { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .p-qs { column-count: 2; column-gap: 10mm; }
+  }
 
   .toast {
     position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 200;
@@ -484,9 +553,10 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
       <div class="qcard">
         <div class="qfix">
           <div class="qtop">
-            <div class="bk"><i class="fa fa-book-open"></i></div>
+            <div class="qnum" id="qLabel">Q1</div>
             <div class="ch"><?= htmlspecialchars($TEST['title'], ENT_QUOTES) ?></div>
             <div class="cnt"><span id="qNow">1</span><span> / <?= $QN ?></span></div>
+            <button class="bmk" id="btnMark" title="Bookmark this question" aria-label="Bookmark"><i class="fa-regular fa-bookmark"></i></button>
           </div>
           <div class="timers">
             <div class="timer" id="tOverall">
@@ -498,26 +568,22 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
               <div><div class="tl">Question Time</div><div class="tv" id="tQuestionVal">01:00</div></div>
             </div>
           </div>
-          <div class="qhead">
-            <div class="qnum" id="qLabel">Question 1</div>
-            <button class="bookmark" id="btnMark"><i class="fa-regular fa-bookmark"></i> <span>Bookmark</span></button>
-          </div>
         </div>
 
         <div class="qmid" id="qScroll">
-          <div class="qtext" id="qText">—</div>
-          <div id="qDead"></div>
-          <div class="opts" id="qOpts"></div>
+          <div class="qmid-in">
+            <div class="qtext" id="qText">—</div>
+            <div id="qDead"></div>
+            <div class="opts" id="qOpts"></div>
+          </div>
         </div>
 
         <div class="qbot">
           <div class="act-row">
+            <button class="btn-ico" id="btnPrev" title="Previous question" aria-label="Previous"><i class="fa fa-arrow-left"></i></button>
             <button class="btn-sm" id="btnClear"><i class="fa fa-eraser"></i> Clear</button>
             <button class="btn-sm grad" id="btnSaveNext">Save &amp; Next <i class="fa fa-arrow-right"></i></button>
-          </div>
-          <div class="act-row two">
-            <button class="btn-sm" id="btnPrev"><i class="fa fa-arrow-left"></i> Previous</button>
-            <button class="btn-sm" id="btnNext">Next <i class="fa fa-arrow-right"></i></button>
+            <button class="btn-ico" id="btnNext" title="Next question" aria-label="Next"><i class="fa fa-arrow-right"></i></button>
           </div>
           <div class="statusbar">
             <span><i class="dot ans"></i> Answered <b id="cAns">0</b></span>
@@ -548,6 +614,7 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
       <div class="pal-body">
         <div class="tab-pane show" id="paneP">
           <div class="pal-grid" id="palGrid"></div>
+          <button class="btn-paper" id="btnPaper"><i class="fa fa-file-lines"></i> View all questions (paper view)</button>
           <div class="pal-note"><i class="fa fa-circle-info"></i><span>Select any question number to go directly to that question. Answered questions can be reviewed and changed at any time before you submit the test.</span></div>
         </div>
         <div class="tab-pane" id="paneI">
@@ -563,6 +630,36 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
             <li><i class="fa fa-paper-plane"></i><span>The test is submitted automatically once the overall timer reaches zero.</span></li>
           </ul>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ ALL QUESTIONS (paper view) ══════════════════ -->
+<div class="paper" id="paperView">
+  <div class="paper-bar">
+    <button id="paperClose"><i class="fa fa-arrow-left"></i> Back</button>
+    <b>All Questions</b>
+    <button id="paperPrint"><i class="fa fa-print"></i> Print / PDF</button>
+  </div>
+  <div class="paper-scroll" id="paperScroll">
+    <div class="p-sheet">
+      <div class="p-hdr">
+        <div class="pl" data-logo></div>
+        <div class="pt">
+          <h2><?= htmlspecialchars($TEST['title'], ENT_QUOTES) ?></h2>
+          <small><?= htmlspecialchars($TEST['subtitle'], ENT_QUOTES) ?></small>
+        </div>
+        <div class="pb"><?= $QN ?> MCQ</div>
+      </div>
+      <div class="p-qs" id="paperQs"></div>
+      <div class="p-key" id="paperKey" style="display:none">
+        <h3>Answer Key</h3>
+        <div class="p-key-grid" id="paperKeyGrid"></div>
+      </div>
+      <div class="p-foot">
+        <span><b>Diploma Wallah</b> — Learn • Practice • Grow</span>
+        <span><?= htmlspecialchars($TEST['title'], ENT_QUOTES) ?></span>
       </div>
     </div>
   </div>
@@ -608,6 +705,7 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
       <button class="btn-sm" id="btnReview"><i class="fa fa-book-open"></i> Review Answers</button>
       <button class="btn-sm grad" id="btnAgain"><i class="fa fa-rotate-right"></i> Try Again</button>
     </div>
+    <button class="btn-ghost" style="margin-top:9px" id="btnPaper2"><i class="fa fa-file-lines"></i> All questions with answer key (PDF view)</button>
     <a class="btn-ghost" style="margin-top:9px" href="<?= htmlspecialchars($TEST['home_url'], ENT_QUOTES) ?>"><i class="fa fa-house"></i> Back to Home</a>
 
     <div class="rev" id="revBox"></div>
@@ -654,11 +752,32 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
     } catch (e) { return null; }
   }
 
-  function show(id) {
+  var curScreen = "scrStart";
+  function paint(id) {
+    curScreen = id;
     [].forEach.call(document.querySelectorAll(".screen"), function (s) { s.classList.toggle("show", s.id === id); });
     document.body.classList.toggle("mode-test", id === "scrTest");
     if (id !== "scrTest") window.scrollTo(0, 0);
   }
+  /* har screen/overlay ko history me rakho taki phone ka Back app ke andar hi chale */
+  function show(id, replace) {
+    paint(id);
+    var st2 = { scr: id, ov: null };
+    try { replace ? history.replaceState(st2, "") : history.pushState(st2, ""); } catch (e) {}
+  }
+  function pushOverlay(name, replace) {
+    try {
+      var st2 = { scr: curScreen, ov: name };
+      replace ? history.replaceState(st2, "") : history.pushState(st2, "");
+    } catch (e) {}
+  }
+  window.addEventListener("popstate", function (e) {
+    var s2 = e.state || { scr: "scrStart", ov: null };
+    if (s2.scr !== curScreen) paint(s2.scr);
+    setSheet(s2.ov === "sheet");
+    setPaper(s2.ov === "paper");
+  });
+  try { history.replaceState({ scr: "scrStart", ov: null }, ""); } catch (e) {}
 
   /* ---------- start ---------- */
   (function () {
@@ -692,10 +811,8 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
       if (wasRunning) st.qt[st.i]--;
       paintTimers();
       if (st.left <= 0) { finish("Time over — the test was submitted automatically."); return; }
-      if (wasRunning && st.qt[st.i] <= 0) {
-        renderQ();
-        if (st.i < T.count - 1) { go(st.i + 1); toast("Time up for this question."); }
-      }
+      /* time khatam hone par sirf batao — na aage bhejo, na option band karo */
+      if (wasRunning && st.qt[st.i] <= 0) { renderQ(); toast("Time is up for this question."); }
       if (st.left % 5 === 0) save();
     }, 1000);
     paintTimers();
@@ -713,15 +830,15 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
   function renderQ() {
     var i = st.i, q = T.questions[i];
     $("qNow").textContent = i + 1;
-    $("qLabel").textContent = "Question " + (i + 1);
+    $("qLabel").textContent = "Q" + (i + 1);
     $("qText").textContent = q.q;
 
-    var dead = PER_Q && st.qt[i] <= 0;
-    $("qDead").innerHTML = dead ? '<div class="timeover"><i class="fa fa-hourglass-end"></i> Time is up for this question</div>' : "";
+    var over = PER_Q && st.qt[i] <= 0;
+    $("qDead").innerHTML = over ? '<div class="timeover"><i class="fa fa-hourglass-end"></i> Time is up for this question — you can still answer it</div>' : "";
 
     var html = "";
     for (var k = 0; k < q.o.length; k++) {
-      html += '<button class="opt' + (st.ans[i] === k ? " sel" : "") + (dead ? " dead" : "") + '" data-k="' + k + '">' +
+      html += '<button class="opt' + (st.ans[i] === k ? " sel" : "") + '" data-k="' + k + '">' +
               '<span class="k">' + LETTERS[k] + '</span><span class="v"></span></button>';
     }
     $("qOpts").innerHTML = html;
@@ -729,9 +846,8 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
 
     var mk = $("btnMark");
     mk.classList.toggle("on", !!st.mark[i]);
-    mk.innerHTML = st.mark[i]
-      ? '<i class="fa-solid fa-bookmark"></i> <span>Bookmarked</span>'
-      : '<i class="fa-regular fa-bookmark"></i> <span>Bookmark</span>';
+    mk.innerHTML = st.mark[i] ? '<i class="fa-solid fa-bookmark"></i>' : '<i class="fa-regular fa-bookmark"></i>';
+    mk.title = st.mark[i] ? "Remove bookmark" : "Bookmark this question";
 
     $("btnPrev").disabled = i === 0;
     $("btnNext").disabled = i === T.count - 1;
@@ -784,8 +900,13 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
     }
     $("palGrid").innerHTML = h;
   }
-  function openSheet(tab) { paintPalette(); switchTab(tab); $("sheet").classList.add("show"); $("scrim").classList.add("show"); }
-  function closeSheet() { $("sheet").classList.remove("show"); $("scrim").classList.remove("show"); }
+  function setSheet(on) { $("sheet").classList.toggle("show", !!on); $("scrim").classList.toggle("show", !!on); }
+  function openSheet(tab) { paintPalette(); switchTab(tab); setSheet(true); pushOverlay("sheet"); }
+  function closeSheet() {
+    if (!$("sheet").classList.contains("show")) return;
+    setSheet(false);
+    if (history.state && history.state.ov === "sheet") history.back();
+  }
   function switchTab(which) {
     [].forEach.call(document.querySelectorAll(".tab"), function (t) { t.classList.toggle("on", t.getAttribute("data-tab") === which); });
     $("paneP").classList.toggle("show", which === "pal");
@@ -795,7 +916,7 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
   $("btnInstr").addEventListener("click", function () { openSheet("ins"); });
   $("btnSheetClose").addEventListener("click", closeSheet);
   $("scrim").addEventListener("click", closeSheet);
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeSheet(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { closePaper(); closeSheet(); } });
   [].forEach.call(document.querySelectorAll(".tab"), function (t) {
     t.addEventListener("click", function () { switchTab(t.getAttribute("data-tab")); });
   });
@@ -803,6 +924,43 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
     var b = e.target.closest(".pal-btn"); if (!b) return;
     closeSheet(); go(parseInt(b.getAttribute("data-i"), 10));
   });
+
+  /* ---------- all questions (paper view) ---------- */
+  function buildPaper() {
+    var h = "", i, k;
+    for (i = 0; i < T.count; i++) {
+      var q = T.questions[i];
+      h += '<div class="p-q"><div class="p-qh"><span class="p-badge">Q' + (i + 1) + '</span>' +
+           '<span class="p-text">' + esc(q.q) + "</span></div><div class=\"p-opts\">";
+      for (k = 0; k < q.o.length; k++) h += '<span class="p-o"><b>(' + LETTERS[k].toLowerCase() + ")</b> " + esc(q.o[k]) + "</span>";
+      h += "</div></div>";
+    }
+    $("paperQs").innerHTML = h;
+
+    /* answer key sirf test khatam hone ke baad */
+    var done = !!(st && st.done);
+    $("paperKey").style.display = done ? "" : "none";
+    if (done) {
+      var g = "";
+      for (i = 0; i < T.count; i++) g += "<span>" + (i + 1) + " &ndash; <b>" + LETTERS[T.questions[i].a] + "</b></span>";
+      $("paperKeyGrid").innerHTML = g;
+    }
+  }
+  function setPaper(on) { $("paperView").classList.toggle("show", !!on); }
+  function openPaper() {
+    buildPaper(); setPaper(true); $("paperScroll").scrollTop = 0;
+    /* palette se khula hai to usi entry ko replace karo — Back seedha test par le jaye */
+    pushOverlay("paper", !!(history.state && history.state.ov === "sheet"));
+  }
+  function closePaper() {
+    if (!$("paperView").classList.contains("show")) return;
+    setPaper(false);
+    if (history.state && history.state.ov === "paper") history.back();
+  }
+  $("btnPaper").addEventListener("click", function () { setSheet(false); openPaper(); });
+  $("btnPaper2").addEventListener("click", function () { openPaper(); });
+  $("paperClose").addEventListener("click", closePaper);
+  $("paperPrint").addEventListener("click", function () { window.print(); });
 
   var toastT = null;
   function toast(msg) {
@@ -818,7 +976,7 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
     if (st.done) return;
     st.done = true;
     if (tick) clearInterval(tick);
-    closeSheet(); clearSaved();
+    setSheet(false); setPaper(false); clearSaved();
 
     var ok = 0, no = 0, sk = 0, i;
     for (i = 0; i < T.count; i++) {
@@ -847,7 +1005,7 @@ $num = function ($v) { return rtrim(rtrim(number_format((float)$v, 2, '.', ''), 
     $("sumGrid").innerHTML = g;
 
     buildReview();
-    show("scrResult");
+    show("scrResult", true);
   }
   function buildReview() {
     var h = "";
