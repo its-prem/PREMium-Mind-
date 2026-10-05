@@ -38,8 +38,11 @@ D2D MCQ TEST (student-facing online test, no login, no DB):
   Time khatam hone par question band nahi hota — sirf notice aata hai, student
   tab bhi answer kar sakta hai aur khud Next dabata hai.
   3-line menu me "View all questions" = saare MCQ ek hi scroll me, MCQ sheet
-  jaisi print/PDF layout me (Print / PDF button se PDF bana sakte ho).
-  Answer key us view me sirf test submit hone ke baad dikhti hai.
+  jaisi layout me. Wahan se bhi option select kar sakte ho — wahi answer
+  test me bhi lag jata hai. Answer key sirf submit hone ke baad dikhti hai.
+  Math: question/option/explanation me $...$ ke andar LaTeX chalta hai, jaise
+  $\lambda = rac{h}{p}$, $1.67 	imes 10^{-27}$, $n^2$, $lpha$.
+  Logo page ke andar bhi embedded hai, isliye file na ho tab bhi dikhega.
   home_url = result page ke "Back to Home" button ka link.
 
 LOGO (sab pages isi file ko use karte hain):
