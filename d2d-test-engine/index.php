@@ -969,7 +969,14 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
   .bmk { width: 34px; height: 34px; flex: none; border-radius: 9px; display: grid; place-items: center; color: var(--muted); background: #f1f5f9; font-size: .9rem; }
   .bmk.on { color: var(--crimson); background: var(--tint); }
 
-  .timers { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 11px; }
+  .timers { margin-top: 9px; }
+  .timer.q { position: relative; display: flex; align-items: center; gap: 9px; padding: 7px 11px 10px; border-radius: 10px; overflow: hidden; }
+  .tq-ic { flex: none; color: var(--crimson); font-size: .88rem; }
+  .tq-l { flex: 1; min-width: 0; font-size: .72rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .timer.q .tv { flex: none; font-size: 1.02rem; }
+  .tq-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: #f3dde1; }
+  .tq-bar i { display: block; height: 100%; width: 100%; background: var(--grad); transition: width 1s linear; }
+  .timer.q.warn .tq-bar i { background: #e11d48; }
   .nav-time { flex: none; display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.2); padding: 6px 12px; border-radius: 99px; font-weight: 700; font-size: .92rem; font-variant-numeric: tabular-nums; letter-spacing: .5px; }
   .nav-time i { font-size: .82rem; opacity: .9; }
   .nav-time.warn { background: #fff; color: #8e1b2a; border-color: #fff; animation: pulse 1s infinite; }
@@ -984,7 +991,7 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
   @keyframes pulse { 50% { opacity: .5; } }
   .timer.off { opacity: .45; }
 
-  .qtext { font-size: 1.02em; font-weight: 600; line-height: 1.5; margin: 0 0 2px; overflow-wrap: anywhere; }
+  .qtext { font-size: 1.02em; font-weight: 600; line-height: 1.5; margin: 0 0 2px; overflow-wrap: break-word; word-break: break-word; }
   /* lamba question ho to niche fade dikhe taki pata chale aur content hai */
   .qmid { position: relative; scrollbar-width: thin; }
   .qmid.more::after { content: ""; position: sticky; bottom: 0; left: 0; display: block; height: 26px; margin-top: -26px; pointer-events: none;
@@ -993,7 +1000,7 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
   .opts { display: flex; flex-direction: column; gap: 9px; margin: 11px 0 2px; }
   .opt { display: flex; align-items: center; gap: 13px; width: 100%; text-align: left; background: #fff; border: 1.5px solid var(--line-2); border-radius: 13px; padding: 12px 13px; transition: border-color .15s var(--ease), background .15s var(--ease); }
   .opt .k { width: 33px; height: 33px; flex: none; border-radius: 10px; background: #f1f5f9; color: #475569; font-weight: 700; display: grid; place-items: center; font-size: .88rem; }
-  .opt .v { flex: 1; min-width: 0; font-size: .94em; font-weight: 500; overflow-wrap: anywhere; }
+  .opt .v { flex: 1; min-width: 0; font-size: .94em; font-weight: 500; overflow-wrap: break-word; word-break: break-word; }
   .opt.sel { border-color: var(--purple-2); background: var(--tint); }
   .opt.sel .k { background: var(--grad); color: #fff; }
   .opt.sel .v { font-weight: 600; }
@@ -1105,13 +1112,19 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
   .rev-q.ok { border-left-color: var(--green); }
   .rev-q.no { border-left-color: var(--red); }
   .rev-q.sk { border-left-color: #94a3b8; }
-  .rev-q .rq { font-size: .92rem; font-weight: 600; line-height: 1.45; }
+  .rev-q .rq { font-size: .92rem; font-weight: 600; line-height: 1.45; overflow-wrap: break-word; word-break: break-word; }
   .rev-q .rq span { color: var(--purple); }
-  .rev-a { display: flex; gap: 8px; align-items: flex-start; font-size: .83rem; margin-top: 8px; }
-  .rev-a .tag { flex: none; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 2px 8px; border-radius: 99px; margin-top: 2px; }
+  .rev-a { display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; align-items: start; font-size: .83rem; margin-top: 8px; }
+  .rev-a .tag { grid-column: 1; align-self: start; font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 2px 8px; border-radius: 99px; margin-top: 2px; white-space: nowrap; }
+  .rev-a > span:last-child { min-width: 0; overflow-wrap: break-word; word-break: break-word; }
+  @media (max-width: 420px) {
+    .rev-a { grid-template-columns: 1fr; gap: 3px; }
+    .rev-a .tag { justify-self: start; }
+    .rev-q { padding: 12px 12px; }
+  }
   .rev-a.you .tag { background: #fdeef2; color: var(--red); }
   .rev-a.you.ok .tag, .rev-a.cor .tag { background: var(--green-bg); color: var(--green); }
-  .rev-exp { margin-top: 9px; padding-top: 9px; border-top: 1px dashed var(--line-2); font-size: .8rem; color: var(--muted); line-height: 1.55; }
+  .rev-exp { margin-top: 9px; padding-top: 9px; border-top: 1px dashed var(--line-2); font-size: .8rem; color: var(--muted); line-height: 1.55; overflow-wrap: break-word; word-break: break-word; }
 
   @media (max-height: 760px), (max-width: 400px) {
     .qfix { padding: 10px 12px 0; }
@@ -1143,8 +1156,17 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
   .paper-bar b { flex: 1; min-width: 0; font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; text-align: center; }
   .paper-bar button { color: #fff; background: rgba(255,255,255,.14); border-radius: 8px; padding: 8px 12px; font-size: .8rem; font-weight: 600; display: flex; align-items: center; gap: 7px; cursor: pointer; border: none; }
   .paper-bar button:active { background: rgba(255,255,255,.26); }
+  .paper-bar b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .paper-bar .paper-time { font-size: .86rem; padding: 6px 11px; }
-  @media (max-width: 680px) { .paper-bar .paper-time { font-size: .78rem; padding: 5px 9px; } .paper-bar .paper-time i { display: none; } }
+  .paper-bar .pb-icon { background: #15803d; border: 1px solid #16a34a; width: 36px; height: 36px; padding: 0; display: grid; place-items: center; font-size: .95rem; flex: none; }
+  @media (max-width: 680px) {
+    .paper-bar { gap: 6px; }
+    .paper-bar .paper-time { font-size: .76rem; padding: 5px 8px; }
+    .paper-bar .paper-time i { display: none; }
+    .paper-bar .pb-icon { width: 32px; height: 32px; font-size: .86rem; }
+    .paper-bar button { padding: 7px 9px; }
+  }
+  @media (max-width: 400px) { .paper-bar b { font-size: .76rem; letter-spacing: .4px; } }
   
   .paper-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 14px 10px 30px; }
 
@@ -1163,12 +1185,13 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
   .p-q { page-break-inside: avoid; break-inside: avoid; margin: 0 0 15px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 10px; }
   .p-qh { display: flex; gap: 8px; align-items: flex-start; }
   .p-badge { flex: none; background: #8e1b2a; color: #fff; font-weight: 700; font-size: .8rem; border-radius: 5px; padding: 3px 6px; min-width: 32px; text-align: center; line-height: 1.2; }
-  .p-text { flex: 1; background: #fbecef; border-radius: 5px; padding: 3px 8px; font-weight: 700; font-size: .9rem; line-height: 1.35; }
+  .p-text { flex: 1; min-width: 0; background: #fbecef; border-radius: 5px; padding: 3px 8px; font-weight: 700; font-size: .9rem; line-height: 1.35; overflow-wrap: break-word; word-break: break-word; }
   
   /* Reduced gap and margin for options */
   .p-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 10px; margin: 4px 0 0 38px; }
   .p-o { font-size: .85rem; line-height: 1.3; text-align: left; border: 1px solid transparent; border-radius: 4px; padding: 2px 5px; display: flex; gap: 6px; align-items: flex-start; font-family: inherit; color: inherit; cursor: pointer; background: none; }
   .p-o b { color: #8e1b2a; flex: none; }
+  .p-o > span { min-width: 0; overflow-wrap: break-word; word-break: break-word; }
   .p-o:hover { background: #fbecef; }
   .p-o.sel { background: #fbecef; border-color: #8e1b2a; font-weight: 700; }
   .p-o.sel b { color: #7d1524; }
@@ -1273,7 +1296,9 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
 
   /* math bits */
   /* math ab bilkul baki text jaisa — sirf structure (fraction, sup/sub) alag */
-  .mi { font-family: inherit; font-size: 1em; font-style: normal; white-space: nowrap; }
+  .mi { font-family: inherit; font-size: 1em; font-style: normal; }
+  /* fraction/root jaise tukde beech se na toote, baaki expression wrap ho jaye */
+  .frac, .rad, .vec, .nuc { white-space: nowrap; }
   .mi .fn, .mi b { font-style: normal; }
   .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.05; margin: 0 .12em; font-size: .92em; font-style: normal; }
   .frac > span { padding: 0 .22em; }
@@ -1424,8 +1449,10 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
           </div>
           <div class="timers" id="timerRow">
             <div class="timer q" id="tQuestion">
-              <div class="ti"><i class="fa fa-stopwatch"></i></div>
-              <div><div class="tl">Question Time</div><div class="tv" id="tQuestionVal">01:00</div></div>
+              <i class="fa fa-stopwatch tq-ic"></i>
+              <span class="tq-l">Question Time</span>
+              <span class="tv" id="tQuestionVal">01:00</span>
+              <span class="tq-bar"><i id="qBar"></i></span>
             </div>
           </div>
         </div>
@@ -1503,7 +1530,7 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
     <b id="paperTitle" style="text-align:center;">Questions</b>
     <div class="nav-time paper-time" id="paperTime" title="Overall time left"><i class="fa fa-hourglass-half"></i> <span id="paperTimeVal">00:00</span></div>
     <!-- 🔥 NEW PRINT BUTTON 🔥 -->
-    <button id="paperPrint" style="display:none; background:#15803d; border:1px solid #16a34a;"><i class="fa-solid fa-print"></i> Print / Save PDF</button>
+    <button id="paperPrint" class="pb-icon" title="Print / Save PDF" aria-label="Print or save as PDF" style="display:none;"><i class="fa-solid fa-print"></i></button>
   </div>
   <div class="paper-scroll" id="paperScroll">
     <div class="p-sheet">
@@ -1713,7 +1740,7 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
     }, 1000);
     paintTimers();
   }
-  function paintTimers() {
+  function paintTimers(snap) {
     /* overall countdown ab navbar ke right me chalta hai */
     $("navTimeVal").textContent = fmt(st.left);
     $("navTime").classList.toggle("warn", st.left <= 60);
@@ -1723,6 +1750,10 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
     var box = $("tQuestion");
     $("tQuestionVal").textContent = fmt(st.qt[st.i]);
     box.classList.toggle("warn", st.qt[st.i] <= 10);
+    /* bar smooth girta hai; question badalne par turant set ho (animate na kare) */
+    var bar = $("qBar"), pct = Math.max(0, Math.min(100, (st.qt[st.i] / T.perQSec) * 100));
+    if (snap) { bar.style.transition = "none"; bar.style.width = pct + "%"; void bar.offsetWidth; bar.style.transition = ""; }
+    else bar.style.width = pct + "%";
   }
 
   /* ---------- question ---------- */
@@ -1754,7 +1785,7 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
       ? 'Save &amp; Finish <i class="fa fa-flag-checkered"></i>'
       : 'Save &amp; Next <i class="fa fa-arrow-right"></i>';
 
-    paintTimers(); paintCounts(); paintPalette();
+    paintTimers(true); paintCounts(); paintPalette();
     setTimeout(function () { fitQuestion(); markScrollable(); }, 0);
   }
   function paintCounts() {
