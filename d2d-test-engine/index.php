@@ -1205,18 +1205,25 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
   .p-key-grid b { color: #8e1b2a; }
   
   /* 🔥 FOOTER UPDATES 🔥 */
-  .p-foot { padding: 12px 14px; border-top: 2px solid #8e1b2a; display: flex; justify-content: space-between; align-items: center; gap: 10px 14px; font-size: .78rem; color: #1a1a1a; flex-wrap: wrap; background: #fffafb; border-radius: 0 0 8px 8px; }
+  .p-foot { padding: 10px 13px; border-top: 2px solid #8e1b2a; display: flex; justify-content: space-between; align-items: center; gap: 10px; color: #1a1a1a; flex-wrap: nowrap; background: #fffafb; border-radius: 0 0 8px 8px; }
   .p-foot .pf-brand { display: flex; align-items: center; gap: 8px; min-width: 0; }
-  .p-foot .pf-brand .pf-logo { width: 26px; height: 26px; flex: none; border-radius: 50%; overflow: hidden; background: #fff; }
-  .p-foot .pf-brand b { font-family: 'Oswald', sans-serif; letter-spacing: 1px; color: #8e1b2a; font-size: .86rem; text-transform: uppercase; }
-  .p-foot .pf-brand small { display: block; font-size: .64rem; letter-spacing: 1.4px; text-transform: uppercase; color: #7a6f71; font-family: 'Poppins', sans-serif; }
-  .p-foot .pf-wa { display: inline-flex; align-items: center; gap: 8px; background: #e8f7ee; border: 1px solid #bfe6cc; color: #15803d; border-radius: 99px; padding: 6px 13px; font-family: 'Poppins', sans-serif; font-size: .74rem; font-weight: 600; white-space: nowrap; }
-  .p-foot .pf-wa i { font-size: 1rem; color: #25D366; }
-  .p-foot .pf-wa b { color: #0f172a; letter-spacing: .3px; }
-  @media (max-width: 680px) {
-    .p-foot { flex-direction: column; text-align: center; gap: 9px; padding: 12px 10px; }
-    .p-foot .pf-brand { flex-direction: column; gap: 3px; }
-    .p-foot .pf-wa { font-size: .78rem; padding: 7px 15px; }
+  .p-foot .pf-brand .pf-logo { width: 28px; height: 28px; flex: none; border-radius: 50%; overflow: hidden; background: #fff; }
+  .p-foot .pf-tx { min-width: 0; line-height: 1.2; }
+  .p-foot .pf-tx b { display: block; font-family: 'Oswald', sans-serif; letter-spacing: 1px; color: #8e1b2a; font-size: .84rem; text-transform: uppercase; white-space: nowrap; }
+  .p-foot .pf-tx small { display: block; font-size: .58rem; letter-spacing: 1.3px; text-transform: uppercase; color: #8a7d80; font-family: 'Poppins', sans-serif; white-space: nowrap; }
+  .p-foot .pf-wa { flex: none; display: inline-flex; align-items: center; gap: 8px; background: #e8f7ee; border: 1px solid #bfe6cc; border-radius: 99px; padding: 5px 13px 5px 10px; font-family: 'Poppins', sans-serif; text-decoration: none; }
+  .p-foot .pf-wa i { font-size: 1.15rem; color: #25D366; flex: none; }
+  .p-foot .pf-wa .pf-wa-tx { line-height: 1.2; text-align: left; }
+  .p-foot .pf-wa small { display: block; font-size: .56rem; letter-spacing: 1.1px; text-transform: uppercase; color: #15803d; font-weight: 700; white-space: nowrap; }
+  .p-foot .pf-wa b { display: block; font-size: .8rem; color: #0f172a; letter-spacing: .4px; white-space: nowrap; }
+  @media (max-width: 440px) {
+    .p-foot { padding: 9px 10px; gap: 8px; }
+    .p-foot .pf-brand .pf-logo { width: 24px; height: 24px; }
+    .p-foot .pf-tx b { font-size: .74rem; letter-spacing: .6px; }
+    .p-foot .pf-tx small { display: none; }
+    .p-foot .pf-wa { padding: 4px 11px 4px 8px; gap: 6px; }
+    .p-foot .pf-wa i { font-size: 1rem; }
+    .p-foot .pf-wa b { font-size: .74rem; }
   }
   
   /* ---- paper view: phone ---- */
@@ -1566,10 +1573,11 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
               <div class="p-foot">
                 <span class="pf-brand">
                   <span class="pf-logo" data-logo></span>
-                  <span><b>Diploma Wallah</b><small>Learn &bull; Practice &bull; Grow</small></span>
+                  <span class="pf-tx"><b>Diploma Wallah</b><small>Learn &bull; Practice &bull; Grow</small></span>
                 </span>
                 <a class="pf-wa" href="https://wa.me/919153950552" target="_blank" rel="noopener">
-                  <i class="fa-brands fa-whatsapp"></i> <span>Join D2D Batch &mdash; <b>9153950552</b></span>
+                  <i class="fa-brands fa-whatsapp"></i>
+                  <span class="pf-wa-tx"><small>Join D2D Batch</small><b>9153950552</b></span>
                 </a>
               </div>
             </td>
