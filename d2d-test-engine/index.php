@@ -1204,7 +1204,6 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
     .p-hdr .pl { width: 40px; height: 40px; }
     .p-hdr h2 { font-size: 1.1rem; }
     .p-hdr small { font-size: .62rem; letter-spacing: 1.4px; }
-    .p-hdr .pb { width: 100%; text-align: center; font-size: .72rem; padding: 5px 10px; }
     .p-qs { padding: 12px 11px 0; }
     .p-q { margin-bottom: 13px; padding-bottom: 9px; }
     .p-badge { font-size: .78rem; min-width: 30px; padding: 3px 5px; }
@@ -1259,7 +1258,8 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
       /* Make sure print table breaks correctly */
       .print-table { width: 100%; border: none; border-collapse: collapse; }
       /* questions do column me (notes sheet jaise) */
-      .p-qs { column-count: 2; column-gap: 9mm; padding: 10px 0 0 !important; }
+      /* do column, beech me divider line (notes sheet jaisi) */
+      .p-qs { column-count: 2; column-gap: 9mm; column-rule: .35mm solid #b9b0b2; padding: 10px 0 0 !important; }
       .p-q { break-inside: avoid; page-break-inside: avoid; margin-bottom: 4mm; }
       .p-opts { grid-template-columns: 1fr !important; margin-left: 10mm !important; }
       .p-o { border: none !important; background: none !important; }
@@ -1520,8 +1520,6 @@ $num = function ($v) { return rtrim(rtrim(number_format((float) $v, 2, '.', ''),
                   <h2><?= htmlspecialchars($TEST['title'], ENT_QUOTES) ?></h2>
                   <small><?= htmlspecialchars($TEST['subtitle'], ENT_QUOTES) ?></small>
                 </div>
-                <!-- 🔥 HEADER RIGHT: MCQ + TIMING 🔥 -->
-                <div class="pb"><?= $QN ?> MCQ &nbsp;|&nbsp; <i class="fa-regular fa-clock"></i> <?= $TEST['total_minutes'] ?> Mins</div>
               </div>
               
               <div class="p-qs" id="paperQs"></div>
