@@ -271,6 +271,16 @@ $pmAdminEmail = pm_auth_admin_email();
   .imgc .ins.again { background: #fff; color: var(--text-main); border: 1px solid var(--line-2); }
   .imgc .ins.again:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
   .imgs-empty { color: var(--text-muted); font-size: .82rem; padding: 10px 6px; text-align: center; }
+  /* notes me likhe "image: name" slots — box pehle se taiyar, bas dropdown se image chuno */
+  .slots { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .slotc { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px dashed var(--primary); border-radius: 8px; padding: 9px 10px; }
+  .slotc .sic { width: 34px; height: 34px; flex: none; border-radius: 7px; background: var(--primary-light); color: var(--primary); display: grid; place-items: center; font-size: .9rem; }
+  .slotc .sbd { flex: 1; min-width: 0; }
+  .slotc .sbd b { display: block; font-size: .8rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .slotc .sbd small { display: block; font-size: .68rem; color: var(--text-muted); }
+  .slotc select { flex: 0 0 150px; max-width: 150px; padding: 6px 8px; font-size: .76rem; }
+  .slots-head { font-family: 'Oswald', sans-serif; font-size: .72rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--primary); margin-bottom: 7px; display: flex; align-items: center; gap: 7px; }
+  .slots-none { color: var(--text-muted); font-size: .74rem; }
 
   .olist { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; padding-right: 6px; }
   .oitem { display: flex; gap: 10px; width: 100%; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--line); border-left: 4px solid transparent; border-radius: 6px; color: var(--text-main); font-size: .82rem; text-align: left; cursor: pointer; transition: all .2s; }
@@ -772,6 +782,10 @@ $pmAdminEmail = pm_auth_admin_email();
             <div class="acc-body">
               <input type="file" id="imgFile" accept="image/*" multiple hidden>
               <div class="drop" id="imgDrop"><b><i class="fa fa-plus"></i> Add image</b> — click karo ya photo yahan drop karo<br><span style="font-size:.7rem">PNG / JPG / screenshot · auto-compress hoti hai</span></div>
+              <div id="slotBox" style="display:none">
+                <div class="slots-head"><i class="fa fa-crop-simple"></i> Notes ke image slots <span class="chip" id="slotCount">0</span></div>
+                <div class="slots" id="slotList"></div>
+              </div>
               <div class="imgs" id="imgList"></div>
               <p style="margin-top:8px">Har image ke niche <b>"Insert after"</b> dropdown se position chuno → <b>Insert</b>. Text me line banti hai: <code style="color:var(--primary)">[img: name | 60% | center | caption]</code> — ise kahin bhi move kar sakte ho. Poori page width ke liye upar <code style="color:var(--primary)">[Wide]</code> likho.</p>
             </div>
@@ -1227,14 +1241,17 @@ $pmAdminEmail = pm_auth_admin_email();
       '<circle cx="12" cy="40" r="3.1" fill="#fff" stroke="none"/>' +
       '<circle cx="41" cy="52" r="3.1" fill="#fff" stroke="none"/>',
     chem:
-      '<path d="M25 7 h14"/>' +
-      '<path d="M28.5 7 v15.5 L14.5 47.5 a4.5 4.5 0 0 0 3.9 6.8 h27.2 a4.5 4.5 0 0 0 3.9 -6.8 L35.5 22.5 V7"/>' +
-      '<path d="M20.6 38 q3.4 -2.6 6.8 0 t6.8 0 t6.8 0 l7 12.4 a3 3 0 0 1 -2.6 4.4 h-29.2 a3 3 0 0 1 -2.6 -4.4 z" fill="#fff" stroke="none"/>' +
-      '<circle cx="25" cy="47" r="2.4" fill="#8e1b2a" stroke="none"/>' +
-      '<circle cx="35" cy="50" r="1.7" fill="#8e1b2a" stroke="none"/>' +
-      '<circle cx="41" cy="45.5" r="2.1" fill="#8e1b2a" stroke="none"/>' +
-      '<circle cx="42" cy="9" r="3.4" fill="#fff" stroke="none"/>' +
-      '<circle cx="35" cy="3.6" r="2.1" fill="#fff" stroke="none"/>'
+      '<path d="M25.5 6.5 h13"/>' +
+      '<path d="M28.8 7 v15.4 L14.6 47.6 a5 5 0 0 0 4.3 7.4 h26.2 a5 5 0 0 0 4.3 -7.4 L35.2 22.4 V7"/>' +
+      '<path d="M19.7 38.5 q3.1 -2.7 6.15 0 t6.15 0 t6.15 0 t6.15 0 L49.4 47.6 a5 5 0 0 1 -4.3 7.4 ' +
+        'H18.9 a5 5 0 0 1 -4.3 -7.4 Z" fill="#fff" stroke="none"/>' +
+      '<circle cx="24.6" cy="47.2" r="2.3" fill="#8e1b2a" stroke="none"/>' +
+      '<circle cx="33" cy="50.3" r="1.7" fill="#8e1b2a" stroke="none"/>' +
+      '<circle cx="40" cy="45.8" r="2" fill="#8e1b2a" stroke="none"/>' +
+      '<g stroke-width="1.5" opacity=".8"><path d="M24.8 31.5 h3.4"/><path d="M22.6 35.4 h3.4"/></g>' +
+      '<circle cx="41.6" cy="9.4" r="3.2" fill="#fff" stroke="none"/>' +
+      '<circle cx="35.2" cy="3.4" r="2" fill="#fff" stroke="none"/>' +
+      '<circle cx="46.6" cy="2.8" r="1.4" fill="#fff" stroke="none"/>'
   };
   function iconSvg(kind, cls) {
     var art = ICON_ART[kind] || ICON_ART.physics;
@@ -1510,7 +1527,7 @@ $pmAdminEmail = pm_auth_admin_email();
     var pages = paginate(buildNodes(blocks));
     pv.scrollTop = Math.min(keepPv, Math.max(0, pv.scrollHeight - pv.clientHeight));
     if (keepWin) window.scrollTo(0, Math.min(keepWin, Math.max(0, document.documentElement.scrollHeight - window.innerHeight)));
-    renderOutline(blocks); refreshPosSelects(); syncImgCards();
+    renderOutline(blocks); refreshPosSelects(); syncImgCards(); renderSlots();
     var c = { h1: 0, h2: 0, formula: 0, table: 0, callout: 0 }; blocks.forEach(function (b) { if (c.hasOwnProperty(b.type)) c[b.type]++; });
     metaEl.textContent = c.h1 + " sections · " + c.h2 + " sub · " + c.callout + " boxes · " + c.formula + " formulas · " + c.table + " tables → " + pages + " page" + (pages === 1 ? "" : "s");
     setStatus(blocks.length ? "Rendered on " + pages + " A4 page" + (pages === 1 ? "" : "s") + ". Print / PDF ready." : "Paste notes to begin.");
@@ -2268,8 +2285,32 @@ $pmAdminEmail = pm_auth_admin_email();
   }
   $("imgList").addEventListener("mousedown", function (e) { var sel = e.target.closest(".imgPos"); if (sel) fillPosSelect(sel); }, true);
   $("imgList").addEventListener("focusin", function (e) { var sel = e.target.closest(".imgPos"); if (sel) fillPosSelect(sel); });
+  /** har "image: name" slot ka apna box — dropdown se image chuno, wahi slot bhar jata hai */
+  function renderSlots() {
+    var sl = imageSlots(), box = $("slotBox"), host = $("slotList");
+    $("slotCount").textContent = sl.length;
+    if (!sl.length) { box.style.display = "none"; host.innerHTML = ""; return; }
+    box.style.display = "";
+    var opts = images.length
+      ? '<option value="">Image chuno…</option>' + images.map(function (im) { return '<option value="' + esc(im.name) + '">' + esc(im.name) + "</option>"; }).join("")
+      : '<option value="">Pehle image add karo</option>';
+    host.innerHTML = sl.map(function (x) {
+      return '<div class="slotc" data-line="' + x.line + '">' +
+        '<span class="sic"><i class="fa fa-image"></i></span>' +
+        '<div class="sbd"><b title="' + esc(x.name) + '">' + esc(x.name) + "</b><small>line " + (x.line + 1) + "</small></div>" +
+        '<select class="inp slotPick"' + (images.length ? "" : " disabled") + ">" + opts + "</select></div>";
+    }).join("");
+  }
+  $("slotList").addEventListener("change", function (e) {
+    var sel = e.target.closest(".slotPick"); if (!sel || !sel.value) return;
+    var row = sel.closest(".slotc"), line = parseInt(row.getAttribute("data-line"), 10);
+    putImage(sel.value, "slot:" + line, "60%", "center", "");
+    toast("Image slot me lag gayi");
+    renderImages();
+  });
   function renderImages() {
     var host = $("imgList"); $("imgCount").textContent = images.length;
+    renderSlots();
     if (!images.length) { host.innerHTML = '<div class="imgs-empty">Abhi koi image nahi. Upar se add karo.</div>'; return; }
     host.innerHTML = images.map(function (im, k) {
       var hit = findImgTag(im.name), tg = hit && hit.tag;
@@ -2437,6 +2478,11 @@ $pmAdminEmail = pm_auth_admin_email();
     "| Col A | Col B |            (table — pehli row header)",
     "[Banner] Table ka title      (table se theek pehle)",
     "",
+    "HIGHLIGHT COLOUR — dono alag rakhna",
+    "%%keyword%%   = BLUE   — notes ke beech me har important term / keyword iske andar",
+    "==keyword==   = YELLOW — sirf aakhir wale 'Quick Revision' section me",
+    "Baaki colour (^^green^^ , !!pink!! , ::orange::) sirf tab jab sach me zarurat ho.",
+    "",
     "MATH — ye sabse zaroori hai, STANDARD LaTeX hi likhna",
     "Har formula $...$ ke andar. Unit aur shabd $ ke BAHAR rakho: $v = 20$ m/s",
     "1. Fraction HAMESHA do braces ke saath: \\frac{a}{b}",
@@ -2471,6 +2517,7 @@ $pmAdminEmail = pm_auth_admin_email();
     "Notes ke sabse end me ek section do:  ## Quick Revision",
     "Usme 5-8 chhote bullet points ho (ek line ke), aur har point me sabse important word ya",
     "formula ko ==aise== highlight karo — ye yellow highlighter me dikhega.",
+    "(Yellow sirf yahin use karna — notes ke beech wale keyword blue %%...%% me hi rahenge.)",
     "Example:  - Work done ka formula ==$W = Fs\\cos\\theta$== hota hai",
     "",
     "YE MAT KARNA",
@@ -2482,7 +2529,7 @@ $pmAdminEmail = pm_auth_admin_email();
     "STYLE",
     "- Hinglish me likho (Hindi + English mix), jaise class me padhate hain.",
     "- Har definition, formula aur difference zaroor cover karo.",
-    "- Important word ko **bold** karo, keyword ko ==highlight== karo.",
+    "- Important word ko **bold** karo, keyword ko %%highlight%% karo (blue).",
     "- Numerical ke liye: Q1. sawaal / Solution: steps / Ans: jawab.",
     "- Exam me jo aata hai uspe focus, theory lamba mat karo.",
     "",
