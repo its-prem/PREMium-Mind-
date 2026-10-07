@@ -253,10 +253,14 @@ $pmAdminEmail = pm_auth_admin_email();
   .drop:hover, .drop.over { border-color: var(--primary); color: var(--primary-hover); background: var(--primary-light); }
   .drop b { color: var(--primary); font-weight: 600; }
   .imgs { display: flex; flex-direction: column; gap: 10px; }
-  .imgc { display: flex; gap: 12px; background: #ffffff; border: 1px solid var(--line); border-radius: 8px; padding: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-  .imgc .th { width: 68px; height: 68px; flex: none; object-fit: cover; border-radius: 6px; background: #f1f5f9; border: 1px solid var(--line); }
-  .imgc .bd { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-  .imgc .nm { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--text-main); }
+  .imgc { background: #ffffff; border: 1px solid var(--line); border-radius: 8px; padding: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+  .imgc-head { display: flex; align-items: center; gap: 11px; cursor: pointer; }
+  .imgc .th { width: 52px; height: 52px; flex: none; object-fit: cover; border-radius: 6px; background: #f1f5f9; border: 1px solid var(--line); }
+  .imgc .exp { flex: none; color: var(--text-muted); font-size: .9rem; transition: transform .22s var(--ease); }
+  .imgc.open .exp { transform: rotate(180deg); }
+  .imgc .bd { display: none; flex-direction: column; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line-2); }
+  .imgc.open .bd { display: flex; }
+  .imgc .nm { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--text-main); }
   .imgc .nm code { color: var(--primary-hover); font-family: Consolas, monospace; font-size: .78rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
   .imgc .nm small { color: var(--text-muted); font-weight: 500; }
   .imgc .del { background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: .85rem; padding: 4px 6px; border-radius: 4px; transition: all 0.2s; }
@@ -2312,6 +2316,7 @@ $pmAdminEmail = pm_auth_admin_email();
     cards.forEach(function (c) { var im = images[parseInt(c.dataset.k, 10)]; if (im && (!!findImgTag(im.name)) !== c.classList.contains("used")) stale = true; });
     if (stale) renderImages();
   }
+  var openImg = {};          /* kaunsa image card khula hai — re-render ke baad bhi yaad rahe */
   var posHtmlStale = true;
   function refreshPosSelects() { posHtmlStale = true; }
   function fillPosSelect(sel) {
@@ -2353,8 +2358,12 @@ $pmAdminEmail = pm_auth_admin_email();
       var curW = tg ? (hit.wide ? "wide" : (tg.w || "100%")) : "60%", curAl = tg ? tg.align : "center", curCap = tg ? tg.cap : "";
       var W = ["100%","75%","60%","50%","40%","33%","wide"], AL = [["center","Center Block"],["float-left","Wrap Text (Left)"],["float-right","Wrap Text (Right)"],["left","Left Block"],["right","Right Block"]];
       if (W.indexOf(curW) < 0) W.splice(1, 0, curW);
-      return '<div class="imgc' + (hit ? " used" : "") + '" data-k="' + k + '"><img class="th" src="' + im.data + '" alt=""><div class="bd">' +
-        '<div class="nm"><code title="' + esc(im.name) + '">' + esc(im.name) + '</code><small>' + im.w + "×" + im.h + '</small><button type="button" class="del" title="Delete"><i class="fa fa-trash"></i></button></div>' +
+      return '<div class="imgc' + (hit ? " used" : "") + (openImg[im.name] ? " open" : "") + '" data-k="' + k + '" data-name="' + esc(im.name) + '">' +
+        '<div class="imgc-head"><img class="th" src="' + im.data + '" alt="">' +
+        '<div class="nm"><code title="' + esc(im.name) + '">' + esc(im.name) + '</code><small>' + im.w + "×" + im.h + '</small></div>' +
+        '<button type="button" class="del" title="Delete"><i class="fa fa-trash"></i></button>' +
+        '<i class="fa fa-angle-down exp"></i></div>' +
+        '<div class="bd">' +
         (hit ? '<div class="used-note"><i class="fa fa-link"></i> Notes me line ' + (hit.line + 1) + ' pe lagi hai — <b>Update</b> = size/caption, <b>Move</b> = nayi jagah</div>' : "") +
         '<select class="inp imgPos" title="' + (hit ? "Nayi position" : "Kahan daalni hai") + '">' + posOptions() + '</select>' +
         '<div class="r2"><select class="inp imgW">' + W.map(function (x) { return '<option value="' + x + '"' + (x === curW ? " selected" : "") + '>' + (x === "wide" ? "Wide (full page)" : (x === "100%" ? "Width 100%" : x)) + "</option>"; }).join("") + '</select>' +
@@ -2365,12 +2374,29 @@ $pmAdminEmail = pm_auth_admin_email();
     }).join("");
     refreshPosSelects();
   }
+  /* dropdown se position chunte hi image wahin chali jaye — alag button dabane ki zarurat nahi */
+  $("imgList").addEventListener("change", function (e) {
+    var sel = e.target.closest(".imgPos"); if (!sel || !sel.value) return;
+    var card = sel.closest(".imgc"), im = images[parseInt(card.dataset.k, 10)]; if (!im) return;
+    var moving = card.classList.contains("used");
+    putImage(im.name, sel.value,
+      card.querySelector(".imgW").value, card.querySelector(".imgAl").value,
+      card.querySelector(".imgCap").value.trim(), { move: moving });
+    toast(moving ? "Image shift ho gayi" : "Image lag gayi");
+    renderImages();
+  });
   $("imgList").addEventListener("click", function (e) {
     var card = e.target.closest(".imgc"); if (!card) return;
     var im = images[parseInt(card.dataset.k, 10)]; if (!im) return;
+    if (e.target.closest(".imgc-head") && !e.target.closest(".del")) {
+      var nowOpen = !card.classList.contains("open");
+      card.classList.toggle("open", nowOpen);
+      openImg[im.name] = nowOpen;
+      return;
+    }
     if (e.target.closest(".del")) {
       if (!confirm("Image \"" + im.name + "\" delete karein?")) return;
-      images.splice(images.indexOf(im), 1); saveImages(); renderImages(); render(); return;
+      images.splice(images.indexOf(im), 1); delete openImg[im.name]; saveImages(); renderImages(); render(); return;
     }
     var btn = e.target.closest(".ins");
     if (btn) {
