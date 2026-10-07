@@ -40,6 +40,11 @@ $pmAdminEmail = pm_auth_admin_email();
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Poppins:wght@300;400;500;600&family=Tinos:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- KaTeX = asli LaTeX engine (matrix, root, integral...), mhchem = \ce{...} chemistry.
+     CDN na mile to math plain text ki tarah dikhega, page chalta rahega. -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/mhchem.min.js"></script>
 <style>
   @page { size: A4 portrait; margin: 0; }
 
@@ -223,6 +228,77 @@ $pmAdminEmail = pm_auth_admin_email();
   .imgc .used-note { font-size: .72rem; color: var(--primary-hover); background: var(--primary-light); border-radius: 6px; padding: 5px 8px; line-height: 1.4; }
   .imgs-empty { color: var(--text-muted); font-size: .82rem; padding: 10px 6px; text-align: center; }
 
+  /* dono listein apne dropdown group me — panel chhota rahe */
+  .grp { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 10px; overflow: hidden; background: #fff; }
+  .grp-head { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 11px; background: #f8fafc; border: none; cursor: pointer;
+    font-family: 'Oswald', sans-serif; font-size: .74rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-main); }
+  .grp-head:hover { background: var(--primary-light); color: var(--primary); }
+  .grp-head > span { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .grp-head .chev { transition: transform .25s var(--ease); font-size: .8rem; color: var(--text-muted); }
+  .grp.open .grp-head { color: var(--primary); }
+  .grp.open .grp-head .chev { transform: rotate(180deg); }
+  .grp-body { display: none; padding: 9px; }
+  .grp.open .grp-body { display: block; }
+
+  /* har "image: name" slot ka apna chhota card */
+  .slots { display: flex; flex-direction: column; gap: 6px; }
+  .slotc { background: #fff; border: 1px dashed var(--primary); border-radius: 7px; padding: 6px 8px; }
+  .slotc .str { display: flex; align-items: center; gap: 9px; }
+  .slotc .sic { width: 26px; height: 26px; flex: none; border-radius: 6px; background: var(--primary-light); color: var(--primary); display: grid; place-items: center; font-size: .78rem; }
+  .slotc .sbd { flex: 1; min-width: 0; }
+  .slotc .sbd b { display: block; font-size: .76rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .slotc .sbd small { display: block; font-size: .64rem; color: var(--text-muted); }
+  .slotc.target { box-shadow: 0 0 0 2px var(--primary); }
+  .pickbtn { flex: none; display: flex; align-items: center; gap: 6px; padding: 5px 9px; border: 1px solid var(--primary); border-radius: 6px;
+    background: var(--primary-light); color: var(--primary); font-size: .72rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .pickbtn:hover { background: var(--primary); color: #fff; }
+
+  /* saanjha image picker — 25 image par bhi sirf 25 thumbnail banti hain */
+  .pick-scrim { position: fixed; inset: 0; background: rgba(15,23,42,.6); z-index: 3200; display: none; align-items: center; justify-content: center; padding: 18px; backdrop-filter: blur(2px); }
+  .pick-scrim.show { display: flex; }
+  .pick-win { background: #fff; border-radius: 12px; width: 100%; max-width: 620px; max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,.18); }
+  .pick-hd { padding: 14px 16px 10px; border-bottom: 1px solid var(--line); }
+  .pick-hd .t { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: .9rem; color: var(--primary); display: flex; align-items: center; gap: 9px; }
+  .pick-hd .t span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-main); }
+  .pick-hd .x { border: none; background: none; cursor: pointer; color: var(--text-muted); font-size: 1rem; padding: 2px 5px; }
+  .pick-hd .x:hover { color: var(--primary); }
+  .pick-hd input { width: 100%; margin-top: 10px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 7px; font-size: .82rem; font-family: inherit; }
+  .pick-bd { padding: 12px; overflow-y: auto; }
+  .pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 9px; }
+  .pk { position: relative; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: #fff; cursor: pointer; overflow: hidden; text-align: left; }
+  .pk img { width: 100%; height: 76px; object-fit: cover; display: block; background: #f1f5f9; }
+  .pk b { display: block; padding: 5px 6px; font-size: .68rem; font-weight: 600; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pk:hover { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
+  .pk.used img { opacity: .45; }
+  .pk.used::after { content: "\2713 lagi hui"; position: absolute; inset: 4px 4px auto auto; background: var(--primary); color: #fff; font-size: .58rem; line-height: 1; padding: 3px 5px; border-radius: 4px; }
+  .pick-none { color: var(--text-muted); font-size: .82rem; text-align: center; padding: 22px 8px; }
+
+  /* image card ab collapse hota hai */
+  .imgc { display: block; }
+  .imgc-head { display: flex; align-items: center; gap: 11px; cursor: pointer; }
+  .imgc .exp { flex: none; color: var(--text-muted); font-size: .9rem; transition: transform .22s var(--ease); }
+  .imgc.open .exp { transform: rotate(180deg); }
+  .imgc .bd { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line-2); }
+  .imgc.open .bd { display: flex; }
+  .imgc.target { box-shadow: 0 0 0 2px var(--primary); }
+  .imgc .th { width: 52px; height: 52px; }
+  .imgc .nm { flex: 1; min-width: 0; }
+
+  /* paper me lagi hui image par click = uska card khul jaye */
+  .q-figs .fig { cursor: pointer; }
+  .q-figs .fig:hover { outline: .4mm solid var(--maroon); outline-offset: .8mm; }
+
+  /* ---------------- subject logo chooser ---------------- */
+  .subj-pick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+  .subj-pick button { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 9px 5px 7px; cursor: pointer;
+    background: #fff; border: 1px solid var(--line); border-radius: 8px; font-size: .68rem; font-weight: 700; letter-spacing: .4px;
+    text-transform: uppercase; color: var(--text-muted); font-family: 'Oswald', sans-serif; }
+  .subj-pick button:hover { border-color: var(--primary); color: var(--primary); }
+  /* icon ke stroke safed hain — maroon tile par hi dikhte hain, jaisa asli header me */
+  .subj-pick button svg { width: 32px; height: 32px; background: var(--primary); border-radius: 7px; padding: 3px; }
+  .subj-pick button.on { border-color: var(--primary); background: var(--primary-light); color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
+  .subj-pick .auto-mark { width: 32px; height: 32px; display: grid; place-items: center; font-size: 1.1rem; }
+
   /* ---------------- modal ---------------- */
   .modal-scrim { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
   .modal-scrim.show { display: flex; }
@@ -266,13 +342,12 @@ $pmAdminEmail = pm_auth_admin_email();
   /* ---- header ---- */
   .hdr { flex: none; background: linear-gradient(180deg, #9a1f2f 0%, var(--maroon) 55%, #7d1524 100%); color: #fff; border-radius: 3mm; padding: 5mm 7mm; margin-bottom: 4mm; display: flex; align-items: center; justify-content: space-between; gap: 6mm; box-shadow: 0 1.5mm 4mm rgba(110,18,32,.28); }
   .hdr-l { display: flex; align-items: center; gap: 5mm; min-width: 0; flex: 1 1 auto; }
-  .hdr-icon { width: 15mm; height: 15mm; flex: none; }
+  .hdr-icon { width: 18mm; height: 18mm; flex: none; }
   .hdr-title { flex: 1 1 auto; min-width: 0; overflow: hidden; font-size: 22pt; font-weight: 700; letter-spacing: .6pt; line-height: 1.05; text-transform: uppercase; overflow-wrap: anywhere; }
   .hdr-r { text-align: center; flex: none; }
   .hdr-badge { display: inline-block; background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.18); border-radius: 2mm; padding: 2mm 5mm; font-size: 11pt; font-weight: 700; letter-spacing: .3pt; text-transform: uppercase; white-space: nowrap; }
   .hdr-tag { margin-top: 2mm; font-size: 8pt; letter-spacing: 1.5pt; text-transform: uppercase; opacity: .95; white-space: nowrap; }
   .hdr.slim { padding: 3mm 6mm; margin-bottom: 3.5mm; }
-  .hdr.slim .hdr-icon { width: 9mm; height: 9mm; }
   .hdr.slim .hdr-title { font-size: 15pt; }
   .hdr.slim .hdr-badge { font-size: 9pt; padding: 1.4mm 4mm; }
   .hdr.slim .hdr-tag { display: none; }
@@ -307,12 +382,12 @@ $pmAdminEmail = pm_auth_admin_email();
   .q { margin: 0 0 3.2mm; break-inside: avoid; }
   .q-head { position: relative; padding-left: 4mm; min-height: 9.5mm; display: flex; align-items: center; }
   .q-badge { position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: var(--maroon); color: #fff; font-weight: 700; font-size: 12pt; border-radius: 2mm; padding: 2.2mm 2.6mm; min-width: 14mm; text-align: center; line-height: 1; box-shadow: 0 1mm 2.5mm rgba(110,18,32,.35); z-index: 2; white-space: nowrap; }
-  .q-text { flex: 1; background: var(--pink-2); border-radius: 2.2mm; padding: 1.8mm 4mm 1.8mm 13mm; font-weight: 700; font-size: var(--qf, 10.5pt); line-height: 1.3; color: var(--ink); text-align: justify; text-justify: inter-word; hyphens: auto; }
+  .q-text { flex: 1; background: var(--pink-2); border-radius: 2.2mm; padding: 1.8mm 4mm 1.8mm 13mm; font-weight: 700; font-size: var(--qf, 10.5pt); line-height: 1.3; color: var(--ink); text-align: justify; text-justify: inter-word; hyphens: none; -webkit-hyphens: none; word-break: normal; overflow-wrap: normal; }
   .q-head.w2 .q-text { padding-left: 16mm; }
   .opts { list-style: none; margin: 2mm 0 0 4mm; padding: 0; }
   .opts li { display: flex; gap: 3mm; font-size: var(--qf, 10.5pt); line-height: 1.3; margin: 0 0 1.2mm; }
   .opts .l { flex: none; min-width: 6.5mm; }
-  .opts .t { flex: 1; min-width: 0; overflow-wrap: anywhere; text-align: justify; text-justify: inter-word; hyphens: auto; }
+  .opts .t { flex: 1; min-width: 0; text-align: justify; text-justify: inter-word; hyphens: none; -webkit-hyphens: none; word-break: normal; overflow-wrap: normal; }
   .opts li.ans .t { text-decoration: underline; text-decoration-color: var(--maroon); text-underline-offset: 1.2pt; }
 
   /* ---- question figures ---- */
@@ -325,6 +400,12 @@ $pmAdminEmail = pm_auth_admin_email();
   .fig figcaption { font-size: .82em; color: #5a4a4a; text-align: center; margin-top: 1mm; font-style: italic; line-height: 1.3; }
   .fig.missing { border: .4mm dashed #c9a9a9; border-radius: 1.5mm; padding: 3mm 2mm; text-align: center; color: #9a5a5a; font-size: 9pt; background: #fff8f8; }
   .fig.missing b { font-family: Consolas, monospace; color: var(--maroon); }
+
+  /* ---- math (KaTeX) ---- */
+  .mi { font-family: Tinos, serif; }
+  .katex { font-size: 1.02em; }
+  .mi .katex { font-size: 1em; }
+  .katex-html { max-width: 100%; }
 
   /* ---- answer key ---- */
   .key { border: .4mm solid var(--maroon); border-radius: 2.2mm; padding: 3mm 4mm; margin: 0 0 4mm; break-inside: avoid; }
@@ -540,6 +621,16 @@ Ans: 2</pre>
             <div class="field"><label class="field-label" for="chapInput">Chapter</label><input class="inp" id="chapInput" type="text" value="1" autocomplete="off"></div>
             <div class="field"><label class="field-label" for="titleInput">Sheet title</label><input class="inp" id="titleInput" type="text" value="Atomic Structure" autocomplete="off"></div>
           </div>
+          <div class="field">
+            <label class="field-label">Subject logo <span style="color:var(--text-muted);text-transform:none;letter-spacing:0">(pehle page ke header par)</span></label>
+            <div class="subj-pick" id="subjPick">
+              <button type="button" data-icon="auto" title="Folder ke naam se khud chun lega">Auto</button>
+              <button type="button" data-icon="physics" title="Physics">Physics</button>
+              <button type="button" data-icon="chem" title="Chemistry">Chemistry</button>
+              <button type="button" data-icon="math" title="Maths">Maths</button>
+            </div>
+            <select id="optIcon" class="inp icon-pick" hidden><option value="auto">Auto</option><option value="math">Maths</option><option value="physics">Physics</option><option value="chem">Chemistry</option></select>
+          </div>
           <div class="row2">
             <div class="field"><label class="field-label" for="badgeInput">Badge</label><input class="inp" id="badgeInput" type="text" value="Chemistry PYQ Practice" autocomplete="off"></div>
             <div class="field"><label class="field-label" for="tagInput">Tagline</label><input class="inp" id="tagInput" type="text" value="Practice | Revise | Score High" autocomplete="off"></div>
@@ -554,7 +645,6 @@ Ans: 2</pre>
             <label class="chk"><input type="checkbox" id="optWM" checked> Watermark</label>
             <label class="chk" title="Off karo to bade sheet pe typing fast rahegi; preview Refresh se banega"><input type="checkbox" id="optLive" checked> Live preview</label>
             <label class="chk">Questions / page <input type="number" id="optPerPage" class="inp num" value="10" min="2" max="20" step="1"></label>
-            <label class="chk">Logo <select id="optIcon" class="inp icon-pick" title="Header ka icon — background sabka same maroon rahega"><option value="auto">Auto (folder se)</option><option value="math">Maths &#960;</option><option value="physics">Physics &#9883;</option><option value="chem">Chemistry &#9879;</option></select></label>
           </div>
 
           <div class="field">
@@ -572,8 +662,15 @@ Ans: 2</pre>
             <div class="acc-body">
               <input type="file" id="imgFile" accept="image/*" multiple hidden>
               <div class="drop" id="imgDrop"><b><i class="fa fa-plus"></i> Add image</b> — click karo ya photo yahan drop karo<br><span style="font-size:.7rem">PNG / JPG / screenshot · auto-compress hoti hai</span></div>
-              <div class="imgs" id="imgList"></div>
-              <p style="margin-top:8px">Image ko kisi question me daalne ke liye niche se <b>question chuno</b> → <b>Insert</b>. Text me line banti hai: <code>[img: name | 60%]</code> — use question ke andar kahin bhi move kar sakte ho.</p>
+              <div class="grp" id="slotBox" style="display:none">
+                <button type="button" class="grp-head" data-grp="slot"><span><i class="fa fa-crop-simple"></i> Text ke image slots <span class="chip" id="slotCount">0</span></span><i class="fa fa-angle-down chev"></i></button>
+                <div class="grp-body"><div class="slots" id="slotList"></div></div>
+              </div>
+              <div class="grp open" id="imgGrp">
+                <button type="button" class="grp-head" data-grp="img"><span><i class="fa fa-images"></i> Added images <span class="chip" id="imgCount2">0</span></span><i class="fa fa-angle-down chev"></i></button>
+                <div class="grp-body"><div class="imgs" id="imgList"></div></div>
+              </div>
+              <p style="margin-top:8px">AI ne jahan <code>image: name</code> likha hai wahan slot ban jata hai — upar se <b>Image chuno</b> dabao. Text me line banti hai: <code>[img: name]</code> — use question ke andar kahin bhi move kar sakte ho.</p>
             </div>
           </div>
         </div>
@@ -583,6 +680,15 @@ Ans: 2</pre>
 
   <div class="zoom-badge" id="zoomBadge">100%</div>
   <div class="toast" id="toast"></div>
+  <div class="pick-scrim" id="pickScrim">
+    <div class="pick-win">
+      <div class="pick-hd">
+        <div class="t"><i class="fa fa-images"></i> <span id="pickFor">Image chuno</span><button type="button" class="x" id="pickX"><i class="fa fa-xmark"></i></button></div>
+        <input type="search" id="pickSearch" placeholder="Image ka naam dhundo…" autocomplete="off">
+      </div>
+      <div class="pick-bd"><div class="pgrid" id="pickGrid"></div></div>
+    </div>
+  </div>
   <div class="modal-scrim" id="modalScrim"><div class="modal"><h3><i class="fa fa-triangle-exclamation"></i> <span id="modalTitle">Unsaved draft mila</span></h3><p id="modalBody"></p><div class="row" id="modalRow"></div></div></div>
 </div>
 
@@ -814,15 +920,44 @@ Ans: 2</pre>
       '<circle cx="12" cy="40" r="3.1" fill="#fff" stroke="none"/>' +
       '<circle cx="41" cy="52" r="3.1" fill="#fff" stroke="none"/>',
     chem:
-      '<path d="M25 7 h14"/>' +
-      '<path d="M28.5 7 v15.5 L14.5 47.5 a4.5 4.5 0 0 0 3.9 6.8 h27.2 a4.5 4.5 0 0 0 3.9 -6.8 L35.5 22.5 V7"/>' +
-      '<path d="M20.6 38 q3.4 -2.6 6.8 0 t6.8 0 t6.8 0 l7 12.4 a3 3 0 0 1 -2.6 4.4 h-29.2 a3 3 0 0 1 -2.6 -4.4 z" fill="#fff" stroke="none"/>' +
-      '<circle cx="25" cy="47" r="2.4" fill="#8e1b2a" stroke="none"/>' +
-      '<circle cx="35" cy="50" r="1.7" fill="#8e1b2a" stroke="none"/>' +
-      '<circle cx="41" cy="45.5" r="2.1" fill="#8e1b2a" stroke="none"/>' +
-      '<circle cx="42" cy="9" r="3.4" fill="#fff" stroke="none"/>' +
-      '<circle cx="35" cy="3.6" r="2.1" fill="#fff" stroke="none"/>'
+      '<path d="M25.5 6.5 h13"/>' +
+      '<path d="M28.8 7 v15.4 L14.6 47.6 a5 5 0 0 0 4.3 7.4 h26.2 a5 5 0 0 0 4.3 -7.4 L35.2 22.4 V7"/>' +
+      '<path d="M19.7 38.5 q3.1 -2.7 6.15 0 t6.15 0 t6.15 0 t6.15 0 L49.4 47.6 a5 5 0 0 1 -4.3 7.4 ' +
+        'H18.9 a5 5 0 0 1 -4.3 -7.4 Z" fill="#fff" stroke="none"/>' +
+      '<circle cx="24.6" cy="47.2" r="2.3" fill="#8e1b2a" stroke="none"/>' +
+      '<circle cx="33" cy="50.3" r="1.7" fill="#8e1b2a" stroke="none"/>' +
+      '<circle cx="40" cy="45.8" r="2" fill="#8e1b2a" stroke="none"/>' +
+      '<g stroke-width="1.5" opacity=".8"><path d="M24.8 31.5 h3.4"/><path d="M22.6 35.4 h3.4"/></g>' +
+      '<circle cx="41.6" cy="9.4" r="3.2" fill="#fff" stroke="none"/>' +
+      '<circle cx="35.2" cy="3.4" r="2" fill="#fff" stroke="none"/>' +
+      '<circle cx="46.6" cy="2.8" r="1.4" fill="#fff" stroke="none"/>'
   };
+  /* ── math: $...$ ke andar ka LaTeX KaTeX se, warna jaisa hai waisa ── */
+  var KATEX_MACROS = { "\\dd": "\\mathrm{d}", "\\degree": "^{\\circ}", "\\half": "\\tfrac{1}{2}" };
+  function texUnesc(x) {
+    return String(x).replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+                    .replace(/&quot;/g, '"').replace(/&#0?39;/g, "'").replace(/&amp;/g, "&");
+  }
+  function katexHtml(x, display) {
+    if (!window.katex) return null;
+    try {
+      return window.katex.renderToString(texUnesc(x), {
+        displayMode: !!display, throwOnError: true, strict: false, output: "html", macros: KATEX_MACROS
+      });
+    } catch (e) { return null; }
+  }
+  /** escape + $...$ ko math bana do */
+  function mathText(t) {
+    var s = esc(t);
+    if (s.indexOf("$") < 0) return s;
+    var box = [];
+    s = s.replace(/\$([^$\n]+?)\$/g, function (whole, m) {
+      var k = katexHtml(m, false);
+      box.push(k === null ? whole : '<span class="mi">' + k + "</span>");
+      return "\u0001" + (box.length - 1) + "\u0001";
+    });
+    return s.replace(/\u0001(\d+)\u0001/g, function (_, i) { return box[+i]; });
+  }
   function iconSvg(kind, cls) {
     var art = ICON_ART[kind] || ICON_ART.physics;
     return '<svg class="' + cls + '" viewBox="-2 -2 68 68" fill="none" stroke="#fff" stroke-width="2.5" ' +
@@ -863,13 +998,13 @@ Ans: 2</pre>
   function headerNode(slim) {
     var d = el("hdr" + (slim ? " slim" : ""));
     d.innerHTML =
-      '<div class="hdr-l">' + iconSvg(iconKind(), "hdr-icon") + '<div class="hdr-title">' + esc($("titleInput").value || "MCQ Practice") + "</div></div>" +
+      '<div class="hdr-l">' + (slim ? "" : iconSvg(iconKind(), "hdr-icon")) + '<div class="hdr-title">' + esc($("titleInput").value || "MCQ Practice") + "</div></div>" +
       '<div class="hdr-r"><div class="hdr-badge">' + esc($("badgeInput").value || "PYQ Practice") + "</div>" +
       '<div class="hdr-tag">' + esc($("tagInput").value || "") + "</div></div>";
     return d;
   }
   function yearNode(y) { var d = el("yr"); d.textContent = "Year: " + y; return d; }
-  function topicNode(text) { var d = el("topic"); d.textContent = text; return d; }
+  function topicNode(text) { var d = el("topic"); d.innerHTML = mathText(text); return d; }
 
   function optLabel(l, normalise) {
     var i = optIndex(l);
@@ -884,7 +1019,7 @@ Ans: 2</pre>
     var w = b.w || "100%";
     return '<figure class="fig al-' + esc(b.align) + '" style="width:' + esc(w) + '">' +
       '<img src="' + im.data + '" width="' + im.w + '" height="' + im.h + '" alt="' + esc(b.name) + '">' +
-      (b.cap ? "<figcaption>" + esc(b.cap) + "</figcaption>" : "") + "</figure>";
+      (b.cap ? "<figcaption>" + mathText(b.cap) + "</figcaption>" : "") + "</figure>";
   }
 
   function qNode(q, label, mark) {
@@ -894,14 +1029,14 @@ Ans: 2</pre>
     var ansIdx = optIndex(q.ans);
     var opts = q.opts.map(function (o) {
       var isAns = mark && ansIdx >= 0 && optIndex(o.l) === ansIdx;
-      return '<li' + (isAns ? ' class="ans"' : "") + '><span class="l">' + esc(optLabel(o.l, norm)) + '</span><span class="t">' + esc(o.t) + "</span></li>";
+      return '<li' + (isAns ? ' class="ans"' : "") + '><span class="l">' + esc(optLabel(o.l, norm)) + '</span><span class="t">' + mathText(o.t) + "</span></li>";
     }).join("");
     var imgs = (q.imgs && q.imgs.length)
       ? '<div class="q-figs' + (q.imgs.length > 1 && q.imgs.some(function (b) { return b.row; }) ? " row" : "") + '">' + q.imgs.map(figHtml).join("") + "</div>"
       : "";
     d.innerHTML =
       '<div class="q-head' + (wide ? " w2" : "") + '"><span class="q-badge">' + esc(label) + '</span>' +
-      '<div class="q-text">' + esc(q.text) + "</div></div>" + imgs +
+      '<div class="q-text">' + mathText(q.text) + "</div></div>" + imgs +
       (opts ? '<ul class="opts">' + opts + "</ul>" : "");
     return d;
   }
@@ -1104,7 +1239,7 @@ Ans: 2</pre>
 
     var pages = paginate(entries, showKey ? keyEntries : [], perPage);
     renderList(items);
-    syncImgCards();
+    syncImgCards(); renderSlots();
 
     metaEl.textContent = qCount + " question" + (qCount === 1 ? "" : "s") +
       (topics ? " · " + topics + " topic" + (topics === 1 ? "" : "s") : "") +
@@ -1204,6 +1339,7 @@ Ans: 2</pre>
       OPTS.forEach(function (id) { $(id).checked = (st.o && typeof st.o[id] === "boolean") ? st.o[id] : $(id).defaultChecked; });
       $("optPerPage").value = st.perPage || $("optPerPage").defaultValue;
       $("optIcon").value = st.icon || "auto";
+      if (subjPickPaint) subjPickPaint();
       $("optLive").checked = st.live !== false; document.body.classList.toggle("live-off", st.live === false);
       images = Array.isArray(imgs) ? imgs.filter(function (x) { return x && x.name && x.data; }) : [];
       imagesDirty = false;
@@ -1516,6 +1652,10 @@ Ans: 2</pre>
     }, Promise.resolve()).then(function () {
       saveImages(); renderImages(); render();
       if (added.length) toast(added.length + " image add ho gayi");
+      if (pendingSlot != null && added.length) {      /* slot se picker khola tha */
+        var ps = pendingSlot; pendingSlot = null;
+        fillSlot(ps.line, ps.name, added[0]);
+      }
       if (then) then(added);
     });
   }
@@ -1579,9 +1719,13 @@ Ans: 2</pre>
     if (opts.move) {
       var hit = findImgTag(name);
       if (hit) {
-        lines.splice(hit.line, 1);
-        if (isSlot) { var sl = parseInt(String(pos).slice(5), 10); pos = "slot:" + (sl > hit.line ? sl - 1 : sl); }
-        else if (pos !== "cursor" && pos !== "end" && parseInt(pos, 10) > hit.line) pos = String(parseInt(pos, 10) - 1);
+        var oldCap = hit.tag && hit.tag.cap ? String(hit.tag.cap).trim() : "";
+        if (opts.restoreSlot && oldCap) lines.splice(hit.line, 1, "image: " + oldCap);  /* purana slot wapas */
+        else {
+          lines.splice(hit.line, 1);
+          if (isSlot) { var sl = parseInt(String(pos).slice(5), 10); pos = "slot:" + (sl > hit.line ? sl - 1 : sl); }
+          else if (pos !== "cursor" && pos !== "end" && parseInt(pos, 10) > hit.line) pos = String(parseInt(pos, 10) - 1);
+        }
       }
     }
 
@@ -1632,16 +1776,139 @@ Ans: 2</pre>
     cards.forEach(function (c) { var im = images[parseInt(c.dataset.k, 10)]; if (im && (!!findImgTag(im.name)) !== c.classList.contains("used")) stale = true; });
     if (stale) renderImages();
   }
+  /* ── group khula/band yaad rakho ── */
+  (function () {
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem("mcq_img_grp") || "{}") || {}; } catch (e) {}
+    function apply(id, key, dflt) {
+      var g = $(id); if (!g) return;
+      g.classList.toggle("open", typeof saved[key] === "boolean" ? saved[key] : dflt);
+    }
+    apply("slotBox", "slot", true); apply("imgGrp", "img", true);
+    document.addEventListener("click", function (e) {
+      var h = e.target.closest(".grp-head"); if (!h) return;
+      var g = h.closest(".grp"), key = h.getAttribute("data-grp");
+      var nowOpen = !g.classList.contains("open");
+      g.classList.toggle("open", nowOpen);
+      saved[key] = nowOpen;
+      try { localStorage.setItem("mcq_img_grp", JSON.stringify(saved)); } catch (e2) {}
+    });
+  })();
+
+  /** har "image: name" slot ka apna card — picker se image chuno */
+  function renderSlots() {
+    var sl = imageSlots(), box = $("slotBox"), host = $("slotList");
+    $("slotCount").textContent = sl.length;
+    if (!sl.length) { box.style.display = "none"; host.innerHTML = ""; return; }
+    box.style.display = "";
+    host.innerHTML = sl.map(function (x) {
+      return '<div class="slotc" data-line="' + x.line + '" data-name="' + esc(x.name) + '">' +
+        '<div class="str"><span class="sic"><i class="fa fa-image"></i></span>' +
+        '<div class="sbd"><b title="' + esc(x.name) + '">' + esc(x.name) + "</b><small>line " + (x.line + 1) + "</small></div>" +
+        '<button type="button" class="pickbtn"><i class="fa fa-images"></i> ' +
+          (images.length ? "Image chuno" : "Image add karo") + "</button></div></div>";
+    }).join("");
+  }
+  /** card ka line number purana ho sakta hai — naam se wahi slot phir se dhundo */
+  function resolveSlot(line, name) {
+    var sl = imageSlots(), i, best = -1, bd = 1e9;
+    for (i = 0; i < sl.length; i++) if (sl[i].line === line && sl[i].name === name) return line;
+    for (i = 0; i < sl.length; i++) if (sl[i].name === name) {
+      var d = Math.abs(sl[i].line - line); if (d < bd) { bd = d; best = sl[i].line; }
+    }
+    if (best < 0) for (i = 0; i < sl.length; i++) if (sl[i].line === line) return line;
+    return best;
+  }
+  function fillSlot(line, name, imgName) {
+    var at = resolveSlot(line, name);
+    if (at < 0) { toast("Ye slot text me nahi mila — text badal gaya hai"); render(); return false; }
+    putImage(imgName, "slot:" + at, "100%", "center", "", { move: !!findImgTag(imgName), restoreSlot: true });
+    renderImages();
+    return true;
+  }
+
+  /* ── saanjha image picker ── */
+  var pickTarget = null, pendingSlot = null;
+  function pickGridHtml(q) {
+    q = (q || "").trim().toLowerCase();
+    var list = q ? images.filter(function (im) { return im.name.toLowerCase().indexOf(q) >= 0; }) : images;
+    if (!list.length) return '<div class="pick-none">' + (images.length ? "Is naam ki koi image nahi mili." : "Abhi koi image nahi — upar Add image se daalo.") + "</div>";
+    return list.map(function (im) {
+      var used = !!findImgTag(im.name);
+      return '<button type="button" class="pk' + (used ? " used" : "") + '" data-img="' + esc(im.name) + '"' +
+        ' title="' + esc(im.name) + (used ? " — pehle se lagi hai, yahan shift ho jayegi" : "") + '">' +
+        '<img src="' + im.data + '" alt="" loading="lazy"><b>' + esc(im.name) + "</b></button>";
+    }).join("");
+  }
+  function openPicker(line, name) {
+    if (!images.length) { pendingSlot = { line: line, name: name }; $("imgFile").click(); return; }
+    pickTarget = { line: line, name: name };
+    $("pickFor").textContent = name || "Image chuno";
+    $("pickSearch").value = "";
+    $("pickGrid").innerHTML = pickGridHtml("");
+    $("pickScrim").classList.add("show");
+    setTimeout(function () { $("pickSearch").focus(); }, 40);
+  }
+  function closePicker() { $("pickScrim").classList.remove("show"); $("pickGrid").innerHTML = ""; pickTarget = null; }
+  $("pickX").addEventListener("click", closePicker);
+  $("pickScrim").addEventListener("click", function (e) { if (e.target === $("pickScrim")) closePicker(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && $("pickScrim").classList.contains("show")) closePicker(); });
+  $("pickSearch").addEventListener("input", function () { $("pickGrid").innerHTML = pickGridHtml(this.value); });
+  $("pickGrid").addEventListener("click", function (e) {
+    var pk = e.target.closest(".pk"); if (!pk || !pickTarget) return;
+    var nm = pk.getAttribute("data-img"), t = pickTarget, moved = !!findImgTag(nm);
+    closePicker();
+    if (fillSlot(t.line, t.name, nm)) toast(moved ? "Image is slot me shift ho gayi" : "Image slot me lag gayi");
+  });
+  $("slotList").addEventListener("click", function (e) {
+    if (!e.target.closest(".pickbtn")) return;
+    var row = e.target.closest(".slotc");
+    openPicker(parseInt(row.getAttribute("data-line"), 10), row.getAttribute("data-name") || "");
+  });
+
+  /** paper me lagi hui image par click — uska card khol ke dikhao */
+  function openImgCard(nm) {
+    setDrawer(true);
+    $("accImages").classList.add("open"); touchAcc($("accImages"));
+    $("imgGrp").classList.add("open");
+    openImg[nm] = true;
+    renderImages();
+    setTimeout(function () {
+      var card = null;
+      [].forEach.call($("imgList").querySelectorAll(".imgc"), function (c) {
+        if (!card && c.getAttribute("data-name") === nm) card = c;
+      });
+      if (!card) return;
+      card.classList.add("open");
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+      card.classList.add("target");
+      setTimeout(function () { card.classList.remove("target"); }, 1600);
+    }, 240);
+  }
+  stage.addEventListener("click", function (e) {
+    var fg = e.target.closest(".q-figs .fig"); if (!fg) return;
+    var ig = fg.querySelector("img"), miss = fg.querySelector("b");
+    var nm = ig ? ig.getAttribute("alt") : (miss ? miss.textContent : null);
+    if (nm) openImgCard(nm);
+  });
+
+  var openImg = {};          /* kaunsa image card khula hai — re-render ke baad bhi yaad rahe */
   function renderImages() {
     var host = $("imgList"); $("imgCount").textContent = images.length;
+    $("imgCount2").textContent = images.length;
+    renderSlots();
     if (!images.length) { host.innerHTML = '<div class="imgs-empty">Abhi koi image nahi. Upar se add karo.</div>'; return; }
     host.innerHTML = images.map(function (im, k) {
       var hit = findImgTag(im.name), tg = hit && hit.tag;
-      var curW = tg ? (tg.w || "100%") : "60%", curAl = tg ? tg.align : "center", curCap = tg ? tg.cap : "";
+      var curW = tg ? (tg.w || "100%") : "100%", curAl = tg ? tg.align : "center", curCap = tg ? tg.cap : "";
       var W = ["100%","75%","60%","50%","40%","33%"], AL = [["center","Center"],["left","Left"],["right","Right"]];
       if (W.indexOf(curW) < 0) W.splice(1, 0, curW);
-      return '<div class="imgc' + (hit ? " used" : "") + '" data-k="' + k + '"><img class="th" src="' + im.data + '" alt=""><div class="bd">' +
-        '<div class="nm"><code title="' + esc(im.name) + '">' + esc(im.name) + '</code><small>' + im.w + "×" + im.h + '</small><button type="button" class="del" title="Delete"><i class="fa fa-trash"></i></button></div>' +
+      return '<div class="imgc' + (hit ? " used" : "") + (openImg[im.name] ? " open" : "") + '" data-k="' + k + '" data-name="' + esc(im.name) + '">' +
+        '<div class="imgc-head"><img class="th" src="' + im.data + '" alt="">' +
+        '<div class="nm"><code title="' + esc(im.name) + '">' + esc(im.name) + '</code><small>' + im.w + "×" + im.h + '</small></div>' +
+        '<button type="button" class="del" title="Delete"><i class="fa fa-trash"></i></button>' +
+        '<i class="fa fa-angle-down exp"></i></div>' +
+        '<div class="bd">' +
         (hit ? '<div class="used-note"><i class="fa fa-link"></i> Line ' + (hit.line + 1) + ' pe lagi hai — <b>Update</b> = size/caption, <b>Move</b> = nayi jagah</div>' : "") +
         '<select class="inp imgPos" title="' + (hit ? "Nayi position" : "Kahan daalni hai") + '">' + qOptions() + '</select>' +
         '<div class="r2"><select class="inp imgW">' + W.map(function (x) { return '<option value="' + x + '"' + (x === curW ? " selected" : "") + '>' + (x === "100%" ? "Width 100%" : x) + "</option>"; }).join("") + '</select>' +
@@ -1655,9 +1922,15 @@ Ans: 2</pre>
   $("imgList").addEventListener("click", function (e) {
     var card = e.target.closest(".imgc"); if (!card) return;
     var im = images[parseInt(card.dataset.k, 10)]; if (!im) return;
+    if (e.target.closest(".imgc-head") && !e.target.closest(".del")) {
+      var nowOpen = !card.classList.contains("open");
+      card.classList.toggle("open", nowOpen);
+      openImg[im.name] = nowOpen;
+      return;
+    }
     if (e.target.closest(".del")) {
       if (!confirm("Image \"" + im.name + "\" delete karein?")) return;
-      images.splice(images.indexOf(im), 1); saveImages(); renderImages(); render(); return;
+      images.splice(images.indexOf(im), 1); delete openImg[im.name]; saveImages(); renderImages(); render(); return;
     }
     var btn = e.target.closest(".ins");
     if (btn) {
@@ -1683,7 +1956,7 @@ Ans: 2</pre>
   ta.addEventListener("drop", function (e) {
     var fs = [].slice.call(e.dataTransfer.files || []).filter(function (f) { return /^image\//.test(f.type); });
     if (!fs.length) return; e.preventDefault();
-    addImageFiles(fs, function (names) { names.forEach(function (nm) { insertImgTag(curLineNo(), imgLine(nm, "60%", "center", "")); }); });
+    addImageFiles(fs, function (names) { names.forEach(function (nm) { insertImgTag(curLineNo(), imgLine(nm, "100%", "center", "")); }); });
   });
   ta.addEventListener("paste", function (e) {
     var its = (e.clipboardData && e.clipboardData.items) || [], fs = [];
@@ -1695,7 +1968,7 @@ Ans: 2</pre>
       return;
     }
     e.preventDefault();
-    addImageFiles(fs, function (names) { names.forEach(function (nm) { insertImgTag(curLineNo(), imgLine(nm, "60%", "center", "")); }); });
+    addImageFiles(fs, function (names) { names.forEach(function (nm) { insertImgTag(curLineNo(), imgLine(nm, "100%", "center", "")); }); });
   });
   function curLineNo() {
     var pos = ta.selectionEnd, lines = ta.value.split("\n"), cnt = 0, i;
@@ -1739,6 +2012,31 @@ Ans: 2</pre>
 
   ta.addEventListener("input", schedule);
   FIELDS.forEach(function (id) { $(id).addEventListener("input", schedule); });
+  /* Subject logo chooser — buttons hidden select ko chalate hain */
+  var subjPickPaint = null;
+  (function () {
+    var host = $("subjPick"), sel = $("optIcon");
+    if (!host || !sel) return;
+    [].forEach.call(host.querySelectorAll("button"), function (b) {
+      var k = b.getAttribute("data-icon");
+      b.insertAdjacentHTML("afterbegin", k === "auto"
+        ? '<span class="auto-mark"><i class="fa fa-wand-magic-sparkles"></i></span>' : iconSvg(k, ""));
+    });
+    function paint() {
+      [].forEach.call(host.querySelectorAll("button"), function (b) {
+        b.classList.toggle("on", b.getAttribute("data-icon") === sel.value);
+      });
+    }
+    host.addEventListener("click", function (e) {
+      var b = e.target.closest("button"); if (!b) return;
+      sel.value = b.getAttribute("data-icon");
+      sel.dispatchEvent(new Event("change", { bubbles: true }));
+      paint();
+    });
+    sel.addEventListener("change", paint);
+    paint();
+    subjPickPaint = paint;
+  })();
   OPTS.concat(["optPerPage", "optIcon"]).forEach(function (id) { $(id).addEventListener("change", function () { render(); saveState(); }); });
   $("optPerPage").addEventListener("input", schedule);
   function applyWatermark() { stage.classList.toggle("no-wm", !$("optWM").checked); document.body.classList.toggle("no-wm", !$("optWM").checked); }
@@ -1832,10 +2130,36 @@ Ans: 2</pre>
     "- Every question must have exactly four options and one 'Ans:' line.",
     "- Keep each option short — a few words, not a sentence, so two fit per line.",
     "- Keep the question to one or two lines; no long paragraphs.",
-    "- Use proper units and symbols (m/s, N, Omega, deg C). Write formulas inline, e.g. v = u + at.",
     "- Do not repeat a question, and do not reveal the answer inside the question text.",
     "- Cover the whole given text: definitions, formulas, numericals and one-liners.",
     "- Finish the sheet completely — do not stop midway and do not write 'continued'.",
+    "",
+    "MATHS — write every formula inside $...$ using standard LaTeX",
+    "Units and words stay OUTSIDE the $: $v = 20$ m/s",
+    "",
+    "Square root uses \\sqrt{...} — always with braces:",
+    "   $\\sqrt{3}$          (root 3)",
+    "   $\\sqrt{x+1}$        (the whole x+1 under the root)",
+    "   $v = \\sqrt{u^{2} + 2as}$   ·   $v = \\sqrt{\\frac{2E}{m}}$",
+    "   cube / n-th root: $\\sqrt[3]{8}$ , $\\sqrt[n]{a}$",
+    "   WRONG: \\sqrt3 , root3 , sqrt(3)",
+    "",
+    "Other rules:",
+    "1. Fractions always with two braces: $\\frac{a}{b}$ , $\\frac{\\sqrt{3}}{2}$ , $\\frac{(mv)^{2}}{2m}$",
+    "   WRONG: \\frac12 , 1/2",
+    "2. Powers and subscripts always with braces: $m^{2}v^{2}$ , $10^{-27}$ , $E_{n}$ , $H_{2}O$",
+    "   WRONG: m^2v^2 (the exponent comes out wrong)",
+    "3. Multiplication: \\times or \\cdot , never a small 'x': $40 \\times 1.2$",
+    "4. Trigonometry / log with a backslash: $\\cos\\theta$ , $\\sin^{2}\\theta$ , $\\log_{10} x$",
+    "5. Greek letters: \\theta \\lambda \\alpha \\mu \\pi \\Delta \\omega \\Omega",
+    "6. Degree: $30^{\\circ}$ · Approx: \\approx · Proportional: \\propto",
+    "7. Vectors: $\\vec{F}$ , unit vectors $\\hat{i}$ , matrix/determinant: $\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix}$",
+    "8. Chemistry equations: $\\ce{H2SO4 + 2NaOH -> Na2SO4 + 2H2O}$ , $\\ce{N2 + 3H2 <=> 2NH3}$",
+    "",
+    "Examples written correctly:",
+    "Q5. The resultant of two forces P and Q inclined at angle theta is",
+    "(a) $\\sqrt{P^{2} + Q^{2}}$ (b) $\\sqrt{P^{2} + Q^{2} + 2PQ\\cos\\theta}$ (c) $P + Q$ (d) $PQ\\cos\\theta$",
+    "Ans: b",
     "",
     "IMAGES",
     "If a question needs a diagram, circuit, graph or figure, put EXACTLY one line",
@@ -1846,11 +2170,21 @@ Ans: 2</pre>
     "image: series parallel resistor circuit",
     "(a) 1 A (b) 2 A (c) 3 A (d) 4 A",
     "Ans: b",
-    "The line must start with 'image:', the name must be 3-8 plain English words, one image per line.",
+    "The line must start with 'image:', the name must be plain English words, one image per line.",
     "Do not draw or describe the figure anywhere else — just leave the slot; I will drop my own image into it.",
     "",
     "SOURCE TEXT:",
-    "<<< paste your question text / chapter here >>>"  ].join("\n");
+    "<<< paste your question text / chapter here >>>"
+  ].join("\n");
+  /* KaTeX ke web-font baad me aate hain — height badalti hai, isliye dobara render */
+  (function () {
+    function again() { try { render(); } catch (e) {} }
+    var tries = 0, t = setInterval(function () {
+      if (window.katex) { clearInterval(t); again(); }
+      else if (++tries > 40) clearInterval(t);
+    }, 150);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(again);
+  })();
   $("aiPrompt").value = AI_PROMPT;
   $("btnCopyPrompt").addEventListener("click", function () {
     var b = this, txt = $("aiPrompt").value;
