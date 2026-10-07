@@ -526,9 +526,15 @@ $pmAdminEmail = pm_auth_admin_email();
   .imgc .ins.mv { background: #fff; color: var(--text-main); border: 1px solid var(--line-2); }
   .imgc .ins.mv:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
   .slot-hint { font-size: .72rem; color: var(--primary-hover); background: var(--primary-light); border-radius: 6px; padding: 5px 8px; line-height: 1.45; }
-  .fig.slot { border: .4mm dashed var(--maroon); border-radius: 1.5mm; padding: 5mm 3mm; text-align: center; color: var(--maroon); font-size: .85em; background: #fff8f8; }
-  .fig.slot b { font-family: Consolas, monospace; }
-  .fig.slot small { display: block; margin-top: 1mm; color: #9a5a5a; font-size: .8em; }
+  /* slot = image ki reserved jagah: utni hi badi, taki page shift na ho */
+  .fig.slot { border: .45mm dashed var(--maroon); border-radius: 1.5mm; min-height: 38mm; padding: 4mm 3mm; text-align: center;
+    color: var(--maroon); font-size: .85em; background: repeating-linear-gradient(45deg, #fff8f8, #fff8f8 3mm, #fdeef2 3mm, #fdeef2 6mm);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.2mm; cursor: pointer; }
+  .fig.slot:hover { border-color: #6f1220; background: #fdeef2; }
+  .fig.slot .si { font-size: 1.9em; opacity: .55; }
+  .fig.slot b { font-family: Consolas, monospace; font-size: 1.02em; }
+  .fig.slot small { display: block; color: #9a5a5a; font-size: .8em; }
+  .slotc.target { box-shadow: 0 0 0 2px var(--primary); }
   .flash-img { outline: 2.5px solid var(--maroon); outline-offset: 3px; border-radius: 2px; }
 
 
@@ -1207,7 +1213,11 @@ $pmAdminEmail = pm_auth_admin_email();
             var ig = document.createElement("img"); ig.src = im.data; ig.width = im.w; ig.height = im.h; ig.alt = b.name; fg.appendChild(ig);
             if (b.cap) { var fc = document.createElement("figcaption"); fc.innerHTML = inline(b.cap); fg.appendChild(fc); }
             node.appendChild(fg);
-          } else if (b.slot) node.innerHTML = '<div class="fig slot"><i class="fa fa-image"></i> Image slot: <b>' + esc(b.name) + '</b><small>Images panel kholo → is slot ko chuno → Insert</small></div>';
+          } else if (b.slot) {
+            node.innerHTML = '<div class="fig slot" data-slot="' + b.line + '" style="width:' + (b.w || "60%") + '" title="Click karo — yahan image lagani hai">' +
+              '<i class="fa fa-image si"></i><b>' + esc(b.name) + "</b>" +
+              '<small>Click karke image lagao</small></div>';
+          }
           else node.innerHTML = '<div class="fig missing" style="width:' + (b.w || "100%") + '"><i class="fa fa-image"></i> Image <b>' + esc(b.name) + '</b> nahi mili — Images panel se add karo</div>';
           break;
         case "qt": node = el("blk qt", b.html); break;
@@ -1767,6 +1777,23 @@ $pmAdminEmail = pm_auth_admin_email();
       b.classList.toggle("on", on);
     });
   }
+  /* paper me slot par click — seedha usi slot ka box khol do */
+  var pendingSlot = null;
+  $("stage").addEventListener("click", function (e) {
+    var sl = e.target.closest(".fig.slot"); if (!sl) return;
+    var line = parseInt(sl.getAttribute("data-slot"), 10);
+    setDrawer(true);
+    $("accImages").classList.add("open"); touchAcc($("accImages"));
+    if (!images.length) { pendingSlot = line; $("imgFile").click(); return; }
+    setTimeout(function () {
+      var card = $("slotList").querySelector('.slotc[data-line="' + line + '"]');
+      if (!card) return;
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+      card.classList.add("target");
+      setTimeout(function () { card.classList.remove("target"); }, 1600);
+      var sel = card.querySelector(".slotPick"); if (sel) sel.focus();
+    }, 260);
+  });
   $("previewCol").addEventListener("mouseup", function () { setTimeout(onPageSelect, 10); });
   $("previewCol").addEventListener("keyup", function () { setTimeout(onPageSelect, 10); });
   document.addEventListener("mousedown", function (e) { if (!fb.contains(e.target) && !stage.contains(e.target)) hideFloat(); });
@@ -2145,7 +2172,16 @@ $pmAdminEmail = pm_auth_admin_email();
     if (!list.length) { toast("Image file choose karo"); return; }
     var added = [];
     list.reduce(function (p, f) { return p.then(function () { return compressFile(f).then(function (r) { var nm = uniqueName(slug(f.name)); images.push({ name: nm, data: r.data, w: r.w, h: r.h }); added.push(nm); }, function () { toast(f.name + " load nahi hui"); }); }); }, Promise.resolve())
-      .then(function () { saveImages(); renderImages(); render(); if (added.length) toast(added.length + " image add ho gayi"); if (then) then(added); });
+      .then(function () {
+        saveImages(); renderImages(); render();
+        if (added.length) toast(added.length + " image add ho gayi");
+        if (pendingSlot != null && added.length) {       /* slot par click karke image chuni thi */
+          var line = pendingSlot; pendingSlot = null;
+          putImage(added[0], "slot:" + line, "60%", "center", "");
+          renderImages();
+        }
+        if (then) then(added);
+      });
   }
   var IMG_TAG_RE = /^\s*\[(?:img|image)\s*:\s*([^\]|]+?)\s*(?:\|[^\]]*)?\]\s*$/i;
   var linesCache = { v: null, lines: null };
