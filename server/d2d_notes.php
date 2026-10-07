@@ -40,6 +40,12 @@ $pmAdminEmail = pm_auth_admin_email();
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Poppins:wght@300;400;500;600&family=Tinos:ital,wght@0,400;0,700;1,400;1,700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- KaTeX = asli LaTeX engine: matrix, determinant, integral, limit, sab.
+     mhchem = chemistry ke liye \ce{...}. CDN na mile to niche wala apna
+     renderer fallback ki tarah chalta rahega. -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/mhchem.min.js"></script>
 <style>
   @page { size: A4 portrait; margin: 0; }
 
@@ -406,16 +412,16 @@ $pmAdminEmail = pm_auth_admin_email();
   .h2 { display: inline-flex; align-items: center; gap: 2.2mm; max-width: 100%; background: linear-gradient(90deg, var(--pink) 0%, var(--pink-2) 100%); border-left: 1.4mm solid var(--maroon); color: var(--maroon); font-weight: 700; font-size: 12pt; line-height: 1.15; padding: 1.1mm 4.5mm 1.1mm 3mm; border-radius: 0 2mm 2mm 0; margin: .6mm 0 2mm; box-shadow: 0 .5mm 1.5mm rgba(110,18,32,.12); }
   .h2 .dia { font-size: 9.5pt; line-height: 1; transform: translateY(-.2mm); }
   .h3 { font-weight: 700; font-size: 11pt; color: var(--maroon); margin: .8mm 0 1.4mm; padding-bottom: .5mm; border-bottom: .3mm dashed #d9b7bd; }
-  .p { text-align: justify; hyphens: auto; }
+  .p { text-align: justify; hyphens: none; -webkit-hyphens: none; word-break: normal; overflow-wrap: normal; }
   .ul { list-style: none; padding-left: 5.5mm; }
-  .ul li { position: relative; margin-bottom: 1.3mm; text-align: justify; hyphens: auto; }
+  .ul li { position: relative; margin-bottom: 1.3mm; text-align: justify; hyphens: none; -webkit-hyphens: none; word-break: normal; overflow-wrap: normal; }
   .ul li::before { content: ""; position: absolute; left: -4.4mm; top: .95em; width: 1.6mm; height: 1.6mm; border-radius: 50%; background: var(--maroon); transform: translateY(-50%); }
   .ul .ul { margin-top: 1mm; padding-left: 5mm; }
   .ul .ul li::before { width: 1.6mm; height: .5mm; border-radius: 0; }
   .ol { list-style: none; counter-reset: c; }
-  .ol li { counter-increment: c; position: relative; padding: 1.4mm 3mm 1.4mm 9.5mm; margin-bottom: 1.8mm; min-height: 7mm; text-align: justify; background: var(--cream-2); border-radius: 2mm; }
+  .ol li { counter-increment: c; position: relative; padding: 1.4mm 3mm 1.4mm 9.5mm; margin-bottom: 1.8mm; min-height: 7mm; text-align: justify; hyphens: none; -webkit-hyphens: none; word-break: normal; overflow-wrap: normal; background: var(--cream-2); border-radius: 2mm; }
   .ol li::before { content: counter(c); position: absolute; left: 1.6mm; top: 1.4mm; width: 6mm; height: 6mm; border-radius: 50%; background: var(--maroon); color: #fff; font-weight: 700; font-size: 10pt; display: flex; align-items: center; justify-content: center; }
-  .callout { background: var(--cream); border-left: 1.4mm solid var(--maroon); border-radius: 1.8mm; padding: 2mm 3.5mm; text-align: justify; hyphens: auto; white-space: normal; }
+  .callout { background: var(--cream); border-left: 1.4mm solid var(--maroon); border-radius: 1.8mm; padding: 2mm 3.5mm; text-align: justify; hyphens: none; -webkit-hyphens: none; word-break: normal; overflow-wrap: normal; white-space: normal; }
   .callout .lbl { font-weight: 700; color: var(--maroon); }
   .callout.def { background: var(--cream-2); border: .45mm solid var(--maroon); padding: 2.2mm 3.8mm; }
   .callout.tip { display: flex; gap: 3mm; align-items: flex-start; border-left: none; }
@@ -425,7 +431,17 @@ $pmAdminEmail = pm_auth_admin_email();
   .formula .lbl { font-weight: 700; color: var(--maroon); }
   .formula .fx { display: inline-block; background: var(--cream); border-radius: 1.8mm; padding: 1.8mm 4mm; font-weight: 700; font-size: 11.5pt; letter-spacing: .2pt; border: .3mm solid #f0dcc0; }
   .formula.center { justify-content: center; }
-  .mi { font-family: Tinos, serif; font-style: italic; background: #fff7ec; padding: 0 .8mm; border-radius: .8mm; white-space: nowrap; }
+  /* inline math kitab jaisa saaf — peeche koi cream chip nahi */
+  .mi { font-family: Tinos, serif; font-style: italic; white-space: nowrap; }
+  .mi:has(.katex) { font-style: normal; white-space: normal; }
+  /* ---- KaTeX ---- */
+  .katex { font-size: 1.04em; }
+  .mi .katex { font-size: 1em; }
+  .formula .fx .katex { font-size: 1.06em; }
+  .katex-display { margin: .6mm 0; }
+  .katex .mord.text { font-family: inherit; }
+  .blk .katex-display > .katex { white-space: normal; }       /* lamba formula wrap ho jaye */
+  .katex-html { max-width: 100%; }
   .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.05; margin: 0 .6mm; font-size: .92em; }
   .frac > span { padding: 0 .6mm; }
   .frac > span:first-child { border-bottom: .3mm solid currentColor; }
@@ -476,7 +492,7 @@ $pmAdminEmail = pm_auth_admin_email();
   .qb { background: #fff; border: .35mm solid #e3cfd3; border-radius: 2.2mm; padding: 2mm 2.6mm 2.2mm; }
   .qb .q-head { display: flex; gap: 2.6mm; align-items: flex-start; }
   .qb .q-badge { flex: none; background: var(--maroon); color: #fff; font-weight: 700; font-size: 9.5pt; border-radius: 1.6mm; padding: 1mm 2.2mm; line-height: 1; margin-top: .4mm; box-shadow: 0 .6mm 1.6mm rgba(110,18,32,.3); }
-  .qb .q-text { flex: 1; font-weight: 700; text-align: justify; }
+  .qb .q-text { flex: 1; font-weight: 700; text-align: justify; hyphens: none; -webkit-hyphens: none; word-break: normal; overflow-wrap: normal; }
   .qb .q-opts { display: grid; grid-template-columns: 1fr 1fr; gap: .8mm 3mm; margin: 1.6mm 0 0 1mm; }
   .qb .q-opts.one { grid-template-columns: 1fr; }
   .qb .q-opts span { display: flex; gap: 1.6mm; }
@@ -588,6 +604,11 @@ $pmAdminEmail = pm_auth_admin_email();
   .fig.slot b { font-family: Consolas, monospace; font-size: 1.02em; }
   .fig.slot small { display: block; color: #9a5a5a; font-size: .8em; }
   .slotc.target { box-shadow: 0 0 0 2px var(--primary); }
+  .imgc.target { box-shadow: 0 0 0 2px var(--primary); }
+  /* paper me lagi hui image par click = uska card khul jaye */
+  .blk.img figure.fig { cursor: pointer; }
+  .blk.img figure.fig:hover { outline: .4mm solid var(--maroon); outline-offset: .8mm; }
+  .fig.missing { cursor: pointer; }
   .flash-img { outline: 2.5px solid var(--maroon); outline-offset: 3px; border-radius: 2px; }
 
 
@@ -1017,7 +1038,33 @@ $pmAdminEmail = pm_auth_admin_email();
     });
     return s;
   }
-  function mathify(s) {
+  /* ── KaTeX: asli LaTeX. Jo isse ban jaye wo isse, baki purane renderer se. ── */
+  var KATEX_MACROS = {
+    "\\RR": "\\mathbb{R}",
+    "\\dd": "\\mathrm{d}",
+    "\\degree": "^{\\circ}",
+    "\\half": "\\tfrac{1}{2}"
+  };
+  function texUnesc(x) {
+    return String(x).replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+                    .replace(/&quot;/g, '"').replace(/&#0?39;/g, "'").replace(/&amp;/g, "&");
+  }
+  /** LaTeX jaisa dikhta hai? (backslash command, braces wala power, ya matrix ka &) */
+  function looksTex(x) { return /\\[A-Za-z]|\\\\|[\^_]\{|&/.test(x); }
+  function katexHtml(x, display) {
+    if (!window.katex || !looksTex(x)) return null;
+    try {
+      /* throwOnError: true — galat LaTeX par laal error chhapne ke bajay
+         catch me jaake purane renderer par chale jao */
+      return window.katex.renderToString(texUnesc(x), {
+        displayMode: !!display, throwOnError: true, strict: false, output: "html", macros: KATEX_MACROS
+      });
+    } catch (e) { return null; }
+  }
+  function mathify(s, display) {
+    if (!$("optMath").checked) return s;
+    var k = katexHtml(s, display);
+    if (k !== null) return k;
     if (!$("optMath").checked) return s;
     s = symbolize(texify(s));
     s = chemify(s);
@@ -1047,7 +1094,10 @@ $pmAdminEmail = pm_auth_admin_email();
     var s = esc(t), maths = [];
     if (inFormula && /\$[^$\n]+?\$/.test(s)) inFormula = false; /* line mixes text + $math$ → treat like prose */
     if (!inFormula) s = s.replace(/\$([^$\n]+?)\$/g, function (_, m) { maths.push('<span class="mi">' + mathify(m) + "</span>"); return "\u0001" + (maths.length - 1) + "\u0001"; });
-    s = inFormula ? mathify(s) : smartText(s);
+    /* formula block ka math bhi placeholder me — warna markers() KaTeX ke
+       HTML ke andar __ ya :: dekh kar use tod deta hai */
+    if (inFormula) { maths.push(mathify(s, true)); s = "\u0001" + (maths.length - 1) + "\u0001"; }
+    else s = smartText(s);
     s = markers(s);
     s = s.replace(/\u0001(\d+)\u0001/g, function (_, i) { return maths[+i]; });
     return s;
@@ -1298,7 +1348,7 @@ $pmAdminEmail = pm_auth_admin_email();
             if (b.cap) { var fc = document.createElement("figcaption"); fc.innerHTML = inline(b.cap); fg.appendChild(fc); }
             node.appendChild(fg);
           } else if (b.slot) {
-            node.innerHTML = '<div class="fig slot" data-slot="' + b.line + '" style="width:' + (b.w || "60%") + '" title="Click karo — yahan image lagani hai">' +
+            node.innerHTML = '<div class="fig slot" data-slot="' + b.line + '" style="width:' + (b.w || "100%") + '" title="Click karo — yahan image lagani hai">' +
               '<i class="fa fa-image si"></i><b>' + esc(b.name) + "</b>" +
               '<small>Click karke image lagao</small></div>';
           }
@@ -1321,11 +1371,14 @@ $pmAdminEmail = pm_auth_admin_email();
   ===================================================================== */
   var ICON_ART = {
     math:
-      '<circle cx="32" cy="32" r="26" stroke-dasharray="4 4.2" opacity=".9"/>' +
-      '<text x="32" y="46" text-anchor="middle" font-family="Tinos, Georgia, serif" font-size="44" ' +
-        'font-weight="700" fill="#fff" stroke="none">&#960;</text>' +
-      '<circle cx="12.5" cy="12.5" r="1.9" fill="#fff" stroke="none" opacity=".9"/>' +
-      '<circle cx="51.5" cy="51.5" r="1.9" fill="#fff" stroke="none" opacity=".9"/>',
+      '<g stroke-width="1.7">' +
+        '<circle cx="32" cy="32" r="24" stroke-dasharray="3 3.4" opacity=".8"/>' +
+        '<line x1="4" y1="32" x2="60" y2="32"/><polyline points="55.5,28 60,32 55.5,36"/><polyline points="8.5,28 4,32 8.5,36"/>' +
+        '<line x1="32" y1="60" x2="32" y2="4"/><polyline points="28,8.5 32,4 36,8.5"/><polyline points="28,55.5 32,60 36,55.5"/>' +
+        '<path d="M11 48 C 17 14, 27 13, 31 32 C 35 51, 45 49, 53 17" opacity=".85"/>' +
+      '</g>' +
+      '<text x="32" y="47" text-anchor="middle" font-family="Tinos, Georgia, serif" font-size="46" font-weight="700" ' +
+        'fill="#fff" stroke="#8e1b2a" stroke-width="3.4" paint-order="stroke">&#960;</text>',
     physics:
       '<circle cx="32" cy="32" r="4.6" fill="#fff" stroke="none"/>' +
       '<ellipse cx="32" cy="32" rx="25" ry="10"/>' +
@@ -1862,9 +1915,35 @@ $pmAdminEmail = pm_auth_admin_email();
       b.classList.toggle("on", on);
     });
   }
+  /** paper me lagi hui image par click — uska card khol ke dikhao */
+  function openImgCard(nm) {
+    setDrawer(true);
+    $("accImages").classList.add("open"); touchAcc($("accImages"));
+    $("imgGrp").classList.add("open");
+    openImg[nm] = true;                       /* card khula hua rahe */
+    renderImages();
+    setTimeout(function () {
+      var card = null;
+      [].forEach.call($("imgList").querySelectorAll(".imgc"), function (c) {
+        if (!card && c.getAttribute("data-name") === nm) card = c;
+      });
+      if (!card) return;
+      card.classList.add("open");
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+      card.classList.add("target");
+      setTimeout(function () { card.classList.remove("target"); }, 1600);
+    }, 240);
+  }
   /* paper me slot par click — seedha usi slot ka box khol do */
   var pendingSlot = null;
   $("stage").addEventListener("click", function (e) {
+    /* pehle: lagi hui (ya missing) image — uska edit card kholo */
+    var blk = e.target.closest(".blk.img");
+    if (blk && !e.target.closest(".fig.slot")) {
+      var ig = blk.querySelector("figure.fig img"), miss = blk.querySelector(".fig.missing b");
+      var nm = ig ? ig.getAttribute("alt") : (miss ? miss.textContent : null);
+      if (nm) { openImgCard(nm); return; }
+    }
     var sl = e.target.closest(".fig.slot"); if (!sl) return;
     var line = parseInt(sl.getAttribute("data-slot"), 10);
     var nm = (sl.querySelector("b") || {}).textContent || "";
@@ -2455,7 +2534,7 @@ $pmAdminEmail = pm_auth_admin_email();
   function fillSlot(line, name, imgName) {
     var at = resolveSlot(line, name);
     if (at < 0) { toast("Ye slot text me nahi mila — text badal gaya hai"); render(); return false; }
-    putImage(imgName, "slot:" + at, "60%", "center", "", { move: !!findImgTag(imgName), restoreSlot: true });
+    putImage(imgName, "slot:" + at, "100%", "center", "", { move: !!findImgTag(imgName), restoreSlot: true });
     renderImages();
     return true;
   }
@@ -2504,7 +2583,7 @@ $pmAdminEmail = pm_auth_admin_email();
     if (!images.length) { host.innerHTML = '<div class="imgs-empty">Abhi koi image nahi. Upar se add karo.</div>'; return; }
     host.innerHTML = images.map(function (im, k) {
       var hit = findImgTag(im.name), tg = hit && hit.tag;
-      var curW = tg ? (hit.wide ? "wide" : (tg.w || "100%")) : "60%", curAl = tg ? tg.align : "center", curCap = tg ? tg.cap : "";
+      var curW = tg ? (hit.wide ? "wide" : (tg.w || "100%")) : "100%", curAl = tg ? tg.align : "center", curCap = tg ? tg.cap : "";
       var W = ["100%","75%","60%","50%","40%","33%","wide"], AL = [["center","Center Block"],["float-left","Wrap Text (Left)"],["float-right","Wrap Text (Right)"],["left","Left Block"],["right","Right Block"]];
       if (W.indexOf(curW) < 0) W.splice(1, 0, curW);
       return '<div class="imgc' + (hit ? " used" : "") + (openImg[im.name] ? " open" : "") + '" data-k="' + k + '" data-name="' + esc(im.name) + '">' +
@@ -2571,7 +2650,7 @@ $pmAdminEmail = pm_auth_admin_email();
   ta.addEventListener("drop", function (e) {
     var fs = [].slice.call(e.dataTransfer.files || []).filter(function (f) { return /^image\//.test(f.type); });
     if (!fs.length) return; e.preventDefault();
-    addImageFiles(fs, function (names) { names.forEach(function (nm) { insertLineAt("cursor", imgLine(nm, "60%", "center", "")); }); });
+    addImageFiles(fs, function (names) { names.forEach(function (nm) { insertLineAt("cursor", imgLine(nm, "100%", "center", "")); }); });
   });
   function autoTitleFrom(txt) {
     var lines = txt.replace(/\r/g, "").split("\n"), pick = "";
@@ -2596,7 +2675,7 @@ $pmAdminEmail = pm_auth_admin_email();
       return;
     }
     e.preventDefault();
-    addImageFiles(fs, function (names) { names.forEach(function (nm) { insertLineAt("cursor", imgLine(nm, "60%", "center", "")); }); });
+    addImageFiles(fs, function (names) { names.forEach(function (nm) { insertLineAt("cursor", imgLine(nm, "100%", "center", "")); }); });
   });
 
   /* =====================================================================
@@ -2792,6 +2871,16 @@ $pmAdminEmail = pm_auth_admin_email();
     "CHAPTER TEXT:",
     "<<< yahan apna chapter text paste karo >>>"
   ].join("\n");
+  /* KaTeX ke web-font baad me aate hain — height badalti hai, isliye ek baar
+     fonts ready hone par pagination dobara chalao */
+  (function () {
+    function again() { try { render(); } catch (e) {} }
+    var tries = 0, t = setInterval(function () {
+      if (window.katex) { clearInterval(t); again(); }
+      else if (++tries > 40) clearInterval(t);
+    }, 150);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(again);
+  })();
   $("aiPrompt").value = AI_PROMPT;
   $("btnCopyPrompt").addEventListener("click", function () {
     var b = this, txt = $("aiPrompt").value;
