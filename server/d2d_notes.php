@@ -218,6 +218,17 @@ $pmAdminEmail = pm_auth_admin_email();
   .src-tools { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
   .src-tools small { color: var(--text-muted); font-size: .72rem; flex: 1; font-weight: 500; }
 
+  /* ---- Subject logo chooser ---- */
+  .subj-pick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+  .subj-pick button { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 9px 5px 7px; cursor: pointer;
+    background: #fff; border: 1px solid var(--line); border-radius: 8px; font-size: .68rem; font-weight: 700; letter-spacing: .4px;
+    text-transform: uppercase; color: var(--text-muted); font-family: 'Oswald', sans-serif; }
+  .subj-pick button:hover { border-color: var(--primary); color: var(--primary); }
+  /* icon ke stroke safed hain — maroon tile par hi dikhte hain, jaisa asli header me */
+  .subj-pick button svg { width: 32px; height: 32px; background: var(--primary); border-radius: 7px; padding: 3px; }
+  .subj-pick button.on { border-color: var(--primary); background: var(--primary-light); color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
+  .subj-pick .auto-mark { width: 30px; height: 30px; display: grid; place-items: center; font-size: 1.1rem; }
+
   /* ---- Modals ---- */
   .modal-scrim { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
   .modal-scrim.show { display: flex; }
@@ -418,7 +429,10 @@ $pmAdminEmail = pm_auth_admin_email();
   .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.05; margin: 0 .6mm; font-size: .92em; }
   .frac > span { padding: 0 .6mm; }
   .frac > span:first-child { border-bottom: .3mm solid currentColor; }
-  .rad { border-top: .3mm solid currentColor; padding: 0 .4mm; }
+  /* root ki upar wali line: absolute hai, isliye upar uthti hai par box ki
+     height nahi badhati — warna upar wali line se overlap ho jata tha */
+  .rad { position: relative; padding: 0 .4mm; }
+  .rad::before { content: ""; position: absolute; left: 0; right: 0; top: -.7mm; border-top: .3mm solid currentColor; }
   .fn { font-style: normal; font-weight: 600; }
   .mac { display: inline-block; position: relative; line-height: 1; }
   .mac::before { content: attr(data-a); position: absolute; left: 0; right: 0; top: -.62em; text-align: center; font-size: .72em; line-height: 1; font-weight: 400; pointer-events: none; }
@@ -729,6 +743,16 @@ $pmAdminEmail = pm_auth_admin_email();
             <div class="field"><label class="field-label">Chapter</label><input class="inp" id="chapInput" type="text" value="1" autocomplete="off"></div>
             <div class="field"><label class="field-label">Title</label><input class="inp" id="titleInput" type="text" value="Atomic Structure" autocomplete="off"></div>
           </div>
+          <div class="field">
+            <label class="field-label">Subject logo <span style="color:var(--text-muted);text-transform:none;letter-spacing:0">(pehle page ke header par)</span></label>
+            <div class="subj-pick" id="subjPick">
+              <button type="button" data-icon="auto" title="Folder ke naam se khud chun lega">Auto</button>
+              <button type="button" data-icon="physics" title="Physics">Physics</button>
+              <button type="button" data-icon="chem" title="Chemistry">Chemistry</button>
+              <button type="button" data-icon="math" title="Maths">Maths</button>
+            </div>
+            <select id="optIcon" class="inp icon-pick" hidden><option value="auto">Auto</option><option value="math">Maths</option><option value="physics">Physics</option><option value="chem">Chemistry</option></select>
+          </div>
           <div class="row2">
             <div class="field"><label class="field-label">Subtitle (optional)</label><input class="inp" id="subInput" type="text" value="" placeholder="e.g. Chemistry Notes" autocomplete="off"></div>
             <div class="field"><label class="field-label">Corner badge</label><input class="inp" id="badgeInput" type="text" value="Small Notes / Big Results" autocomplete="off"></div>
@@ -743,7 +767,6 @@ $pmAdminEmail = pm_auth_admin_email();
             <label class="chk"><input type="checkbox" id="optTwoCol" checked> 2 columns</label>
             <label class="chk"><input type="checkbox" id="optWM" checked> Watermark</label>
             <label class="chk"><input type="checkbox" id="optBrand" checked> Brand footer</label>
-            <label class="chk">Subject <select id="optIcon" class="inp icon-pick" title="Subject chuno — header ka logo usi hisab se aayega"><option value="auto">Auto (folder se)</option><option value="math">Maths &#960;</option><option value="physics">Physics &#9883;</option><option value="chem">Chemistry &#9879;</option></select></label>
             <label class="chk" title="Off karo to bade text pe typing fast rahegi; preview Refresh se banega"><input type="checkbox" id="optLive" checked> Live preview</label>
             <label class="chk">Font <input type="number" id="optFont" class="inp num" value="10.5" min="8" max="13" step="0.5"> pt</label>
           </div>
@@ -954,12 +977,18 @@ $pmAdminEmail = pm_auth_admin_email();
       if (t === "bar") return '<span class="mac bar">' + body + "</span>";
       return '<span class="mac" data-a="' + t + '">' + body + "</span>";
     });
-    /* ── pehle wo sab jo braces use karte hain, taki \frac ke groups saaf mil jayein ── */
-    s = s.replace(/\\sqrt\[([^\]]+)\]\{([^{}]*)\}/g, '<sup>$1</sup>√<span class="rad">$2</span>');
-    s = s.replace(/\\sqrt\{([^{}]*)\}/g, '√<span class="rad">$1</span>');
-    s = s.replace(/\^\{([^{}]*)\}/g, "<sup>$1</sup>").replace(/_\{([^{}]*)\}/g, "<sub>$1</sub>");
-    /* ab \frac — andar ke braces hat chuke hain, isliye \frac{m^{2}v^{2}}{m} bhi banta hai */
-    for (var k = 0; k < 6; k++) s = s.replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g, '<span class="frac"><span>$1</span><span>$2</span></span>');
+    /* braces wale construct sabse andar se bahar ki taraf kholo: [^{}] wale group
+       nested braces nahi pakadte, isliye ek hi pass me \sqrt{u^{2}+2as} ya
+       \sqrt{\frac{2E}{m}} toot jate the. Loop har baar sabse andar wala resolve
+       karta hai, jab tak kuch badalna band na ho. */
+    for (var k = 0; k < 8; k++) {
+      var prevTex = s;
+      s = s.replace(/\^\{([^{}]*)\}/g, "<sup>$1</sup>").replace(/_\{([^{}]*)\}/g, "<sub>$1</sub>");
+      s = s.replace(/\\sqrt\[([^\]]+)\]\{([^{}]*)\}/g, '<sup>$1</sup>\u221a<span class="rad">$2</span>');
+      s = s.replace(/\\sqrt\{([^{}]*)\}/g, '\u221a<span class="rad">$1</span>');
+      s = s.replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g, '<span class="frac"><span>$1</span><span>$2</span></span>');
+      if (s === prevTex) break;
+    }
     /* \frac12 jaisa short form bhi chale (LaTeX me allowed hai) */
     s = s.replace(/\\frac\s*([0-9A-Za-z])\s*([0-9A-Za-z])/g, '<span class="frac"><span>$1</span><span>$2</span></span>');
     s = s.replace(new RegExp("\\\\(" + FUNCS + ")(?![A-Za-z])((?:\\^|_)(?:\\{[^{}]*\\}|\\S))?\\s*", "g"), function (m, f, sc) { return '<span class="fn">' + f + "</span>" + (sc || "") + "&thinsp;"; });
@@ -1119,7 +1148,7 @@ $pmAdminEmail = pm_auth_admin_email();
       }
       var ib = parseImgLine(t);
       if (ib) { ib.line = i; ib.count = 1; if (wideNext) { ib.wide = true; wideNext = false; } push(ib); i++; continue; }
-      if ((m = t.match(/^\[(Banner|Caption)\]\s*(.+)$/i))) { push({ type: m[1].toLowerCase() === "banner" ? "banner" : "cap", html: inline(m[2]), line: i, count: 1 }); i++; continue; }
+      if ((m = t.match(/^\[(Banner|Caption)\]\s*(.+)$/i))) { var isBan = m[1].toLowerCase() === "banner"; push({ type: isBan ? "banner" : "cap", html: isBan ? inline(m[2]).replace(/<\/?mark\b[^>]*>/g, "") : inline(m[2]), line: i, count: 1 }); i++; continue; }
       if (/^\[wide\]$/i.test(t)) { flushAll(); wideNext = true; i++; continue; }
       if ((m = t.match(/^~\s+(.+)$/))) { push({ type: "qt", html: inline(m[1]), line: i, count: 1 }); i++; continue; }
 
@@ -1206,13 +1235,17 @@ $pmAdminEmail = pm_auth_admin_email();
     if (!lblHtml) return html;
     return /^<span class="ln[^"]*">/.test(html) ? html.replace(/^(<span class="ln[^"]*">)/, "$1" + lblHtml) : lblHtml + html;
   }
+  /* heading / table header rangeen patti par hote hain — wahan highlighter box jaisa dikhta hai,
+     isliye mark hata do, baki sab (maths, bold) waisa hi rahe */
+  function inlineNoMark(t) { return inline(t).replace(/<\/?mark\b[^>]*>/g, ""); }
   function buildNodes(blocks) {
-    var chap = ($("chapInput").value || "1").trim(), s1 = 0, qn = 0, out = [];
+    var s1 = 0, qn = 0, out = [];
     blocks.forEach(function (b) {
       var node = null;
       switch (b.type) {
-        case "h1": s1++; b.num = chap + "." + s1; node = el("blk h1", '<span class="num">' + esc(b.num) + '</span><span class="tt">' + inline(b.text) + "</span>"); break;
-        case "h2": b.num = ""; node = el("blk h2", '<span class="dia">❖</span><span>' + inline(b.text) + "</span>"); break;
+        /* section number har chapter me 1.1 se shuru — chapter no. ka prefix nahi */
+        case "h1": s1++; b.num = "1." + s1; node = el("blk h1", '<span class="num">' + esc(b.num) + '</span><span class="tt">' + inlineNoMark(b.text) + "</span>"); break;
+        case "h2": b.num = ""; node = el("blk h2", '<span class="dia">❖</span><span>' + inlineNoMark(b.text) + "</span>"); break;
         case "q":
           qn++; var label = "Q" + (b.num || qn);
           var isNum = !b.opts.length && (b.sol.length || /calculate|find|determine|compute|how much|how many|kitna|nikalo|value of/i.test(b.text));
@@ -1225,7 +1258,7 @@ $pmAdminEmail = pm_auth_admin_email();
           if (b.ans) html += '<div class="q-ans"><i class="fa fa-circle-check"></i> Ans: ' + inline(b.ans) + "</div>";
           node = el("blk qb" + (isNum ? " numerical" : ""), html);
           break;
-        case "h3": node = el("blk h3", inline(b.text)); break;
+        case "h3": node = el("blk h3", inlineNoMark(b.text)); break;
         case "p": node = el("blk p", b.html); break;
         case "ul": node = el("blk"); var ul = document.createElement("ul"); ul.className = "ul";
           b.items.forEach(function (it) { var li = document.createElement("li"); li.innerHTML = it.html; if (it.line != null) li.dataset.line = it.line;
@@ -1246,7 +1279,7 @@ $pmAdminEmail = pm_auth_admin_email();
           node = el("blk"); var tb = document.createElement("table"); tb.className = "tb";
           if (b.wide) node.dataset.wide = "1";
           var cols = b.head.length;
-          tb.innerHTML = "<thead><tr>" + b.head.map(function (h) { return "<th>" + inline(h) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+          tb.innerHTML = "<thead><tr>" + b.head.map(function (h) { return "<th>" + inlineNoMark(h) + "</th>"; }).join("") + "</tr></thead><tbody>" +
             b.rows.map(function (r) { var c = r.slice(0, cols); while (c.length < cols) c.push(""); return "<tr>" + c.map(function (x) { return "<td>" + inline(x) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody>";
           node.appendChild(tb); break;
         case "banner": node = el("blk banner", b.html); node.style.marginBottom = "0"; break;
@@ -1320,6 +1353,7 @@ $pmAdminEmail = pm_auth_admin_email();
            'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + art + "</svg>";
   }
   /** which glyph to draw — explicit choice, else guessed from folder/title */
+  var subjPickPaint = null;
   function iconKind() {
     var pick = $("optIcon") ? $("optIcon").value : "auto";
     if (pick && pick !== "auto") return pick;
@@ -1925,6 +1959,7 @@ $pmAdminEmail = pm_auth_admin_email();
       OPTS.forEach(function (id) { $(id).checked = (st.o && typeof st.o[id] === "boolean") ? st.o[id] : $(id).defaultChecked; });
       $("optFont").value = st.font || $("optFont").defaultValue;
       $("optIcon").value = st.icon || "auto";
+      if (subjPickPaint) subjPickPaint();
       $("optLive").checked = st.live !== false; document.body.classList.toggle("live-off", st.live === false);
       palette = (Array.isArray(st.pal) && st.pal.length === 5) ? st.pal.slice() : PRESETS.textbook.slice();
       images = Array.isArray(imgs) ? imgs.filter(function (x) { return x && x.name && x.data; }) : []; imagesDirty = false;
@@ -2581,6 +2616,30 @@ $pmAdminEmail = pm_auth_admin_email();
   $("optLive").addEventListener("change", function () { document.body.classList.toggle("live-off", !this.checked); if (this.checked && previewStale) refreshPreview(); saveState(); });
   ta.addEventListener("input", function () { schedule(); if (histT) clearTimeout(histT); histT = setTimeout(function () { snap(); }, 450); });
   FIELDS.forEach(function (id) { $(id).addEventListener("input", schedule); });
+  /* Subject logo chooser — buttons hidden select ko chalate hain */
+  (function () {
+    var host = $("subjPick"), sel = $("optIcon");
+    if (!host || !sel) return;
+    [].forEach.call(host.querySelectorAll("button"), function (b) {
+      var k = b.getAttribute("data-icon");
+      var art = k === "auto" ? '<span class="auto-mark"><i class="fa fa-wand-magic-sparkles"></i></span>' : iconSvg(k, "");
+      b.insertAdjacentHTML("afterbegin", art);
+    });
+    function paint() {
+      [].forEach.call(host.querySelectorAll("button"), function (b) {
+        b.classList.toggle("on", b.getAttribute("data-icon") === sel.value);
+      });
+    }
+    host.addEventListener("click", function (e) {
+      var b = e.target.closest("button"); if (!b) return;
+      sel.value = b.getAttribute("data-icon");
+      sel.dispatchEvent(new Event("change", { bubbles: true }));
+      paint();
+    });
+    sel.addEventListener("change", paint);
+    paint();
+    subjPickPaint = paint;
+  })();
   OPTS.concat(["optFont", "optIcon"]).forEach(function (id) { $(id).addEventListener("change", function () { render(); saveState(); }); });
   $("optFont").addEventListener("input", schedule);
   $("optWM").addEventListener("change", function () { stage.classList.toggle("no-wm", !$("optWM").checked); document.body.classList.toggle("no-wm", !$("optWM").checked); });
@@ -2639,7 +2698,7 @@ $pmAdminEmail = pm_auth_admin_email();
      AI PROMPT
   ===================================================================== */
   var AI_PROMPT = [
-    "Tum ek diploma (polytechnic) ke teacher ho. Niche diye chapter ke text se SHORT NOTES banao.",
+    "Tum ek diploma (polytechnic) ke teacher ho. Niche diye chapter ke text se notes banao.",
     "Output sirf plain text me do — niche wali markup exactly follow karo, koi extra commentary nahi.",
     "",
     "STRUCTURE",
@@ -2654,28 +2713,48 @@ $pmAdminEmail = pm_auth_admin_email();
     "| Col A | Col B |            (table — pehli row header)",
     "[Banner] Table ka title      (table se theek pehle)",
     "",
-    "HIGHLIGHT COLOUR — dono alag rakhna",
-    "%%keyword%%   = BLUE   — notes ke beech me har important term / keyword iske andar",
-    "==keyword==   = YELLOW — sirf aakhir wale 'Quick Revision' section me",
-    "Baaki colour (^^green^^ , !!pink!! , ::orange::) sirf tab jab sach me zarurat ho.",
+    "HIGHLIGHTER — SIRF YELLOW",
+    "==keyword==   = YELLOW highlighter. Poore notes me bas yahi ek highlighter use karna hai.",
+    "Koi dusra highlighter mat lagana — %%...%% , ^^...^^ , !!...!! , ::...:: bilkul mat likhna.",
+    "Jahan bhi koi important term, definition ka key word, ya formula ka result highlight",
+    "karna ho, use ==aise== likho.",
+    "",
+    "HIGHLIGHTER YAHAN BILKUL NAHI",
+    "- Kisi bhi heading me nahi — '# ', '## ', '### ' wali line me kabhi ==...== mat lagao.",
+    "- Table ki header row me nahi — '| Angle | Resultant | Meaning |' jaisi pehli row saaf rahegi.",
+    "- [Banner] wali line me nahi.",
+    "  (Ye sab rangeen patti par chhapte hain, wahan highlighter khali dabba jaisa dikhta hai.)",
+    "Table ke andar ki baaki rows me highlighter chalega.",
     "",
     "MATH — ye sabse zaroori hai, STANDARD LaTeX hi likhna",
     "Har formula $...$ ke andar. Unit aur shabd $ ke BAHAR rakho: $v = 20$ m/s",
+    "",
+    "ROOT (square root) ke liye \\sqrt{...} likhte hain — braces hamesha lagana:",
+    "   $\\sqrt{3}$        (root 3)",
+    "   $\\sqrt{x+1}$      (poora x+1 root ke andar)",
+    "   $\\sqrt{2gh}$   ·   $v = \\sqrt{\\frac{2E}{m}}$",
+    "   $R = \\sqrt{P^{2} + Q^{2} + 2PQ\\cos\\theta}$",
+    "   cube root / n-th root: $\\sqrt[3]{8}$ , $\\sqrt[n]{a}$",
+    "   GALAT: \\sqrt3 , √3 , root3 , sqrt(3) — inse galat chhapta hai.",
+    "",
+    "Baaki math ke rules:",
     "1. Fraction HAMESHA do braces ke saath: \\frac{a}{b}",
     "   sahi:  $\\frac{1}{2}$ , $\\frac{\\sqrt{3}}{2}$ , $\\frac{(mv)^{2}}{2m}$",
-    "   GALAT: \\frac12 , \\frac√32 , 1/2 likhna",
-    "2. Root hamesha braces ke saath: \\sqrt{3} , \\sqrt{x+1}      GALAT: \\sqrt3",
-    "3. Power aur subscript hamesha braces ke saath: m^{2}v^{2} , 10^{-27} , E_{n} , H_{2}O",
+    "   GALAT: \\frac12 , 1/2 likhna",
+    "2. Power aur subscript hamesha braces ke saath: m^{2}v^{2} , 10^{-27} , E_{n} , H_{2}O",
     "   GALAT: m^2v^2 (isse exponent galat ban jata hai)",
-    "4. Guna ke liye \\times ya \\cdot likho, chhota 'x' kabhi nahi: $40 \\times 1.2$",
-    "5. Trigonometry / log backslash ke saath: \\cos\\theta , \\sin^{2}\\theta , \\log_{10} x",
+    "3. Guna ke liye \\times ya \\cdot likho, chhota 'x' kabhi nahi: $40 \\times 1.2$",
+    "4. Trigonometry / log backslash ke saath: \\cos\\theta , \\sin^{2}\\theta , \\log_{10} x",
     "   GALAT: cos θ ko 'cos' aise hi chipka dena (Fscos θ ban jata hai)",
-    "6. Greek letters: \\theta \\lambda \\alpha \\mu \\pi \\Delta \\omega",
-    "7. Degree: 30^{\\circ}   ·   Approx: \\approx   ·   Proportional: \\propto",
+    "5. Greek letters: \\theta \\lambda \\alpha \\mu \\pi \\Delta \\omega",
+    "6. Degree: 30^{\\circ}   ·   Approx: \\approx   ·   Proportional: \\propto",
+    "7. Vector: \\vec{F}   ·   Average: \\bar{v}   ·   Arrow: \\rightarrow",
     "",
     "MATH KE SAHI EXAMPLE (bilkul aise hi likhna):",
     "$W = Fs\\cos\\theta = 40 \\times 1.2 \\times \\cos 30^{\\circ} = 48 \\times \\frac{\\sqrt{3}}{2} \\approx 41.57$ J",
     "$E = \\frac{1}{2} \\cdot \\frac{m^{2}v^{2}}{m} = \\frac{(mv)^{2}}{2m}$",
+    "$R = \\sqrt{P^{2} + Q^{2} + 2PQ\\cos\\theta}$",
+    "$v = \\sqrt{u^{2} + 2as}$",
     "$\\lambda = \\frac{h}{p} = \\frac{h}{mv}$",
     "$E_{n} = -\\frac{13.6}{n^{2}}$ eV",
     "",
@@ -2685,15 +2764,14 @@ $pmAdminEmail = pm_auth_admin_email();
     "Example:",
     "image: full wave rectifier circuit",
     "image: stress strain curve for mild steel",
-    "Rules: line 'image:' se shuru ho, naam chhota aur saaf (5-8 shabd), ek line me ek hi image,",
+    "Rules: line 'image:' se shuru ho, naam saaf aur seedha ho, ek line me ek hi image,",
     "aur us paragraph se theek upar rakho jiske saath wo padhni hai. Image khud mat banao —",
     "sirf slot chhodo, mai apni image uss slot me daal dunga.",
     "",
     "QUICK REVISION",
     "Notes ke sabse end me ek section do:  ## Quick Revision",
-    "Usme 5-8 chhote bullet points ho (ek line ke), aur har point me sabse important word ya",
-    "formula ko ==aise== highlight karo — ye yellow highlighter me dikhega.",
-    "(Yellow sirf yahin use karna — notes ke beech wale keyword blue %%...%% me hi rahenge.)",
+    "Usme ek-ek line ke bullet points ho, aur har point me sabse important word ya formula ko",
+    "==aise== highlight karo.",
     "Example:  - Work done ka formula ==$W = Fs\\cos\\theta$== hota hai",
     "",
     "YE MAT KARNA",
@@ -2701,13 +2779,15 @@ $pmAdminEmail = pm_auth_admin_email();
     "  (jaise 'Energy can neither be created nor destroyed, only transformed').",
     "- '~' se shuru hone wali handwritten quote line bilkul mat banao.",
     "- Notes ke bahar koi intro, summary ya 'Here are your notes' type line mat likho.",
+    "- Yellow ke alawa koi aur highlighter mat lagao.",
+    "- Kisi heading ya table header me highlighter mat lagao.",
     "",
     "STYLE",
     "- Hinglish me likho (Hindi + English mix), jaise class me padhate hain.",
     "- Har definition, formula aur difference zaroor cover karo.",
-    "- Important word ko **bold** karo, keyword ko %%highlight%% karo (blue).",
+    "- Important word ko **bold** karo, keyword ko ==highlight== karo (yellow).",
     "- Numerical ke liye: Q1. sawaal / Solution: steps / Ans: jawab.",
-    "- Exam me jo aata hai uspe focus, theory lamba mat karo.",
+    "- Exam me jo poochha jata hai uspe focus karo.",
     "",
     "CHAPTER TEXT:",
     "<<< yahan apna chapter text paste karo >>>"
