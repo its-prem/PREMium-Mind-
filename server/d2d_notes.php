@@ -295,6 +295,11 @@ $pmAdminEmail = pm_auth_admin_email();
 
   /* ---- header ---- */
   .hdr { flex: none; background: linear-gradient(180deg,#9a1f2f 0%,var(--maroon) 55%,#7d1524 100%); color: #fff; border-radius: 3mm; padding: 3.6mm 6mm 3.4mm; margin-bottom: 4mm; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 5mm; box-shadow: 0 1.5mm 4mm rgba(110,18,32,.28); }
+  /* Diploma Wallah group logo — header me sabse left */
+  .hdr-logo { display: flex; align-items: center; }
+  .hdr-logo .dw-logo { width: 15mm; height: 15mm; flex: none; object-fit: contain; background: #fff; border-radius: 50%; padding: .8mm; box-shadow: 0 .6mm 1.8mm rgba(0,0,0,.22); }
+  .hdr.slim .hdr-logo .dw-logo { width: 9mm; height: 9mm; padding: .5mm; }
+  .hdr.no-logo { grid-template-columns: 1fr auto; }
   .chap { background: var(--pink-2); color: var(--maroon); border-radius: 2.5mm; padding: 1.6mm 4.2mm; text-align: center; line-height: 1; }
   .chap small { display: block; font-size: 8pt; letter-spacing: 1pt; text-transform: uppercase; font-weight: 700; }
   .chap b { display: block; font-size: 24pt; font-weight: 700; margin-top: 1mm; }
@@ -683,7 +688,7 @@ $pmAdminEmail = pm_auth_admin_email();
             <label class="chk"><input type="checkbox" id="optTwoCol" checked> 2 columns</label>
             <label class="chk"><input type="checkbox" id="optWM" checked> Watermark</label>
             <label class="chk"><input type="checkbox" id="optBrand" checked> Brand footer</label>
-            <label class="chk">Logo <select id="optIcon" class="inp icon-pick" title="Header ka icon — background sabka same maroon rahega"><option value="auto">Auto (folder se)</option><option value="math">Maths &#960;</option><option value="physics">Physics &#9883;</option><option value="chem">Chemistry &#9879;</option></select></label>
+            <label class="chk">Subject <select id="optIcon" class="inp icon-pick" title="Subject chuno — header ka logo usi hisab se aayega"><option value="auto">Auto (folder se)</option><option value="math">Maths &#960;</option><option value="physics">Physics &#9883;</option><option value="chem">Chemistry &#9879;</option></select></label>
             <label class="chk" title="Off karo to bade text pe typing fast rahegi; preview Refresh se banega"><input type="checkbox" id="optLive" checked> Live preview</label>
             <label class="chk">Font <input type="number" id="optFont" class="inp num" value="10.5" min="8" max="13" step="0.5"> pt</label>
           </div>
@@ -878,14 +883,20 @@ $pmAdminEmail = pm_auth_admin_email();
       if (t === "bar") return '<span class="mac bar">' + body + "</span>";
       return '<span class="mac" data-a="' + t + '">' + body + "</span>";
     });
-    for (var k = 0; k < 4; k++) s = s.replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g, '<span class="frac"><span>$1</span><span>$2</span></span>');
+    /* ── pehle wo sab jo braces use karte hain, taki \frac ke groups saaf mil jayein ── */
     s = s.replace(/\\sqrt\[([^\]]+)\]\{([^{}]*)\}/g, '<sup>$1</sup>√<span class="rad">$2</span>');
-    s = s.replace(new RegExp("\\\\(" + FUNCS + ")(?![A-Za-z])((?:\\^|_)(?:\\{[^{}]*\\}|\\S))?\\s*", "g"), function (m, f, sc) { return '<span class="fn">' + f + "</span>" + (sc || "") + "&thinsp;"; });
-    s = s.replace(/\\sqrt\{([^{}]*)\}/g, '√<span class="rad">$1</span>').replace(/\\sqrt\s*([A-Za-z0-9]+)/g, '√<span class="rad">$1</span>');
-    s = s.replace(/\\([A-Za-z]+)/g, function (m, w) { return TEX.hasOwnProperty(w) ? TEX[w] : (GREEK.hasOwnProperty(w) ? GREEK[w] : m); });
+    s = s.replace(/\\sqrt\{([^{}]*)\}/g, '√<span class="rad">$1</span>');
     s = s.replace(/\^\{([^{}]*)\}/g, "<sup>$1</sup>").replace(/_\{([^{}]*)\}/g, "<sub>$1</sub>");
-    s = s.replace(/\^\(([^)]+)\)/g, "<sup>$1</sup>").replace(/\^(-?[0-9A-Za-z]+)/g, "<sup>$1</sup>");
-    s = s.replace(/([^\s_^{}<>;&])_(\d+|[A-Za-z]+)/g, "$1<sub>$2</sub>");
+    /* ab \frac — andar ke braces hat chuke hain, isliye \frac{m^{2}v^{2}}{m} bhi banta hai */
+    for (var k = 0; k < 6; k++) s = s.replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g, '<span class="frac"><span>$1</span><span>$2</span></span>');
+    /* \frac12 jaisa short form bhi chale (LaTeX me allowed hai) */
+    s = s.replace(/\\frac\s*([0-9A-Za-z])\s*([0-9A-Za-z])/g, '<span class="frac"><span>$1</span><span>$2</span></span>');
+    s = s.replace(new RegExp("\\\\(" + FUNCS + ")(?![A-Za-z])((?:\\^|_)(?:\\{[^{}]*\\}|\\S))?\\s*", "g"), function (m, f, sc) { return '<span class="fn">' + f + "</span>" + (sc || "") + "&thinsp;"; });
+    s = s.replace(/\\sqrt\s*([A-Za-z0-9])/g, '√<span class="rad">$1</span>');
+    s = s.replace(/\\([A-Za-z]+)/g, function (m, w) { return TEX.hasOwnProperty(w) ? TEX[w] : (GREEK.hasOwnProperty(w) ? GREEK[w] : m); });
+    /* braces ke bina power/subscript sirf EK token leta hai, warna m^2v^2 ka exponent "2v" ban jata tha */
+    s = s.replace(/\^\(([^)]+)\)/g, "<sup>$1</sup>").replace(/\^\s*(-?\d+|[A-Za-z0-9])/g, "<sup>$1</sup>");
+    s = s.replace(/([^\s_^{}<>;&])_\s*(-?\d+|[A-Za-z0-9])/g, "$1<sub>$2</sub>");
     s = s.replace(/\{|\}/g, "");
     return s;
   }
@@ -1202,14 +1213,11 @@ $pmAdminEmail = pm_auth_admin_email();
   ===================================================================== */
   var ICON_ART = {
     math:
-      '<g stroke-width="1.7">' +
-        '<circle cx="32" cy="32" r="24" stroke-dasharray="3 3.4" opacity=".8"/>' +
-        '<line x1="4" y1="32" x2="60" y2="32"/><polyline points="55.5,28 60,32 55.5,36"/><polyline points="8.5,28 4,32 8.5,36"/>' +
-        '<line x1="32" y1="60" x2="32" y2="4"/><polyline points="28,8.5 32,4 36,8.5"/><polyline points="28,55.5 32,60 36,55.5"/>' +
-        '<path d="M11 48 C 17 14, 27 13, 31 32 C 35 51, 45 49, 53 17" opacity=".85"/>' +
-      '</g>' +
-      '<text x="32" y="47" text-anchor="middle" font-family="Tinos, Georgia, serif" font-size="46" font-weight="700" ' +
-        'fill="#fff" stroke="#8e1b2a" stroke-width="3.4" paint-order="stroke">&#960;</text>',
+      '<circle cx="32" cy="32" r="26" stroke-dasharray="4 4.2" opacity=".9"/>' +
+      '<text x="32" y="46" text-anchor="middle" font-family="Tinos, Georgia, serif" font-size="44" ' +
+        'font-weight="700" fill="#fff" stroke="none">&#960;</text>' +
+      '<circle cx="12.5" cy="12.5" r="1.9" fill="#fff" stroke="none" opacity=".9"/>' +
+      '<circle cx="51.5" cy="51.5" r="1.9" fill="#fff" stroke="none" opacity=".9"/>',
     physics:
       '<circle cx="32" cy="32" r="4.6" fill="#fff" stroke="none"/>' +
       '<ellipse cx="32" cy="32" rx="25" ry="10"/>' +
@@ -1263,13 +1271,22 @@ $pmAdminEmail = pm_auth_admin_email();
     return im;
   }
 
+  /** Diploma Wallah ka logo — file ho to wahi, warna chhod do */
+  function dwLogoHtml() {
+    return wmLogoOk === false ? "" : '<img class="dw-logo" src="diplomawallah-logo.png" alt="Diploma Wallah">';
+  }
   function headerNode(slim) {
     var badge = ($("badgeInput").value || "").replace(/\s*\/\s*/g, "\n");
-    var d = el("hdr" + (slim ? " slim" : ""));
-    d.innerHTML = '<div class="chap"><small>Chapter</small><b>' + esc($("chapInput").value || "1") + "</b></div>" +
-      '<div class="hdr-tt"><div class="hdr-title">' + esc($("titleInput").value || "Notes") + "</div>" + ($("subInput").value ? '<div class="hdr-sub">' + esc($("subInput").value) + "</div>" : "") + "</div>" +
-      '<div class="hdr-r"><div class="top">' + iconSvg(iconKind(), "hdr-icon") + (badge ? '<div class="hand-badge">' + esc(badge) + "</div>" : "") + "</div>" +
-      ($("tagInput").value ? '<div class="hdr-tag">' + esc($("tagInput").value.replace(/\s*\|\s*/g, "  |  ")) + "</div>" : "") + "</div>";
+    var dw = dwLogoHtml();
+    var d = el("hdr" + (slim ? " slim" : "") + (dw ? "" : " no-logo"));
+    d.innerHTML =
+      (dw ? '<div class="hdr-logo">' + dw + "</div>" : "") +
+      '<div class="hdr-tt"><div class="hdr-title">' + esc($("titleInput").value || "Notes") + "</div>" +
+        ($("subInput").value ? '<div class="hdr-sub">' + esc($("subInput").value) + "</div>" : "") + "</div>" +
+      '<div class="hdr-r"><div class="top">' + iconSvg(iconKind(), "hdr-icon") +
+        (badge ? '<div class="hand-badge">' + esc(badge) + "</div>" : "") + "</div>" +
+        ($("tagInput").value ? '<div class="hdr-tag">' + esc($("tagInput").value.replace(/\s*\|\s*/g, "  |  ")) + "</div>" : "") +
+      "</div>";
     return d;
   }
   function footNode(no) {
@@ -1485,10 +1502,14 @@ $pmAdminEmail = pm_auth_admin_email();
     if (renderAgain) { renderAgain = false; schedule(); }
   }
   function renderNow() {
+    /* re-render ke baad wahin rukna hai jahan user tha — text hataane par upar mat kudo */
+    var pv = $("previewCol"), keepPv = pv.scrollTop, keepWin = window.scrollY || 0;
     titleFitCache = {};
     document.documentElement.style.setProperty("--nf", (parseFloat($("optFont").value) || 10) + "pt");
     var blocks = parse(ta.value); lastBlocks = blocks;
     var pages = paginate(buildNodes(blocks));
+    pv.scrollTop = Math.min(keepPv, Math.max(0, pv.scrollHeight - pv.clientHeight));
+    if (keepWin) window.scrollTo(0, Math.min(keepWin, Math.max(0, document.documentElement.scrollHeight - window.innerHeight)));
     renderOutline(blocks); refreshPosSelects(); syncImgCards();
     var c = { h1: 0, h2: 0, formula: 0, table: 0, callout: 0 }; blocks.forEach(function (b) { if (c.hasOwnProperty(b.type)) c[b.type]++; });
     metaEl.textContent = c.h1 + " sections · " + c.h2 + " sub · " + c.callout + " boxes · " + c.formula + " formulas · " + c.table + " tables → " + pages + " page" + (pages === 1 ? "" : "s");
@@ -2411,20 +2432,52 @@ $pmAdminEmail = pm_auth_admin_email();
     "- bullet point               (2 space + '- ' = sub-bullet)",
     "1. numbered point",
     "> Note: important baat       (box me aayega; agli lines bhi usi box me)",
-    "$ F = m a                    (formula box — apni line par)",
+    "$ F = ma                     (formula box — apni line par, akela)",
     "$...$                        (line ke beech ka math, jaise $v = u + at$)",
     "| Col A | Col B |            (table — pehli row header)",
     "[Banner] Table ka title      (table se theek pehle)",
     "",
-    "IMAGES — ye sabse zaroori hai",
+    "MATH — ye sabse zaroori hai, STANDARD LaTeX hi likhna",
+    "Har formula $...$ ke andar. Unit aur shabd $ ke BAHAR rakho: $v = 20$ m/s",
+    "1. Fraction HAMESHA do braces ke saath: \\frac{a}{b}",
+    "   sahi:  $\\frac{1}{2}$ , $\\frac{\\sqrt{3}}{2}$ , $\\frac{(mv)^{2}}{2m}$",
+    "   GALAT: \\frac12 , \\frac√32 , 1/2 likhna",
+    "2. Root hamesha braces ke saath: \\sqrt{3} , \\sqrt{x+1}      GALAT: \\sqrt3",
+    "3. Power aur subscript hamesha braces ke saath: m^{2}v^{2} , 10^{-27} , E_{n} , H_{2}O",
+    "   GALAT: m^2v^2 (isse exponent galat ban jata hai)",
+    "4. Guna ke liye \\times ya \\cdot likho, chhota 'x' kabhi nahi: $40 \\times 1.2$",
+    "5. Trigonometry / log backslash ke saath: \\cos\\theta , \\sin^{2}\\theta , \\log_{10} x",
+    "   GALAT: cos θ ko 'cos' aise hi chipka dena (Fscos θ ban jata hai)",
+    "6. Greek letters: \\theta \\lambda \\alpha \\mu \\pi \\Delta \\omega",
+    "7. Degree: 30^{\\circ}   ·   Approx: \\approx   ·   Proportional: \\propto",
+    "",
+    "MATH KE SAHI EXAMPLE (bilkul aise hi likhna):",
+    "$W = Fs\\cos\\theta = 40 \\times 1.2 \\times \\cos 30^{\\circ} = 48 \\times \\frac{\\sqrt{3}}{2} \\approx 41.57$ J",
+    "$E = \\frac{1}{2} \\cdot \\frac{m^{2}v^{2}}{m} = \\frac{(mv)^{2}}{2m}$",
+    "$\\lambda = \\frac{h}{p} = \\frac{h}{mv}$",
+    "$E_{n} = -\\frac{13.6}{n^{2}}$ eV",
+    "",
+    "IMAGES",
     "Jahan bhi diagram / figure / graph / circuit chahiye, wahan EXACTLY aisi ek line likho:",
     "image: short name of the figure",
     "Example:",
     "image: full wave rectifier circuit",
     "image: stress strain curve for mild steel",
-    "Rules: line ki shuruaat 'image:' se ho, naam chhota aur saaf ho (5-8 shabd), ek line me ek hi image,",
-    "aur us image ko jis paragraph ke saath padhna hai usse theek upar rakho. Image khud mat banao,",
-    "sirf slot chhodo — mai apni image uss slot me daal dunga.",
+    "Rules: line 'image:' se shuru ho, naam chhota aur saaf (5-8 shabd), ek line me ek hi image,",
+    "aur us paragraph se theek upar rakho jiske saath wo padhni hai. Image khud mat banao —",
+    "sirf slot chhodo, mai apni image uss slot me daal dunga.",
+    "",
+    "QUICK REVISION",
+    "Notes ke sabse end me ek section do:  ## Quick Revision",
+    "Usme 5-8 chhote bullet points ho (ek line ke), aur har point me sabse important word ya",
+    "formula ko ==aise== highlight karo — ye yellow highlighter me dikhega.",
+    "Example:  - Work done ka formula ==$W = Fs\\cos\\theta$== hota hai",
+    "",
+    "YE MAT KARNA",
+    "- Aakhir me koi motivational line, quote ya tagline mat likho",
+    "  (jaise 'Energy can neither be created nor destroyed, only transformed').",
+    "- '~' se shuru hone wali handwritten quote line bilkul mat banao.",
+    "- Notes ke bahar koi intro, summary ya 'Here are your notes' type line mat likho.",
     "",
     "STYLE",
     "- Hinglish me likho (Hindi + English mix), jaise class me padhate hain.",
