@@ -276,15 +276,35 @@ $pmAdminEmail = pm_auth_admin_email();
   .imgc .ins.again:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
   .imgs-empty { color: var(--text-muted); font-size: .82rem; padding: 10px 6px; text-align: center; }
   /* notes me likhe "image: name" slots — box pehle se taiyar, bas dropdown se image chuno */
-  .slots { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-  .slotc { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px dashed var(--primary); border-radius: 8px; padding: 9px 10px; }
-  .slotc .sic { width: 34px; height: 34px; flex: none; border-radius: 7px; background: var(--primary-light); color: var(--primary); display: grid; place-items: center; font-size: .9rem; }
+  .slots { display: flex; flex-direction: column; gap: 6px; }
+  .slotc { background: #fff; border: 1px dashed var(--primary); border-radius: 7px; padding: 6px 8px; }
+  .slotc .str { display: flex; align-items: center; gap: 9px; }
+  .slotc .sic { width: 26px; height: 26px; flex: none; border-radius: 6px; background: var(--primary-light); color: var(--primary); display: grid; place-items: center; font-size: .78rem; }
   .slotc .sbd { flex: 1; min-width: 0; }
-  .slotc .sbd b { display: block; font-size: .8rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .slotc .sbd small { display: block; font-size: .68rem; color: var(--text-muted); }
-  .slotc select { flex: 0 0 150px; max-width: 150px; padding: 6px 8px; font-size: .76rem; }
-  .slots-head { font-family: 'Oswald', sans-serif; font-size: .72rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--primary); margin-bottom: 7px; display: flex; align-items: center; gap: 7px; }
+  .slotc .sbd b { display: block; font-size: .76rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .slotc .sbd small { display: block; font-size: .64rem; color: var(--text-muted); }
+  /* naam ki jagah asli image dikhao — click karo, wahi slot me chali jayegi */
+  .picks { display: flex; flex-wrap: nowrap; gap: 5px; overflow-x: auto; margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--line-2); }
+  .picks::-webkit-scrollbar { height: 5px; }
+  .picks::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  .pk { position: relative; width: 36px; height: 36px; flex: none; padding: 0; border: 1px solid var(--line); border-radius: 5px; background: #fff; cursor: pointer; overflow: hidden; }
+  .pk img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pk:hover { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
+  .pk.used { opacity: .5; }
+  .pk.used::after { content: "¹3"; position: absolute; inset: auto 1px 1px auto; background: var(--primary); color: #fff; font-size: .55rem; line-height: 1; padding: 1px 2px; border-radius: 3px; }
   .slots-none { color: var(--text-muted); font-size: .74rem; }
+
+  /* dono listein apne dropdown group me — panel chhota rahe */
+  .grp { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 10px; overflow: hidden; background: #fff; }
+  .grp-head { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 11px; background: #f8fafc; border: none; cursor: pointer;
+    font-family: 'Oswald', sans-serif; font-size: .74rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-main); }
+  .grp-head:hover { background: var(--primary-light); color: var(--primary); }
+  .grp-head > span { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .grp-head .chev { transition: transform .25s var(--ease); font-size: .8rem; color: var(--text-muted); }
+  .grp.open .grp-head { color: var(--primary); }
+  .grp.open .grp-head .chev { transform: rotate(180deg); }
+  .grp-body { display: none; padding: 9px; }
+  .grp.open .grp-body { display: block; }
 
   .olist { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; padding-right: 6px; }
   .oitem { display: flex; gap: 10px; width: 100%; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--line); border-left: 4px solid transparent; border-radius: 6px; color: var(--text-main); font-size: .82rem; text-align: left; cursor: pointer; transition: all .2s; }
@@ -323,13 +343,12 @@ $pmAdminEmail = pm_auth_admin_email();
   .hdr-sub::before, .hdr-sub::after { content: ""; height: .3mm; width: 14mm; background: rgba(255,255,255,.75); flex: none; }
   .hdr-r { display: flex; flex-direction: column; align-items: center; gap: 1.6mm; }
   .hdr-r .top { display: flex; align-items: center; gap: 3.5mm; }
-  .hdr-icon { width: 12mm; height: 12mm; flex: none; }
+  .hdr-icon { width: 18mm; height: 18mm; flex: none; }
   .hand-badge { background: #fff; color: var(--maroon); border-radius: 3mm; padding: 1.8mm 4.5mm; font-family: Caveat, cursive; font-weight: 700; font-size: 14pt; line-height: 1.02; text-align: center; transform: rotate(-3deg); box-shadow: 0 1mm 3mm rgba(0,0,0,.18); white-space: pre-line; }
   .hdr-tag { font-size: 8pt; letter-spacing: 2pt; text-transform: uppercase; opacity: .95; white-space: nowrap; }
   .hdr.slim { padding: 2.2mm 5mm; margin-bottom: 3.5mm; gap: 4mm; }
   .hdr.slim .chap { padding: 1mm 3mm; } .hdr.slim .chap small { font-size: 6pt; } .hdr.slim .chap b { font-size: 13pt; }
   .hdr.slim .hdr-title { font-size: 14pt; } .hdr.slim .hdr-sub { display: none; }
-  .hdr.slim .hdr-icon { width: 7.5mm; height: 7.5mm; }
   .hdr.slim .hand-badge { font-size: 10pt; padding: 1mm 3mm; } .hdr.slim .hdr-tag { display: none; }
 
   /* ---- body = stack of bands; each band is 2 columns, a .wide block spans both ---- */
@@ -792,11 +811,14 @@ $pmAdminEmail = pm_auth_admin_email();
             <div class="acc-body">
               <input type="file" id="imgFile" accept="image/*" multiple hidden>
               <div class="drop" id="imgDrop"><b><i class="fa fa-plus"></i> Add image</b> — click karo ya photo yahan drop karo<br><span style="font-size:.7rem">PNG / JPG / screenshot · auto-compress hoti hai</span></div>
-              <div id="slotBox" style="display:none">
-                <div class="slots-head"><i class="fa fa-crop-simple"></i> Notes ke image slots <span class="chip" id="slotCount">0</span></div>
-                <div class="slots" id="slotList"></div>
+              <div class="grp" id="slotBox" style="display:none">
+                <button type="button" class="grp-head" data-grp="slot"><span><i class="fa fa-crop-simple"></i> Notes ke image slots <span class="chip" id="slotCount">0</span></span><i class="fa fa-angle-down chev"></i></button>
+                <div class="grp-body"><div class="slots" id="slotList"></div></div>
               </div>
-              <div class="imgs" id="imgList"></div>
+              <div class="grp open" id="imgGrp">
+                <button type="button" class="grp-head" data-grp="img"><span><i class="fa fa-images"></i> Added images <span class="chip" id="imgCount2">0</span></span><i class="fa fa-angle-down chev"></i></button>
+                <div class="grp-body"><div class="imgs" id="imgList"></div></div>
+              </div>
               <p style="margin-top:8px">Har image ke niche <b>"Insert after"</b> dropdown se position chuno → <b>Insert</b>. Text me line banti hai: <code style="color:var(--primary)">[img: name | 60% | center | caption]</code> — ise kahin bhi move kar sakte ho. Poori page width ke liye upar <code style="color:var(--primary)">[Wide]</code> likho.</p>
             </div>
           </div>
@@ -1314,7 +1336,7 @@ $pmAdminEmail = pm_auth_admin_email();
       (dw ? '<div class="hdr-logo">' + dw + "</div>" : "") +
       '<div class="hdr-tt"><div class="hdr-title">' + esc($("titleInput").value || "Notes") + "</div>" +
         ($("subInput").value ? '<div class="hdr-sub">' + esc($("subInput").value) + "</div>" : "") + "</div>" +
-      '<div class="hdr-r"><div class="top">' + iconSvg(iconKind(), "hdr-icon") +
+      '<div class="hdr-r"><div class="top">' + (slim ? "" : iconSvg(iconKind(), "hdr-icon")) +
         (badge ? '<div class="hand-badge">' + esc(badge) + "</div>" : "") + "</div>" +
         ($("tagInput").value ? '<div class="hdr-tag">' + esc($("tagInput").value.replace(/\s*\|\s*/g, "  |  ")) + "</div>" : "") +
       "</div>";
@@ -1786,16 +1808,18 @@ $pmAdminEmail = pm_auth_admin_email();
   $("stage").addEventListener("click", function (e) {
     var sl = e.target.closest(".fig.slot"); if (!sl) return;
     var line = parseInt(sl.getAttribute("data-slot"), 10);
+    var nm = (sl.querySelector("b") || {}).textContent || "";
     setDrawer(true);
     $("accImages").classList.add("open"); touchAcc($("accImages"));
-    if (!images.length) { pendingSlot = line; $("imgFile").click(); return; }
+    $("slotBox").classList.add("open");
+    if (!images.length) { pendingSlot = { line: line, name: nm }; $("imgFile").click(); return; }
     setTimeout(function () {
       var card = $("slotList").querySelector('.slotc[data-line="' + line + '"]');
       if (!card) return;
       card.scrollIntoView({ behavior: "smooth", block: "center" });
       card.classList.add("target");
       setTimeout(function () { card.classList.remove("target"); }, 1600);
-      var sel = card.querySelector(".slotPick"); if (sel) sel.focus();
+      var pk = card.querySelector(".pk"); if (pk) pk.focus();
     }, 260);
   });
   $("previewCol").addEventListener("mouseup", function () { setTimeout(onPageSelect, 10); });
@@ -2180,9 +2204,8 @@ $pmAdminEmail = pm_auth_admin_email();
         saveImages(); renderImages(); render();
         if (added.length) toast(added.length + " image add ho gayi");
         if (pendingSlot != null && added.length) {       /* slot par click karke image chuni thi */
-          var line = pendingSlot; pendingSlot = null;
-          putImage(added[0], "slot:" + line, "60%", "center", "");
-          renderImages();
+          var ps = pendingSlot; pendingSlot = null;
+          fillSlot(ps.line, ps.name, added[0]);
         }
         if (then) then(added);
       });
@@ -2317,6 +2340,24 @@ $pmAdminEmail = pm_auth_admin_email();
     if (stale) renderImages();
   }
   var openImg = {};          /* kaunsa image card khula hai — re-render ke baad bhi yaad rahe */
+  /* dono group (slots / images) khule the ya band — yaad rakho */
+  (function () {
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem("d2d_img_grp") || "{}") || {}; } catch (e) {}
+    function apply(id, key, dflt) {
+      var g = $(id); if (!g) return;
+      g.classList.toggle("open", typeof saved[key] === "boolean" ? saved[key] : dflt);
+    }
+    apply("slotBox", "slot", true); apply("imgGrp", "img", true);
+    document.addEventListener("click", function (e) {
+      var h = e.target.closest(".grp-head"); if (!h) return;
+      var g = h.closest(".grp"), key = h.getAttribute("data-grp");
+      var nowOpen = !g.classList.contains("open");
+      g.classList.toggle("open", nowOpen);
+      saved[key] = nowOpen;
+      try { localStorage.setItem("d2d_img_grp", JSON.stringify(saved)); } catch (e2) {}
+    });
+  })();
   var posHtmlStale = true;
   function refreshPosSelects() { posHtmlStale = true; }
   function fillPosSelect(sel) {
@@ -2332,25 +2373,51 @@ $pmAdminEmail = pm_auth_admin_email();
     $("slotCount").textContent = sl.length;
     if (!sl.length) { box.style.display = "none"; host.innerHTML = ""; return; }
     box.style.display = "";
-    var opts = images.length
-      ? '<option value="">Image chuno…</option>' + images.map(function (im) { return '<option value="' + esc(im.name) + '">' + esc(im.name) + "</option>"; }).join("")
-      : '<option value="">Pehle image add karo</option>';
+    var picks = images.length
+      ? images.map(function (im) {
+          var used = !!findImgTag(im.name);
+          return '<button type="button" class="pk' + (used ? " used" : "") + '" data-img="' + esc(im.name) + '"' +
+            ' title="' + esc(im.name) + (used ? " — pehle se lagi hai, yahan shift ho jayegi" : "") + '">' +
+            '<img src="' + im.data + '" alt=""></button>';
+        }).join("")
+      : '<span class="slots-none">Pehle upar se image add karo</span>';
     host.innerHTML = sl.map(function (x) {
-      return '<div class="slotc" data-line="' + x.line + '">' +
-        '<span class="sic"><i class="fa fa-image"></i></span>' +
-        '<div class="sbd"><b title="' + esc(x.name) + '">' + esc(x.name) + "</b><small>line " + (x.line + 1) + "</small></div>" +
-        '<select class="inp slotPick"' + (images.length ? "" : " disabled") + ">" + opts + "</select></div>";
+      return '<div class="slotc" data-line="' + x.line + '" data-name="' + esc(x.name) + '">' +
+        '<div class="str"><span class="sic"><i class="fa fa-image"></i></span>' +
+        '<div class="sbd"><b title="' + esc(x.name) + '">' + esc(x.name) + "</b><small>line " + (x.line + 1) +
+          (images.length ? " · niche se image par click karo" : "") + "</small></div></div>" +
+        '<div class="picks">' + picks + "</div></div>";
     }).join("");
   }
-  $("slotList").addEventListener("change", function (e) {
-    var sel = e.target.closest(".slotPick"); if (!sel || !sel.value) return;
-    var row = sel.closest(".slotc"), line = parseInt(row.getAttribute("data-line"), 10);
-    putImage(sel.value, "slot:" + line, "60%", "center", "");
-    toast("Image slot me lag gayi");
+  /** card ka line number purana ho sakta hai (typing ke baad render ruka hua) —
+   *  isliye naam se wahi slot phir se dhundo, warna galat line par image chipak jati thi */
+  function resolveSlot(line, name) {
+    var sl = imageSlots(), i, best = -1, bd = 1e9;
+    for (i = 0; i < sl.length; i++) if (sl[i].line === line && sl[i].name === name) return line;
+    for (i = 0; i < sl.length; i++) if (sl[i].name === name) {
+      var d = Math.abs(sl[i].line - line); if (d < bd) { bd = d; best = sl[i].line; }
+    }
+    if (best < 0) for (i = 0; i < sl.length; i++) if (sl[i].line === line) return line;
+    return best;
+  }
+  /** slot me image lagao — dobara lagi image ko shift karo, duplicate tag na bane */
+  function fillSlot(line, name, imgName) {
+    var at = resolveSlot(line, name);
+    if (at < 0) { toast("Ye slot text me nahi mila — text badal gaya hai"); render(); return false; }
+    putImage(imgName, "slot:" + at, "60%", "center", "", { move: !!findImgTag(imgName) });
     renderImages();
+    return true;
+  }
+  $("slotList").addEventListener("click", function (e) {
+    var pk = e.target.closest(".pk"); if (!pk) return;
+    var row = pk.closest(".slotc"), nm = pk.getAttribute("data-img");
+    var moved = !!findImgTag(nm);
+    if (fillSlot(parseInt(row.getAttribute("data-line"), 10), row.getAttribute("data-name") || "", nm))
+      toast(moved ? "Image is slot me shift ho gayi" : "Image slot me lag gayi");
   });
   function renderImages() {
     var host = $("imgList"); $("imgCount").textContent = images.length;
+    $("imgCount2").textContent = images.length;
     renderSlots();
     if (!images.length) { host.innerHTML = '<div class="imgs-empty">Abhi koi image nahi. Upar se add karo.</div>'; return; }
     host.innerHTML = images.map(function (im, k) {
