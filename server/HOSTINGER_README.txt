@@ -50,16 +50,6 @@ LOGO (sab pages isi file ko use karte hain):
   Notes/MCQ sheet ka watermark aur MCQ test page ka header logo yahi file hai.
   premind/ folder me rakhna zaroori hai, warna watermark khali rahega.
 
-D2D TEST ENGINE (d2d.diplomawallah.in — admin panel + student test in one file):
-  d2d_test_engine.php     <- us site par "index.php" ke naam se rakho
-  Tables: web_test_series / web_test_questions / web_test_results
-  Logo: diplomawallah-logo.png usi folder me rakho.
-  Sahi answer kabhi page me nahi bhejte — submit ke baad server se aate hain.
-  Questions har load par shuffle hote hain; adhura attempt question-id se
-  dobara map hota hai, isliye Resume par answers idhar-udhar nahi hote.
-  Paper view ka Print/Save-PDF: 2-column questions, answer key alag page par,
-  footer har page par repeat hota hai.
-
 D2D SHARED FOLDERS:
   d2d_folders.php         <- one folder list for BOTH editors (creates d2d_folders table)
   Notes aur MCQ dono isi file ko use karte hain, isliye ise bhi upload karna zaroori hai.

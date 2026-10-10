@@ -11,7 +11,7 @@
     <script>
         window.MathJax = {
             tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
-            startup: { typeset: false } // Auto-typeset band kiya for faster manual control
+            startup: { typeset: false }
         };
     </script>
 
@@ -32,7 +32,6 @@
         .fade-in { animation: fadeIn 0.4s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Loading Screen */
         #loading-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--glass-bg); backdrop-filter: blur(5px); z-index: 3000; justify-content: center; align-items: center; flex-direction: column; }
         .spinner { border: 4px solid rgba(0, 0, 0, 0.1); border-left-color: var(--black); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px;}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -58,11 +57,17 @@
 
         /* ================= TEST & FILTER VIEW ================= */
         #test-view { display: none; padding-bottom: 120px; }
-        .top-nav { position: sticky; top: 0; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); z-index: 1000; padding: 15px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .back-btn { background: var(--white); border: 1px solid var(--gray-light); padding: 8px 16px; border-radius: 12px; cursor: pointer; font-weight: 700; transition: all 0.2s; display: flex; align-items: center; gap: 8px; font-size: 14px;}
+        .top-nav { position: sticky; top: 0; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); z-index: 1000; padding: 15px 24px; display: flex; justify-content: space-between; align-items: center; gap: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .nav-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .back-btn { background: var(--white); border: 1px solid var(--gray-light); padding: 8px 16px; border-radius: 12px; cursor: pointer; font-weight: 700; transition: all 0.2s; display: flex; align-items: center; gap: 8px; font-size: 14px; font-family: inherit;}
         .back-btn:hover { background: var(--black); color: var(--white); }
 
-        /* Custom Multi-Select Dropdown UI */
+        /* Copy button */
+        .copy-btn { background: var(--primary); color: var(--white); border: none; padding: 10px 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 14px; font-family: inherit; display: flex; align-items: center; gap: 8px; transition: all 0.2s; white-space: nowrap; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        .copy-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(37,99,235,0.4); }
+        .copy-btn.done { background: #10b981; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+        .copy-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
         .filter-bar { background: var(--white); padding: 15px 24px; border-bottom: 1px solid var(--gray-light); display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .dd-container { position: relative; flex: 1; min-width: 200px; max-width: 250px; }
         .dd-header { padding: 12px 16px; border-radius: 12px; border: 2px solid var(--gray-light); background: #f8fafc; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--black-muted); user-select: none; transition: 0.2s; }
@@ -84,29 +89,25 @@
         .year-header::before { content: '📅'; font-size: 28px; margin-right: 8px; }
         .subject-badge { display: inline-block; background: var(--black-muted); color: var(--white); padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; margin-bottom: 20px; letter-spacing: 0.5px; }
 
-        /* Question Cards - PERFORMANCE & OVERFLOW FIXES */
         .q-card { 
             background: var(--white); border-radius: 20px; padding: 30px; margin-bottom: 25px; 
             border: 1px solid var(--glass-border); box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
             transition: transform 0.2s; width: 100%;
-            /* Speed rendering for long lists */
             content-visibility: auto; contain-intrinsic-size: 300px;
-            /* Force break long unbreakable text */
             word-wrap: break-word; overflow-wrap: break-word;
         }
         .q-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
         .q-meta { font-size: 11px; font-weight: 700; color: var(--gray-dark); margin-bottom: 15px; display: flex; gap: 8px; flex-wrap: wrap;}
         .q-meta span { background: #f1f5f9; padding: 4px 10px; border-radius: 8px; }
+        .q-meta span.yr { background: var(--primary); color: var(--white); }
         
-        /* Allow horizontal scroll for crazy long equations */
         .q-text { font-size: 16px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; overflow-x: auto; padding-bottom: 5px; }
         
         .options-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
         
-        /* Layout fix for mobile multiline options */
         .opt-label { 
             padding: 14px 18px; border-radius: 14px; border: 2px solid var(--gray-light); background: #f8fafc; 
-            cursor: pointer; font-size: 15px; font-weight: 500; display: flex; align-items: flex-start; /* flex-start prevents radio from centering weirdly on multiline */
+            cursor: pointer; font-size: 15px; font-weight: 500; display: flex; align-items: flex-start;
             transition: all 0.2s; width: 100%; 
         }
         .opt-label input { position: absolute; opacity: 0; }
@@ -115,12 +116,11 @@
         .opt-label input:checked ~ .custom-radio::after { content: ''; width: 10px; height: 10px; background: var(--black); border-radius: 50%; }
         .opt-label.selected-bg { border-color: var(--black); background: var(--white); }
         
-        /* Make sure text wraps correctly inside the label */
         .opt-label span { flex: 1; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.4; overflow-x: auto; }
 
         .bottom-action-bar { position: fixed; bottom: 30px; right: 30px; z-index: 1000; opacity: 0; transform: translateY(20px); pointer-events: none; transition: all 0.3s; }
         .bottom-action-bar.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        .btn-submit { background: var(--black); color: var(--white); border: none; padding: 16px 32px; border-radius: 50px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; transition: transform 0.2s; }
+        .btn-submit { background: var(--black); color: var(--white); border: none; padding: 16px 32px; border-radius: 50px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; transition: transform 0.2s; font-family: inherit; }
         .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
         #scroll-anchor { height: 10px; width: 100%; margin-top: 10px; }
 
@@ -134,14 +134,20 @@
         .result-dashboard { display: none; text-align: center; background: var(--white); padding: 40px 20px; border-radius: 24px; margin-top: 30px; border: 1px solid var(--gray-light); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         .score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--white); display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 800; margin: 0 auto 20px auto; border: 8px solid var(--black); }
 
+        #toast { position: fixed; top: 80px; left: 50%; transform: translate(-50%, -20px); background: var(--black); color: var(--white); padding: 12px 22px; border-radius: 30px; font-weight: 700; font-size: 14px; z-index: 4000; opacity: 0; pointer-events: none; transition: all 0.3s; box-shadow: 0 10px 25px rgba(0,0,0,0.25); }
+        #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
         @media (max-width: 600px) {
             .hero-section h1 { font-size: 30px; }
+            .top-nav { padding: 12px 14px; }
             .filter-bar { padding: 15px; flex-direction: column; }
             .dd-container { max-width: 100%; width: 100%; }
             .bottom-action-bar { bottom: 20px; right: 20px; left: 20px; display: flex; justify-content: center; }
             .btn-submit { width: 100%; justify-content: center; }
             .q-card { padding: 20px; }
             .opt-label { padding: 12px 14px; }
+            #test-title { display: none; }
+            .copy-btn { padding: 9px 12px; font-size: 13px; }
         }
     </style>
 </head>
@@ -151,6 +157,7 @@
         <div class="spinner"></div>
         <div style="font-weight: 800;">Fetching Real-Time Data...</div>
     </div>
+    <div id="toast"></div>
 
     <div id="home-view" class="fade-in">
         <div class="hero-section">
@@ -166,7 +173,7 @@
             <div class="combine-icon">ENTER →</div>
         </div>
 
-        <div class="section-title">Year-Wise Papers (2017-2025)</div>
+        <div class="section-title">Year-Wise Papers (2017-2026)</div>
         <div class="grid-container" id="year-grid"></div>
     </div>
 
@@ -176,25 +183,25 @@
                 <button class="back-btn" onclick="goHome()">← Back</button>
                 <div style="font-weight: 800; font-size: 16px;" id="test-title">Paper Setup</div>
             </div>
+            <button class="copy-btn" id="copy-btn" onclick="copyAllQuestions()" title="Copy all shown questions with options and year">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span id="copy-label">Copy All</span>
+            </button>
         </nav>
 
         <div class="filter-bar" id="filter-bar">
-            
             <div class="dd-container" id="container-year">
                 <div class="dd-header" id="hdr-year" onclick="toggleDD('list-year')">Years (All) <span>▼</span></div>
                 <div class="dd-list" id="list-year"></div>
             </div>
-
             <div class="dd-container" id="container-subject">
                 <div class="dd-header" id="hdr-subject" onclick="toggleDD('list-subject')">Subjects (All) <span>▼</span></div>
                 <div class="dd-list" id="list-subject"></div>
             </div>
-
             <div class="dd-container" id="container-chapter">
                 <div class="dd-header" id="hdr-chapter" onclick="toggleDD('list-chapter')">Chapters (All) <span>▼</span></div>
                 <div class="dd-list" id="list-chapter"></div>
             </div>
-
         </div>
 
         <div class="container" id="quiz-container"></div>
@@ -212,11 +219,9 @@
 
     <script type="module">
         let allLoadedData = [];
-        
-        // Cache object to store fetched year data
+        let currentShown = []; // questions currently rendered (used by Copy)
         const cache = {};
 
-        // Helper function for fast loading with cache
         async function loadYear(y) {
             if (cache[y]) return cache[y];
             try {
@@ -229,7 +234,6 @@
             }
         }
         
-        // Setup 2017 to 2025 Data
         const yearsList = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
         const subjectsList = ["Physics", "Chemistry", "Math"];
         let isCombineMode = false;
@@ -245,13 +249,73 @@
                     </div>
                 `;
             });
-            grid.innerHTML = htmlBuffer; // Faster DOM injection
+            grid.innerHTML = htmlBuffer;
         };
 
         window.goHome = () => {
             document.getElementById('test-view').style.display = 'none';
             document.getElementById('home-view').style.display = 'block';
-            allLoadedData = []; // Free memory
+            allLoadedData = [];
+            currentShown = [];
+        }
+
+        // --- Toast + Copy ---
+        let toastTimer;
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+        }
+
+        // HTML entities / tags -> plain text so pasted text is clean
+        function toPlain(s) {
+            const d = document.createElement('div');
+            d.innerHTML = String(s ?? '').replace(/<br\s*\/?>/gi, '\n');
+            return (d.textContent || '').trim();
+        }
+
+        function buildCopyText() {
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+            return currentShown.map((q, i) => {
+                const opts = (q.options || []).map((o, k) => `(${letters[k]}) ${toPlain(o)}`).join('\n');
+                return `Q${i + 1}. [${q.year}] ${toPlain(q.text)}\n${opts}`;
+            }).join('\n\n');
+        }
+
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+            document.body.appendChild(ta);
+            ta.select();
+            let ok = false;
+            try { ok = document.execCommand('copy'); } catch (e) {}
+            document.body.removeChild(ta);
+            return ok;
+        }
+
+        window.copyAllQuestions = async () => {
+            if (currentShown.length === 0) { showToast('Copy karne ke liye koi question nahi hai'); return; }
+            const text = buildCopyText();
+            let ok = false;
+            try {
+                await navigator.clipboard.writeText(text);
+                ok = true;
+            } catch (e) {
+                ok = fallbackCopy(text);
+            }
+            if (ok) {
+                const btn = document.getElementById('copy-btn');
+                const lbl = document.getElementById('copy-label');
+                btn.classList.add('done');
+                lbl.textContent = 'Copied!';
+                showToast(`✅ ${currentShown.length} questions copy ho gaye`);
+                setTimeout(() => { btn.classList.remove('done'); lbl.textContent = 'Copy All'; }, 2000);
+            } else {
+                showToast('❌ Copy fail ho gaya');
+            }
         }
 
         // --- Custom Dropdown Logic ---
@@ -268,7 +332,7 @@
 
         window.selectAll = (className, checkStatus) => {
             document.querySelectorAll(`.${className}`).forEach(cb => cb.checked = checkStatus);
-            applyFilters();
+            if (className === 'cb-chapter') renderQuestions(); else applyFilters();
         }
 
         // --- Data Fetching ---
@@ -321,7 +385,6 @@
             }
         }
 
-        // --- Dynamic Filter Builders ---
         function buildYearFilter() {
             document.getElementById('list-year').innerHTML = `
                 <div class="dd-actions">
@@ -386,8 +449,6 @@
             renderQuestions(); 
         }
 
-        // --- Render UI ---
-        // Event delegation logic to handle clicks efficiently without 400 inline onclicks
         document.addEventListener('change', function(e) {
             if(e.target && e.target.matches('.opt-label input[type="radio"]')) {
                 const name = e.target.name;
@@ -415,6 +476,8 @@
             );
 
             if (filteredData.length === 0) {
+                currentShown = [];
+                document.getElementById('copy-btn').disabled = true;
                 container.innerHTML = `<div style="text-align:center; padding: 60px; color:var(--gray-dark); font-weight:600;">Please select filters to load questions. 🔍</div>`;
                 return;
             }
@@ -429,6 +492,9 @@
                 let qNumB = parseInt((b.id || "").split('_')[1] || 0);
                 return qNumA - qNumB;
             });
+
+            currentShown = filteredData;
+            document.getElementById('copy-btn').disabled = false;
 
             let fullHTML = "";
             let currentYear = null;
@@ -455,7 +521,7 @@
 
                 fullHTML += `
                     <div class="q-card" data-id="${q.id}" data-ans="${q.answer}">
-                        <div class="q-meta"><span>ID: ${q.id}</span><span>${q.chapter}</span></div>
+                        <div class="q-meta"><span class="yr">${q.year}</span><span>ID: ${q.id}</span><span>${q.chapter}</span></div>
                         <div class="q-text">Q. ${q.text}</div>
                         <div class="options-grid">${optionsHtml}</div>
                     </div>
@@ -464,9 +530,7 @@
 
             requestAnimationFrame(() => {
                 container.innerHTML = fullHTML;
-                
-                // Smart MathJax execution
-                if (window.MathJax && (fullHTML.includes('$') || fullHTML.includes('\\(') || fullHTML.includes('\\['))) {
+                if (window.MathJax && MathJax.typesetPromise && (fullHTML.includes('$') || fullHTML.includes('\\(') || fullHTML.includes('\\['))) {
                     requestAnimationFrame(() => {
                         MathJax.typesetPromise([container]).catch(console.error);
                     });
@@ -474,7 +538,6 @@
             });
         }
 
-        // --- Submit Logic ---
         const observer = new IntersectionObserver((entries) => {
             const bottomBar = document.getElementById('bottom-bar');
             if (entries[0].isIntersecting && document.querySelectorAll('.q-card').length > 0) {
