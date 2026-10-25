@@ -17,137 +17,472 @@
 
     <style>
         :root {
-            --black: #09090b; --black-muted: #27272a;
-            --gray-dark: #52525b; --gray-light: #e4e4e7;
-            --white: #ffffff; --primary: #2563eb;
-            --glass-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.9);
-            --glass-blur: blur(20px);
-            --smooth: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            /* Keep Top Banner Signature Colors */
+            --crimson-dark: #3b0206;
+            --crimson-main: #7f0912;
+            --crimson-bright: #a8131d;
+            --gold: #facc15;
+            
+            /* Ultra-Clean Modern UI Surface Palette */
+            --bg-page: #f4f5f7;
+            --white: #ffffff;
+            --slate-900: #0f172a;
+            --slate-700: #334155;
+            --slate-500: #64748b;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            
+            --smooth: 0.25s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); background-attachment: fixed; color: var(--black); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-        .fade-in { animation: fadeIn 0.4s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--bg-page); 
+            color: var(--slate-900); 
+            margin: 0; 
+            padding: 0; 
+            -webkit-font-smoothing: antialiased; 
+            overflow-x: hidden; 
+        }
 
-        #loading-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--glass-bg); backdrop-filter: blur(5px); z-index: 3000; justify-content: center; align-items: center; flex-direction: column; }
-        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); border-left-color: var(--black); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px;}
+        .fade-in { animation: fadeIn 0.35s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ================= LOADING & TOAST ================= */
+        #loading-screen { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); z-index: 3000; 
+            justify-content: center; align-items: center; flex-direction: column; color: var(--white);
+        }
+        .spinner { 
+            border: 4px solid rgba(255, 255, 255, 0.15); border-left-color: var(--gold); 
+            border-radius: 50%; width: 42px; height: 42px; animation: spin 0.8s linear infinite; margin-bottom: 14px;
+        }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* ================= HOME DASHBOARD ================= */
-        #home-view { padding: 40px 20px 100px 20px; max-width: 1000px; margin: 0 auto; }
-        .hero-section { text-align: center; margin-bottom: 50px; }
-        .hero-section h1 { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
-        .funny-tag { font-size: 15px; color: var(--gray-dark); font-weight: 600; background: var(--white); display: inline-block; padding: 10px 25px; border-radius: 30px; border: 1px solid var(--gray-light); box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-        .section-title { font-size: 18px; font-weight: 800; text-transform: uppercase; color: var(--black-muted); margin: 40px 0 20px 0; display: inline-block; }
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-
-        .combine-card { background: var(--black); color: var(--white); padding: 30px; border-radius: 20px; cursor: pointer; text-align: left; box-shadow: 0 10px 20px rgba(0,0,0,0.15); transition: transform var(--smooth); grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; }
-        .combine-card:hover { transform: translateY(-4px); box-shadow: 0 15px 30px rgba(0,0,0,0.25); }
-        .combine-card h2 { margin: 0 0 8px 0; font-size: 26px; font-weight: 800; }
-        .combine-card p { margin: 0; color: #a1a1aa; font-size: 14px; font-weight: 500; }
-        .combine-icon { background: var(--white); color: var(--black); padding: 12px 20px; border-radius: 30px; font-weight: 800; font-size: 13px; }
-
-        .year-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); padding: 30px 20px; border-radius: 20px; text-align: center; cursor: pointer; transition: all var(--smooth); }
-        .year-card:hover { transform: translateY(-4px); background: var(--white); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .year-card h3 { margin: 0; font-size: 32px; font-weight: 800; color: var(--black); }
-        .year-card p { margin: 8px 0 0 0; font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; }
-
-        /* ================= TEST & FILTER VIEW ================= */
-        #test-view { display: none; padding-bottom: 120px; }
-        .top-nav { position: sticky; top: 0; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); z-index: 1000; padding: 15px 24px; display: flex; justify-content: space-between; align-items: center; gap: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .nav-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-        .back-btn { background: var(--white); border: 1px solid var(--gray-light); padding: 8px 16px; border-radius: 12px; cursor: pointer; font-weight: 700; transition: all 0.2s; display: flex; align-items: center; gap: 8px; font-size: 14px; font-family: inherit;}
-        .back-btn:hover { background: var(--black); color: var(--white); }
-
-        /* Copy button */
-        .copy-btn { background: var(--primary); color: var(--white); border: none; padding: 10px 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 14px; font-family: inherit; display: flex; align-items: center; gap: 8px; transition: all 0.2s; white-space: nowrap; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
-        .copy-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(37,99,235,0.4); }
-        .copy-btn.done { background: #10b981; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
-        .copy-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        .filter-bar { background: var(--white); padding: 15px 24px; border-bottom: 1px solid var(--gray-light); display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .dd-container { position: relative; flex: 1; min-width: 200px; max-width: 250px; }
-        .dd-header { padding: 12px 16px; border-radius: 12px; border: 2px solid var(--gray-light); background: #f8fafc; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--black-muted); user-select: none; transition: 0.2s; }
-        .dd-header:hover { border-color: var(--black); background: var(--white); color: var(--black); }
-        .dd-header span { font-size: 10px; color: var(--gray-dark); }
-        .dd-list { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: var(--white); border: 1px solid var(--gray-light); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 2000; max-height: 300px; overflow-y: auto; display: none; flex-direction: column; padding: 10px; }
-        .dd-list.show { display: flex; }
-        
-        .dd-actions { display: flex; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid var(--gray-light); margin-bottom: 10px; }
-        .dd-btn { background: none; border: none; color: var(--primary); font-size: 12px; font-weight: 700; cursor: pointer; }
-        .dd-btn:hover { text-decoration: underline; }
-        
-        .cb-label { display: flex; align-items: center; gap: 10px; padding: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 8px; transition: 0.2s; color: var(--black); }
-        .cb-label:hover { background: #f1f5f9; }
-        .cb-label input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--black); flex-shrink: 0; }
-
-        .container { max-width: 800px; margin: 0 auto; padding: 30px 20px; width: 100%; }
-        .year-header { font-size: 22px; font-weight: 800; color: var(--black); margin: 40px 0 15px 0; border-bottom: 2px solid var(--gray-light); padding-bottom: 8px; }
-        .year-header::before { content: '📅'; font-size: 28px; margin-right: 8px; }
-        .subject-badge { display: inline-block; background: var(--black-muted); color: var(--white); padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; margin-bottom: 20px; letter-spacing: 0.5px; }
-
-        .q-card { 
-            background: var(--white); border-radius: 20px; padding: 30px; margin-bottom: 25px; 
-            border: 1px solid var(--glass-border); box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
-            transition: transform 0.2s; width: 100%;
-            content-visibility: auto; contain-intrinsic-size: 300px;
-            word-wrap: break-word; overflow-wrap: break-word;
+        #toast { 
+            position: fixed; top: 75px; left: 50%; transform: translate(-50%, -20px); 
+            background: var(--slate-900); color: var(--gold);
+            padding: 10px 20px; border-radius: 30px; font-weight: 700; font-size: 13px; 
+            z-index: 4000; opacity: 0; pointer-events: none; transition: all 0.3s; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25); white-space: nowrap;
         }
-        .q-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
-        .q-meta { font-size: 11px; font-weight: 700; color: var(--gray-dark); margin-bottom: 15px; display: flex; gap: 8px; flex-wrap: wrap;}
-        .q-meta span { background: #f1f5f9; padding: 4px 10px; border-radius: 8px; }
-        .q-meta span.yr { background: var(--primary); color: var(--white); }
-        
-        .q-text { font-size: 16px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; overflow-x: auto; padding-bottom: 5px; }
-        
-        .options-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
-        
-        .opt-label { 
-            padding: 14px 18px; border-radius: 14px; border: 2px solid var(--gray-light); background: #f8fafc; 
-            cursor: pointer; font-size: 15px; font-weight: 500; display: flex; align-items: flex-start;
-            transition: all 0.2s; width: 100%; 
-        }
-        .opt-label input { position: absolute; opacity: 0; }
-        .custom-radio { width: 20px; height: 20px; min-width: 20px; border: 2px solid var(--gray-dark); border-radius: 50%; margin-right: 15px; margin-top: 2px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .opt-label input:checked ~ .custom-radio { border-color: var(--black); }
-        .opt-label input:checked ~ .custom-radio::after { content: ''; width: 10px; height: 10px; background: var(--black); border-radius: 50%; }
-        .opt-label.selected-bg { border-color: var(--black); background: var(--white); }
-        
-        .opt-label span { flex: 1; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.4; overflow-x: auto; }
-
-        .bottom-action-bar { position: fixed; bottom: 30px; right: 30px; z-index: 1000; opacity: 0; transform: translateY(20px); pointer-events: none; transition: all 0.3s; }
-        .bottom-action-bar.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        .btn-submit { background: var(--black); color: var(--white); border: none; padding: 16px 32px; border-radius: 50px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; transition: transform 0.2s; font-family: inherit; }
-        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
-        #scroll-anchor { height: 10px; width: 100%; margin-top: 10px; }
-
-        .correct-opt { border-color: #10b981 !important; background: #ecfdf5 !important; color: #065f46; font-weight: 700; }
-        .correct-opt .custom-radio { border-color: #10b981 !important; background: #10b981 !important; }
-        .correct-opt .custom-radio::after { display: none; }
-        .wrong-opt { border-color: #ef4444 !important; background: #fef2f2 !important; color: #991b1b; text-decoration: line-through; }
-        .wrong-opt .custom-radio { border-color: #ef4444 !important; background: #ef4444 !important; }
-        .wrong-opt .custom-radio::after { display: none; }
-        
-        .result-dashboard { display: none; text-align: center; background: var(--white); padding: 40px 20px; border-radius: 24px; margin-top: 30px; border: 1px solid var(--gray-light); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--white); display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 800; margin: 0 auto 20px auto; border: 8px solid var(--black); }
-
-        #toast { position: fixed; top: 80px; left: 50%; transform: translate(-50%, -20px); background: var(--black); color: var(--white); padding: 12px 22px; border-radius: 30px; font-weight: 700; font-size: 14px; z-index: 4000; opacity: 0; pointer-events: none; transition: all 0.3s; box-shadow: 0 10px 25px rgba(0,0,0,0.25); }
         #toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-        @media (max-width: 600px) {
-            .hero-section h1 { font-size: 30px; }
-            .top-nav { padding: 12px 14px; }
-            .filter-bar { padding: 15px; flex-direction: column; }
-            .dd-container { max-width: 100%; width: 100%; }
-            .bottom-action-bar { bottom: 20px; right: 20px; left: 20px; display: flex; justify-content: center; }
-            .btn-submit { width: 100%; justify-content: center; }
-            .q-card { padding: 20px; }
-            .opt-label { padding: 12px 14px; }
-            #test-title { display: none; }
-            .copy-btn { padding: 9px 12px; font-size: 13px; }
+        /* ================= HERO BANNER (KEPT EXACTLY AS YOU LIKED) ================= */
+        .hero-banner {
+            background: radial-gradient(circle at 50% 15%, #a8131d 0%, #68050c 60%, #3b0206 100%);
+            color: var(--white);
+            padding: 28px 18px 48px 18px;
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            text-align: center;
+            box-shadow: 0 12px 30px rgba(104, 5, 12, 0.22);
+            position: relative;
+        }
+
+        .top-brand-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--white); color: var(--crimson-main);
+            padding: 6px 14px; border-radius: 20px;
+            font-size: 11px; font-weight: 800; letter-spacing: 0.5px;
+            text-transform: uppercase; margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .hero-banner h1 {
+            font-size: 32px; font-weight: 800; letter-spacing: -0.5px;
+            margin: 0 0 6px 0; line-height: 1.1; text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.25);
+        }
+
+        .funny-tag {
+            font-size: 13px; color: var(--gold); font-weight: 700;
+            letter-spacing: 0.4px; text-transform: uppercase;
+            margin: 0 0 22px 0;
+        }
+
+        .stats-frame {
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            background: rgba(0, 0, 0, 0.18);
+            border-radius: 16px;
+            padding: 14px 12px;
+            max-width: 360px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .stats-frame-title {
+            position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+            background: #6c060e; padding: 0 10px; font-size: 10px;
+            font-weight: 700; color: rgba(255,255,255,0.85); letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .stat-item { display: flex; align-items: center; gap: 8px; text-align: left; }
+        .stat-num { font-size: 26px; font-weight: 800; color: var(--gold); line-height: 1; }
+        .stat-label { font-size: 11px; font-weight: 600; color: var(--white); line-height: 1.2; }
+        .stat-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.25); }
+
+        /* ================= NEW SLEEK LOWER HOME DESIGN ================= */
+        .home-body {
+            padding: 0 16px 90px 16px;
+            max-width: 720px;
+            margin: -26px auto 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Luxury Dark-Crimson & Gold Combine Card */
+        .combine-card {
+            background: linear-gradient(135deg, #1e1b24 0%, #2d0a10 100%);
+            color: var(--white);
+            padding: 20px;
+            border-radius: 22px;
+            cursor: pointer;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16);
+            transition: all var(--smooth);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(250, 204, 21, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        .combine-card::after {
+            content: ''; position: absolute; right: -30px; top: -30px;
+            width: 110px; height: 110px;
+            background: radial-gradient(circle, rgba(250,204,21,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .combine-card:active { transform: scale(0.98); }
+        
+        .combine-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: rgba(250, 204, 21, 0.15); color: var(--gold);
+            border: 1px solid rgba(250, 204, 21, 0.35);
+            font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 30px;
+            text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;
+        }
+        .combine-card h2 { margin: 0 0 4px 0; font-size: 19px; font-weight: 800; letter-spacing: -0.3px; }
+        .combine-card p { margin: 0; color: #cbd5e1; font-size: 12px; font-weight: 500; }
+        
+        .combine-icon {
+            background: var(--gold); color: var(--crimson-dark);
+            width: 44px; height: 44px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 20px; flex-shrink: 0;
+            box-shadow: 0 6px 16px rgba(250, 204, 21, 0.3);
+            transition: transform var(--smooth);
+        }
+        .combine-card:hover .combine-icon { transform: translateX(3px); }
+
+        /* Clean Section Header */
+        .section-header-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin: 28px 4px 14px 4px;
+        }
+        .section-title {
+            font-size: 13px; font-weight: 800; text-transform: uppercase;
+            color: var(--slate-700); display: flex; align-items: center; gap: 8px;
+            letter-spacing: 0.6px; margin: 0;
+        }
+        .section-title::before {
+            content: ''; display: inline-block; width: 6px; height: 16px;
+            background: var(--crimson-main); border-radius: 4px;
+        }
+        .section-count {
+            font-size: 11px; font-weight: 700; color: var(--crimson-main);
+            background: rgba(127, 9, 18, 0.08); padding: 4px 10px; border-radius: 20px;
+        }
+
+        /* Smooth Modern 2-Column Year Grid */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        @media (min-width: 600px) {
+            .grid-container { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+        }
+
+        .year-card {
+            background: var(--white);
+            border: 1px solid var(--slate-200);
+            padding: 16px;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all var(--smooth);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+        }
+        .year-card:hover {
+            border-color: rgba(127, 9, 18, 0.35);
+            box-shadow: 0 8px 20px rgba(127, 9, 18, 0.08);
+            transform: translateY(-2px);
+        }
+        .year-card:active { transform: scale(0.97); }
+        
+        .yc-left { text-align: left; }
+        .yc-tag {
+            display: inline-block; font-size: 9px; font-weight: 800;
+            color: var(--crimson-main); background: rgba(127, 9, 18, 0.07);
+            padding: 3px 7px; border-radius: 6px; text-transform: uppercase;
+            margin-bottom: 4px; letter-spacing: 0.4px;
+        }
+        .year-card h3 {
+            margin: 0; font-size: 24px; font-weight: 800;
+            color: var(--slate-900); letter-spacing: -0.5px; line-height: 1.1;
+        }
+        .year-card p {
+            margin: 3px 0 0 0; font-size: 11px; font-weight: 600;
+            color: var(--slate-500);
+        }
+        .yc-arrow {
+            width: 34px; height: 34px; border-radius: 10px;
+            background: var(--slate-100); color: var(--slate-700);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 15px; transition: all var(--smooth);
+            flex-shrink: 0;
+        }
+        .year-card:hover .yc-arrow, .year-card:active .yc-arrow {
+            background: var(--crimson-main); color: var(--white);
+        }
+
+        /* ================= NEW SMOOTH MCQ & FILTER VIEW ================= */
+        #test-view { display: none; padding-bottom: 110px; }
+        
+        .top-nav {
+            position: sticky; top: 0;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--slate-200);
+            z-index: 1000; padding: 12px 16px;
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
+        }
+        .nav-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        
+        .back-btn {
+            background: var(--slate-100); color: var(--slate-900);
+            border: 1px solid var(--slate-200); padding: 8px 13px;
+            border-radius: 12px; cursor: pointer; font-weight: 700;
+            font-size: 13px; font-family: inherit; white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .back-btn:active { background: var(--crimson-main); color: var(--white); border-color: var(--crimson-main); }
+        
+        #test-title {
+            font-weight: 800; font-size: 16px; color: var(--slate-900);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .copy-btn {
+            background: var(--crimson-main); color: var(--white); border: none;
+            padding: 9px 14px; border-radius: 12px; cursor: pointer;
+            font-weight: 700; font-size: 12px; font-family: inherit;
+            display: flex; align-items: center; gap: 6px; white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(127, 9, 18, 0.25);
+            transition: all 0.2s;
+        }
+        .copy-btn:active { transform: scale(0.96); }
+        .copy-btn.done { background: #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); }
+        .copy-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+        /* Sleek Pill Filter Bar */
+        .filter-bar {
+            background: var(--white); padding: 10px 12px;
+            border-bottom: 1px solid var(--slate-200);
+            display: flex; gap: 8px; justify-content: center;
+            position: sticky; top: 57px; z-index: 900;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.03);
+        }
+        .dd-container { position: relative; flex: 1; min-width: 0; max-width: 240px; }
+        .dd-header {
+            padding: 9px 11px; border-radius: 11px;
+            border: 1.5px solid var(--slate-200); background: var(--slate-100);
+            font-size: 12px; font-weight: 700; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            color: var(--slate-700); user-select: none;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            transition: all 0.2s;
+        }
+        .dd-header:hover, .dd-header:active {
+            border-color: var(--crimson-main); background: var(--white); color: var(--crimson-main);
+        }
+        .dd-header span { font-size: 9px; color: var(--crimson-main); margin-left: 4px; }
+        
+        .dd-list {
+            position: absolute; top: calc(100% + 6px); left: 0;
+            min-width: 210px; width: 100%;
+            background: var(--white); border: 1px solid var(--slate-200);
+            border-radius: 16px; box-shadow: 0 15px 35px rgba(15, 23, 42, 0.14);
+            z-index: 2000; max-height: 280px; overflow-y: auto;
+            display: none; flex-direction: column; padding: 10px;
+        }
+        #container-chapter .dd-list { left: auto; right: 0; }
+        .dd-list.show { display: flex; }
+        
+        .dd-actions {
+            display: flex; justify-content: space-between;
+            padding-bottom: 8px; border-bottom: 1px solid var(--slate-200); margin-bottom: 6px;
+        }
+        .dd-btn { background: none; border: none; color: var(--crimson-main); font-size: 11px; font-weight: 800; cursor: pointer; }
+        
+        .cb-label {
+            display: flex; align-items: center; gap: 9px; padding: 8px;
+            font-size: 13px; font-weight: 600; cursor: pointer;
+            border-radius: 8px; color: var(--slate-900);
+        }
+        .cb-label:active { background: var(--slate-100); }
+        .cb-label input { width: 16px; height: 16px; accent-color: var(--crimson-main); flex-shrink: 0; }
+
+        /* ================= PREMIUM MCQ CARDS ================= */
+        .container { max-width: 720px; margin: 0 auto; padding: 16px 14px; width: 100%; }
+        
+        .year-header {
+            font-size: 16px; font-weight: 800; color: var(--slate-900);
+            margin: 24px 0 12px 0; display: flex; align-items: center; gap: 8px;
+        }
+        .year-header::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--crimson-main); display: inline-block;
+        }
+        
+        .subject-badge {
+            display: inline-block;
+            background: var(--slate-900); color: var(--gold);
+            padding: 5px 12px; border-radius: 8px;
+            font-size: 11px; font-weight: 800; margin-bottom: 12px;
+            letter-spacing: 0.6px; text-transform: uppercase;
+        }
+
+        .q-card { 
+            background: var(--white); border-radius: 20px; padding: 20px 16px; margin-bottom: 16px; 
+            border: 1px solid var(--slate-200);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03); 
+            width: 100%; content-visibility: auto; contain-intrinsic-size: 260px;
+            word-wrap: break-word; overflow-wrap: break-word;
+        }
+        
+        .q-meta {
+            font-size: 11px; font-weight: 700; color: var(--slate-500);
+            margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+        }
+        .q-meta span {
+            background: var(--slate-100); padding: 4px 9px; border-radius: 6px;
+        }
+        .q-meta span.yr {
+            background: rgba(127, 9, 18, 0.1); color: var(--crimson-main); font-weight: 800;
+        }
+        
+        .q-text {
+            font-size: 15px; font-weight: 700; margin-bottom: 16px;
+            line-height: 1.55; overflow-x: auto; color: var(--slate-900);
+        }
+        
+        .options-grid { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        
+        /* Interactive Option Pills with Letter Badge */
+        .opt-label { 
+            padding: 11px 13px; border-radius: 14px;
+            border: 1.5px solid var(--slate-200); background: var(--white); 
+            cursor: pointer; font-size: 14px; font-weight: 500;
+            display: flex; align-items: center; gap: 12px;
+            transition: all 0.18s ease; width: 100%; color: var(--slate-700);
+        }
+        .opt-label:active { transform: scale(0.99); }
+        .opt-label input { position: absolute; opacity: 0; pointer-events: none; }
+        
+        .opt-letter {
+            width: 30px; height: 30px; min-width: 30px;
+            border-radius: 9px; background: var(--slate-100);
+            border: 1px solid var(--slate-200);
+            color: var(--slate-700); font-weight: 800; font-size: 13px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.18s ease; flex-shrink: 0;
+        }
+        
+        .opt-text {
+            flex: 1; word-wrap: break-word; overflow-wrap: break-word;
+            line-height: 1.45; overflow-x: auto;
+        }
+
+        /* Selected Option State */
+        .opt-label.selected-bg {
+            border-color: var(--crimson-main);
+            background: rgba(127, 9, 18, 0.04);
+            color: var(--slate-900);
+            font-weight: 600;
+        }
+        .opt-label.selected-bg .opt-letter {
+            background: var(--crimson-main);
+            border-color: var(--crimson-main);
+            color: var(--gold);
+        }
+
+        /* Floating Submit Action Bar */
+        .bottom-action-bar {
+            position: fixed; bottom: 18px; right: 16px; left: 16px;
+            z-index: 1000; opacity: 0; transform: translateY(20px);
+            pointer-events: none; transition: all 0.3s;
+            display: flex; justify-content: center;
+        }
+        .bottom-action-bar.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, var(--crimson-main) 0%, var(--crimson-dark) 100%);
+            color: var(--white); border: 1px solid rgba(250, 204, 21, 0.35);
+            padding: 15px 32px; border-radius: 50px; font-size: 15px; font-weight: 800;
+            cursor: pointer; box-shadow: 0 12px 28px rgba(69, 6, 11, 0.35);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; max-width: 340px; font-family: inherit;
+        }
+        .btn-submit:active { transform: scale(0.97); }
+        #scroll-anchor { height: 10px; width: 100%; margin-top: 10px; }
+
+        /* Result Answer States (Correct / Wrong) */
+        .correct-opt {
+            border-color: #10b981 !important;
+            background: #ecfdf5 !important;
+            color: #065f46 !important;
+            font-weight: 700 !important;
+        }
+        .correct-opt .opt-letter {
+            background: #10b981 !important;
+            border-color: #10b981 !important;
+            color: var(--white) !important;
+        }
+        
+        .wrong-opt {
+            border-color: #ef4444 !important;
+            background: #fef2f2 !important;
+            color: #991b1b !important;
+            text-decoration: line-through;
+        }
+        .wrong-opt .opt-letter {
+            background: #ef4444 !important;
+            border-color: #ef4444 !important;
+            color: var(--white) !important;
+        }
+        
+        .result-dashboard {
+            display: none; text-align: center;
+            background: radial-gradient(circle at top, #7f0912, #3b0206);
+            color: var(--white); padding: 28px 18px; border-radius: 22px;
+            margin-bottom: 22px; border: 1.5px solid rgba(250, 204, 21, 0.5);
+            box-shadow: 0 12px 28px rgba(69, 6, 11, 0.2);
+        }
+        .score-circle {
+            width: 105px; height: 105px; border-radius: 50%;
+            background: rgba(0,0,0,0.25); color: var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; font-weight: 800; margin: 12px auto;
+            border: 4px solid var(--gold);
         }
     </style>
 </head>
@@ -155,51 +490,76 @@
 
     <div id="loading-screen">
         <div class="spinner"></div>
-        <div style="font-weight: 800;">Fetching Real-Time Data...</div>
+        <div style="font-weight: 800; letter-spacing: 0.5px;">Loading Questions...</div>
     </div>
     <div id="toast"></div>
 
+    <!-- ================= HOME VIEW ================= -->
     <div id="home-view" class="fade-in">
-        <div class="hero-section">
-            <h1>D2D PYQ Master 🎓</h1>
-            <p class="funny-tag">Kyunki ratta maarne se achha hai previous year pel do! 🚀</p>
-        </div>
-
-        <div class="combine-card" onclick="openCombineFilter()">
-            <div>
-                <h2>Combine Research Lab 🧪</h2>
-                <p>Select Multiple Years, Subjects, and Chapters!</p>
+        <!-- TOP BANNER KEPT EXACTLY AS REQUESTED -->
+        <div class="hero-banner">
+            <div class="top-brand-pill">🎓 D2D Entrance Portal</div>
+            <h1>D2D PYQ MASTER</h1>
+            <p class="funny-tag">Ratta maarne se achha hai PYQ pel do! 🚀</p>
+            
+            <div class="stats-frame">
+                <span class="stats-frame-title">CHOOSE FROM</span>
+                <div class="stat-item">
+                    <span class="stat-num">10</span>
+                    <span class="stat-label">Years<br>Papers</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-num">03</span>
+                    <span class="stat-label">Core<br>Subjects</span>
+                </div>
             </div>
-            <div class="combine-icon">ENTER →</div>
         </div>
 
-        <div class="section-title">Year-Wise Papers (2017-2026)</div>
-        <div class="grid-container" id="year-grid"></div>
+        <!-- NEW SMOOTH & MODERN LOWER BODY -->
+        <div class="home-body">
+            <div class="combine-card" onclick="openCombineFilter()">
+                <div>
+                    <div class="combine-badge">⚡ Custom Filter Mode</div>
+                    <h2>Combine Research Lab 🧪</h2>
+                    <p>Mix Multiple Years, Subjects & Chapters</p>
+                </div>
+                <div class="combine-icon">→</div>
+            </div>
+
+            <div class="section-header-row">
+                <div class="section-title">Year-Wise Papers</div>
+                <div class="section-count">2017 – 2026</div>
+            </div>
+            
+            <div class="grid-container" id="year-grid"></div>
+        </div>
     </div>
 
+    <!-- ================= TEST VIEW ================= -->
     <div id="test-view">
         <nav class="top-nav">
             <div class="nav-left">
                 <button class="back-btn" onclick="goHome()">← Back</button>
-                <div style="font-weight: 800; font-size: 16px;" id="test-title">Paper Setup</div>
+                <div id="test-title">Paper Setup</div>
             </div>
-            <button class="copy-btn" id="copy-btn" onclick="copyAllQuestions()" title="Copy all shown questions with options and year">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <button class="copy-btn" id="copy-btn" onclick="copyAllQuestions()" title="Copy all shown questions">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                 <span id="copy-label">Copy All</span>
             </button>
         </nav>
 
         <div class="filter-bar" id="filter-bar">
             <div class="dd-container" id="container-year">
-                <div class="dd-header" id="hdr-year" onclick="toggleDD('list-year')">Years (All) <span>▼</span></div>
+                <div class="dd-header" id="hdr-year" onclick="toggleDD('list-year')">Years <span>▼</span></div>
                 <div class="dd-list" id="list-year"></div>
             </div>
             <div class="dd-container" id="container-subject">
-                <div class="dd-header" id="hdr-subject" onclick="toggleDD('list-subject')">Subjects (All) <span>▼</span></div>
+                <div class="dd-header" id="hdr-subject" onclick="toggleDD('list-subject')">Subj <span>▼</span></div>
                 <div class="dd-list" id="list-subject"></div>
             </div>
             <div class="dd-container" id="container-chapter">
-                <div class="dd-header" id="hdr-chapter" onclick="toggleDD('list-chapter')">Chapters (All) <span>▼</span></div>
+                <div class="dd-header" id="hdr-chapter" onclick="toggleDD('list-chapter')">Chap <span>▼</span></div>
                 <div class="dd-list" id="list-chapter"></div>
             </div>
         </div>
@@ -219,7 +579,7 @@
 
     <script type="module">
         let allLoadedData = [];
-        let currentShown = []; // questions currently rendered (used by Copy)
+        let currentShown = [];
         const cache = {};
 
         async function loadYear(y) {
@@ -244,8 +604,12 @@
             yearsList.forEach(y => {
                 htmlBuffer += `
                     <div class="year-card" onclick="openYearTest(${y})">
-                        <h3>${y}</h3>
-                        <p>Physics • Chem • Math</p>
+                        <div class="yc-left">
+                            <span class="yc-tag">PYQ Paper</span>
+                            <h3>${y}</h3>
+                            <p>Phy • Chem • Math</p>
+                        </div>
+                        <div class="yc-arrow">›</div>
                     </div>
                 `;
             });
@@ -257,6 +621,7 @@
             document.getElementById('home-view').style.display = 'block';
             allLoadedData = [];
             currentShown = [];
+            window.scrollTo({ top: 0, behavior: 'instant' });
         }
 
         // --- Toast + Copy ---
@@ -269,7 +634,6 @@
             toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
         }
 
-        // HTML entities / tags -> plain text so pasted text is clean
         function toPlain(s) {
             const d = document.createElement('div');
             d.innerHTML = String(s ?? '').replace(/<br\s*\/?>/gi, '\n');
@@ -353,6 +717,7 @@
                 
                 buildSubjectFilter();
                 applyFilters();
+                window.scrollTo({ top: 0, behavior: 'instant' });
             } catch (error) {
                 alert(`Data file for ${year} is not uploaded yet! Create data/data_${year}.js`);
             } finally {
@@ -378,6 +743,7 @@
                 buildYearFilter();
                 buildSubjectFilter();
                 applyFilters();
+                window.scrollTo({ top: 0, behavior: 'instant' });
             } catch (error) {
                 alert("Failed to load combine data. Ensure files exist in /data folder.");
             } finally {
@@ -415,7 +781,7 @@
             }
 
             const selSubj = Array.from(document.querySelectorAll('.cb-subject:checked')).map(cb => cb.value);
-            document.getElementById('hdr-subject').innerHTML = `Subjects (${selSubj.length}) <span>▼</span>`;
+            document.getElementById('hdr-subject').innerHTML = `Subj (${selSubj.length}) <span>▼</span>`;
 
             updateChapterCheckboxes(selYears, selSubj);
         }
@@ -437,7 +803,7 @@
             `;
 
             if (availableChapters.length === 0) {
-                html += `<div style="padding:10px; font-size:13px; color:gray; text-align:center;">No chapters found</div>`;
+                html += `<div style="padding:10px; font-size:12px; color:gray; text-align:center;">No chapters found</div>`;
             } else {
                 availableChapters.forEach(c => {
                     let isChecked = (!hasExisting || prevChecked.includes(c)) ? 'checked' : '';
@@ -469,7 +835,7 @@
             const selSubj = Array.from(document.querySelectorAll('.cb-subject:checked')).map(cb => cb.value);
             const selChap = Array.from(document.querySelectorAll('.cb-chapter:checked')).map(cb => cb.value);
             
-            document.getElementById('hdr-chapter').innerHTML = `Chapters (${selChap.length}) <span>▼</span>`;
+            document.getElementById('hdr-chapter').innerHTML = `Chap (${selChap.length}) <span>▼</span>`;
 
             let filteredData = allLoadedData.filter(q => 
                 selYears.includes(q.year) && selSubj.includes(q.subject) && selChap.includes(q.chapter)
@@ -478,11 +844,10 @@
             if (filteredData.length === 0) {
                 currentShown = [];
                 document.getElementById('copy-btn').disabled = true;
-                container.innerHTML = `<div style="text-align:center; padding: 60px; color:var(--gray-dark); font-weight:600;">Please select filters to load questions. 🔍</div>`;
+                container.innerHTML = `<div style="text-align:center; padding: 50px 20px; color:var(--slate-500); font-weight:600;">Please select filters above to load questions. 🔍</div>`;
                 return;
             }
 
-            // Cap at 150 to keep browsers highly responsive
             filteredData = filteredData.slice(0, 150);
 
             filteredData.sort((a, b) => {
@@ -499,11 +864,12 @@
             let fullHTML = "";
             let currentYear = null;
             let currentSubject = null;
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
 
             filteredData.forEach((q) => {
                 if (q.year !== currentYear && isCombineMode) {
                     currentYear = q.year;
-                    fullHTML += `<div class="year-header">Year: ${currentYear}</div>`;
+                    fullHTML += `<div class="year-header">Year ${currentYear}</div>`;
                     currentSubject = null;
                 }
                 if (q.subject !== currentSubject) {
@@ -514,14 +880,14 @@
                 let optionsHtml = q.options.map((opt, i) => `
                     <label class="opt-label" id="lbl-q${q.id}-o${i}">
                         <input type="radio" name="q${q.id}" value="${i}">
-                        <div class="custom-radio"></div>
-                        <span>${['A', 'B', 'C', 'D'][i]}) ${opt}</span>
+                        <div class="opt-letter">${letters[i]}</div>
+                        <span class="opt-text">${opt}</span>
                     </label>
                 `).join('');
 
                 fullHTML += `
                     <div class="q-card" data-id="${q.id}" data-ans="${q.answer}">
-                        <div class="q-meta"><span class="yr">${q.year}</span><span>ID: ${q.id}</span><span>${q.chapter}</span></div>
+                        <div class="q-meta"><span class="yr">${q.year}</span><span>#${q.id}</span><span>${q.chapter}</span></div>
                         <div class="q-text">Q. ${q.text}</div>
                         <div class="options-grid">${optionsHtml}</div>
                     </div>
@@ -576,9 +942,9 @@
             const container = document.getElementById('quiz-container');
             container.insertAdjacentHTML('afterbegin', `
                 <div class="result-dashboard fade-in" style="display:block;">
-                    <h2 style="margin-top:0; color:var(--black); font-weight:800;">Report Card 📋</h2>
+                    <h2 style="margin:0; font-weight:800;">Report Card 📋</h2>
                     <div class="score-circle">${score}/${cards.length}</div>
-                    <p style="color:var(--gray-dark); font-weight:600;">Review your answers below.</p>
+                    <p style="color:var(--gold); font-weight:700; margin:0; font-size:13px;">Review your answers below 👇</p>
                 </div>
             `);
             window.scrollTo({ top: 0, behavior: 'smooth' });
