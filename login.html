@@ -399,6 +399,18 @@
     if (!window.saveLoginSession(user.email, name, phone)) {
       throw new Error('Could not save session. Please allow cookies/storage.');
     }
+    // Mint a signed PDF session token now (Firebase token is available here).
+    // Stored for later so watch.html can prove identity without a live session.
+    try {
+      const idt = await user.getIdToken(true);
+      const base = window.PM_HOSTINGER_API || 'https://premind.diplomawallah.in';
+      const sres = await fetch(base + '/get_pdf_session.php', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_token: idt })
+      });
+      const sdata = await sres.json().catch(function () { return {}; });
+      if (sdata && sdata.pdf_session && window.pmSetPdfSession) window.pmSetPdfSession(sdata.pdf_session);
+    } catch (e) { /* non-fatal — PDF falls back to old behaviour */ }
     showMessage('loginMsg', 'Login successful. Redirecting...', false);
     window.location.replace('index.html');
   }

@@ -171,6 +171,21 @@
     return !!(localStorage.getItem('customUserEmail') || getCookie('customUserEmail') || sessionStorage.getItem('customUserEmail'));
   }
 
+  // Signed PDF session token (minted by the server at login) — proves who the
+  // user is to the PDF endpoints without a live Firebase session.
+  function setPdfSession(token) {
+    if (!token) return;
+    try { syncSession('pm_pdf_session', String(token)); } catch (e) {}
+    try { sessionStorage.setItem('pm_pdf_session', String(token)); } catch (e) {}
+  }
+  function getPdfSession() {
+    var v = null;
+    try { v = localStorage.getItem('pm_pdf_session'); } catch (e) {}
+    if (!v) { try { v = sessionStorage.getItem('pm_pdf_session'); } catch (e) {} }
+    if (!v) v = getCookie('pm_pdf_session');
+    return v || null;
+  }
+
   function getStoredEmail() {
     let val = null;
     try { val = localStorage.getItem('customUserEmail'); } catch (e) {}
@@ -206,10 +221,13 @@
       localStorage.removeItem('customUserEmail');
       localStorage.removeItem('customUserName');
       localStorage.removeItem('customUserPhone');
+      localStorage.removeItem('pm_pdf_session');
       sessionStorage.removeItem('customUserEmail');
       sessionStorage.removeItem('customUserName');
       sessionStorage.removeItem('customUserPhone');
+      sessionStorage.removeItem('pm_pdf_session');
     } catch (e) {}
+    deleteCookie('pm_pdf_session');
     deleteCookie('customUserEmail');
     deleteCookie('customUserName');
     deleteCookie('customUserPhone');
@@ -221,6 +239,8 @@
   window.getStoredPhone = getStoredPhone;
   window.saveLoginSession = saveLoginSession;
   window.clearStoredSession = clearStoredSession;
+  window.pmSetPdfSession = setPdfSession;
+  window.pmGetPdfSession = getPdfSession;
   window.pmIsApiSuccess = isApiSuccess;
   window.pmGetCookie = getCookie;
   window.pmIsAdminAccount = isAdminAccount;

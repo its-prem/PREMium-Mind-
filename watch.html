@@ -794,7 +794,7 @@
          const res = await fetch(`${API_BASE}/get_pdf_token.php`, {
              method: 'POST',
              headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ file: pdfFile, email: userEmail, purpose, id_token: (window.pmIdToken ? await window.pmIdToken() : null) || undefined })
+             body: JSON.stringify({ file: pdfFile, email: userEmail, purpose, pdf_session: (window.pmGetPdfSession ? window.pmGetPdfSession() : null) || undefined, id_token: (window.pmIdToken ? await window.pmIdToken() : null) || undefined })
          });
          const data = await res.json().catch(() => ({}));
          if (!res.ok || data.status !== 'success' || !data.token) {
@@ -819,7 +819,7 @@
              const tokenRes = await fetch(`${API_BASE}/get_pdf_token.php`, {
                  method: 'POST',
                  headers: { 'Content-Type': 'application/json' },
-                 body: JSON.stringify({ file: pdfFile, email: userEmail, purpose, id_token: (window.pmIdToken ? await window.pmIdToken() : null) || undefined }),
+                 body: JSON.stringify({ file: pdfFile, email: userEmail, purpose, pdf_session: (window.pmGetPdfSession ? window.pmGetPdfSession() : null) || undefined, id_token: (window.pmIdToken ? await window.pmIdToken() : null) || undefined }),
                  signal: ctrl.signal
              });
              const tokenData = await tokenRes.json().catch(() => ({}));
@@ -1161,7 +1161,7 @@
              const res = await fetch(`${API_BASE}/get_pdf_token.php`, {
                  method: 'POST',
                  headers: { 'Content-Type': 'application/json' },
-                 body: JSON.stringify({ file: pdfFile, email: userEmail, purpose: 'page_view', id_token: (window.pmIdToken ? await window.pmIdToken() : null) || undefined })
+                 body: JSON.stringify({ file: pdfFile, email: userEmail, purpose: 'page_view', pdf_session: (window.pmGetPdfSession ? window.pmGetPdfSession() : null) || undefined, id_token: (window.pmIdToken ? await window.pmIdToken() : null) || undefined })
              });
              const data = await res.json().catch(() => ({}));
              if (!res.ok || data.status !== 'success' || !data.token) {

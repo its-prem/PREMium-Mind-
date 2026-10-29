@@ -129,7 +129,11 @@ $purpose = trim((string)($data['purpose'] ?? 'view'));
 
 if ($file === '' || $email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     http_response_code(400);
-    echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
+    $msg = 'Invalid request';
+    if ($email === '' && !empty($GLOBALS['pm_pdf_identity_reason'])) {
+        $msg = 'Login required to open this PDF (' . $GLOBALS['pm_pdf_identity_reason'] . ')';
+    }
+    echo json_encode(['status' => 'error', 'message' => $msg]);
     exit;
 }
 
