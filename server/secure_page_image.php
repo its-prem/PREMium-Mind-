@@ -76,7 +76,7 @@ function is_allowed_site_request(): bool {
     foreach ($allowed_origins as $allowed) {
         if (strpos($referer, $allowed) === 0) return true;
     }
-    if (strpos($referer, 'netlify.app') !== false) return true;
+    if (preg_match('~^https://[a-z0-9-]+\.netlify\.app(?:[/?#]|$)~i', $referer)) return true;
     return false;
 }
 

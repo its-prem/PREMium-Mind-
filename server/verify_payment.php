@@ -53,11 +53,19 @@ curl_close($ch);
 $resData = json_decode($response, true);
 
 if (isset($resData['order_status']) && $resData['order_status'] === "PAID") {
-    // 🎉 Database me course update karo
-    $check = $conn->query("SELECT * FROM user_courses WHERE user_email='$user_email' AND course_id='$course_id'");
+    // Grant from the PAID order's own data (course + customer), not client params.
+    $paidCourse = $conn->real_escape_string((string)($resData['order_tags']['course_id'] ?? ''));
+    $paidEmail  = $conn->real_escape_string(strtolower(trim((string)($resData['customer_details']['customer_email'] ?? ''))));
 
-    if ($check->num_rows == 0) {
-        $conn->query("INSERT INTO user_courses (user_email, course_id) VALUES ('$user_email', '$course_id')");
+    if ($paidCourse === '' || $paidEmail === '') {
+        echo json_encode(["status" => "error", "message" => "Order is missing course/customer details"]);
+        exit();
+    }
+
+    // 🎉 Database me course update karo (order ke apne course + customer ke liye)
+    $check = $conn->query("SELECT 1 FROM user_courses WHERE user_email='$paidEmail' AND course_id='$paidCourse' LIMIT 1");
+    if ($check && $check->num_rows == 0) {
+        $conn->query("INSERT INTO user_courses (user_email, course_id) VALUES ('$paidEmail', '$paidCourse')");
     }
 
     // Frontend ko Success signal bhej do

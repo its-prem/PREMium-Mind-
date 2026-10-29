@@ -12,6 +12,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="pm-inspect-block.js"></script>
   <script src="app-back.js"></script>
+  <script type="module" src="pm-firebase.js"></script>
 
   <style>
     :root {
@@ -793,7 +794,7 @@
          const res = await fetch(`${API_BASE}/get_pdf_token.php`, {
              method: 'POST',
              headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ file: pdfFile, email: userEmail, purpose })
+             body: JSON.stringify({ file: pdfFile, email: userEmail, purpose, id_token: (window.pmIdToken ? await window.pmIdToken() : null) || undefined })
          });
          const data = await res.json().catch(() => ({}));
          if (!res.ok || data.status !== 'success' || !data.token) {
@@ -818,7 +819,7 @@
              const tokenRes = await fetch(`${API_BASE}/get_pdf_token.php`, {
                  method: 'POST',
                  headers: { 'Content-Type': 'application/json' },
-                 body: JSON.stringify({ file: pdfFile, email: userEmail, purpose }),
+                 body: JSON.stringify({ file: pdfFile, email: userEmail, purpose, id_token: (window.pmIdToken ? await window.pmIdToken() : null) || undefined }),
                  signal: ctrl.signal
              });
              const tokenData = await tokenRes.json().catch(() => ({}));
@@ -1160,7 +1161,7 @@
              const res = await fetch(`${API_BASE}/get_pdf_token.php`, {
                  method: 'POST',
                  headers: { 'Content-Type': 'application/json' },
-                 body: JSON.stringify({ file: pdfFile, email: userEmail, purpose: 'page_view' })
+                 body: JSON.stringify({ file: pdfFile, email: userEmail, purpose: 'page_view', id_token: (window.pmIdToken ? await window.pmIdToken() : null) || undefined })
              });
              const data = await res.json().catch(() => ({}));
              if (!res.ok || data.status !== 'success' || !data.token) {

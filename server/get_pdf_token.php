@@ -71,7 +71,7 @@ function is_allowed_site_request(): bool {
     foreach ($allowed_origins as $allowed) {
         if (strpos($referer, $allowed) === 0) return true;
     }
-    if (strpos($referer, 'netlify.app') !== false) return true;
+    if (preg_match('~^https://[a-z0-9-]+\.netlify\.app(?:[/?#]|$)~i', $referer)) return true;
     return false;
 }
 
@@ -118,8 +118,13 @@ if (!is_array($data)) {
     $data = $_POST;
 }
 
+require_once __DIR__ . '/pm_firebase_verify.php';
+require_once __DIR__ . '/pm_pdf_access.php';
+
 $file  = normalize_pdf_path((string)($data['file'] ?? ''));
-$email = strtolower(trim((string)($data['email'] ?? '')));
+// Email proven by a Firebase token when sent; otherwise the body email
+// (old behaviour) until PM_PDF_REQUIRE_IDENTITY is turned on.
+$email = pm_pdf_resolve_email($data, pm_is_native_app_request());
 $purpose = trim((string)($data['purpose'] ?? 'view'));
 
 if ($file === '' || $email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {

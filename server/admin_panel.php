@@ -202,23 +202,7 @@ function pm_verify_firebase_id_token($idToken, $projectId, $apiKey) {
         }
     }
 
-    // 3) Last resort: decode JWT claims locally (Hostinger blocked Google APIs)
-    $claims = pm_jwt_payload($idToken);
-    if (is_array($claims) && !empty($claims['email'])) {
-        $aud = (string)($claims['aud'] ?? '');
-        $iss = (string)($claims['iss'] ?? '');
-        $exp = (int)($claims['exp'] ?? 0);
-        $issOk = ($iss === ('https://securetoken.google.com/' . $projectId));
-        $audOk = ($aud === $projectId);
-        if (!$issOk || !$audOk) {
-            return ['ok' => false, 'reason' => 'JWT claims invalid (iss/aud).'];
-        }
-        if ($exp && time() >= ($exp + 30)) {
-            return ['ok' => false, 'reason' => 'Token expired.'];
-        }
-        return ['ok' => true, 'data' => $claims];
-    }
-
+    // Token is accepted only if Google confirms it (steps 1 & 2). No local fallback.
     $reason = 'Could not verify token with Google.';
     if (!empty($lookupErr)) $reason .= ' (' . $lookupErr . ')';
     if (!empty($res['err'])) $reason .= ' curl: ' . $res['err'];
@@ -446,6 +430,7 @@ if (isset($_GET['fetch_table'])) {
                       <button class='btn-icon btn-delete' onclick='hardDeleteCard(".$row['id'].")' title='Permanent Delete'><ion-icon name='trash-bin-outline'></ion-icon></button>";
             } else {
                 echo "<button class='btn-icon btn-edit' data-course='$json' onclick='editCard(this)' title='Edit'><ion-icon name='create-outline'></ion-icon></button>
+                      <button class='btn-icon' style='background:#fef3c7; color:#92400e;' onclick='revokeAllCard(".$row['id'].")' title='Remove this course from ALL student accounts (history kept)'><ion-icon name='person-remove-outline'></ion-icon></button>
                       <button class='btn-icon btn-delete' onclick='deleteCard(".$row['id'].")' title='Move to Trash'><ion-icon name='trash-outline'></ion-icon></button>";
             }
 
@@ -845,6 +830,44 @@ if (isset($_POST['ajax_enrollment'])) {
         }
     }
     echo json_encode(['status' => 'success']);
+    exit;
+}
+
+// 6.5 REVOKE A COURSE FROM ALL ACCOUNTS (access removed, history kept)
+if (isset($_POST['ajax_revoke_course_all'])) {
+    pm_require_admin(true);
+    $cid = (int)($_POST['course_id'] ?? 0);
+    if ($cid <= 0) { echo json_encode(['status' => 'error', 'msg' => 'Bad course id']); exit; }
+
+    $conn->query("CREATE TABLE IF NOT EXISTS user_courses_revoked (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_email VARCHAR(190) NOT NULL,
+        course_id INT NOT NULL,
+        purchased_at DATETIME NULL,
+        revoked_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        revoked_by VARCHAR(190) NOT NULL DEFAULT '',
+        INDEX idx_course (course_id),
+        INDEX idx_email (user_email)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    $adminEmail = $conn->real_escape_string((string)($_SESSION['pm_admin_email'] ?? ''));
+
+    $hasPc = $conn->query("SHOW COLUMNS FROM user_courses LIKE 'purchased_at'");
+    if ($hasPc && $hasPc->num_rows > 0) {
+        $conn->query("INSERT INTO user_courses_revoked (user_email, course_id, purchased_at, revoked_by)
+                      SELECT user_email, course_id, purchased_at, '$adminEmail' FROM user_courses WHERE course_id = $cid");
+    } else {
+        $conn->query("INSERT INTO user_courses_revoked (user_email, course_id, revoked_by)
+                      SELECT user_email, course_id, '$adminEmail' FROM user_courses WHERE course_id = $cid");
+    }
+
+    $cntRow = $conn->query("SELECT COUNT(*) AS c FROM user_courses WHERE course_id = $cid");
+    $removed = $cntRow ? (int)$cntRow->fetch_assoc()['c'] : 0;
+    $ok = $conn->query("DELETE FROM user_courses WHERE course_id = $cid");
+
+    echo json_encode($ok
+        ? ['status' => 'success', 'removed' => $removed]
+        : ['status' => 'error', 'msg' => $conn->error]);
     exit;
 }
 
@@ -2598,6 +2621,20 @@ input:checked + .slider:before { transform: translateX(20px); }
                     showToast("Moved to Trash!", 'warning'); 
                     loadCourses(); 
                 } else showToast('Trash failed!', 'error'); 
+            });
+        }
+
+        // REVOKE COURSE FROM ALL ACCOUNTS (access removed, history kept)
+        window.revokeAllCard = function(id) {
+            if(!confirm('⚠️ Ye course SABHI student accounts se hata dega — jinhone purchase kiya tha unki access chali jayegi.\n\nRecord history me safe rahega. Pakka?')) return;
+            if(!confirm('🚨 Last confirm: SABHI buyers ki access turant band ho jayegi. Proceed?')) return;
+            const fd = new FormData();
+            fd.append('ajax_revoke_course_all','1'); fd.append('course_id', id);
+            fetch(window.location.href, {method:'POST',body:fd})
+            .then(res => res.json())
+            .then(d => {
+                if(d.status==='success') { showToast((d.removed||0) + ' accounts se access hata — history me safe', 'warning'); loadCourses(); }
+                else showToast('Revoke failed: ' + (d.msg||''), 'error');
             });
         }
 
