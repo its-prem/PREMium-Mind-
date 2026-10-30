@@ -1415,6 +1415,11 @@ input:checked + .slider:before { transform: translateX(20px); }
                         <?php if($pendingReports > 0) echo "<span class='nav-badge'>$pendingReports</span>"; ?>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="d2d_pyq_admin.php" class="nav-link">
+                        <ion-icon name="document-lock-outline"></ion-icon> D2D PYQ Access
+                    </a>
+                </li>
             </ul>
 
             <div class="sidebar-footer" style="padding: 20px;">

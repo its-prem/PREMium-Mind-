@@ -227,7 +227,10 @@
             transform: translateY(-2px);
         }
         .year-card:active { transform: scale(0.97); }
-        
+        .year-card.locked { opacity: 0.6; background: #f8fafc; }
+        .year-card.locked:hover { border-color: var(--slate-200); box-shadow: 0 2px 8px rgba(15,23,42,.03); transform: none; }
+        .year-card.locked .yc-tag { color: #94a3b8; background: #e2e8f0; }
+
         .yc-left { text-align: left; }
         .yc-tag {
             display: inline-block; font-size: 9px; font-weight: 800;
@@ -535,10 +538,6 @@
                 <button class="back-btn" onclick="goHome()">← Back</button>
                 <div id="test-title">Paper Setup</div>
             </div>
-            <button class="copy-btn" id="copy-btn" onclick="copyAllQuestions()" title="Copy all shown questions">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                <span id="copy-label">Copy All</span>
-            </button>
         </nav>
 
         <div class="filter-bar" id="filter-bar">
@@ -569,6 +568,7 @@
         </div>
     </div>
 
+    <script src="/pm-session.js"></script>
     <script type="module">
         let allLoadedData = [];
         let currentShown = [];
@@ -590,23 +590,53 @@
         const subjectsList = ["Physics", "Chemistry", "Math"];
         let isCombineMode = false;
 
-        window.onload = () => {
+        // ===== Access control: full (admin-granted email) vs free (only 2026) =====
+        const FREE_YEAR = 2026;
+        let PYQ_FULL = false;
+        let allowedYears = [FREE_YEAR];
+
+        function renderHomeGrid() {
             const grid = document.getElementById('year-grid');
             let htmlBuffer = '';
             yearsList.forEach(y => {
+                const locked = !allowedYears.includes(y);
                 htmlBuffer += `
-                    <div class="year-card" onclick="openYearTest(${y})">
+                    <div class="year-card${locked ? ' locked' : ''}" onclick="${locked ? `lockedMsg(${y})` : `openYearTest(${y})`}">
                         <div class="yc-left">
-                            <span class="yc-tag">PYQ Paper</span>
+                            <span class="yc-tag">${locked ? '🔒 Locked' : 'PYQ Paper'}</span>
                             <h3>${y}</h3>
                             <p>Phy • Chem • Math</p>
                         </div>
-                        
                     </div>
                 `;
             });
             grid.innerHTML = htmlBuffer;
+        }
+
+        window.lockedMsg = (y) => {
+            showToast('🔒 ' + y + ' lock hai — full access ke liye admin se sampark karo.');
         };
+
+        async function initAccess() {
+            const email = (window.getStoredEmail ? window.getStoredEmail() : null)
+                       || localStorage.getItem('customUserEmail')
+                       || localStorage.getItem('userEmail');
+            if (!email) { window.location.href = '/login.html'; return; }
+            try {
+                const body = { email: email };
+                try { if (window.pmGetPdfSession) { const t = window.pmGetPdfSession(); if (t) body.pdf_session = t; } } catch (e) {}
+                const res = await fetch('https://premind.diplomawallah.in/d2d_pyq_access.php', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const d = await res.json().catch(() => ({}));
+                PYQ_FULL = !!(d && d.full);
+            } catch (e) { PYQ_FULL = false; }
+            allowedYears = PYQ_FULL ? yearsList.slice() : [FREE_YEAR];
+            renderHomeGrid();
+        }
+
+        window.addEventListener('DOMContentLoaded', initAccess);
 
         window.goHome = () => {
             document.getElementById('test-view').style.display = 'none';
@@ -693,6 +723,7 @@
 
         // --- Data Fetching ---
         window.openYearTest = async (year) => {
+            if (!allowedYears.includes(year)) { lockedMsg(year); return; }
             document.getElementById('loading-screen').style.display = 'flex';
             try {
                 const data = await loadYear(year);
@@ -720,7 +751,7 @@
         window.openCombineFilter = async () => {
             document.getElementById('loading-screen').style.display = 'flex';
             try {
-                const modules = await Promise.all(yearsList.map(loadYear));
+                const modules = await Promise.all(allowedYears.map(loadYear));
                 allLoadedData = modules.flat();
 
                 if(allLoadedData.length === 0) throw new Error("No data files found!");
@@ -749,7 +780,7 @@
                     <button class="dd-btn" onclick="selectAll('cb-year', true)">Select All</button>
                     <button class="dd-btn" onclick="selectAll('cb-year', false)">Clear</button>
                 </div>
-                ${yearsList.map(y => `<label class="cb-label"><input type="checkbox" class="cb-year" value="${y}" checked onchange="applyFilters()"> ${y}</label>`).join('')}
+                ${allowedYears.map(y => `<label class="cb-label"><input type="checkbox" class="cb-year" value="${y}" checked onchange="applyFilters()"> ${y}</label>`).join('')}
             `;
         }
 
