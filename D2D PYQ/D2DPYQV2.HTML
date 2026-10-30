@@ -574,15 +574,38 @@
         let currentShown = [];
         const cache = {};
 
+        // Server-side gated data endpoint. Questions are NOT public files anymore:
+        // each year is returned only after the server confirms this user is allowed
+        // that year, so dev-tools / direct fetch cannot unlock locked years.
+        const PYQ_API = 'https://premind.diplomawallah.in/d2d_pyq_data.php';
+
+        function pyqCreds() {
+            const email = (window.getStoredEmail ? window.getStoredEmail() : null)
+                       || localStorage.getItem('customUserEmail')
+                       || localStorage.getItem('userEmail') || '';
+            const body = { email };
+            try { if (window.pmGetPdfSession) { const t = window.pmGetPdfSession(); if (t) body.pdf_session = t; } } catch (e) {}
+            return body;
+        }
+
         async function loadYear(y) {
             if (cache[y]) return cache[y];
             try {
-                const module = await import(`./data/data_${y}.js`);
-                cache[y] = module[`data${y}`];
+                const res = await fetch(PYQ_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...pyqCreds(), year: y })
+                });
+                const d = await res.json().catch(() => ({}));
+                if (!res.ok || !d || d.status !== 'success' || !Array.isArray(d.questions)) {
+                    // Locked (403), not logged in (401), or error — no questions.
+                    return [];
+                }
+                cache[y] = d.questions;
                 return cache[y];
             } catch (e) {
-                console.warn(`Data for ${y} is missing or failed to load.`);
-                return []; 
+                console.warn(`Data for ${y} failed to load (connection).`, e);
+                return [];
             }
         }
         
@@ -866,7 +889,6 @@
 
             if (filteredData.length === 0) {
                 currentShown = [];
-                document.getElementById('copy-btn').disabled = true;
                 container.innerHTML = `<div style="text-align:center; padding: 50px 20px; color:var(--slate-500); font-weight:600;">Please select filters above to load questions. 🔍</div>`;
                 return;
             }
@@ -882,7 +904,6 @@
             });
 
             currentShown = filteredData;
-            document.getElementById('copy-btn').disabled = false;
 
             let fullHTML = "";
             let currentYear = null;

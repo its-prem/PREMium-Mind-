@@ -1,6 +1,12 @@
 # Secrets / local Hostinger copies — do not push API keys
 server/create_order.php
 server/pm_secrets.php
+
+# D2D PYQ question data — must stay OFF the public Netlify deploy.
+# Netlify publishes the whole repo, so anything tracked here becomes a
+# public URL. This data is served only by Hostinger's gated endpoint
+# (server/d2d_pyq_data.php). Keep the folder local; upload it to Hostinger.
+server/d2d_pyq_data/
 .env
 .env.*
 !.env.example
