@@ -367,7 +367,7 @@ if ($colSort && $colSort->num_rows === 0) {
 // 1. FETCH COURSES
 if (isset($_GET['fetch_table'])) {
     pm_require_admin(false);
-    $result = $conn->query("SELECT * FROM courses ORDER BY sort_order ASC, id DESC");
+    $result = $conn->query("SELECT *, (SELECT COUNT(*) FROM user_courses uc WHERE uc.course_id = courses.id) AS enrolled_count FROM courses ORDER BY sort_order ASC, id DESC");
     // db_connect.php now sets MYSQLI_REPORT_OFF, so a failed query returns
     // false instead of throwing — calling ->num_rows on that is a fatal
     // (blank 500), which is indistinguishable from a network error in the
@@ -406,8 +406,18 @@ if (isset($_GET['fetch_table'])) {
             $row_style = $is_deleted ? "opacity: 0.6; background: #fef2f2;" : "";
             $status_badge = $is_deleted ? "<div style='margin-top:6px;'><span class='badge-danger' style='white-space:nowrap;'>🗑️ Trashed</span></div>" : "<div style='margin-top:6px;'><span class='badge-success' style='white-space:nowrap;'>🟢 Active</span></div>";
 
+            // How many students are still enrolled (shown even when trashed, so
+            // the admin can see leftover access and revoke it).
+            $enrolled = (int)($row['enrolled_count'] ?? 0);
+            if ($enrolled > 0) {
+                $enr_bg = $is_deleted ? '#fee2e2' : '#dcfce7';
+                $enr_fg = $is_deleted ? '#991b1b' : '#166534';
+                $status_badge .= "<div style='margin-top:4px;'><span style='background:$enr_bg;color:$enr_fg;padding:3px 8px;border-radius:8px;font-size:0.75rem;font-weight:800;white-space:nowrap;'>👥 $enrolled enrolled</span></div>";
+            }
+
             echo "<tr style='$row_style' class='fade-in'>
                 <td style='font-weight:700;'>
+                    <label style='display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin-bottom:6px;'><input type='checkbox' class='revoke-pick' value='".$row['id']."' style='width:16px;height:16px;cursor:pointer;'></label>
                     <div style='font-size:0.75rem;color:var(--dark-muted);'>ID #".$row['id']."</div>
                     <div style='margin-top:4px;background:#eef2ff;color:#3730a3;display:inline-block;padding:3px 8px;border-radius:8px;font-size:0.8rem;font-weight:800;'>Rank ".(int)($row['sort_order'] ?? 0)."</div>
                 </td>
@@ -437,8 +447,11 @@ if (isset($_GET['fetch_table'])) {
                     <div class='action-buttons'>";
                     
             if ($is_deleted) {
-                echo "<button class='btn-icon btn-edit' style='background:#dcfce7; color:#166534;' onclick='restoreCard(".$row['id'].")' title='Restore Course'><ion-icon name='refresh-outline'></ion-icon></button>
-                      <button class='btn-icon btn-delete' onclick='hardDeleteCard(".$row['id'].")' title='Permanent Delete'><ion-icon name='trash-bin-outline'></ion-icon></button>";
+                echo "<button class='btn-icon btn-edit' style='background:#dcfce7; color:#166534;' onclick='restoreCard(".$row['id'].")' title='Restore Course'><ion-icon name='refresh-outline'></ion-icon></button>";
+                if ($enrolled > 0) {
+                    echo "<button class='btn-icon' style='background:#fef3c7; color:#92400e;' onclick='revokeAllCard(".$row['id'].")' title='$enrolled student(s) still have access — remove from ALL accounts (history kept)'><ion-icon name='person-remove-outline'></ion-icon></button>";
+                }
+                echo "<button class='btn-icon btn-delete' onclick='hardDeleteCard(".$row['id'].")' title='Permanent Delete'><ion-icon name='trash-bin-outline'></ion-icon></button>";
             } else {
                 echo "<button class='btn-icon btn-edit' data-course='$json' onclick='editCard(this)' title='Edit'><ion-icon name='create-outline'></ion-icon></button>
                       <button class='btn-icon' style='background:#fef3c7; color:#92400e;' onclick='revokeAllCard(".$row['id'].")' title='Remove this course from ALL student accounts (history kept)'><ion-icon name='person-remove-outline'></ion-icon></button>
@@ -844,11 +857,24 @@ if (isset($_POST['ajax_enrollment'])) {
     exit;
 }
 
-// 6.5 REVOKE A COURSE FROM ALL ACCOUNTS (access removed, history kept)
+// 6.5 REVOKE COURSE(S) FROM ALL ACCOUNTS (access removed, history kept)
+// Accepts a single course_id OR course_ids (comma-separated) so one click can
+// clear enrolments across many cards at once.
 if (isset($_POST['ajax_revoke_course_all'])) {
     pm_require_admin(true);
-    $cid = (int)($_POST['course_id'] ?? 0);
-    if ($cid <= 0) { echo json_encode(['status' => 'error', 'msg' => 'Bad course id']); exit; }
+
+    // Collect ids from course_ids (bulk) and/or course_id (single).
+    $ids = [];
+    if (isset($_POST['course_ids'])) {
+        foreach (explode(',', (string)$_POST['course_ids']) as $part) {
+            $n = (int)trim($part);
+            if ($n > 0) $ids[$n] = $n;
+        }
+    }
+    $single = (int)($_POST['course_id'] ?? 0);
+    if ($single > 0) $ids[$single] = $single;
+
+    if (empty($ids)) { echo json_encode(['status' => 'error', 'msg' => 'Bad course id']); exit; }
 
     $conn->query("CREATE TABLE IF NOT EXISTS user_courses_revoked (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -862,22 +888,25 @@ if (isset($_POST['ajax_revoke_course_all'])) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     $adminEmail = $conn->real_escape_string((string)($_SESSION['pm_admin_email'] ?? ''));
-
     $hasPc = $conn->query("SHOW COLUMNS FROM user_courses LIKE 'purchased_at'");
-    if ($hasPc && $hasPc->num_rows > 0) {
+    $pcExists = ($hasPc && $hasPc->num_rows > 0);
+
+    $inList = implode(',', array_map('intval', $ids));
+    $cntRow = $conn->query("SELECT COUNT(*) AS c FROM user_courses WHERE course_id IN ($inList)");
+    $removed = $cntRow ? (int)$cntRow->fetch_assoc()['c'] : 0;
+
+    if ($pcExists) {
         $conn->query("INSERT INTO user_courses_revoked (user_email, course_id, purchased_at, revoked_by)
-                      SELECT user_email, course_id, purchased_at, '$adminEmail' FROM user_courses WHERE course_id = $cid");
+                      SELECT user_email, course_id, purchased_at, '$adminEmail' FROM user_courses WHERE course_id IN ($inList)");
     } else {
         $conn->query("INSERT INTO user_courses_revoked (user_email, course_id, revoked_by)
-                      SELECT user_email, course_id, '$adminEmail' FROM user_courses WHERE course_id = $cid");
+                      SELECT user_email, course_id, '$adminEmail' FROM user_courses WHERE course_id IN ($inList)");
     }
 
-    $cntRow = $conn->query("SELECT COUNT(*) AS c FROM user_courses WHERE course_id = $cid");
-    $removed = $cntRow ? (int)$cntRow->fetch_assoc()['c'] : 0;
-    $ok = $conn->query("DELETE FROM user_courses WHERE course_id = $cid");
+    $ok = $conn->query("DELETE FROM user_courses WHERE course_id IN ($inList)");
 
     echo json_encode($ok
-        ? ['status' => 'success', 'removed' => $removed]
+        ? ['status' => 'success', 'removed' => $removed, 'cards' => count($ids)]
         : ['status' => 'error', 'msg' => $conn->error]);
     exit;
 }
@@ -1727,6 +1756,15 @@ input:checked + .slider:before { transform: translateX(20px); }
 
                     <div class="list-section">
                         <h3 class="section-title"><ion-icon name="list"></ion-icon> Published & Trashed Inventory</h3>
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px;">
+                            <label style="display:inline-flex;align-items:center;gap:6px;font-size:0.85rem;font-weight:700;color:var(--dark-muted);cursor:pointer;">
+                                <input type="checkbox" id="revokePickAll" onclick="togglePickAll(this)" style="width:16px;height:16px;cursor:pointer;"> Select all
+                            </label>
+                            <button type="button" onclick="revokeSelected()" class="btn-icon" style="width:auto;padding:8px 14px;border-radius:10px;background:#fef3c7;color:#92400e;font-weight:800;font-size:0.85rem;display:inline-flex;align-items:center;gap:6px;">
+                                <ion-icon name="person-remove-outline"></ion-icon> Revoke selected
+                            </button>
+                            <span style="font-size:0.78rem;color:var(--dark-muted);">Tick the cards, then remove their access from ALL students at once (history kept).</span>
+                        </div>
                         <div class="table-responsive">
                             <table class="custom-table">
                                 <thead>
@@ -2650,6 +2688,27 @@ input:checked + .slider:before { transform: translateX(20px); }
             .then(res => res.json())
             .then(d => {
                 if(d.status==='success') { showToast((d.removed||0) + ' accounts se access hata — history me safe', 'warning'); loadCourses(); }
+                else showToast('Revoke failed: ' + (d.msg||''), 'error');
+            });
+        }
+
+        // Tick / untick every card's revoke checkbox at once.
+        window.togglePickAll = function(master) {
+            document.querySelectorAll('.revoke-pick').forEach(cb => cb.checked = master.checked);
+        }
+
+        // REVOKE MULTIPLE CARDS FROM ALL ACCOUNTS in one go.
+        window.revokeSelected = function() {
+            const ids = Array.from(document.querySelectorAll('.revoke-pick:checked')).map(cb => cb.value);
+            if(ids.length === 0) { showToast('Pehle kuch cards select karo', 'error'); return; }
+            if(!confirm('⚠️ ' + ids.length + ' card(s) SABHI student accounts se hata denge — in sabke buyers ki access chali jayegi.\n\nRecord history me safe rahega. Pakka?')) return;
+            if(!confirm('🚨 Last confirm: in ' + ids.length + ' card(s) ke SABHI buyers ki access turant band ho jayegi. Proceed?')) return;
+            const fd = new FormData();
+            fd.append('ajax_revoke_course_all','1'); fd.append('course_ids', ids.join(','));
+            fetch(window.location.href, {method:'POST',body:fd})
+            .then(res => res.json())
+            .then(d => {
+                if(d.status==='success') { showToast((d.removed||0) + ' accounts se access hata (' + (d.cards||ids.length) + ' cards) — history me safe', 'warning'); loadCourses(); }
                 else showToast('Revoke failed: ' + (d.msg||''), 'error');
             });
         }

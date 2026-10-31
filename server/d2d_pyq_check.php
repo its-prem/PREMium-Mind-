@@ -29,10 +29,15 @@ if (!function_exists('pm_d2d_pyq_has_full')) {
         if ($r && $r->num_rows > 0) return true;
 
         // 2) Paid for a course flagged as granting D2D PYQ access.
+        // NOTE: we intentionally do NOT require the course to be active
+        // (is_deleted=0). A paid user keeps PYQ access even if the admin
+        // later trashes/hides the card from the store — same as normal
+        // courses. To actually strip access from everyone, use the admin's
+        // "Revoke from all" (which deletes the user_courses rows).
         $r2 = @$conn->query(
             "SELECT 1 FROM user_courses uc
              JOIN courses c ON c.id = uc.course_id
-             WHERE uc.user_email='$e' AND c.grants_pyq=1 AND c.is_deleted=0
+             WHERE uc.user_email='$e' AND c.grants_pyq=1
              LIMIT 1"
         );
         if ($r2 && $r2->num_rows > 0) return true;

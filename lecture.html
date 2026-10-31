@@ -256,6 +256,12 @@
           btnLabel = 'Open in App';
         } else if (pdfPath) {
           btnAction = "sessionStorage.setItem('pmWatchReturn','lecture.html'+window.location.search);window.location.href='watch.html?file=" + encodeURIComponent(pdfPath) + "&download=" + (canDownload ? '1' : '0') + "&dlmsg=" + encodeURIComponent(downloadMsg) + "&title=" + encodeURIComponent(course.title || '') + "'";
+        } else if (course.website_link && String(course.website_link).trim() && String(course.website_link).trim().toLowerCase() !== 'null') {
+          // No PDF but a website link is set (e.g. the D2D PYQ access course) —
+          // open that page instead of showing a "PDF not uploaded" error.
+          const wl = String(course.website_link).trim().replace(/'/g, "\\'");
+          btnAction = "window.location.href='" + wl + "'";
+          btnLabel = 'Open';
         } else {
           btnAction = "alert('PDF abhi upload nahi hui. Admin panel me pdf_file column check karo (uploads/pdfs/...)')";
         }

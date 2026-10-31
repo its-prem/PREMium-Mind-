@@ -288,6 +288,16 @@
         .copy-btn.done { background: #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); }
         .copy-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
 
+        /* Copy protection for students (admin is exempt). Blocks text
+           selection across the whole page; copy/cut/contextmenu are also
+           blocked in JS. Inputs stay usable. */
+        body.copy-locked, body.copy-locked * {
+            -webkit-user-select: none; -moz-user-select: none;
+            -ms-user-select: none; user-select: none;
+            -webkit-touch-callout: none;
+        }
+        body.copy-locked input, body.copy-locked textarea { user-select: text; }
+
         /* Sleek Pill Filter Bar */
         .filter-bar {
             background: var(--white); padding: 10px 12px;
@@ -538,6 +548,10 @@
                 <button class="back-btn" onclick="goHome()">← Back</button>
                 <div id="test-title">Paper Setup</div>
             </div>
+            <!-- Admin-only: copy all questions. Hidden for students. -->
+            <button class="copy-btn" id="copy-btn" onclick="copyAllQuestions()" style="display:none;">
+                📋 <span id="copy-label">Copy All</span>
+            </button>
         </nav>
 
         <div class="filter-bar" id="filter-bar">
@@ -657,7 +671,28 @@
             } catch (e) { PYQ_FULL = false; }
             allowedYears = PYQ_FULL ? yearsList.slice() : [FREE_YEAR];
             renderHomeGrid();
+            applyCopyPolicy(email);
         }
+
+        // Admins can copy (button appears); students cannot select/copy text.
+        let PYQ_IS_ADMIN = false;
+        function applyCopyPolicy(email) {
+            try { PYQ_IS_ADMIN = !!(window.pmIsAdminAccount && window.pmIsAdminAccount(email)); } catch (e) { PYQ_IS_ADMIN = false; }
+            const btn = document.getElementById('copy-btn');
+            if (PYQ_IS_ADMIN) {
+                if (btn) btn.style.display = 'flex';
+                document.body.classList.remove('copy-locked');
+            } else {
+                if (btn) btn.style.display = 'none';
+                document.body.classList.add('copy-locked');
+            }
+        }
+        // Block copy/cut/context-menu for students (admin exempt).
+        ['copy', 'cut', 'contextmenu', 'selectstart', 'dragstart'].forEach(ev => {
+            document.addEventListener(ev, (e) => {
+                if (!PYQ_IS_ADMIN && !/^(INPUT|TEXTAREA)$/.test(e.target.tagName || '')) e.preventDefault();
+            });
+        });
 
         window.addEventListener('DOMContentLoaded', initAccess);
 
