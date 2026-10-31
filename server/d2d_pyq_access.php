@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
 include 'db_connect.php';
 require_once __DIR__ . '/pm_session_token.php';
+require_once __DIR__ . '/d2d_pyq_check.php';
 
 $conn->query("CREATE TABLE IF NOT EXISTS d2d_pyq_access (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -56,8 +57,6 @@ if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
-$e = $conn->real_escape_string($email);
-$r = $conn->query("SELECT 1 FROM d2d_pyq_access WHERE email='$e' LIMIT 1");
-$full = ($r && $r->num_rows > 0);
+$full = pm_d2d_pyq_has_full($conn, $email);
 
 echo json_encode(['status' => 'success', 'full' => $full]);

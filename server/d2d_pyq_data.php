@@ -80,17 +80,16 @@ if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
 // ---- decide if this caller may read this year ----
 $allowed = in_array($year, $FREE_YEARS, true);
 if (!$allowed) {
-    // Needs an admin-granted FULL-access email.
+    // Needs FULL access: an admin-granted email OR a paid "D2D PYQ" course.
     include 'db_connect.php';
+    require_once __DIR__ . '/d2d_pyq_check.php';
     $conn->query("CREATE TABLE IF NOT EXISTS d2d_pyq_access (
         id INT AUTO_INCREMENT PRIMARY KEY,
         email VARCHAR(190) NOT NULL UNIQUE,
         granted_by VARCHAR(190) NOT NULL DEFAULT '',
         granted_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-    $e = $conn->real_escape_string($email);
-    $r = $conn->query("SELECT 1 FROM d2d_pyq_access WHERE email='$e' LIMIT 1");
-    $allowed = ($r && $r->num_rows > 0);
+    $allowed = pm_d2d_pyq_has_full($conn, $email);
 }
 
 if (!$allowed) {

@@ -325,6 +325,13 @@ if ($colPrev && $colPrev->num_rows === 0) {
     @$conn->query("ALTER TABLE courses ADD COLUMN show_preview TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = show 1-page PDF preview on store card'");
 }
 
+// Ensure grants_pyq column exists (1 = buying this course unlocks ALL years
+// of the D2D PYQ page for that student's email, automatically).
+$colPyq = @$conn->query("SHOW COLUMNS FROM courses LIKE 'grants_pyq'");
+if ($colPyq && $colPyq->num_rows === 0) {
+    @$conn->query("ALTER TABLE courses ADD COLUMN grants_pyq TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = purchase unlocks all D2D PYQ years'");
+}
+
 // Custom T&C text per course (empty = use default sample on website)
 $colTnc = @$conn->query("SHOW COLUMNS FROM courses LIKE 'tnc_text'");
 if ($colTnc && $colTnc->num_rows === 0) {
@@ -389,6 +396,9 @@ if (isset($_GET['fetch_table'])) {
             $preview_on = !empty($row['show_preview']) && (int)$row['show_preview'] === 1;
             $preview_status = pm_flag_toggle((int)$row['id'], 'show_preview', $preview_on, 'eye-outline', 'Preview');
 
+            $pyq_on = !empty($row['grants_pyq']) && (int)$row['grants_pyq'] === 1;
+            $pyq_status = pm_flag_toggle((int)$row['id'], 'grants_pyq', $pyq_on, 'documents-outline', 'D2D PYQ');
+
             $btn_type_status = pm_btn_type_select((int)$row['id'], (string)($row['btn_type'] ?? 'normal'));
 
             // Check if course is deleted
@@ -419,6 +429,7 @@ if (isset($_GET['fetch_table'])) {
                         $dl_status
                         $app_only_status
                         $preview_status
+                        $pyq_status
                         $btn_type_status
                     </div>
                 </td>
@@ -770,7 +781,7 @@ if (isset($_POST['ajax_bulk_update_flags'])) {
         exit;
     }
 
-    $allowedFlags = ['allow_download', 'app_only', 'show_preview'];
+    $allowedFlags = ['allow_download', 'app_only', 'show_preview', 'grants_pyq'];
     $allowedBtnTypes = array_keys(pm_btn_type_options());
     // One prepared statement per column (field names can't be bound), then
     // reused for every row changing that column.
