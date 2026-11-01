@@ -2004,7 +2004,7 @@
         async function syncProfilePhoneFromServer(email) {
             if (!email) return '';
             try {
-                const res = await fetch('https://premind.diplomawallah.in/get_user.php?email=' + encodeURIComponent(email));
+                const res = await fetch('https://premind.diplomawallah.in/get_user.php?email=' + encodeURIComponent(email) + '&pdf_session=' + encodeURIComponent((window.pmGetPdfSession && window.pmGetPdfSession()) || ''));
                 const data = await res.json();
                 const phone = String((data && (data.phone || data.mobile)) || '').replace(/\D/g, '').slice(-10);
                 if (phone.length === 10 && phone !== '0000000000' && phone !== '9999999999') {
@@ -2385,7 +2385,8 @@
                     container.innerHTML = '<p style="text-align:center; width:100%;">Loading Premium Store...</p>';
                 }
 
-                const apiUrl = userEmail ? `https://premind.diplomawallah.in/api.php?email=${encodeURIComponent(userEmail)}` : 'https://premind.diplomawallah.in/api.php';
+                const pmTok = (window.pmGetPdfSession && window.pmGetPdfSession()) || '';
+                const apiUrl = userEmail ? `https://premind.diplomawallah.in/api.php?email=${encodeURIComponent(userEmail)}&pdf_session=${encodeURIComponent(pmTok)}` : 'https://premind.diplomawallah.in/api.php';
 
                 const response = await fetch(apiUrl, { cache: 'no-store' });
                 const allCourses = await response.json();

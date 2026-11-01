@@ -216,7 +216,7 @@
     const container = document.getElementById('my-courses-container');
     if (!userEmail) { window.location.href = 'login.html'; return; }
     try {
-      const res = await fetch('https://premind.diplomawallah.in/api.php?email=' + encodeURIComponent(userEmail));
+      const res = await fetch('https://premind.diplomawallah.in/api.php?email=' + encodeURIComponent(userEmail) + '&pdf_session=' + encodeURIComponent((window.pmGetPdfSession && window.pmGetPdfSession()) || ''));
       const courses = await res.json();
       const enrolled = (Array.isArray(courses)?courses:[]).filter(c => c.is_enrolled == 1);
       container.innerHTML = '';

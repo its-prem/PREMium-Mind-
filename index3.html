@@ -1299,7 +1299,7 @@ window.loadCourses = async function(userEmail = '') {
         const container = document.getElementById('dynamic-products-container');
         container.innerHTML = '<p style="text-align:center; width:100%;">Loading Premium Store...</p>';
 
-        const apiUrl = userEmail ? `https://premind.diplomawallah.in/api.php?email=${encodeURIComponent(userEmail)}` : 'https://premind.diplomawallah.in/api.php'; 
+        const apiUrl = userEmail ? `https://premind.diplomawallah.in/api.php?email=${encodeURIComponent(userEmail)}&pdf_session=${encodeURIComponent((window.pmGetPdfSession && window.pmGetPdfSession()) || '')}` : 'https://premind.diplomawallah.in/api.php';
         
         const response = await fetch(apiUrl);
         const allCourses = await response.json();

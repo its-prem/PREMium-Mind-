@@ -342,7 +342,7 @@
     let profile = null;
     try {
       const uRes = await fetch(
-        'https://premind.diplomawallah.in/get_user.php?email=' + encodeURIComponent(user.email),
+        'https://premind.diplomawallah.in/get_user.php?email=' + encodeURIComponent(user.email) + '&pdf_session=' + encodeURIComponent((window.pmGetPdfSession && window.pmGetPdfSession()) || ''),
         { mode: 'cors', credentials: 'omit', cache: 'no-store' }
       );
       profile = await uRes.json();
