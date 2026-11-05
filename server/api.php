@@ -57,12 +57,22 @@ $result = $conn->query($sql);
 
 if ($result) {
     while ($row = $result->fetch_assoc()) {
-        // Reveal the premium file path ONLY when the caller owns the course AND
-        // identity was proven by the token. Email-only (unverified) callers
-        // never get a path, so paths can't be scraped by spoofing an email.
+        // Reveal premium content locators ONLY when the caller owns the course
+        // AND identity was proven by the token. Email-only (unverified) callers
+        // never get them, so they can't be scraped by spoofing an email.
         $owns_verified = ($verified_email !== '' && (int)($row['is_enrolled'] ?? 0) === 1);
-        if (!$owns_verified && array_key_exists('pdf_file', $row)) {
-            $row['pdf_file'] = '';
+        $is_project    = (strtolower(trim((string)($row['category'] ?? ''))) === 'projects');
+        if (!$owns_verified) {
+            // PDF path + any paid-content links are hidden from non-owners.
+            if (array_key_exists('pdf_file', $row)) $row['pdf_file'] = '';
+            if (array_key_exists('pdf_link', $row)) $row['pdf_link'] = '';
+            if (array_key_exists('link', $row))     $row['link']     = '';
+            // website_link is a PUBLIC "see project" demo for category=projects,
+            // but a PAID access link (e.g. D2D PYQ) for every other category —
+            // so keep it for projects, gate it for paid courses.
+            if (!$is_project && array_key_exists('website_link', $row)) {
+                $row['website_link'] = '';
+            }
         }
         $courses[] = $row;
     }

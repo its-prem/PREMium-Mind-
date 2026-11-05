@@ -4,8 +4,9 @@
  *
  * Student check: does this email have FULL access to the D2D PYQ page?
  * Emails are granted by the admin (d2d_pyq_admin.php). Everyone else only
- * gets the free year on the page (2026). Identity is taken from the signed
- * pm_pdf_session token when present (can't be faked), else the raw email.
+ * gets the free year on the page (2026). Identity for this paid-access check
+ * is taken ONLY from the signed pm_pdf_session token (can't be faked); a raw
+ * email is never trusted, so without a valid token the page stays locked.
  */
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -46,17 +47,17 @@ $conn->query("CREATE TABLE IF NOT EXISTS d2d_pyq_access (
 $data = json_decode((string)file_get_contents('php://input'), true);
 if (!is_array($data)) $data = $_POST;
 
-// Prefer the verified session token; fall back to the raw email.
-$email = '';
-$sess = (string)($data['pdf_session'] ?? '');
-if ($sess !== '') $email = pm_session_email($sess);
-if ($email === '') $email = strtolower(trim((string)($data['email'] ?? '')));
+// FULL access is a paid entitlement, so identity must be proven by the signed
+// pm_pdf_session token. A raw ?email= is never trusted here (that was the
+// bypass): without a valid token the UI simply stays locked.
+$sess        = (string)($data['pdf_session'] ?? '');
+$token_email = ($sess !== '') ? strtolower(trim(pm_session_email($sess))) : '';
 
-if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+if ($token_email === '' || !filter_var($token_email, FILTER_VALIDATE_EMAIL)) {
     echo json_encode(['status' => 'success', 'full' => false]);
     exit;
 }
 
-$full = pm_d2d_pyq_has_full($conn, $email);
+$full = pm_d2d_pyq_has_full($conn, $token_email);
 
 echo json_encode(['status' => 'success', 'full' => $full]);

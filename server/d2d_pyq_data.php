@@ -13,9 +13,11 @@
  *   - every other year ........ only emails granted FULL access by the admin
  *                               (the d2d_pyq_access table)
  *
- * Identity is read from the signed pm_pdf_session token when present (cannot be
- * faked without the server secret); it falls back to the raw email, matching
- * d2d_pyq_access.php. A disallowed year returns 403 and no questions.
+ * Identity is read from the signed pm_pdf_session token (HMAC-signed, cannot be
+ * faked without the server secret). For PAID years a valid token is REQUIRED —
+ * a raw ?email= is never trusted, so nobody can type a buyer's email to unlock
+ * papers. The free year also accepts a raw email (nothing to bypass there).
+ * A disallowed year returns 403 and no questions.
  */
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -65,22 +67,33 @@ if (!is_file($file)) {
     exit;
 }
 
-// ---- identify the caller (signed token preferred, raw email fallback) ----
-$email = '';
-$sess = (string)($data['pdf_session'] ?? '');
-if ($sess !== '') $email = pm_session_email($sess);
-if ($email === '') $email = strtolower(trim((string)($data['email'] ?? '')));
+// ---- identify the caller ----
+// The signed pm_pdf_session token is the ONLY proof of identity we trust for
+// paid papers: it is HMAC-signed with the server secret, so it cannot be faked.
+// A raw ?email= can be anyone's, so it unlocks nothing paid.
+$sess        = (string)($data['pdf_session'] ?? '');
+$token_email = ($sess !== '') ? strtolower(trim(pm_session_email($sess))) : '';
+$raw_email   = strtolower(trim((string)($data['email'] ?? '')));
 
-if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    http_response_code(401);
-    echo json_encode(['status' => 'error', 'message' => 'login required']);
-    exit;
-}
+$is_free = in_array($year, $FREE_YEARS, true);
 
-// ---- decide if this caller may read this year ----
-$allowed = in_array($year, $FREE_YEARS, true);
-if (!$allowed) {
-    // Needs FULL access: an admin-granted email OR a paid "D2D PYQ" course.
+if ($is_free) {
+    // Free year: nothing to bypass, so any logged-in user is fine. Prefer the
+    // token, accept the raw email as a fallback.
+    $email = $token_email !== '' ? $token_email : $raw_email;
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(401);
+        echo json_encode(['status' => 'error', 'message' => 'login required']);
+        exit;
+    }
+} else {
+    // Paid year: identity MUST come from a valid token. No raw-email fallback —
+    // that was the hole that let someone type a buyer's email to unlock papers.
+    if ($token_email === '' || !filter_var($token_email, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(401);
+        echo json_encode(['status' => 'error', 'message' => 'Please log in again to open paid papers.']);
+        exit;
+    }
     include 'db_connect.php';
     require_once __DIR__ . '/d2d_pyq_check.php';
     $conn->query("CREATE TABLE IF NOT EXISTS d2d_pyq_access (
@@ -89,13 +102,11 @@ if (!$allowed) {
         granted_by VARCHAR(190) NOT NULL DEFAULT '',
         granted_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-    $allowed = pm_d2d_pyq_has_full($conn, $email);
-}
-
-if (!$allowed) {
-    http_response_code(403);
-    echo json_encode(['status' => 'locked', 'message' => 'This year is locked. Contact admin for full access.']);
-    exit;
+    if (!pm_d2d_pyq_has_full($conn, $token_email)) {
+        http_response_code(403);
+        echo json_encode(['status' => 'locked', 'message' => 'This year is locked. Contact admin for full access.']);
+        exit;
+    }
 }
 
 // ---- allowed: stream the questions straight through ----

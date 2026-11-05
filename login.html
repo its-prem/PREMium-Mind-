@@ -328,7 +328,24 @@
     return p.length === 10 && p !== '0000000000' && p !== '9999999999';
   }
 
-  async function handleGoogleUser(user, googleBtn, originalBtnContent) {
+async function handleGoogleUser(user, googleBtn, originalBtnContent) {
+    // STEP 1: Sabse pehle PDF Session Token generate karo aur save karo
+    try {
+      const idt = await user.getIdToken(true);
+      const base = window.PM_HOSTINGER_API || 'https://premind.diplomawallah.in';
+      const sres = await fetch(base + '/get_pdf_session.php', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_token: idt })
+      });
+      const sdata = await sres.json().catch(function () { return {}; });
+      if (sdata && sdata.pdf_session && window.pmSetPdfSession) {
+        window.pmSetPdfSession(sdata.pdf_session);
+      }
+    } catch (e) {
+      console.warn('PDF Token generation failed', e);
+    }
+
+    // STEP 2: Ab Check User API call karo
     const fd = new FormData();
     fd.append('email', user.email);
 
@@ -339,14 +356,27 @@
       throw new Error('Could not verify account. Please try again.');
     }
 
+    // STEP 3: Ab Get User API call karo (Naye token ke saath)
     let profile = null;
     try {
+      const sessionToken = (window.pmGetPdfSession && window.pmGetPdfSession()) || '';
+      
       const uRes = await fetch(
-        'https://premind.diplomawallah.in/get_user.php?email=' + encodeURIComponent(user.email) + '&pdf_session=' + encodeURIComponent((window.pmGetPdfSession && window.pmGetPdfSession()) || ''),
-        { mode: 'cors', credentials: 'omit', cache: 'no-store' }
+        'https://premind.diplomawallah.in/get_user.php',
+        { 
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-PM-Session': sessionToken // Yahan token directly header me jaa raha hai
+          },
+          body: 'email=' + encodeURIComponent(user.email) + '&pdf_session=' + encodeURIComponent(sessionToken),
+          mode: 'cors', credentials: 'omit', cache: 'no-store' 
+        }
       );
       profile = await uRes.json();
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Get User API failed', e);
+    }
 
     // Hostinger APIs: check_user → {exists:true}; get_user → {status,phone} (often no name)
     const dbName = String(
@@ -354,6 +384,7 @@
       || (profile && (profile.name || profile.user_name || profile.full_name))
       || ''
     ).trim();
+    
     const phone = String(
       (checkData && (checkData.phone || checkData.mobile))
       || (profile && (profile.phone || profile.mobile))
@@ -399,18 +430,7 @@
     if (!window.saveLoginSession(user.email, name, phone)) {
       throw new Error('Could not save session. Please allow cookies/storage.');
     }
-    // Mint a signed PDF session token now (Firebase token is available here).
-    // Stored for later so watch.html can prove identity without a live session.
-    try {
-      const idt = await user.getIdToken(true);
-      const base = window.PM_HOSTINGER_API || 'https://premind.diplomawallah.in';
-      const sres = await fetch(base + '/get_pdf_session.php', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_token: idt })
-      });
-      const sdata = await sres.json().catch(function () { return {}; });
-      if (sdata && sdata.pdf_session && window.pmSetPdfSession) window.pmSetPdfSession(sdata.pdf_session);
-    } catch (e) { /* non-fatal — PDF falls back to old behaviour */ }
+    
     showMessage('loginMsg', 'Login successful. Redirecting...', false);
     window.location.replace('index.html');
   }
