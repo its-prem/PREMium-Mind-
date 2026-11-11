@@ -18,820 +18,52 @@
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
-
     <style>
-        @media screen and (max-width: 600px) {
-            .card-container {
-                padding-left: 10px !important;
-                padding-right: 10px !important;
-            }
+        :root {
+            /* Signature Crimson & Gold Theme */
+            --crimson-dark: #3b0206;
+            --crimson-main: #7f0912;
+            --crimson-bright: #a8131d;
+            --action-red: #dc2626;
+            --gold: #facc15;
+            --gold-dark: #eab308;
 
-            .course-card {
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-            }
+            /* Executive Slate Surface Palette */
+            --bg-page: #f8fafc;
+            --white: #ffffff;
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-500: #64748b;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
 
-            .footer-container {
-                padding-left: 10px !important;
-                padding-right: 10px !important;
-            }
+            /* Crisp Architectural Radius Tokens */
+            --r-xs: 6px;
+            --r-sm: 8px;
+            --r-md: 10px;
+            --r-lg: 12px;
+
+            --smooth: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         html {
             scroll-behavior: smooth;
         }
 
-        /* Hero Section */
-        .hero-section {
-            background: linear-gradient(135deg, #000000 0%, #434343 100%);
-            color: white;
-            padding: 80px 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 0.5;
-            }
-
-            50% {
-                opacity: 1;
-            }
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            background: rgba(20, 20, 20, 0.6);
-            backdrop-filter: blur(10px);
-            padding: 8px 24px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #fbbf24;
-            margin-bottom: 25px;
-            border: 1px solid rgba(251, 191, 36, 0.4);
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
-            text-transform: uppercase;
-            transition: all 0.3s ease;
-        }
-        .hero-badge:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.25);
-            border-color: rgba(251, 191, 36, 0.8);
-        }
-
-        .hero-section h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-
-        .hero-section p {
-            font-size: 1.3rem;
-            margin-bottom: 35px;
-            opacity: 0.95;
-            line-height: 1.6;
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .cta-btn {
-            padding: 15px 35px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .cta-primary {
-            background: white;
-            color: #000;
-        }
-
-        .cta-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
-        }
-
-        .cta-secondary {
-            background: transparent;
-            color: white;
-            border: 2px solid white;
-        }
-
-        .cta-secondary:hover {
-            background: white;
-            color: #000;
-        }
-
-        /* Stats Section */
-        .stats-section {
-            background: #f9f9f9;
-            padding: 60px 20px;
-        }
-
-        .stats-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 35px 25px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #000;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            font-size: 1rem;
-            color: #666;
-            font-weight: 500;
-        }
-
-        /* Features Section */
-        .features-section {
-            padding: 80px 20px;
-            background: white;
-        }
-
-        .features-header {
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto 60px;
-        }
-
-        .features-header h2 {
-            font-size: 2.8rem;
-            font-weight: 800;
-            margin-bottom: 15px;
-            background: linear-gradient(135deg, #000000 0%, #434343 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .features-header p {
-            font-size: 1.2rem;
-            color: #666;
-        }
-
-        .features-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 35px;
-        }
-
-        .feature-card {
-            padding: 35px;
-            border-radius: 15px;
-            background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
-            border: 2px solid #f0f0f0;
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover {
-            border-color: #000;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-icon {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
-        .feature-card p {
-            color: #666;
-            line-height: 1.7;
-            font-size: 1rem;
-        }
-
-        /* User Profile in Sidebar */
-        .user-profile {
-            text-align: center;
-            padding: 20px 15px;
-            border-bottom: 2px solid rgba(0, 0, 0, 0.08);
-            margin: 0 15px 20px 15px;
-            background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .profile-photo-container {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 15px;
-        }
-
-        .profile-photo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #000;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        .profile-photo:hover {
-            transform: scale(1.08);
-            border-color: #333;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-        }
-
-        .change-photo-btn {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            background: linear-gradient(135deg, #000 0%, #333 100%);
-            color: #fff;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .change-photo-btn:hover {
-            background: linear-gradient(135deg, #333 0%, #000 100%);
-            transform: scale(1.15) rotate(15deg);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .user-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #000;
-            margin-bottom: 6px;
-            letter-spacing: 0.3px;
-        }
-
-        .user-email {
-            font-size: 0.85rem;
-            color: #666;
-            word-break: break-all;
-            background: rgba(0, 0, 0, 0.03);
-            padding: 5px 10px;
-            border-radius: 6px;
-            display: inline-block;
-        }
-
-        .logout-btn-sidebar {
-            width: 90%;
-            margin: 15px auto 10px;
-            padding: 11px;
-            background: linear-gradient(135deg, #000 0%, #333 100%);
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            letter-spacing: 0.5px;
-        }
-
-        .logout-btn-sidebar:hover {
-            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
-        }
-
-        .logout-btn-sidebar:active {
-            transform: translateY(0);
-        }
-
-        .login-prompt {
-            text-align: center;
-            padding: 25px 20px;
-            background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
-            margin: 0 15px 20px 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .login-prompt h3 {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #000 0%, #333 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 800;
-        }
-
-        .login-prompt p {
-            margin: 10px 0;
-            color: #666;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .login-btn {
-            background: linear-gradient(135deg, #000 0%, #333 100%);
-            color: #fff;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 15px;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            letter-spacing: 0.5px;
-        }
-
-        .login-btn:hover {
-            background: linear-gradient(135deg, #333 0%, #000 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .login-btn:active {
-            transform: translateY(0);
-        }
-
-        #photo-input {
-            display: none;
-        }
-
-        .protected-route {
-            position: relative;
-        }
-
-        .protected-route.locked::after {
-            content: '🔒';
-            margin-left: 5px;
-        }
-
-        /* Course Enrollment Badge */
-        .enrolled-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
-        .enroll-btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 1rem;
-            margin-top: 10px;
-            transition: all 0.3s;
-        }
-
-        .enroll-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
-        }
-
-        .buy-course-btn {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 1rem;
-            margin-top: 10px;
-            transition: all 0.3s;
-        }
-
-        .buy-course-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
-        }
-
-        .card-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .course-card {
-            position: relative;
-            width: 280px;
-            border-radius: 12px;
-            padding: 15px;
-            background: #fff;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            transition: transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .course-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .course-card img {
-            width: 100%;
-            border-radius: 8px;
-        }
-
-        .course-card h2 {
-            font-size: 18px;
-            margin: 22px 0px 5px 0px;
-        }
-
-        .price {
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .price span {
-            color: #888;
-            text-decoration: line-through;
-            font-size: 14px;
-            margin-left: 6px;
-        }
-
-        .disabled-btn {
-            width: 100%;
-            padding: 10px;
-            background: #ff9800;
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 16px;
-            cursor: not-allowed;
-            font-weight: bold;
-            opacity: 0.95;
-        }
-
-        .coming-soon-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 15px;
-            font-weight: 800;
-            cursor: not-allowed;
-            letter-spacing: 0.4px;
-            text-transform: uppercase;
-            opacity: 1 !important;
-            pointer-events: none;
-            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
-        }
-        .coming-soon-btn:disabled {
-            opacity: 1 !important;
-            color: #fff;
-        }
-
-        .new-badge {
-            position: absolute;
-            top: 12px;
-            right: -35px;
-            background: red;
-            color: #fff;
-            font-size: 13px;
-            font-weight: bold;
-            padding: 6px 40px;
-            transform: rotate(45deg);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .course-section h1 {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #000000 0%, #434343 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 40px 0 30px 0;
-            padding: 0 20px;
-            letter-spacing: 1px;
-            position: relative;
-        }
-
-        .course-section h1::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 4px;
-            background: linear-gradient(90deg, #000000, #666666);
-            border-radius: 2px;
-        }
-
-        .mini-timer {
-            font-size: 12px;
-            font-weight: 700;
-            color: #d32f2f;
-            margin: 4px 0;
-            text-align: center;
-        }
-
-        .mini-timer span {
-            background: #fdecea;
-            color: #b71c1c;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 700;
-        }
-
-        @media screen and (max-width: 768px) {
-            .hero-section h1 {
-                font-size: 2.2rem;
-            }
-
-            .hero-section p {
-                font-size: 1.1rem;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-            }
-
-            .cta-btn {
-                width: 100%;
-            }
-        }
-
-        /* --- 💥 NEW WHATSAPP MODAL & BUTTON STYLES 💥 --- */
-        .card-report-slot {
-            display: flex;
-            justify-content: flex-end;
-            width: 100%;
-        }
-
-        .wa-unlock-btn {
-            width: max-content;
-            align-self: flex-end;
-            margin: 0 0 10px auto;
-            background: #f0fdf4;
-            color: #15803d;
-            border: 1.5px dashed #22c55e;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.75rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            transition: 0.3s;
-        }
-
-        .wa-unlock-btn:hover {
-            background: #dcfce7;
-            transform: translateY(-2px);
-        }
-
-        /* --- 👁️ PREVIEW BUTTON & BADGE STYLES 👁️ --- */
-        .preview-badge-btn {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(255, 255, 255, 0.95);
-            color: #1e293b;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            z-index: 10;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transition: all 0.2s ease;
-        }
-
-        .preview-badge-btn:hover {
-            background: #ffffff;
-            transform: translateY(-1px) scale(1.03);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-            color: #0f172a;
-        }
-        
-        .preview-badge-btn ion-icon {
-            font-size: 13px;
-            color: #2563eb; /* premium blue icon */
-        }
-
-        .preview-btn-bottom {
-            flex: 1;
-            background: #f8fafc;
-            color: #334155;
-            border: 1px solid #cbd5e1;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            transition: all 0.2s ease;
-        }
-
-        .preview-btn-bottom:hover {
-            background: #f1f5f9;
-            color: #1e293b;
-            border-color: #94a3b8;
-        }
-
-        .btn-reviewing {
-            width: 100%;
-            background: #94a3b8 !important;
-            color: white !important;
-            border: none !important;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: not-allowed !important;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        /* --- 🚩 REPORT BUTTON & SOLVING STATES 🚩 --- */
-        .course-card .report-btn {
-            width: max-content !important;
-            align-self: flex-end !important;
-            margin: 0 0 10px auto !important;
-            background: #fff1f2 !important;
-            color: #e11d48 !important;
-            border: 1.5px dashed #f43f5e !important;
-            padding: 6px 14px !important;
-            border-radius: 8px !important;
-            font-weight: 700 !important;
-            font-size: 0.75rem !important;
-            cursor: pointer !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 4px !important;
-            transition: 0.3s !important;
-        }
-
-        .course-card .report-btn:hover {
-            background: #ffe4e6 !important;
-            transform: translateY(-2px) !important;
-        }
-
-        .course-card .btn-solving {
-            width: max-content !important;
-            align-self: flex-end !important;
-            margin: 0 0 10px auto !important;
-            background: #fef08a !important;
-            color: #854d0e !important;
-            border: 1.5px dashed #eab308 !important;
-            padding: 6px 14px !important;
-            border-radius: 8px !important;
-            cursor: not-allowed !important;
-            font-weight: bold !important;
-            font-size: 0.75rem !important;
-            display: inline-flex !important;
-        }
-
-        /* MODAL BASE */
-        .wa-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 10001;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            backdrop-filter: blur(5px);
-        }
-
-        .wa-content {
-            background: white;
-            width: 100%;
-            max-width: 400px;
-            padding: 30px;
-            border-radius: 20px;
-            position: relative;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .wa-input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1.5px solid #eee;
-            border-radius: 10px;
-            outline: none;
-            font-family: 'Poppins';
-            box-sizing: border-box;
-        }
-
-        .wa-submit-btn {
-            width: 100%;
-            padding: 14px;
-            background: #000;
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        /* ================================================================
-       📱 IMPROVED RESPONSIVE RULES (added)
-       ================================================================ */
-        * {
-            box-sizing: border-box;
+        body {
+            font-family: 'Plus Jakarta Sans', 'Poppins', sans-serif;
+            background: var(--bg-page);
+            color: var(--slate-900);
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
         img {
@@ -839,116 +71,1091 @@
             height: auto;
         }
 
-        .card-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            justify-content: center;
+        /* ================= KEYFRAME ANIMATIONS ================= */
+        @keyframes gridFloat {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
         }
 
-        .course-card {
-            width: 100%;
-            max-width: 320px;
+        @keyframes ambientGlow {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.35; }
+            50% { transform: translate(-45%, -55%) scale(1.15); opacity: 0.55; }
+        }
+
+        @keyframes shimmerSweep {
+            0% { transform: translateX(-120%) skewX(-20deg); }
+            100% { transform: translateX(220%) skewX(-20deg); }
+        }
+
+        @keyframes cardReveal {
+            from {
+                opacity: 0;
+                transform: translateY(22px) scale(0.985);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.5; }
+        }
+
+        /* ================= NAVBAR THEME POLISH ================= */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(16px) !important;
+            border-bottom: 1px solid var(--slate-200) !important;
+            box-shadow: 0 2px 15px rgba(15, 23, 42, 0.04) !important;
+        }
+
+        #desktopLoginBtnContainer .nav-link {
+            background: linear-gradient(135deg, var(--crimson-main) 0%, var(--crimson-dark) 100%) !important;
+            color: var(--white) !important;
+            border-radius: var(--r-sm) !important;
+            padding: 9px 20px !important;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 12px rgba(127, 9, 18, 0.2) !important;
+            transition: all var(--smooth) !important;
+        }
+
+        #desktopLoginBtnContainer .nav-link:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 6px 16px rgba(127, 9, 18, 0.32) !important;
+        }
+
+        /* ================= HERO SECTION (SHARP & ANIMATED) ================= */
+        .hero-section {
+            background: radial-gradient(circle at 50% 10%, #9e111b 0%, #64050c 60%, #330205 100%);
+            color: var(--white);
+            padding: 48px 20px 72px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 3px solid var(--gold);
+            box-shadow: 0 12px 32px rgba(59, 2, 6, 0.2);
+        }
+
+        /* Animated Architectural Tech Grid Overlay */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridFloat 14s linear infinite;
+            pointer-events: none;
+        }
+
+        /* Floating Gold Spotlight Glow */
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            width: 480px;
+            height: 240px;
+            background: radial-gradient(circle, rgba(250, 204, 21, 0.16) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            animation: ambientGlow 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 880px;
             margin: 0 auto;
         }
 
-        @media screen and (max-width: 1024px) {
-            .features-grid {
-                gap: 25px;
-            }
+        /* Crisp Structured Top Badge */
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            color: var(--crimson-main);
+            padding: 6px 16px;
+            border-radius: var(--r-xs);
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--gold-dark);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+            text-transform: uppercase;
+            transition: transform var(--smooth);
+        }
 
-            .stats-container {
-                gap: 20px;
+        .hero-badge::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            background: var(--action-red);
+            border-radius: 50%;
+            animation: pulseDot 1.8s infinite;
+        }
+
+        .hero-badge:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Hero Title Animations */
+        .animated-hero-title {
+            font-size: 46px;
+            line-height: 1.28;
+            margin: 0 0 16px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 8px 14px;
+            cursor: pointer;
+        }
+
+        .animated-word {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(28px) scale(0.9);
+            filter: blur(6px);
+            animation: wordPopIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            transition: transform 0.25s ease;
+        }
+
+        .animated-word:hover {
+            transform: translateY(-3px) scale(1.04) !important;
+        }
+
+        .animated-word.word-1 { animation-delay: 0.08s; }
+        .animated-word.word-2 { animation-delay: 0.16s; }
+        .animated-word.word-3 { animation-delay: 0.24s; }
+        .animated-word.word-4 { animation-delay: 0.32s; }
+        .animated-word.word-5 { animation-delay: 0.40s; }
+        .animated-word.word-6 { animation-delay: 0.48s; }
+        .animated-word.word-7 { animation-delay: 0.56s; }
+
+        @keyframes wordPopIn {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
             }
         }
 
+        .font-kalam {
+            font-family: 'Kalam', cursive;
+            color: var(--gold) !important;
+            -webkit-text-fill-color: var(--gold) !important;
+            font-weight: 800;
+            font-size: 1.08em;
+            text-shadow: 0 4px 16px rgba(250, 204, 21, 0.3);
+        }
+
+        .font-serif {
+            font-family: 'Crimson Pro', 'EB Garamond', serif;
+            font-style: italic;
+            font-weight: 600;
+            color: #fff;
+            font-size: 42px;
+        }
+
+        .accent-fails {
+            font-family: 'EB Garamond', serif;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border-bottom: 2px solid rgba(250, 204, 21, 0.6);
+        }
+
+        .font-archivo {
+            font-family: 'Archivo Black', sans-serif;
+            letter-spacing: -1px;
+            font-size: 46px;
+        }
+
+        .brand-gradient {
+            background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .works-badge {
+            color: var(--crimson-dark);
+            background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
+            padding: 2px 16px;
+            border-radius: var(--r-xs);
+            box-shadow: 0 8px 22px rgba(250, 204, 21, 0.28);
+            animation: wordPopIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.56s forwards;
+        }
+
+        .hero-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .hero-section p {
+            font-size: 0.96rem;
+            color: rgba(255, 255, 255, 0.86);
+            max-width: 600px;
+            margin: 0 auto 24px auto;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        /* Crisp Symbiosis-Style Framed Stats Box (Low Radius) */
+        .hero-stats-frame {
+            border: 1px solid rgba(250, 204, 21, 0.38);
+            background: rgba(15, 2, 4, 0.45);
+            backdrop-filter: blur(8px);
+            border-radius: var(--r-sm);
+            padding: 14px 20px;
+            max-width: 420px;
+            margin: 0 auto 26px auto;
+            position: relative;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-stats-title {
+            position: absolute;
+            top: -9px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #58050b;
+            border: 1px solid rgba(250, 204, 21, 0.4);
+            border-radius: 4px;
+            padding: 1px 10px;
+            font-size: 9.5px;
+            font-weight: 800;
+            color: var(--gold);
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        .h-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .h-stat-num {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--gold);
+            line-height: 1;
+            letter-spacing: -0.5px;
+        }
+
+        .h-stat-lbl {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.92);
+            line-height: 1.25;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .h-stat-div {
+            width: 1px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        /* Crisp Rectangular CTA Buttons with Shimmer */
+        .cta-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            padding: 13px 26px;
+            border-radius: var(--r-sm);
+            font-size: 0.92rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all var(--smooth);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-primary {
+            background: var(--gold);
+            color: var(--crimson-dark);
+            border: 1.5px solid var(--gold);
+            box-shadow: 0 6px 20px rgba(250, 204, 21, 0.28);
+        }
+
+        .cta-primary::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 45%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            transform: translateX(-120%) skewX(-20deg);
+            animation: shimmerSweep 3.5s infinite;
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-2px);
+            background: #fde047;
+            box-shadow: 0 10px 25px rgba(250, 204, 21, 0.4);
+        }
+
+        .cta-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--white);
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(6px);
+        }
+
+        .cta-secondary:hover {
+            background: var(--white);
+            color: var(--crimson-dark);
+            border-color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* ================= STORE SECTION & STRUCTURED CATEGORY BAR ================= */
+        .course-section {
+            max-width: 1220px;
+            margin: -26px auto 0 auto;
+            padding: 0 16px 70px 16px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Crisp Segmented Control Bar (Reduced Radius) */
+        .store-categories-wrapper {
+            background: var(--white);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--r-md);
+            padding: 8px;
+            margin: 0 auto 32px auto;
+            max-width: 860px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+            scrollbar-width: none;
+        }
+
+        .store-categories-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .store-categories-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: nowrap;
+            width: max-content;
+            margin: 0 auto;
+        }
+
+        .category-tab {
+            white-space: nowrap;
+            flex-shrink: 0;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--slate-700);
+            padding: 10px 18px;
+            border-radius: var(--r-xs);
+            font-weight: 700;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all var(--smooth);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .category-tab ion-icon {
+            font-size: 16px;
+            color: var(--slate-500);
+            transition: transform 0.25s ease, color 0.2s ease;
+        }
+
+        .category-tab:hover {
+            background: var(--slate-100);
+            color: var(--crimson-main);
+        }
+
+        .category-tab:hover ion-icon {
+            transform: scale(1.12);
+            color: var(--crimson-main);
+        }
+
+        .category-tab.active {
+            background: linear-gradient(135deg, var(--crimson-main) 0%, var(--crimson-dark) 100%);
+            color: var(--white);
+            border-color: var(--crimson-dark);
+            box-shadow: 0 4px 12px rgba(127, 9, 18, 0.22);
+        }
+
+        .category-tab.active ion-icon {
+            color: var(--gold);
+        }
+
+        .course-section h1 {
+            text-align: center;
+            font-size: 1.65rem;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin: 6px 0 28px 0;
+            letter-spacing: -0.4px;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .course-section h1::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 56px;
+            height: 3px;
+            background: var(--crimson-main);
+            border-radius: 2px;
+        }
+
+        /* ================= PROFESSIONAL ARCHITECTURAL PRODUCT CARDS ================= */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+            gap: 20px;
+            padding: 4px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .course-card {
+            position: relative;
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+            border-radius: var(--r-md);
+            padding: 14px;
+            background: var(--white);
+            border: 1px solid var(--slate-200);
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+            overflow: hidden;
+            transition: transform var(--smooth), box-shadow var(--smooth), border-color var(--smooth);
+            display: flex;
+            flex-direction: column;
+            animation: cardReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+        }
+
+        /* Top Accent Line on Hover */
+        .course-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--crimson-main), var(--gold-dark));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+            z-index: 3;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(127, 9, 18, 0.35);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.09);
+        }
+
+        .course-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-img-wrapper {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            border-radius: var(--r-xs);
+            background: var(--slate-100);
+            border: 1px solid var(--slate-200);
+            margin-bottom: 6px;
+        }
+
+        .course-card img {
+            width: 100%;
+            border-radius: var(--r-xs);
+            display: block;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .course-card:hover .card-img-wrapper img {
+            transform: scale(1.03);
+        }
+
+        .new-badge {
+            position: absolute;
+            top: 10px;
+            right: -34px;
+            background: var(--crimson-main);
+            color: var(--gold);
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 4px 36px;
+            transform: rotate(45deg);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+            z-index: 2;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        .course-card h2 {
+            font-size: 16.5px;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin: 10px 0 6px 0;
+            line-height: 1.35;
+            letter-spacing: -0.2px;
+        }
+
+        .course-card p {
+            font-size: 12.8px;
+            color: var(--slate-500);
+            line-height: 1.5;
+            margin: 0 0 6px 0;
+        }
+
+        .see-project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--crimson-main);
+            font-size: 12px;
+            font-weight: 800;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            background: rgba(127, 9, 18, 0.07);
+            border: 1px solid rgba(127, 9, 18, 0.15);
+            padding: 5px 11px;
+            border-radius: var(--r-xs);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .see-project-link:hover {
+            background: var(--crimson-main);
+            color: var(--white);
+            transform: translateX(3px);
+        }
+
+        .mini-timer {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--crimson-main);
+            background: #fff1f2;
+            border: 1px solid #fecdd3;
+            padding: 5px 10px;
+            border-radius: var(--r-xs);
+            margin: 8px 0;
+            text-align: center;
+        }
+
+        .mini-timer span {
+            background: var(--crimson-main);
+            color: var(--gold);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 800;
+            margin-left: 4px;
+        }
+
+        /* Course Meta & Pricing Blocks */
+        .course-meta {
+            margin-top: auto;
+            padding: 10px 0 8px 0;
+            border-top: 1px solid var(--slate-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price-box {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .price {
+            font-size: 21px !important;
+            font-weight: 800 !important;
+            color: var(--slate-900) !important;
+            margin: 0 !important;
+        }
+
+        .old-price {
+            font-size: 12.5px !important;
+            color: var(--slate-500) !important;
+            text-decoration: line-through !important;
+            font-weight: 600 !important;
+        }
+
+        .rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--slate-900);
+            background: #fefce8;
+            border: 1px solid #fde047;
+            padding: 3px 8px;
+            border-radius: var(--r-xs);
+        }
+
+        .rating ion-icon {
+            color: #eab308;
+            font-size: 13.5px;
+        }
+
+        .card-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        /* Sharp Executive Buy Button with Hover Lift */
+        .buy-course-btn,
+        .enroll-btn {
+            background: linear-gradient(135deg, var(--crimson-main) 0%, var(--crimson-dark) 100%) !important;
+            color: var(--white) !important;
+            border: 1px solid rgba(250, 204, 21, 0.3) !important;
+            padding: 12px 18px !important;
+            border-radius: var(--r-sm) !important;
+            font-weight: 800 !important;
+            cursor: pointer !important;
+            font-size: 14.5px !important;
+            font-family: inherit !important;
+            letter-spacing: 0.2px !important;
+            transition: all var(--smooth) !important;
+            box-shadow: 0 4px 12px rgba(127, 9, 18, 0.18) !important;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .buy-course-btn:hover,
+        .enroll-btn:hover {
+            background: linear-gradient(135deg, var(--crimson-bright) 0%, var(--crimson-main) 100%) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 20px rgba(127, 9, 18, 0.28) !important;
+        }
+
+        .buy-course-btn:active {
+            transform: scale(0.98) !important;
+        }
+
+        .disabled-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--slate-200);
+            border: none;
+            border-radius: var(--r-sm);
+            color: var(--slate-500);
+            font-size: 14px;
+            cursor: not-allowed;
+            font-weight: 800;
+        }
+
+        .coming-soon-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border: none;
+            border-radius: var(--r-sm);
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 800;
+            cursor: not-allowed;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            opacity: 1 !important;
+            pointer-events: none;
+            box-shadow: 0 4px 14px rgba(217, 119, 6, 0.25);
+        }
+
+        .btn-reviewing {
+            width: 100%;
+            background: var(--slate-500) !important;
+            color: white !important;
+            border: none !important;
+            padding: 12px;
+            border-radius: var(--r-sm);
+            cursor: not-allowed !important;
+            font-weight: 800;
+        }
+
+        /* Report & Solving Buttons */
+        .card-report-slot {
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+            margin-top: 6px;
+        }
+
+        .course-card .report-btn {
+            width: max-content !important;
+            align-self: flex-end !important;
+            margin: 0 !important;
+            background: #fff1f2 !important;
+            color: #be123c !important;
+            border: 1px solid #fecdd3 !important;
+            padding: 4px 10px !important;
+            border-radius: var(--r-xs) !important;
+            font-weight: 700 !important;
+            font-size: 0.72rem !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+            transition: 0.2s !important;
+        }
+
+        .course-card .report-btn:hover {
+            background: #ffe4e6 !important;
+            transform: translateY(-1px) !important;
+        }
+
+        .course-card .btn-solving {
+            width: max-content !important;
+            align-self: flex-end !important;
+            margin: 0 !important;
+            background: #fef08a !important;
+            color: #854d0e !important;
+            border: 1px solid #fde047 !important;
+            padding: 4px 10px !important;
+            border-radius: var(--r-xs) !important;
+            cursor: not-allowed !important;
+            font-weight: 700 !important;
+            font-size: 0.72rem !important;
+            display: inline-flex !important;
+        }
+
+        /* Empty Category State (Crisp Corners) */
+        .empty-category-state {
+            grid-column: 1 / -1;
+            background: var(--white);
+            border: 1.5px dashed var(--slate-200);
+            border-radius: var(--r-lg);
+            padding: 50px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            width: 100%;
+            animation: cardReveal 0.4s ease forwards;
+        }
+
+        .empty-icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--r-sm);
+            background: rgba(127, 9, 18, 0.08);
+            color: var(--crimson-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        .empty-category-state h3 {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin: 0;
+        }
+
+        .empty-category-state p {
+            color: var(--slate-500);
+            font-size: 13.5px;
+            max-width: 420px;
+            margin: 0;
+        }
+
+        .empty-action-btn {
+            background: var(--crimson-main);
+            color: var(--white);
+            border: none;
+            padding: 11px 22px;
+            border-radius: var(--r-sm);
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .empty-action-btn:hover {
+            background: var(--crimson-dark);
+            transform: translateY(-2px);
+        }
+
+        /* ================= MODALS (SHARP PROFESSIONAL DIALOGS) ================= */
+        .wa-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.78);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            backdrop-filter: blur(5px);
+        }
+
+        .wa-content {
+            background: var(--white);
+            width: 100%;
+            max-width: 410px;
+            padding: 26px 22px;
+            border-radius: var(--r-lg);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--slate-200);
+            border-top: 4px solid var(--crimson-main);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+            animation: cardReveal 0.3s ease forwards;
+        }
+
+        .wa-input {
+            width: 100%;
+            padding: 11px 13px;
+            margin-top: 6px;
+            margin-bottom: 14px;
+            border: 1.5px solid var(--slate-200);
+            border-radius: var(--r-sm);
+            outline: none;
+            font-family: inherit;
+            font-size: 13.5px;
+            transition: border-color 0.2s;
+        }
+
+        .wa-input:focus {
+            border-color: var(--crimson-main);
+        }
+
+        .wa-submit-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, var(--crimson-main) 0%, var(--crimson-dark) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: var(--r-sm);
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(127, 9, 18, 0.22);
+        }
+
+        /* PDF Preview modal (1 page only) */
+        .pdf-preview-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            background: rgba(15, 23, 42, 0.78);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .pdf-preview-modal.show { display: flex; }
+
+        .pdf-preview-box {
+            width: min(560px, 100%);
+            max-height: min(92vh, 900px);
+            background: #fff;
+            border-radius: var(--r-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--slate-200);
+            animation: cardReveal 0.3s ease forwards;
+        }
+
+        .pdf-preview-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 13px 16px;
+            background: linear-gradient(90deg, var(--crimson-dark) 0%, var(--crimson-main) 100%);
+            color: var(--white);
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .pdf-preview-head h3 {
+            margin: 0;
+            font-size: 0.96rem;
+            font-weight: 800;
+            color: var(--white);
+            line-height: 1.3;
+        }
+
+        .pdf-preview-head .pdf-preview-sub {
+            margin: 2px 0 0;
+            font-size: 0.72rem;
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .pdf-preview-close {
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--white);
+            width: 34px;
+            height: 34px;
+            border-radius: var(--r-xs);
+            font-size: 20px;
+            cursor: pointer;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .pdf-preview-body {
+            padding: 14px;
+            overflow: auto;
+            background: var(--slate-100);
+            text-align: center;
+            min-height: 220px;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .pdf-preview-body canvas,
+        .pdf-preview-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--r-xs);
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.16);
+            background: #fff;
+        }
+
+        .pdf-preview-status {
+            color: var(--slate-700);
+            font-size: 0.9rem;
+            font-weight: 700;
+            padding: 40px 12px;
+        }
+
+        .pdf-preview-status.error { color: #b91c1c; }
+
+        /* ================= FOOTER THEME OVERRIDE ================= */
+        .footer {
+            background: linear-gradient(180deg, #1a0407 0%, #0d0103 100%) !important;
+            color: var(--white) !important;
+            border-top: 3px solid var(--crimson-main) !important;
+        }
+
+        .footer h3 {
+            color: var(--gold) !important;
+        }
+
+        .footer-form button[type="submit"] {
+            background: linear-gradient(135deg, var(--crimson-main) 0%, var(--action-red) 100%) !important;
+            color: var(--white) !important;
+            font-weight: 800 !important;
+            border-radius: var(--r-sm) !important;
+            border: 1px solid rgba(250, 204, 21, 0.35) !important;
+        }
+
+        .protected-route.locked::after {
+            content: '🔒';
+            margin-left: 5px;
+        }
+
+        /* ================= MOBILE RESPONSIVE RULES ================= */
         @media screen and (max-width: 768px) {
-            .stats-container {
-                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-                gap: 15px;
+            .hero-section {
+                padding: 34px 16px 56px 16px;
             }
 
-            .stat-card {
-                padding: 22px 15px;
+            .animated-hero-title {
+                font-size: 32px;
+                gap: 6px 10px;
             }
 
-            .stat-number {
-                font-size: 2rem;
+            .font-serif { font-size: 30px; }
+            .font-archivo { font-size: 32px; }
+
+            .hero-section p {
+                font-size: 0.88rem;
+                margin-bottom: 18px;
             }
 
-            .stat-icon {
-                font-size: 2.2rem;
-                margin-bottom: 8px;
+            .cta-buttons {
+                flex-direction: row;
+                gap: 10px;
             }
 
-            .features-section {
-                padding: 50px 15px;
+            .cta-btn {
+                padding: 11px 18px;
+                font-size: 0.85rem;
+                flex: 1;
             }
 
-            .features-header h2 {
-                font-size: 2rem;
-            }
-
-            .features-header p {
-                font-size: 1rem;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .feature-card {
-                padding: 25px;
+            .course-section {
+                padding: 0 12px 50px 12px;
             }
 
             .course-section h1 {
-                font-size: 1.7rem;
-                margin: 25px 0 20px 0;
+                font-size: 1.3rem;
+                margin: 8px 0 22px 0;
             }
 
             .card-container {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-                gap: 12px;
-                padding: 12px;
-            }
-
-            .course-card {
-                padding: 10px;
-                max-width: 100%;
-            }
-
-            .course-card h2 {
-                font-size: 15px;
-                margin: 6px 0;
-            }
-
-            .course-card p {
-                font-size: 10px;
-            }
-
-            .price {
-                font-size: 15px;
-            }
-
-            .wa-content {
-                padding: 20px;
-                border-radius: 14px;
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: 16px;
             }
 
             .footer-container {
                 flex-direction: column;
                 text-align: center;
                 align-items: center;
+                padding-left: 14px !important;
+                padding-right: 14px !important;
             }
 
             .footer-part {
                 width: 100%;
-                margin-bottom: 25px;
-            }
-
-            .logo-part {
-                justify-content: center;
-                margin: 0 auto;
+                margin-bottom: 24px;
             }
 
             .logo-part .logo {
@@ -986,520 +1193,31 @@
         }
 
         @media screen and (max-width: 480px) {
-            .hero-section {
-                padding: 55px 15px;
+            .animated-hero-title {
+                font-size: 27px;
             }
 
-            .hero-section h1 {
-                font-size: 1.7rem;
-            }
+            .font-serif { font-size: 26px; }
+            .font-archivo { font-size: 28px; }
 
-            .hero-section p {
-                font-size: 0.95rem;
-            }
-
-            .hero-badge {
-                font-size: 0.75rem;
-                padding: 6px 14px;
-            }
+            .h-stat-num { font-size: 22px; }
 
             .card-container {
                 grid-template-columns: 1fr;
-                gap: 20px;
-                padding: 12px;
+                gap: 16px;
             }
 
             .course-card {
-                padding: 13px;
-                border-radius: 8px;
                 max-width: 420px;
-                margin: 0 auto;
-                width: 100%;
-                min-height: auto;
+                padding: 13px;
+                border-radius: var(--r-md);
             }
 
-            .course-card h2 {
-                font-size: 16px;
-                margin: 6px 0;
-            }
-
-            .course-card p {
-                font-size: 13px;
-                line-height: 1.4;
-                margin: 0px 0PX 0PX 0PX;
-            }
-
-            .price {
-                font-size: 16px;
-                margin: 10px 0;
-            }
-
-            .disabled-btn,
-            .coming-soon-btn,
-            .enroll-btn,
-            .buy-course-btn {
-                font-size: 14px;
-                padding: 10px;
-            }
-
-            .new-badge {
-                font-size: 10px;
-                padding: 4px 30px;
-                right: -30px;
-                top: 8px;
-            }
-
-            .course-section h1 {
-                font-size: 1.3rem;
-            }
-
-            .wa-content {
-                padding: 15px;
-            }
-
-            .wa-input {
-                padding: 10px;
-                font-size: 13px;
+            .category-tab {
+                padding: 9px 14px;
+                font-size: 12.5px;
             }
         }
-
-
-        /* Hero Title Animations */
-        .animated-hero-title {
-            font-size: 48px;
-            line-height: 1.35;
-            margin-bottom: 24px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 10px 14px;
-            cursor: pointer;
-        }
-
-        .animated-word {
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(35px) scale(0.85);
-            filter: blur(8px);
-            animation: wordPopIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            transition: transform 0.3s ease;
-        }
-
-        .animated-word:hover {
-            transform: translateY(-4px) scale(1.06) !important;
-        }
-
-        .animated-word.word-1 {
-            animation-delay: 0.1s;
-        }
-
-        .animated-word.word-2 {
-            animation-delay: 0.2s;
-        }
-
-        .animated-word.word-3 {
-            animation-delay: 0.3s;
-        }
-
-        .animated-word.word-4 {
-            animation-delay: 0.4s;
-        }
-
-        .animated-word.word-5 {
-            animation-delay: 0.5s;
-        }
-
-        .animated-word.word-6 {
-            animation-delay: 0.6s;
-        }
-
-        .animated-word.word-7 {
-            animation-delay: 0.7s;
-        }
-
-        @keyframes wordPopIn {
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-                filter: blur(0);
-            }
-        }
-
-        .font-kalam {
-            font-family: 'Kalam', cursive;
-            color: #111;
-            font-weight: 800;
-            background: #fbbf24; /* Bright amber/yellow */
-            padding: 4px 20px;
-            border-radius: 8px;
-            border: 2px solid #fff;
-            transform: rotate(-4deg);
-            display: inline-block;
-            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.4);
-        }
-
-        .font-serif {
-            font-family: 'Crimson Pro', 'EB Garamond', serif;
-            font-style: italic;
-            font-weight: 600;
-            color: #fff;
-            font-size: 44px;
-        }
-
-        .accent-fails {
-            font-family: 'EB Garamond', serif;
-            font-weight: 800;
-            color: #dc2626;
-            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .font-archivo {
-            font-family: 'Archivo Black', sans-serif;
-            letter-spacing: -1px;
-            font-size: 50px;
-        }
-
-        .brand-gradient {
-            background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .works-badge {
-            color: #000;
-            background: linear-gradient(135deg, #ffffff 0%, #dddddd 100%);
-            padding: 4px 22px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2);
-            animation: wordPopIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s forwards, pulseWorks 2.5s infinite 1.4s ease-in-out;
-        }
-
-        @keyframes pulseWorks {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.06);
-            }
-        }
-
-        .hero-break {
-            flex-basis: 100%;
-            height: 0;
-        }
-
-        /* Category Tab Styles */
-        .store-categories-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 8px 4px 14px 4px;
-            margin-top: 20px;
-            margin-bottom: 25px;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(0, 0, 0, 0.4) transparent;
-        }
-
-        .store-categories-wrapper::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .store-categories-wrapper::-webkit-scrollbar-track {
-            background: rgba(226, 232, 240, 0.6);
-            border-radius: 10px;
-        }
-
-        .store-categories-wrapper::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.35);
-            border-radius: 10px;
-        }
-
-        .store-categories-wrapper::-webkit-scrollbar-thumb:hover {
-            background: #000;
-        }
-
-        .store-categories-tabs {
-            display: flex;
-            gap: 12px;
-            flex-wrap: nowrap;
-            width: max-content;
-            justify-content: center;
-            margin: 0 auto;
-        }
-
-        .category-tab {
-            white-space: nowrap;
-            flex-shrink: 0;
-            background: #fff;
-            border: 1px solid #e1e1e1;
-            color: #555;
-            padding: 11px 24px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-
-        .category-tab ion-icon {
-            font-size: 16px;
-            color: #888;
-        }
-
-        .category-tab:hover {
-            border-color: #000;
-            color: #000;
-            transform: translateY(-2px);
-        }
-
-        .category-tab.active {
-            background: #000;
-            color: #fff;
-            border-color: #000;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-        }
-
-        .category-tab.active ion-icon {
-            color: #fff;
-        }
-
-        /* Course Meta & Pricing Blocks */
-        .course-meta {
-            margin-top: auto;
-            padding-top: 6px;
-            padding-bottom: 6px;
-            border-top: 1px dashed #e1e1e1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .price-box {
-            display: flex;
-            align-items: baseline;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-
-        .price {
-            font-size: 22px !important;
-            font-weight: 800 !important;
-            color: #000 !important;
-            margin: 0 !important;
-        }
-
-        .old-price {
-            font-size: 13px !important;
-            color: #888 !important;
-            text-decoration: line-through !important;
-            font-weight: 600 !important;
-            margin-left: 5px !important;
-        }
-
-        .rating {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 13px;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .rating ion-icon {
-            color: #f59e0b;
-            font-size: 15px;
-        }
-
-        .card-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 100%;
-            margin-top: 4px;
-        }
-
-        /* Project Link Styles inside Description Slot */
-        .see-project-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            color: #000;
-            font-size: 13px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            background: rgba(0, 0, 0, 0.05);
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-
-        .see-project-link:hover {
-            color: #333;
-            background: rgba(0, 0, 0, 0.12);
-            transform: translateX(3px);
-        }
-
-        /* Empty State for Store Categories */
-        .empty-category-state {
-            grid-column: 1 / -1;
-            background: #fff;
-            border: 2px dashed #e1e1e1;
-            border-radius: 24px;
-            padding: 60px 20px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            width: 100%;
-        }
-
-        .empty-icon-box {
-            width: 70px;
-            height: 70px;
-            border-radius: 20px;
-            background: #f5f5f5;
-            color: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-        }
-
-        .empty-category-state h3 {
-            font-size: 22px;
-            font-weight: 800;
-            margin: 0;
-        }
-
-        .empty-category-state p {
-            color: #666;
-            font-size: 15px;
-            max-width: 450px;
-            margin: 0;
-        }
-
-        .empty-action-btn {
-            background: #000;
-            color: #fff;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 50px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .empty-action-btn:hover {
-            background: #333;
-            transform: translateY(-2px);
-        }
-
-        .card-img-wrapper {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-            border-radius: 12px;
-            margin-bottom: -15px;
-        }
-
-        /* PDF Preview modal (1 page only) */
-        .pdf-preview-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 100000;
-            background: rgba(15, 23, 42, 0.72);
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            box-sizing: border-box;
-        }
-        .pdf-preview-modal.show { display: flex; }
-        .pdf-preview-box {
-            width: min(560px, 100%);
-            max-height: min(92vh, 900px);
-            background: #fff;
-            border-radius: 16px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 24px 60px rgba(0,0,0,.35);
-        }
-        .pdf-preview-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 14px 16px;
-            border-bottom: 1px solid #e2e8f0;
-            background: #f8fafc;
-        }
-        .pdf-preview-head h3 {
-            margin: 0;
-            font-size: 0.98rem;
-            font-weight: 700;
-            color: #0f172a;
-            line-height: 1.3;
-        }
-        .pdf-preview-head .pdf-preview-sub {
-            margin: 2px 0 0;
-            font-size: 0.72rem;
-            color: #64748b;
-            font-weight: 600;
-        }
-        .pdf-preview-close {
-            border: none;
-            background: #fee2e2;
-            color: #b91c1c;
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            font-size: 22px;
-            cursor: pointer;
-            line-height: 1;
-            flex-shrink: 0;
-        }
-        .pdf-preview-body {
-            padding: 12px;
-            overflow: auto;
-            background: #e2e8f0;
-            text-align: center;
-            min-height: 220px;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-        .pdf-preview-body canvas,
-        .pdf-preview-body img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(15,23,42,.18);
-            background: #fff;
-        }
-        .pdf-preview-status {
-            color: #475569;
-            font-size: 0.9rem;
-            font-weight: 600;
-            padding: 40px 12px;
-        }
-        .pdf-preview-status.error { color: #b91c1c; }
     </style>
 
     <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
@@ -1590,7 +1308,7 @@
                 </a>
             </li>
             <li id="desktopLoginBtnContainer">
-                <a href="login.html" class="nav-link" style="background: #111; color: #fff;">
+                <a href="login.html" class="nav-link">
                     <ion-icon name="person-circle-outline" style="color:#fff;"></ion-icon> Login
                 </a>
             </li>
@@ -1598,7 +1316,7 @@
                 <div class="nav-user-pill" onclick="document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active');">
                     <img src="" id="navAvatarImg" alt="Profile" class="nav-avatar">
                     <span class="nav-user-name" id="navUserName">User</span>
-                    <ion-icon name="chevron-down-outline" style="color: #2563eb; font-size: 16px; margin-left: 2px;"></ion-icon>
+                    <ion-icon name="chevron-down-outline" style="color: #7f0912; font-size: 16px; margin-left: 2px;"></ion-icon>
                 </div>
             </li>
         </ul>
@@ -1620,7 +1338,7 @@
 
             <div class="user-profile-compact" id="userProfile" style="display: none;">
                 <div class="profile-photo-container">
-                    <img src="https://ui-avatars.com/api/?name=User&background=000&color=fff&size=80" alt="Profile"
+                    <img src="https://ui-avatars.com/api/?name=User&background=7f0912&color=fff&size=80" alt="Profile"
                         class="profile-photo" id="profilePhoto" title="Click to change photo"
                         onclick="document.getElementById('photo-input').click()">
                 </div>
@@ -1632,12 +1350,12 @@
             </div>
 
             <div class="login-prompt" id="loginPrompt"
-                style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; border: 1px solid #e2e8f0;">
-                <h3 style="margin:0 0 5px 0; font-size:15px; color:#111;">Welcome to PREMium Mind</h3>
-                <p style="margin:0 0 10px 0; font-size:12px; color:#666;">Access your courses and profile.</p>
+                style="background: #fff5f5; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; border: 1px solid #fecdd3;">
+                <h3 style="margin:0 0 5px 0; font-size:15px; color:#7f0912; font-weight:800;">Welcome to PREMium Mind</h3>
+                <p style="margin:0 0 10px 0; font-size:12px; color:#64748b;">Access your courses and profile.</p>
                 <button onclick="window.location.href='login.html'"
-                    style="width:100%; padding:10px; border:none; background:#111; color:#fff; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
-                    <ion-icon name="log-in-outline" style="font-size:18px;"></ion-icon> Login / Sign Up
+                    style="width:100%; padding:10px; border:none; background:linear-gradient(135deg, #7f0912 0%, #3b0206 100%); color:#fff; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <ion-icon name="log-in-outline" style="font-size:18px; color:#facc15;"></ion-icon> Login / Sign Up
                 </button>
             </div>
 
@@ -1708,17 +1426,18 @@
         <!-- Bottom Logout Action (always pinned) -->
         <div class="sidebar-footer" id="sidebarFooter">
             <button id="sidebarLogoutBtn" onclick="handleLogout()"
-                style="width:100%; padding:12px; background:#fff1f2; color:#e11d48; border:1px solid #ffe4e6; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                style="width:100%; padding:12px; background:#fff1f2; color:#be123c; border:1px solid #ffe4e6; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
                 <ion-icon name="log-out-outline" style="font-size:18px;"></ion-icon> Logout Account
             </button>
         </div>
     </div>
 
+    <!-- ================= SHARP ANIMATED CRIMSON-GOLD HERO SECTION ================= -->
     <section class="hero-section">
         <div class="hero-content">
-            <span class="hero-badge">🎓 Your Learning Partner</span>
+            <span class="hero-badge">YOUR LEARNING PARTNER</span>
             <h1 class="animated-hero-title" id="hero-title" title="Click to replay animation">
-                <span class="animated-word word-1 font-kalam" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.15em; font-weight: 700; text-shadow: 0px 4px 20px rgba(245, 158, 11, 0.4); display: inline-block; padding-right: 5px;">Boss,</span>
+                <span class="animated-word word-1 font-kalam">Boss,</span>
                 <span class="animated-word word-2 font-serif">When</span>
                 <span class="animated-word word-3 font-serif">Everything</span>
                 <span class="animated-word word-4 font-serif accent-fails">Fails...</span>
@@ -1729,15 +1448,29 @@
             </h1>
             <p>Access premium study materials, expert-crafted notes, and career-building resources designed for
                 ambitious students and professionals.</p>
+
+            <div class="hero-stats-frame">
+                <span class="hero-stats-title">CHOOSE FROM</span>
+                <div class="h-stat-item">
+                    <span class="h-stat-num">05+</span>
+                    <span class="h-stat-lbl">Resource<br>Categories</span>
+                </div>
+                <div class="h-stat-div"></div>
+                <div class="h-stat-item">
+                    <span class="h-stat-num">4.9★</span>
+                    <span class="h-stat-lbl">Student<br>Rating</span>
+                </div>
+            </div>
+
             <div class="cta-buttons">
-                <a href="#products" class="cta-btn cta-primary">Explore Products</a>
-                <a href="termcondition.html" class="cta-btn cta-secondary">Privacy & Policy</a>
+                <a href="#products" class="cta-btn cta-primary">Explore Store →</a>
+                <a href="termcondition.html" class="cta-btn cta-secondary">Privacy &amp; Policy</a>
             </div>
         </div>
     </section>
 
+    <!-- ================= STORE SECTION ================= -->
     <section class="course-section" id="products">
-        <h1>EXPLORE OUR PREMium Mind STORE</h1>
         <div class="store-categories-wrapper">
             <div class="store-categories-tabs" id="category-tabs">
                 <button class="category-tab active" data-category="all">
@@ -1760,39 +1493,42 @@
                 </button>
             </div>
         </div>
+
+        <h1>EXPLORE OUR PREMium Mind STORE</h1>
+
         <div class="card-container" id="dynamic-products-container">
-            <p style="text-align: center; width: 100%;">Loading Premium Store...</p>
+            <p style="text-align: center; width: 100%; color: #64748b; font-weight: 600;">Loading Premium Store...</p>
         </div>
     </section>
 
+    <!-- ================= MODALS ================= -->
     <div id="reportModal" class="wa-modal">
         <div class="wa-content">
             <span onclick="document.getElementById('reportModal').style.display='none'"
                 style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
-            <h3 style="margin-bottom:8px; font-size:1.4rem; color: #be123c;">Report an Issue 🚩</h3>
-            <p style="font-size:13px; color:#666; margin-bottom:20px;">Describe your problem below. If it's a payment
+            <h3 style="margin-bottom:8px; font-size:1.35rem; color: #7f0912; font-weight:800;">Report an Issue 🚩</h3>
+            <p style="font-size:13px; color:#64748b; margin-bottom:20px;">Describe your problem below. If it's a payment
                 issue, please attach a screenshot.</p>
             <form id="reportForm">
                 <input type="hidden" id="report_cid">
-                <label style="font-size:12px; font-weight:600;">Your Message*</label>
+                <label style="font-size:12px; font-weight:700; color:#0f172a;">Your Message*</label>
                 <textarea id="report_msg" class="wa-input" rows="3" placeholder="Explain your issue here..."
                     required></textarea>
 
-                <label style="font-size:12px; font-weight:600;">Upload Payment Screenshot (Optional for Payment
+                <label style="font-size:12px; font-weight:700; color:#0f172a;">Upload Payment Screenshot (Optional for Payment
                     Issues)</label>
                 <input type="file" id="report_file" accept="image/*"
-                    style="margin-bottom:15px; font-size:12px; width: 100%;">
+                    style="margin-top:6px; margin-bottom:15px; font-size:12px; width: 100%;">
 
                 <div
-                    style="margin-bottom: 15px; display: flex; gap: 8px; align-items: start; background: #fef2f2; padding: 12px; border-radius: 8px; border: 1px dashed #fda4af;">
-                    <input type="checkbox" id="report_agree" required style="margin-top: 2px;">
+                    style="margin-bottom: 15px; display: flex; gap: 8px; align-items: start; background: #fff1f2; padding: 12px; border-radius: 8px; border: 1px dashed #fda4af;">
+                    <input type="checkbox" id="report_agree" required style="margin-top: 2px; accent-color:#7f0912;">
                     <label for="report_agree"
-                        style="font-size: 11px; color: #be123c; font-weight: 600; cursor: pointer;">I understand that my
+                        style="font-size: 11px; color: #7f0912; font-weight: 700; cursor: pointer;">I understand that my
                         problem will be reviewed and resolved within 1-2 hours.</label>
                 </div>
 
-                <button type="submit" id="reportSubmit" class="wa-submit-btn" style="background: #be123c;">Submit
-                    Report</button>
+                <button type="submit" id="reportSubmit" class="wa-submit-btn">Submit Report</button>
             </form>
         </div>
     </div>
@@ -1816,25 +1552,24 @@
         <div class="wa-content">
             <span onclick="closeTncModal()"
                 style="position:absolute; right:20px; top:15px; cursor:pointer; font-size:28px; color: #555;">&times;</span>
-            <h3 style="margin-bottom:8px; font-size:1.4rem;">Terms & Conditions 📜</h3>
-            <p style="font-size:13px; color:#666; margin-bottom:15px;">Please read terms before payment.</p>
+            <h3 style="margin-bottom:8px; font-size:1.35rem; color:#7f0912; font-weight:800;">Terms &amp; Conditions 📜</h3>
+            <p style="font-size:13px; color:#64748b; margin-bottom:15px;">Please read terms before payment.</p>
 
             <div id="tncTextBody"
-                style="background:#f9fafb; padding:15px; border-radius:8px; font-size:11px; color:#444; margin-bottom:15px; border:1px solid #eee; line-height: 1.6; height: 240px; overflow-y: auto;">
+                style="background:#f8fafc; padding:14px; border-radius:8px; font-size:11.5px; color:#334155; margin-bottom:15px; border:1px solid #e2e8f0; line-height: 1.6; height: 240px; overflow-y: auto;">
             </div>
 
             <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
-                <input type="checkbox" id="tnc_agree" style="width: 16px; height: 16px;">
-                <label for="tnc_agree" style="font-size: 13px; font-weight: 700; color: #111; cursor: pointer;">I agree
-                    to the Terms & Conditions</label>
+                <input type="checkbox" id="tnc_agree" style="width: 16px; height: 16px; accent-color:#7f0912;">
+                <label for="tnc_agree" style="font-size: 13px; font-weight: 700; color: #0f172a; cursor: pointer;">I agree
+                    to the Terms &amp; Conditions</label>
             </div>
 
-            <button type="button" id="tncProceedBtn" class="wa-submit-btn"
-                style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Accept & Proceed to
-                Payment</button>
+            <button type="button" id="tncProceedBtn" class="wa-submit-btn">Accept &amp; Proceed to Payment</button>
         </div>
     </div>
 
+    <!-- ================= FOOTER ================= -->
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-part logo-part">
@@ -1883,7 +1618,7 @@
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; 2025 PREMium Mind | <a href="termcondition.html">Privacy Policy</a></p>
+            <p>&copy; 2025 PREMium Mind | <a href="termcondition.html" style="color: #facc15;">Privacy Policy</a></p>
         </div>
     </footer>
 
@@ -1951,7 +1686,7 @@
             document.getElementById('userName').textContent = name || 'User';
             document.getElementById('userEmail').textContent = email || '';
 
-            const finalPhotoSrc = photoSrc || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=000&color=fff&size=80`;
+            const finalPhotoSrc = photoSrc || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=7f0912&color=fff&size=80`;
             document.getElementById('profilePhoto').src = finalPhotoSrc;
 
             if (desktopLoginBtn) desktopLoginBtn.style.display = 'none';
@@ -2104,7 +1839,6 @@
         }
 
         // Default T&C sample — used when course has no custom tnc_text
-        // Format: "N. Title: body" → Title bold, body normal (same look as before)
         const PM_DEFAULT_TNC =
 `1. Non-Refundable: All sales are final. No refunds will be provided once the course access is granted.
 2. No Sharing: Sharing your account details with others is strictly prohibited and will lead to an instant permanent ban without refund.
@@ -2131,7 +1865,6 @@
         function formatTncHtml(raw) {
             const text = String(raw || '').trim();
             if (!text) return '';
-            // Admin pasted HTML (strong/br) — use as-is
             if (/<\s*(strong|b|br|p|em|div)\b/i.test(text)) return text;
             return text.split(/\n+/).map(function (line) {
                 line = line.trim();
@@ -2210,13 +1943,11 @@
 
 
         window.enrollCourse = async function (courseId, price, btnEl) {
-            // 🔥 FIX: CASHFREE LOCALHOST BLOCKER ALERT 🔥
             if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
                 alert("⚠️ WARNING: Cashfree Payments strictly block localhost/127.0.0.1 for security reasons.\n\nTo test payments, please deploy/upload this HTML file to your live server (Netlify or Hostinger).");
                 return;
             }
 
-            // Must be a real course id number — never accept a Function (ASI bug guard)
             const safeCourseId = String(typeof courseId === 'function' ? '' : (courseId == null ? '' : courseId)).trim();
 
             const emailToUse = String((window.getStoredEmail && window.getStoredEmail()) || (document.getElementById('userEmail') && document.getElementById('userEmail').textContent) || '').trim();
@@ -2249,12 +1980,10 @@
                 }
                 const nameToUse = (window.getStoredName && window.getStoredName()) || localStorage.getItem('customUserName') || 'Student';
                 const redirectTarget = getCashfreeRedirectTarget();
-                // Keep under Cashfree 500-char return_url limit
                 const returnUrl = 'https://premind.netlify.app/index.html'
                     + '?pm=1&oid={order_id}&cid=' + encodeURIComponent(safeCourseId)
                     + '&e=' + encodeURIComponent(emailToUse);
 
-                // Price: loaded courses list se resolve; server DB se bhi fix karega
                 const safePrice = resolveCoursePrice(safeCourseId, price);
 
                 const payload = {
@@ -2331,8 +2060,6 @@
             }
         };
 
-        // Full-page Cashfree return (mobile/app) — verifies payment without touching login
-        // Leading semicolon prevents ASI from treating this as enrollCourse(...)(IIFE)
         ;(function () {
             const params = new URLSearchParams(window.location.search);
             const orderId = params.get('oid') || params.get('order_id');
@@ -2363,7 +2090,6 @@
                 const cacheKey = 'pm_store_cache_v1_' + String(userEmail || 'guest');
                 let usedCache = false;
 
-                // Instant paint from last successful store fetch
                 try {
                     const cached = localStorage.getItem(cacheKey);
                     if (cached) {
@@ -2382,7 +2108,7 @@
                 } catch (e) {}
 
                 if (!usedCache && container) {
-                    container.innerHTML = '<p style="text-align:center; width:100%;">Loading Premium Store...</p>';
+                    container.innerHTML = '<p style="text-align:center; width:100%; color:#64748b; font-weight:600;">Loading Premium Store...</p>';
                 }
 
                 const pmTok = (window.pmGetPdfSession && window.pmGetPdfSession()) || '';
@@ -2391,7 +2117,6 @@
                 const response = await fetch(apiUrl, { cache: 'no-store' });
                 const allCourses = await response.json();
 
-                // 🚫 Filter out soft-deleted courses (is_deleted = 1). Only is_deleted = 0 (or missing) shows.
                 globalLoadedCourses = Array.isArray(allCourses) ? allCourses.filter(c => {
                     const deletedVal = c.is_deleted;
                     const isDeleted = deletedVal == 1 || deletedVal === '1' || deletedVal === true;
@@ -2404,7 +2129,6 @@
                 } catch (e) {}
 
                 renderStoreGrid();
-                // Deep link from app: ?pm_buy=COURSE_ID
                 try {
                     const buyId = new URLSearchParams(window.location.search).get('pm_buy');
                     if (buyId && window.pmIsNativeApp && window.pmIsNativeApp() && typeof window.initiatePurchase === 'function') {
@@ -2421,7 +2145,7 @@
                 } catch (e) {}
             } catch (error) {
                 if (!document.querySelector('#dynamic-products-container .course-card')) {
-                    document.getElementById('dynamic-products-container').innerHTML = '<p style="text-align:center; width:100%; color:red;">Database Connection Error.</p>';
+                    document.getElementById('dynamic-products-container').innerHTML = '<p style="text-align:center; width:100%; color:#be123c; font-weight:700;">Database Connection Error.</p>';
                 }
             }
         };
@@ -2431,12 +2155,10 @@
             if (!container) return;
             container.innerHTML = '';
 
-            // Filter by category
             const filtered = globalLoadedCourses.filter(course => {
                 const cat = (course.category || 'projects').toLowerCase();
                 return currentActiveCategory === 'all' || cat === currentActiveCategory;
             }).sort(function (a, b) {
-                // Admin Store Ranking: lower sort_order = higher on page
                 const sa = parseInt(a.sort_order, 10);
                 const sb = parseInt(b.sort_order, 10);
                 const na = isFinite(sa) ? sa : 999999;
@@ -2472,7 +2194,6 @@
             }
 
             filtered.forEach((course, index) => {
-                // Badge Ribbon / Badge
                 let badgeHTML = '';
                 if (course.badge) {
                     badgeHTML = `<span class="new-badge">${course.badge}</span>`;
@@ -2482,14 +2203,12 @@
 
                 let oldPriceHTML = course.old_price ? `<span class="old-price">₹${course.old_price}</span>` : '';
 
-                // Category
                 const cat = (course.category || 'projects').toLowerCase();
 
-                // Descriptions
                 let descHTML = '';
                 if (cat === 'projects') {
                     if (course.website_link && course.website_link.trim() !== '') {
-                        descHTML = `<a href="${course.website_link}" target="_blank" class="see-project-link">see project <ion-icon name="arrow-forward-outline"></ion-icon></a>`;
+                        descHTML = `<a href="${course.website_link}" target="_blank" class="see-project-link">See Project <ion-icon name="arrow-forward-outline"></ion-icon></a>`;
                     } else {
                         if (course.desc1) descHTML += `<p>${course.desc1}</p>`;
                         if (course.desc2) descHTML += `<p>${course.desc2}</p>`;
@@ -2500,14 +2219,12 @@
                     if (!course.desc1 && !course.desc2 && course.desc) descHTML += `<p>${course.desc}</p>`;
                 }
 
-                // Mini Timer Box
                 let timerHTML = '';
                 if (course.timer || course.timer_text || course.show_timer == 1 || course.show_timer == "1") {
                     const timerVal = course.timer || course.timer_text || '02h 15m';
                     timerHTML = `<div class="mini-timer">⏰ Limited Offer: <span>${timerVal}</span></div>`;
                 }
 
-                // Report Problem / Solving Button Container
                 let reportBtnContainerHTML = '';
                 if (course.show_report_btn == 1 || course.show_report_btn == "1") {
                     let reportBtnHTML = '';
@@ -2523,27 +2240,23 @@
             `;
                 }
 
-                // Main CTA Button
-                // App-only: always use initiatePurchase / lecture click handlers so native
-                // detection runs at click-time (bridge may load after first render).
                 let btnHTML = '';
                 const appOnly = window.pmIsAppOnlyCourse && window.pmIsAppOnlyCourse(course);
                 const inApp = window.pmIsNativeApp && window.pmIsNativeApp();
                 const btnType = String(course.btn_type || '').trim().toLowerCase();
                 const rawBtnText = String(course.btn_text || '').trim();
-                // Coming Soon: always show clear label (ignore default "Buy Now")
                 const comingSoonLabel = (!rawBtnText || /^buy\s*now$/i.test(rawBtnText))
                     ? 'Coming Soon'
                     : rawBtnText;
 
                 if (course.is_enrolled == 1 || course.is_enrolled == "1") {
                     if (appOnly && !inApp) {
-                        btnHTML = `<button type="button" class="buy-course-btn" style="background: linear-gradient(135deg, #111 0%, #334155 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="if(window.pmGateAppOnly&&window.pmGateAppOnly('${course.id}','open'))return; window.location.href='lecture.html?id=${course.id}'">Open in App 📱</button>`;
+                        btnHTML = `<button type="button" class="buy-course-btn" style="background: linear-gradient(135deg, #0f172a 0%, #334155 100%) !important; width: 100%;" onclick="if(window.pmGateAppOnly&&window.pmGateAppOnly('${course.id}','open'))return; window.location.href='lecture.html?id=${course.id}'">Open in App 📱</button>`;
                     } else if (cat === 'projects') {
                         const waText = encodeURIComponent(`Hello PREMium Mind! 👋\n\nI have purchased the project: *${course.title}*.\n\nPlease share the project source code/files.\nEmail: ${getStoredEmail()}`);
-                        btnHTML = `<button class="buy-course-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.open('https://wa.me/918709911016?text=${waText}', '_blank')">Access Now 🎓</button>`;
+                        btnHTML = `<button class="buy-course-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; width: 100%;" onclick="window.open('https://wa.me/918709911016?text=${waText}', '_blank')">Access Now 🎓</button>`;
                     } else {
-                        btnHTML = `<button class="buy-course-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px;" onclick="window.location.href='lecture.html?id=${course.id}'">Access Now 🎓</button>`;
+                        btnHTML = `<button class="buy-course-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; width: 100%;" onclick="window.location.href='lecture.html?id=${course.id}'">Access Now 🎓</button>`;
                     }
                 } else if (course.req_status === 'pending') {
                     btnHTML = `<button class="btn-reviewing" disabled>Reviewing... ⏳</button>`;
@@ -2554,13 +2267,13 @@
                 } else if (btnType === 'disabled') {
                     btnHTML = `<button type="button" class="disabled-btn" disabled>${rawBtnText || 'Unavailable'}</button>`;
                 } else if (course.is_free == 1 || course.price == 0) {
-                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="0" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${rawBtnText || 'Get Free Access'}</button>`;
+                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%;" data-course-id="${String(course.id)}" data-course-price="0" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${rawBtnText || 'Get Free Access'}</button>`;
                 } else if (course.is_disabled == 1 || course.disabled == 1 || course.is_disabled == "1") {
                     btnHTML = `<button class="disabled-btn" disabled>Sold Out / Closed</button>`;
                 } else if (appOnly && !inApp) {
-                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">Buy in App 📱</button>`;
+                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">Buy in App 📱</button>`;
                 } else {
-                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%; padding: 12px; background: #111; border: none; border-radius: 8px; color: #fff; font-size: 16px; font-weight:bold; cursor: pointer;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${rawBtnText || 'Buy Now'}</button>`;
+                    btnHTML = `<button type="button" class="buy-course-btn" style="width: 100%;" data-course-id="${String(course.id)}" data-course-price="${String(course.price)}" data-show-tnc="${course.show_tnc || 0}" onclick="window.initiatePurchase(this.getAttribute('data-course-id'), this.getAttribute('data-course-price'), this.getAttribute('data-show-tnc'))">${rawBtnText || 'Buy Now'}</button>`;
                 }
 
                 const showPdfPreview = course.show_preview == 1 || course.show_preview === '1' || course.show_preview === true;
@@ -2568,20 +2281,22 @@
                     .replace(/\\/g, '\\\\')
                     .replace(/'/g, "\\'")
                     .replace(/"/g, '&quot;');
-                // Simple left text under photo — no badge/button design
+                
                 let previewLinkHTML = '';
                 if (showPdfPreview) {
-                    previewLinkHTML = `<div style="text-align:left;margin-top:8px;margin-bottom:-10px;padding:0 5px;">
-                        <span style="color:#dc2626;text-decoration:underline;font-weight:bold;cursor:pointer;font-size:13.5px;" onclick="window.openPdfPreview(${Number(course.id)}, '${safePreviewTitle}')">Preview</span>
+                    previewLinkHTML = `<div style="text-align:left;margin-top:6px;margin-bottom:-2px;">
+                        <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(127,9,18,0.07);border:1px solid rgba(127,9,18,0.18);color:#7f0912;padding:4px 9px;border-radius:6px;font-weight:800;cursor:pointer;font-size:11.5px;" onclick="window.openPdfPreview(${Number(course.id)}, '${safePreviewTitle}')"><ion-icon name="eye-outline"></ion-icon> Preview Page 1</span>
                     </div>`;
                 } else if (btnType === 'preview_buy' && course.demo_link && course.demo_link.trim() !== '' && course.demo_link.startsWith('http')) {
-                    previewLinkHTML = `<div style="text-align:left;margin-top:8px;margin-bottom:-10px;padding:0 5px;">
-                        <span style="color:#dc2626;text-decoration:underline;font-weight:bold;cursor:pointer;font-size:13.5px;" onclick="window.open('${course.demo_link}', '_blank')">Preview</span>
+                    previewLinkHTML = `<div style="text-align:left;margin-top:6px;margin-bottom:-2px;">
+                        <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(127,9,18,0.07);border:1px solid rgba(127,9,18,0.18);color:#7f0912;padding:4px 9px;border-radius:6px;font-weight:800;cursor:pointer;font-size:11.5px;" onclick="window.open('${course.demo_link}', '_blank')"><ion-icon name="eye-outline"></ion-icon> Preview</span>
                     </div>`;
                 }
 
+                const delayMs = Math.min(index * 55, 450);
+
                 const cardHTML = `
-          <div class="course-card">
+          <div class="course-card" style="animation-delay: ${delayMs}ms;">
               <div class="card-img-wrapper">
                   ${badgeHTML}
                   <img src="${course.image || 'small-logo.png'}" alt="${course.title}" loading="lazy" decoding="async" fetchpriority="${index < 4 ? 'high' : 'low'}" onerror="this.src='small-logo.png'">
@@ -2591,7 +2306,7 @@
               
               ${reportBtnContainerHTML}
               <h2>${course.title}</h2>
-              <div style="min-height: 44px; margin-bottom: -1px;">
+              <div style="min-height: 38px;">
                   ${descHTML}
               </div>
               ${timerHTML}
@@ -2644,7 +2359,6 @@
                 }
 
                 try {
-                    // Prefer server-rendered page-1 image (Imagick) when available
                     const imgUrl = PREVIEW_API + '?course_id=' + id + '&as=image&t=' + Date.now();
                     const imgProbe = await fetch(imgUrl, { cache: 'no-store' });
                     const imgType = (imgProbe.headers.get('content-type') || '').toLowerCase();
@@ -2662,7 +2376,6 @@
                         return;
                     }
 
-                    // Fallback: PDF.js render only page 1
                     if (typeof pdfjsLib === 'undefined') {
                         throw new Error('Preview engine missing');
                     }
@@ -2845,8 +2558,8 @@
 
     </script>
 
-<script src="pm-inspect-block.js"></script>
-<script src="app-back.js"></script>
+    <script src="pm-inspect-block.js"></script>
+    <script src="app-back.js"></script>
 </body>
 
 </html>
