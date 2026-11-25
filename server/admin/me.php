@@ -3,4 +3,5 @@
 require_once __DIR__ . '/_boot.php';
 
 $email = pm_admin_require();
-pm_admin_ok(['email' => $email, 'options' => pm_admin_options()]);
+$pending = (int)pm_scalar($conn, "SELECT COUNT(*) FROM reports WHERE status = 'pending'");
+pm_admin_ok(['email' => $email, 'options' => pm_admin_options(), 'badges' => ['reports' => $pending]]);

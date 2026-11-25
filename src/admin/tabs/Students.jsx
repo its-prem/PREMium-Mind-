@@ -66,8 +66,11 @@ export default function Students() {
           <div className="adm-cards">
             {data.students.map((s) => (
               <div key={s.id} className="adm-card">
-                <div className="adm-row between">
-                  <b>{s.name || '—'}</b>
+                <div className="adm-row between" style={{ flexWrap: 'nowrap' }}>
+                  <div className="adm-row" style={{ flexWrap: 'nowrap', minWidth: 0 }}>
+                    <span className="adm-avatar big">{(s.name || s.email || '?').charAt(0).toUpperCase()}</span>
+                    <b className="adm-ellipsis">{s.name || '—'}</b>
+                  </div>
                   <span className={`adm-chip ${s.is_active == 1 ? 'ok' : 'warn'}`}>{s.is_active == 1 ? 'Verified' : 'Pending'}</span>
                 </div>
                 <div className="adm-muted small" style={{ marginTop: 4 }}>

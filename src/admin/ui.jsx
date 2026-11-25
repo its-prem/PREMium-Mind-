@@ -60,7 +60,7 @@ export function UiProvider({ children }) {
   );
 }
 
-export function Modal({ title, onClose, children, small, wide }) {
+export function Modal({ title, onClose, children, small, wide, footer }) {
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose?.();
     window.addEventListener('keydown', onKey);
@@ -76,6 +76,7 @@ export function Modal({ title, onClose, children, small, wide }) {
           </button>
         </div>
         <div className="adm-modal-body">{children}</div>
+        {footer && <div className="adm-modal-foot">{footer}</div>}
       </div>
     </div>
   );
@@ -90,8 +91,25 @@ export function Switch({ checked, onChange, disabled, label }) {
   );
 }
 
-export const Loading = ({ text = 'Loading…' }) => <div className="adm-state">{text}</div>;
-export const Empty = ({ text }) => <div className="adm-state">{text}</div>;
+// grey placeholder blocks while a tab loads
+export const Loading = ({ text = 'Loading…' }) => (
+  <div aria-busy="true" aria-label={text}>
+    <div className="adm-skel-row">
+      {[0, 1, 2, 3].map((i) => (
+        <div key={i} className="adm-skel" style={{ height: 76 }} />
+      ))}
+    </div>
+    <div className="adm-skel" style={{ height: 260, marginTop: 16 }} />
+  </div>
+);
+export const Empty = ({ text }) => (
+  <div className="adm-state">
+    <svg className="adm-empty-ico" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 8l-9-5-9 5v8l9 5 9-5V8zM3.3 7.5L12 12.5l8.7-5M12 12.5V21" />
+    </svg>
+    <div>{text}</div>
+  </div>
+);
 
 export function ErrorBox({ error, onRetry }) {
   return (

@@ -9,10 +9,12 @@
 import { lazy } from 'react';
 
 export const TABS = [
-  { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', component: lazy(() => import('./tabs/Dashboard.jsx')) },
-  { id: 'courses', label: 'Products', icon: 'box', component: lazy(() => import('./tabs/Courses.jsx')) },
-  { id: 'ranking', label: 'Home order', icon: 'sort', component: lazy(() => import('./tabs/Ranking.jsx')) },
-  { id: 'students', label: 'Students', icon: 'users', component: lazy(() => import('./tabs/Students.jsx')) },
-  { id: 'orders', label: 'Payments', icon: 'card', component: lazy(() => import('./tabs/Orders.jsx')) },
-  { id: 'reports', label: 'Reports', icon: 'flag', component: lazy(() => import('./tabs/Reports.jsx')) },
+  { id: 'dashboard', desc: 'Sales, students and what happened lately', label: 'Dashboard', icon: 'dashboard', component: lazy(() => import('./tabs/Dashboard.jsx')) },
+  { id: 'courses', desc: 'Add, edit and manage everything you sell', label: 'Products', icon: 'box', component: lazy(() => import('./tabs/Courses.jsx')) },
+  { id: 'ranking', desc: 'Drag products into the order shown on the home page', label: 'Home order', icon: 'sort', component: lazy(() => import('./tabs/Ranking.jsx')) },
+  { id: 'students', desc: 'Search students and give or take away products', label: 'Students', icon: 'users', component: lazy(() => import('./tabs/Students.jsx')) },
+  { id: 'orders', desc: 'Every payment, with a check against Cashfree', label: 'Payments', icon: 'card', component: lazy(() => import('./tabs/Orders.jsx')) },
+  { id: 'reports', desc: 'Problems students have sent you', label: 'Reports', icon: 'flag', badge: 'reports', component: lazy(() => import('./tabs/Reports.jsx')) },
+  // A link to a page outside this admin (opens in a new tab). Delete the line to remove it.
+  { id: 'd2d-pyq', label: 'D2D PYQ Access', icon: 'lock', href: 'https://premind.diplomawallah.in/d2d_pyq_admin.php' },
 ];

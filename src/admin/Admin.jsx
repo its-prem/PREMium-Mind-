@@ -5,6 +5,7 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { adminGet } from './api';
+import { clearStoredSession } from '../lib/session';
 import { TABS } from './registry';
 import { Loading, UiProvider } from './ui';
 import Icon from './Icon';
@@ -21,7 +22,7 @@ export default function Admin() {
     adminGet('me.php').then(setMe).catch(setError);
   }, []);
 
-  const current = TABS.find((t) => t.id === tab) || TABS[0];
+  const current = TABS.find((t) => t.id === tab && t.component) || TABS[0];
 
   useEffect(() => {
     if (me && tab !== current.id) navigate(`/admin/${current.id}`, { replace: true });
@@ -65,25 +66,50 @@ export default function Admin() {
           <div className="adm-brand">
             PREMium <b>Admin</b>
           </div>
+          <div className="adm-nav-label">Manage</div>
           <nav>
-            {TABS.map((t) => (
-              <Link key={t.id} to={`/admin/${t.id}`} className={`adm-nav${t.id === current.id ? ' on' : ''}`}>
-                <Icon name={t.icon} />
-                {t.label}
-              </Link>
-            ))}
+            {TABS.map((t) =>
+              t.href ? (
+                <a key={t.id} href={t.href} target="_blank" rel="noreferrer" className="adm-nav">
+                  <Icon name={t.icon} />
+                  {t.label}
+                </a>
+              ) : (
+                <Link key={t.id} to={`/admin/${t.id}`} className={`adm-nav${t.id === current.id ? ' on' : ''}`}>
+                  <Icon name={t.icon} />
+                  {t.label}
+                  {t.badge && me.badges?.[t.badge] > 0 && <em className="adm-badge">{me.badges[t.badge]}</em>}
+                </Link>
+              )
+            )}
           </nav>
           <div className="adm-side-foot">
             <div className="adm-muted small">{me.email}</div>
             <Link to="/" className="adm-nav">
               <Icon name="home" />Open website
             </Link>
+            <button
+              className="adm-nav adm-logout"
+              onClick={() => {
+                clearStoredSession();
+                navigate('/login');
+              }}
+            >
+              <Icon name="logout" />Log out
+            </button>
           </div>
         </aside>
         <main className="adm-main">
-          <h1 className="adm-title">
-            {current.label}
-          </h1>
+          <header className="adm-head">
+            <div>
+              <h1 className="adm-title">{current.label}</h1>
+              <p className="adm-sub">{current.desc}</p>
+            </div>
+            <div className="adm-me" title={me.email}>
+              <span className="adm-avatar">{me.email.charAt(0).toUpperCase()}</span>
+              <span className="adm-me-mail">{me.email}</span>
+            </div>
+          </header>
           <Suspense fallback={<Loading />}>
             <Tab key={current.id} options={me.options} adminEmail={me.email} />
           </Suspense>

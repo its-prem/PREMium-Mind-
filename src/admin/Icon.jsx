@@ -17,6 +17,7 @@ const PATHS = {
   plus: 'M12 5v14M5 12h14',
   logout: 'M9 4H5v16h4M16 8l4 4-4 4M20 12H9',
   grip: 'M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01',
+  lock: 'M6 11h12v9H6zM8 11V8a4 4 0 0 1 8 0v3',
   check: 'M5 12l5 5 9-10',
   close: 'M6 6l12 12M18 6L6 18',
 };

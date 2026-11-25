@@ -15,6 +15,7 @@ export default function Courses({ options }) {
   const [form, setForm] = useState(null); // null | {} (new) | course
   const [local, setLocal] = useState({}); // switch values just changed here
   const [busy, setBusy] = useState([]); // switches being saved
+  const [picked, setPicked] = useState([]); // ids ticked for “Revoke selected”
 
   const rows = useMemo(() => {
     if (!data) return [];
@@ -60,6 +61,33 @@ export default function Courses({ options }) {
     return k in local ? local[k] : c[field];
   };
 
+  const allPicked = rows.length > 0 && rows.every((c) => picked.includes(c.id));
+  const togglePick = (id) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+
+  // take every ticked product away from all students (a history copy is kept on the server)
+  const revokeSelected = async () => {
+    const total = rows.filter((c) => picked.includes(c.id)).reduce((n, c) => n + Number(c.enrolled_count || 0), 0);
+    const ok = await confirm({
+      title: `Remove access for ${picked.length} product(s)?`,
+      text: `${total} student access record(s) will be removed from all accounts. A history copy is kept.`,
+      danger: true,
+      confirmText: 'Remove access',
+    });
+    if (!ok) return;
+    let removed = 0;
+    try {
+      for (const id of picked) {
+        const r = await adminPost('courses.php', { action: 'revoke_all', id });
+        removed += Number(r.removed || 0);
+      }
+      toast(`Removed ${removed} access record(s)`);
+    } catch (e) {
+      toast(e.message, 'error');
+    }
+    setPicked([]);
+    reload();
+  };
+
   const ask = async (opts, body, okText) => {
     if (await confirm(opts)) call(body, okText);
   };
@@ -85,6 +113,11 @@ export default function Courses({ options }) {
         <button className={`adm-btn ${view === 'trash' ? '' : 'ghost'}`} onClick={() => setView('trash')}>
           Trash ({trashed})
         </button>
+        {picked.length > 0 && (
+          <button className="adm-btn warn" onClick={revokeSelected}>
+            Revoke selected ({picked.length})
+          </button>
+        )}
         <button className="adm-btn good" onClick={() => setForm({})}>
           <Icon name="plus" size={16} /> Add product
         </button>
@@ -97,7 +130,12 @@ export default function Courses({ options }) {
           <table className="adm-table">
             <thead>
               <tr>
-                <th>Product</th>
+                <th>
+                  <label style={{ display: 'inline-flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={allPicked} onChange={() => setPicked(allPicked ? [] : rows.map((c) => c.id))} />
+                    Product
+                  </label>
+                </th>
                 <th>Price</th>
                 <th>Switches</th>
                 <th />
@@ -111,6 +149,7 @@ export default function Courses({ options }) {
                   <tr key={c.id} className={dead ? 'dim' : ''}>
                     <td>
                       <div className="adm-prod">
+                        <input type="checkbox" checked={picked.includes(c.id)} onChange={() => togglePick(c.id)} aria-label="Select product" />
                         <img className="adm-thumb" src={c.image} alt="" onError={(e) => (e.currentTarget.style.visibility = 'hidden')} />
                         <div>
                           <b>{c.title}</b>
@@ -136,7 +175,7 @@ export default function Courses({ options }) {
                         <div className="adm-flags">
                           {FLAGS.filter((f) => f.inList).map((f) => (
                             <div key={f.name} className="adm-flag">
-                              {f.label}
+                              {f.listLabel || f.label}
                               <Switch
                                 checked={flagValue(c, f.name) == 1 || flagValue(c, f.name) === true}
                                 disabled={busy.includes(`${c.id}:${f.name}`)}
@@ -243,6 +282,7 @@ export default function Courses({ options }) {
         <CourseForm
           course={form.id ? form : null}
           options={options}
+          allCourses={data.courses}
           onClose={() => setForm(null)}
           onSaved={() => {
             setForm(null);
