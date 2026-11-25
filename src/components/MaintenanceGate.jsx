@@ -1,4 +1,5 @@
 import React, { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import './Maintenance.css';
 
 // The maintenance page (cat artwork + styles) is only downloaded when maintenance is really on.
@@ -71,6 +72,7 @@ const readBypass = () => {
 };
 
 export default function MaintenanceGate({ children }) {
+  const location = useLocation();
   const [config, setConfig] = useState(readCache); // null only on the very first visit, until the first check ends
   const [checking, setChecking] = useState(true);
   const [bypass, setBypass] = useState(readBypass);
@@ -138,7 +140,9 @@ export default function MaintenanceGate({ children }) {
   // Waiting for the very first answer: a plain dark screen, no site flash
   if (!config) return <div className="mt-splash" />;
 
-  if (config.enabled === true && !bypass) {
+  // The admin panel stays reachable during maintenance (it needs an admin login anyway).
+  const isAdminPage = location.pathname.startsWith('/admin');
+  if (config.enabled === true && !bypass && !isAdminPage) {
     return (
       <Suspense fallback={<div className="mt-splash" />}>
         <MaintenancePage

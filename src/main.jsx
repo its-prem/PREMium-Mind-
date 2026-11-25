@@ -1,6 +1,6 @@
 import { StrictMode, Suspense, lazy, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import './index.css'
 import { installClickSound, installHoverNotes } from './lib/uiSounds'
 import MaintenanceGate from './components/MaintenanceGate.jsx'
@@ -19,12 +19,15 @@ const Syllabus = lazy(() => import('./pages/Syllabus.jsx'))
 const PaymentReturn = lazy(() => import('./pages/PaymentReturn.jsx'))
 // Login pulls in the Firebase SDK, so it is loaded only when /login is opened.
 const Login = lazy(() => import('./pages/Login.jsx'))
+// The admin panel (src/admin) is its own download, opened only at /admin
+const Admin = lazy(() => import('./admin/Admin.jsx'))
 
 // The ant and the butterfly are decoration: they download after the page has finished loading.
 const Butterfly = lazy(() => import('./components/Butterfly.jsx'))
 const Ant = lazy(() => import('./components/Ant.jsx'))
 
 function Pets() {
+  const { pathname } = useLocation()
   const [on, setOn] = useState(false)
   useEffect(() => {
     const start = () => setOn(true)
@@ -35,7 +38,7 @@ function Pets() {
     const id = setTimeout(start, 2500)
     return () => clearTimeout(id)
   }, [])
-  if (!on) return null
+  if (!on || pathname.startsWith('/admin')) return null // no pets in the admin panel
   return (
     <Suspense fallback={null}>
       <Butterfly />
@@ -68,6 +71,8 @@ createRoot(document.getElementById('root')).render(
             <Route path="/syllabus/:branch/:subject" element={<Syllabus />} />
             <Route path="/resume-editor/:productId" element={<ResumeEditor />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/:tab" element={<Admin />} />
             <Route path="*" element={<App />} />
           </Routes>
         </Suspense>
