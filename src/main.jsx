@@ -1,24 +1,48 @@
-import { StrictMode, Suspense, lazy } from 'react'
+import { StrictMode, Suspense, lazy, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './index.css'
 import { installClickSound, installHoverNotes } from './lib/uiSounds'
-import Butterfly from './components/Butterfly.jsx'
 import MaintenanceGate from './components/MaintenanceGate.jsx'
-import Ant from './components/Ant.jsx'
 import App from './App.jsx'
-import Lecture from './pages/Lecture.jsx'
-import Watch from './pages/Watch.jsx'
-import Terms from './pages/Terms.jsx'
-import AppDownload from './pages/AppDownload.jsx'
-import ResumeEditor from './pages/ResumeEditor.jsx'
-import Tools from './pages/Tools.jsx'
-import MockTests from './pages/MockTests.jsx'
-import Syllabus from './pages/Syllabus.jsx'
-import PaymentReturn from './pages/PaymentReturn.jsx'
 
-// Login pulls in the Firebase SDK, so load it only when /login is opened.
+// Every other page is a separate download that starts only when the page is opened,
+// so the home page loads fast. (The home page itself stays in the main file.)
+const Lecture = lazy(() => import('./pages/Lecture.jsx'))
+const Watch = lazy(() => import('./pages/Watch.jsx'))
+const Terms = lazy(() => import('./pages/Terms.jsx'))
+const AppDownload = lazy(() => import('./pages/AppDownload.jsx'))
+const ResumeEditor = lazy(() => import('./pages/ResumeEditor.jsx'))
+const Tools = lazy(() => import('./pages/Tools.jsx'))
+const MockTests = lazy(() => import('./pages/MockTests.jsx'))
+const Syllabus = lazy(() => import('./pages/Syllabus.jsx'))
+const PaymentReturn = lazy(() => import('./pages/PaymentReturn.jsx'))
+// Login pulls in the Firebase SDK, so it is loaded only when /login is opened.
 const Login = lazy(() => import('./pages/Login.jsx'))
+
+// The ant and the butterfly are decoration: they download after the page has finished loading.
+const Butterfly = lazy(() => import('./components/Butterfly.jsx'))
+const Ant = lazy(() => import('./components/Ant.jsx'))
+
+function Pets() {
+  const [on, setOn] = useState(false)
+  useEffect(() => {
+    const start = () => setOn(true)
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(start, { timeout: 4000 })
+      return () => window.cancelIdleCallback(id)
+    }
+    const id = setTimeout(start, 2500)
+    return () => clearTimeout(id)
+  }, [])
+  if (!on) return null
+  return (
+    <Suspense fallback={null}>
+      <Butterfly />
+      <Ant />
+    </Suspense>
+  )
+}
 
 installClickSound()
 installHoverNotes()
@@ -28,31 +52,25 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       {/* Shows a maintenance page on every route while public/maintenance.json has "enabled": true */}
       <MaintenanceGate>
-      <Butterfly />
-      <Ant />
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/lecture" element={<Lecture />} />
-        <Route path="/watch" element={<Watch />} />
-        <Route path="/termcondition" element={<Terms />} />
-        <Route path="/app-download" element={<AppDownload />} />
-        <Route path="/tools" element={<Tools />} />
-        <Route path="/mock-tests" element={<MockTests />} />
-        <Route path="/payment-return" element={<PaymentReturn />} />
-        <Route path="/syllabus" element={<Syllabus />} />
-        <Route path="/syllabus/:branch" element={<Syllabus />} />
-        <Route path="/syllabus/:branch/:subject" element={<Syllabus />} />
-        <Route path="/resume-editor/:productId" element={<ResumeEditor />} />
-        <Route
-          path="/login"
-          element={
-            <Suspense fallback={null}>
-              <Login />
-            </Suspense>
-          }
-        />
-        <Route path="*" element={<App />} />
-      </Routes>
+        <Pets />
+        <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/lecture" element={<Lecture />} />
+            <Route path="/watch" element={<Watch />} />
+            <Route path="/termcondition" element={<Terms />} />
+            <Route path="/app-download" element={<AppDownload />} />
+            <Route path="/tools" element={<Tools />} />
+            <Route path="/mock-tests" element={<MockTests />} />
+            <Route path="/payment-return" element={<PaymentReturn />} />
+            <Route path="/syllabus" element={<Syllabus />} />
+            <Route path="/syllabus/:branch" element={<Syllabus />} />
+            <Route path="/syllabus/:branch/:subject" element={<Syllabus />} />
+            <Route path="/resume-editor/:productId" element={<ResumeEditor />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="*" element={<App />} />
+          </Routes>
+        </Suspense>
       </MaintenanceGate>
     </BrowserRouter>
   </StrictMode>,

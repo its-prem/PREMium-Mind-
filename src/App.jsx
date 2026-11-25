@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   clearStoredSession,
@@ -9,8 +9,9 @@ import {
 import './styles/theme.css';
 import './App.css';
 import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
-import Footer from './components/Footer';
+// The side menu and the footer are not needed for the first paint: they load right after it.
+const Sidebar = lazy(() => import('./components/Sidebar'));
+const Footer = lazy(() => import('./components/Footer'));
 import Store from './components/Store';
 import { ResumeScaled, SAMPLE_RESUME } from './components/ResumeDocument';
 import { usePurchases } from './lib/purchases';
@@ -28,6 +29,17 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // true shortly after the page is ready (or at once if the menu is opened sooner)
+  const [lowerReady, setLowerReady] = useState(false);
+  useEffect(() => {
+    const start = () => setLowerReady(true);
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(start, { timeout: 2500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = setTimeout(start, 1200);
+    return () => clearTimeout(id);
+  }, []);
   const [activeNav, setActiveNav] = useState('home');
   // null = show the 4 category cards; otherwise the id of the open category
   const [activeCategory, setActiveCategory] = useState(null);
@@ -144,23 +156,30 @@ export default function App() {
         user={user}
         activeNav={activeNav}
         onNavChange={setActiveNav}
-        onOpenSidebar={() => setSidebarOpen(true)}
-        onSelectCategory={(cat) => setActiveCategory(cat === 'all' ? null : cat)}
-        onNavigate={navigate}
-      />
-
-      <Sidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        user={user}
-        onLoginDemo={() => navigate('/login')}
-        onLogout={() => {
-          clearStoredSession();
-          setUser(null);
+        onOpenSidebar={() => {
+          setLowerReady(true);
+          setSidebarOpen(true);
         }}
         onSelectCategory={(cat) => setActiveCategory(cat === 'all' ? null : cat)}
         onNavigate={navigate}
       />
+
+      {lowerReady && (
+        <Suspense fallback={null}>
+          <Sidebar
+            isOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+            user={user}
+            onLoginDemo={() => navigate('/login')}
+            onLogout={() => {
+              clearStoredSession();
+              setUser(null);
+            }}
+            onSelectCategory={(cat) => setActiveCategory(cat === 'all' ? null : cat)}
+            onNavigate={navigate}
+          />
+        </Suspense>
+      )}
 
       {/* ================= SEAMLESS HERO ================= */}
       <section className="pm-hero">
@@ -370,7 +389,11 @@ export default function App() {
       </section>
 
       {/* ================= FOOTER ================= */}
-      <Footer />
+      {lowerReady && (
+        <Suspense fallback={null}>
+          <Footer />
+        </Suspense>
+      )}
 
       {/* ================= SAMPLE PAGE 1 PREVIEW MODAL ================= */}
       {previewItem && (

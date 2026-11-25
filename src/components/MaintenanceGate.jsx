@@ -1,6 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import MaintenancePage from './MaintenancePage';
+import React, { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import './Maintenance.css';
+
+// The maintenance page (cat artwork + styles) is only downloaded when maintenance is really on.
+const MaintenancePage = lazy(() => import('./MaintenancePage'));
 
 /**
  * Maintenance mode for the WHOLE site.
@@ -24,6 +26,24 @@ const CONFIG_URL = '/maintenance.json';
 const POLL_MS = 60 * 1000;
 const FIRST_CHECK_TIMEOUT_MS = 2000;
 const BYPASS_KEY = 'pm_maintenance_bypass';
+const CACHE_KEY = 'pm_maintenance_cache';
+
+// The last answer we got. With it the page can open at once instead of waiting for the network.
+const readCache = () => {
+  try {
+    const v = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    return v && typeof v === 'object' ? v : null;
+  } catch {
+    return null;
+  }
+};
+const writeCache = (v) => {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(v));
+  } catch {
+    /* storage blocked */
+  }
+};
 
 async function loadConfig(signal) {
   const res = await fetch(`${CONFIG_URL}?t=${Date.now()}`, {
@@ -51,7 +71,7 @@ const readBypass = () => {
 };
 
 export default function MaintenanceGate({ children }) {
-  const [config, setConfig] = useState(null); // null until the first check ends
+  const [config, setConfig] = useState(readCache); // null only on the very first visit, until the first check ends
   const [checking, setChecking] = useState(true);
   const [bypass, setBypass] = useState(readBypass);
   const bypassTried = useRef(false);
@@ -62,7 +82,9 @@ export default function MaintenanceGate({ children }) {
     const timer = timeoutMs ? setTimeout(() => ctrl.abort(), timeoutMs) : null;
     try {
       const data = await loadConfig(ctrl.signal);
-      setConfig(data && typeof data === 'object' ? data : { enabled: false });
+      const next = data && typeof data === 'object' ? data : { enabled: false };
+      writeCache(next);
+      setConfig(next);
       return data;
     } catch {
       // Missing file / offline / slow: never lock people out because of it
@@ -118,11 +140,13 @@ export default function MaintenanceGate({ children }) {
 
   if (config.enabled === true && !bypass) {
     return (
-      <MaintenancePage
-        config={config}
-        checking={checking}
-        onRetry={() => check(0)}
-      />
+      <Suspense fallback={<div className="mt-splash" />}>
+        <MaintenancePage
+          config={config}
+          checking={checking}
+          onRetry={() => check(0)}
+        />
+      </Suspense>
     );
   }
 
