@@ -1,0 +1,343 @@
+/* =========================================================
+   App Version / Download page - matches PREMium Mind theme
+   ========================================================= */
+
+.ad-page {
+  min-height: 100vh;
+  background: #f4f4f5;
+  color: #09090b;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Hero ---------- */
+.ad-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 40px 20px 92px;
+  text-align: center;
+  color: #ffffff;
+  background:
+    radial-gradient(160px 110px at 14% 60%, rgba(220, 38, 38, 0.38), transparent 72%),
+    radial-gradient(200px 120px at 100% 0%, rgba(239, 68, 68, 0.3), transparent 70%),
+    linear-gradient(145deg, #09090b 0%, #141417 55%, #1c1012 100%);
+}
+
+.ad-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1.5px);
+  background-size: 16px 16px;
+  -webkit-mask-image: linear-gradient(160deg, #000 0%, rgba(0, 0, 0, 0.1) 80%);
+  mask-image: linear-gradient(160deg, #000 0%, rgba(0, 0, 0, 0.1) 80%);
+  pointer-events: none;
+}
+
+.ad-hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.ad-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  margin-bottom: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #e4e4e7;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.ad-badge ion-icon {
+  color: #34d399;
+  font-size: 14px;
+}
+
+.ad-hero h1 {
+  margin: 0 0 8px;
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.ad-hero p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.95rem;
+}
+
+/* ---------- Layout ---------- */
+.ad-wrap {
+  position: relative;
+  z-index: 5;
+  max-width: 620px;
+  margin: -62px auto 0;
+  padding: 0 16px 48px;
+}
+
+.ad-card,
+.ad-section {
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 18px;
+  box-shadow: 0 14px 36px rgba(9, 9, 11, 0.08);
+}
+
+.ad-card {
+  padding: 26px 22px 22px;
+  text-align: center;
+}
+
+.ad-logo {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 12px;
+  object-fit: contain;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  box-shadow: 0 8px 20px rgba(9, 9, 11, 0.12);
+}
+
+.ad-card h2 {
+  margin: 0 0 8px;
+  color: #09090b;
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.ad-sub {
+  max-width: 460px;
+  margin: 0 auto 16px;
+  color: #71717a;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.ad-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.ad-chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #f4f4f5;
+  border: 1px solid #e4e4e7;
+  color: #52525b;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.ad-chip span {
+  margin-left: 3px;
+  color: #09090b;
+  font-weight: 800;
+}
+
+/* ---------- Download button ---------- */
+.ad-download {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  background: #09090b;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(9, 9, 11, 0.25);
+  transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.ad-download ion-icon {
+  color: #34d399;
+  font-size: 22px;
+  transition: color 0.25s ease;
+}
+
+.ad-download:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(220, 38, 38, 0.32);
+}
+
+.ad-download:hover ion-icon {
+  color: #ffffff;
+}
+
+.ad-hint {
+  margin: 10px 0 0;
+  color: #71717a;
+  font-size: 0.78rem;
+}
+
+/* In-app helper */
+.ad-inapp {
+  margin-top: 14px;
+  padding: 14px;
+  text-align: left;
+  background: #fafafa;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+}
+
+.ad-inapp p {
+  margin: 0 0 10px;
+  color: #3f3f46;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.ad-btn-blue,
+.ad-btn-ghost {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ad-btn-blue {
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.ad-btn-ghost {
+  border: 1px solid #d4d4d8;
+  background: #ffffff;
+  color: #09090b;
+}
+
+.ad-open {
+  display: inline-block;
+  margin-top: 14px;
+  color: #dc2626;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.ad-open:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Info sections ---------- */
+.ad-section {
+  margin-top: 16px;
+  padding: 18px 20px;
+}
+
+.ad-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: #09090b;
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.ad-section h3 ion-icon {
+  color: #dc2626;
+  font-size: 20px;
+}
+
+.ad-section ul {
+  margin: 0;
+  padding-left: 20px;
+  text-align: left;
+}
+
+.ad-section li {
+  margin-bottom: 6px;
+  color: #52525b;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.ad-section li::marker {
+  color: #dc2626;
+}
+
+.ad-steps {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ad-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0;
+  padding: 11px 12px;
+  background: #fafafa;
+  border: 1px solid #f4f4f5;
+  border-radius: 12px;
+}
+
+.ad-steps b {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: #09090b;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.ad-steps span {
+  flex: 1;
+  min-width: 0;
+  color: #3f3f46;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 520px) {
+  .ad-hero {
+    padding: 32px 16px 84px;
+  }
+
+  .ad-card {
+    padding: 22px 16px 20px;
+  }
+
+  .ad-section {
+    padding: 16px 14px;
+  }
+}

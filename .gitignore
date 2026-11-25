@@ -1,5 +1,4 @@
 # Secrets / local Hostinger copies — do not push API keys
-server/create_order.php
 server/pm_secrets.php
 
 # D2D PYQ question data — must stay OFF the public Netlify deploy.
@@ -14,3 +13,20 @@ server/d2d_pyq_data/
 
 # local dev-server config
 .claude/launch.json
+
+# ---- React (Vite) website ----
+logs
+*.log
+npm-debug.log*
+node_modules
+dist
+dist-ssr
+*.local
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+
+# Not part of the website
+/PREMium Mind/
+.claude/

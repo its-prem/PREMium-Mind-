@@ -1,0 +1,347 @@
+/* =========================================================
+   Terms & Conditions page - matches PREMium Mind theme
+   ========================================================= */
+
+.tc-page {
+  min-height: 100vh;
+  background: #f4f4f5;
+  color: #09090b;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Hero ---------- */
+.tc-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 44px 20px 76px;
+  text-align: center;
+  color: #ffffff;
+  background:
+    radial-gradient(160px 110px at 14% 60%, rgba(220, 38, 38, 0.38), transparent 72%),
+    radial-gradient(200px 120px at 100% 0%, rgba(239, 68, 68, 0.3), transparent 70%),
+    linear-gradient(145deg, #09090b 0%, #141417 55%, #1c1012 100%);
+}
+
+.tc-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1.5px);
+  background-size: 16px 16px;
+  -webkit-mask-image: linear-gradient(160deg, #000 0%, rgba(0, 0, 0, 0.1) 80%);
+  mask-image: linear-gradient(160deg, #000 0%, rgba(0, 0, 0, 0.1) 80%);
+  pointer-events: none;
+}
+
+.tc-hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.tc-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  margin-bottom: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #e4e4e7;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.tc-hero-badge ion-icon {
+  color: #34d399;
+  font-size: 14px;
+}
+
+.tc-hero h1 {
+  margin: 0 0 8px;
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 2.7rem);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.tc-hero p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.95rem;
+}
+
+/* ---------- Content card ---------- */
+.tc-card {
+  position: relative;
+  text-align: left;
+  z-index: 5;
+  max-width: 860px;
+  margin: -44px auto 48px;
+  padding: 30px 32px 34px;
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 18px;
+  box-shadow: 0 14px 36px rgba(9, 9, 11, 0.08);
+}
+
+.tc-intro {
+  margin: 0 0 18px;
+  color: #52525b;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.tc-intro strong {
+  color: #09090b;
+}
+
+/* Table of contents chips */
+.tc-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 0 20px;
+  margin-bottom: 6px;
+  border-bottom: 1px dashed #e4e4e7;
+}
+
+.tc-toc a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px 6px 7px;
+  border-radius: 999px;
+  background: #f4f4f5;
+  border: 1px solid #e4e4e7;
+  color: #27272a;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.tc-toc a span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #09090b;
+  color: #ffffff;
+  font-size: 0.66rem;
+}
+
+.tc-toc a:hover {
+  background: #ffffff;
+  border-color: #dc2626;
+  transform: translateY(-1px);
+}
+
+/* Sections */
+.tc-section {
+  padding: 20px 0 4px;
+  scroll-margin-top: 90px;
+}
+
+.tc-section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.tc-num {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: #09090b;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.tc-section-head h2 {
+  flex: 1;
+  margin: 0;
+  color: #09090b;
+  text-align: left;
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.tc-section-head ion-icon {
+  color: #dc2626;
+  font-size: 22px;
+}
+
+.tc-section p,
+.tc-section li {
+  color: #52525b;
+  font-size: 0.97rem;
+  line-height: 1.75;
+}
+
+.tc-section p {
+  margin: 0;
+  padding-left: 42px;
+}
+
+.tc-section ul {
+  margin: 0;
+  padding-left: 62px;
+}
+
+.tc-section li {
+  margin-bottom: 4px;
+}
+
+.tc-section li::marker {
+  color: #dc2626;
+}
+
+/* Contact block */
+.tc-contact {
+  margin-top: 22px;
+  padding: 18px 18px 18px;
+  background: #fafafa;
+  border: 1px solid #e4e4e7;
+  border-radius: 14px;
+}
+
+.tc-contact p {
+  padding-left: 42px;
+}
+
+.tc-contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 0 42px;
+}
+
+.tc-btn-wa,
+.tc-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.tc-btn-wa {
+  background: #09090b;
+  color: #ffffff;
+}
+
+.tc-btn-wa ion-icon {
+  color: #25d366;
+  font-size: 18px;
+}
+
+.tc-btn-wa:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(9, 9, 11, 0.25);
+}
+
+.tc-btn-ghost {
+  background: #ffffff;
+  border: 1px solid #d4d4d8;
+  color: #27272a;
+}
+
+.tc-btn-ghost:hover {
+  background: #f4f4f5;
+  transform: translateY(-2px);
+}
+
+/* ---------- Footer ---------- */
+.tc-footer {
+  padding: 14px 16px;
+  background: #050506;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.tc-footer p {
+  margin: 0;
+  color: #a1a1aa;
+  font-size: 12px;
+}
+
+.tc-footer strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.tc-footer span {
+  margin: 0 8px;
+  color: #3f3f46;
+}
+
+.tc-footer a {
+  color: #d4d4d8;
+  text-decoration: none;
+}
+
+.tc-footer a:hover {
+  color: #ffffff;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 640px) {
+  .tc-hero {
+    padding: 34px 16px 68px;
+  }
+
+  .tc-card {
+    margin: -40px 12px 36px;
+    padding: 22px 16px 24px;
+    border-radius: 16px;
+  }
+
+  .tc-section p {
+    padding-left: 0;
+  }
+
+  .tc-section ul {
+    padding-left: 22px;
+  }
+
+  .tc-contact {
+    padding: 16px 14px;
+  }
+
+  .tc-contact p {
+    padding-left: 0;
+  }
+
+  .tc-contact-actions {
+    margin-left: 0;
+  }
+
+  .tc-section-head h2 {
+    font-size: 1.02rem;
+  }
+
+  .tc-section p,
+  .tc-section li {
+    font-size: 0.92rem;
+  }
+}

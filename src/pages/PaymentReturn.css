@@ -1,0 +1,102 @@
+.pr-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px 16px;
+  background: #f4f4f5;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.pr-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  width: min(420px, 100%);
+  padding: 28px 22px;
+  border: 1px solid #e4e4e7;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 40px rgba(9, 9, 11, 0.08);
+  color: #09090b;
+  text-align: center;
+}
+
+.pr-card h1 {
+  margin: 4px 0 0;
+  color: #09090b;
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.3rem;
+}
+
+.pr-card p {
+  margin: 0 0 8px;
+  color: #52525b;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.pr-card code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: #f4f4f5;
+  font-size: 0.8rem;
+  word-break: break-all;
+}
+
+.pr-icon {
+  font-size: 64px;
+  line-height: 1;
+}
+
+.pr-icon.is-ok {
+  color: #16a34a;
+}
+
+.pr-icon.is-wait {
+  color: #d97706;
+}
+
+.pr-icon.is-bad {
+  color: #dc2626;
+}
+
+.pr-spin {
+  align-self: center;
+  width: 44px;
+  height: 44px;
+  border: 4px solid #e4e4e7;
+  border-top-color: #dc2626;
+  border-radius: 50%;
+  animation: prSpin 0.8s linear infinite;
+}
+
+@keyframes prSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 16px;
+  border: 1.5px solid #d4d4d8;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #09090b;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.pr-btn.is-dark {
+  border-color: #09090b;
+  background: #09090b;
+  color: #ffffff;
+}

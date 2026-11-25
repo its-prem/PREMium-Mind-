@@ -1,0 +1,86 @@
+/* Highlighter layer + popover extras */
+
+.rd-page {
+  position: relative;
+}
+
+.rdx-hl-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.rdx-hl-layer svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Marks look like ink on paper in the light theme */
+  mix-blend-mode: multiply;
+}
+
+.rd-root.is-dark .rdx-hl-layer svg {
+  /* Light text on a dark page: keep the ink see-through so text stays readable */
+  mix-blend-mode: normal;
+  opacity: 0.55;
+}
+
+/* While a tool is active the page is for drawing, not scrolling */
+.rd-root[data-rdx-pen] .rdx-hl-layer {
+  pointer-events: auto;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.rd-root[data-rdx-pen='erase'] .rdx-hl-layer {
+  cursor: cell;
+}
+
+.rdx-hl-pop {
+  min-width: 210px;
+}
+
+.rdx-swatches {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.rdx-swatch {
+  flex: 1;
+  height: 30px;
+  border: 2px solid transparent;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.rdx-swatch.is-on {
+  border-color: #09090b;
+  transform: scale(1.08);
+}
+
+.rd-root.is-dark .rdx-swatch.is-on {
+  border-color: #fafafa;
+}
+
+/* Real highlighter: on PDF pages the ink sits BEHIND the text.
+   (Server-rendered locked pages are opaque images, so they keep the
+   multiply overlay above.) */
+.rd-page.rd-text-canvas .rdx-hl-layer {
+  z-index: 0;
+}
+
+.rd-page.rd-text-canvas canvas {
+  position: relative;
+  z-index: 1;
+}
+
+.rd-page.rd-text-canvas .rdx-hl-layer svg {
+  mix-blend-mode: normal;
+}
+
+/* While drawing, the layer must still receive the pointer */
+.rd-root[data-rdx-pen] .rd-page.rd-text-canvas canvas {
+  pointer-events: none;
+}

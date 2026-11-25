@@ -1,0 +1,147 @@
+/* Page indicator + progress bar */
+
+.rdx-progress {
+  position: absolute;
+  top: calc(var(--rd-header-h, 64px) + var(--rd-safe-top, 0px));
+  left: 0;
+  z-index: 4000;
+  width: 100%;
+  height: 3px;
+  background: rgba(9, 9, 11, 0.06);
+  pointer-events: none;
+}
+
+.rdx-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #09090b, #dc2626);
+  transition: width 0.15s linear;
+}
+
+.rd-root.is-dark .rdx-progress {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.rd-root.is-dark .rdx-progress span {
+  background: linear-gradient(90deg, #fafafa, #dc2626);
+}
+
+.rdx-pager-wrap {
+  position: absolute;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  z-index: 4000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transform: translateX(-50%);
+}
+
+.rdx-pager {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 8px 16px;
+  border: 1px solid #e4e4e7;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #09090b;
+  font-family: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(9, 9, 11, 0.16);
+  backdrop-filter: blur(8px);
+}
+
+.rdx-pager b {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.rdx-pager span {
+  color: #71717a;
+  font-weight: 600;
+}
+
+.rdx-jump {
+  min-width: 190px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(9, 9, 11, 0.22);
+  color: #09090b;
+  text-align: left;
+}
+
+.rdx-jump label {
+  display: block;
+  margin-bottom: 8px;
+  color: #71717a;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rdx-jump input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1.5px solid #e4e4e7;
+  border-radius: 9px;
+  background: #fafafa;
+  color: #09090b;
+  font-family: inherit;
+  font-size: 0.9rem;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.rdx-jump input:focus {
+  outline: none;
+  border-color: #09090b;
+}
+
+.rdx-jump button {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 9px;
+  background: #09090b;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.rdx-jump p {
+  margin: 8px 0 0;
+  color: #b45309;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.rd-root.is-dark .rdx-pager,
+.rd-root.is-dark .rdx-jump {
+  border-color: #2e2e33;
+  background: rgba(24, 24, 27, 0.95);
+  color: #fafafa;
+}
+
+.rd-root.is-dark .rdx-pager span,
+.rd-root.is-dark .rdx-jump label {
+  color: #a1a1aa;
+}
+
+.rd-root.is-dark .rdx-jump input {
+  border-color: #2e2e33;
+  background: #09090b;
+  color: #fafafa;
+}
+
+.rd-root.is-dark .rdx-jump button {
+  background: #fafafa;
+  color: #09090b;
+}

@@ -1,0 +1,155 @@
+/* Kitty moods: eyes follow, angry, sleepy (base look is in Sidebar.css) */
+
+@keyframes catShake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  20% { transform: translateX(-3px) rotate(-4deg); }
+  40% { transform: translateX(3px) rotate(4deg); }
+  60% { transform: translateX(-2px) rotate(-3deg); }
+  80% { transform: translateX(2px) rotate(3deg); }
+}
+
+@keyframes catBreathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(1px) scale(1.035); }
+}
+
+@keyframes catZzz {
+  0% { opacity: 0; transform: translate(0, 4px) scale(0.6); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translate(10px, -22px) scale(1.15); }
+}
+
+@keyframes catAngerPop {
+  0%, 100% { transform: scale(0.9) rotate(-8deg); }
+  50% { transform: scale(1.25) rotate(8deg); }
+}
+
+.pm-sb-cat {
+  /* so eyes/zzz/anger marks can sit outside the head */
+  overflow: visible;
+}
+
+/* Eyes follow the pointer (individual `translate` keeps the blink animation) */
+.pm-sb-cat-eye {
+  translate: var(--lx, 0px) var(--ly, 0px);
+  transition: translate 0.12s ease-out;
+}
+
+/* Brows, anger mark and Zzz are hidden until their mood */
+.pm-sb-cat-brow {
+  position: absolute;
+  top: 15px;
+  z-index: 3;
+  width: 13px;
+  height: 2.6px;
+  border-radius: 2px;
+  background: #3b0a0a;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.pm-sb-cat-brow.left {
+  left: 7px;
+  transform: rotate(22deg);
+}
+
+.pm-sb-cat-brow.right {
+  right: 7px;
+  transform: rotate(-22deg);
+}
+
+.pm-sb-cat-anger {
+  position: absolute;
+  top: -12px;
+  right: -10px;
+  z-index: 4;
+  font-size: 17px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pm-sb-cat-zzz {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  z-index: 4;
+  display: flex;
+  gap: 1px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.pm-sb-cat-zzz i {
+  font-style: normal;
+  opacity: 0;
+}
+
+/* ---------- Angry ---------- */
+.pm-sb-cat.is-angry {
+  animation: catShake 0.35s linear infinite;
+}
+
+.pm-sb-cat.is-angry .pm-sb-cat-brow {
+  opacity: 1;
+}
+
+.pm-sb-cat.is-angry .pm-sb-cat-eye {
+  animation: none;
+  transform: scaleY(0.72);
+}
+
+.pm-sb-cat.is-angry .pm-sb-cat-blush {
+  background: rgba(239, 68, 68, 0.7);
+}
+
+.pm-sb-cat.is-angry .pm-sb-cat-mouth {
+  top: 40px;
+  transform: scaleY(-1);
+}
+
+.pm-sb-cat.is-angry .pm-sb-cat-anger {
+  opacity: 1;
+  animation: catAngerPop 0.5s ease-in-out infinite;
+}
+
+/* ---------- Sleepy ---------- */
+.pm-sb-cat.is-sleepy {
+  animation: catBreathe 3.4s ease-in-out infinite;
+}
+
+.pm-sb-cat.is-sleepy .pm-sb-cat-eye {
+  animation: none;
+  transform: scaleY(0.1);
+  translate: 0 0;
+}
+
+.pm-sb-cat.is-sleepy .pm-sb-cat-mouth {
+  opacity: 0.6;
+}
+
+.pm-sb-cat.is-sleepy .pm-sb-cat-zzz i {
+  animation: catZzz 2.6s ease-in-out infinite;
+}
+
+.pm-sb-cat.is-sleepy .pm-sb-cat-zzz i:nth-child(2) {
+  animation-delay: 0.7s;
+}
+
+.pm-sb-cat.is-sleepy .pm-sb-cat-zzz i:nth-child(3) {
+  animation-delay: 1.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm-sb-cat.is-angry,
+  .pm-sb-cat.is-sleepy,
+  .pm-sb-cat.is-angry .pm-sb-cat-anger {
+    animation: none;
+  }
+
+  .pm-sb-cat.is-sleepy .pm-sb-cat-zzz i {
+    animation: none;
+    opacity: 1;
+  }
+}

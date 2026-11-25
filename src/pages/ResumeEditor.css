@@ -1,0 +1,499 @@
+/* Resume editor - edit on the left, live A4 preview on the right */
+
+.re-root {
+  min-height: 100vh;
+  background: #f4f4f5;
+  color: #09090b;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  text-align: left;
+}
+
+/* ---------- Top bar ---------- */
+.re-bar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid #e4e4e7;
+  backdrop-filter: blur(10px);
+}
+
+.re-bar-title {
+  min-width: 0;
+  flex: 1;
+}
+
+.re-bar-title strong {
+  display: block;
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.95rem;
+}
+
+.re-bar-title small {
+  display: block;
+  overflow: hidden;
+  color: #71717a;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.re-saved {
+  min-width: 44px;
+  color: #059669;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+.re-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border: 1px solid #d4d4d8;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #09090b;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.re-btn:hover {
+  background: #f4f4f5;
+  transform: translateY(-1px);
+}
+
+.re-btn-dark {
+  border-color: #09090b;
+  background: #09090b;
+  color: #ffffff;
+}
+
+.re-btn-dark ion-icon {
+  color: #34d399;
+  font-size: 17px;
+}
+
+.re-btn-dark:hover {
+  background: #059669;
+  border-color: #059669;
+}
+
+.re-btn-dark:hover ion-icon {
+  color: #ffffff;
+}
+
+.re-icon {
+  width: 40px;
+  padding: 0;
+  font-size: 18px;
+}
+
+/* ---------- Phone tabs ---------- */
+.re-tabs {
+  display: none;
+  gap: 6px;
+  padding: 10px 14px 0;
+}
+
+.re-tabs button {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid #e4e4e7;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #52525b;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.re-tabs button.is-on {
+  border-color: #09090b;
+  background: #09090b;
+  color: #ffffff;
+}
+
+/* ---------- Layout ---------- */
+.re-layout {
+  display: grid;
+  grid-template-columns: minmax(340px, 440px) minmax(0, 1fr);
+  gap: 20px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 18px 14px 40px;
+  align-items: start;
+}
+
+.re-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.re-preview {
+  position: sticky;
+  top: 74px;
+}
+
+.re-sheet {
+  max-width: 640px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  box-shadow: 0 16px 44px rgba(9, 9, 11, 0.16);
+  overflow: hidden;
+}
+
+/* ---------- Style row ---------- */
+.re-style {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 14px;
+}
+
+.re-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.re-row-end {
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.re-label {
+  width: 56px;
+  color: #71717a;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.re-chips,
+.re-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.re-chip {
+  padding: 7px 14px;
+  border: 1px solid #e4e4e7;
+  border-radius: 999px;
+  background: #fafafa;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.re-chip.is-on {
+  border-color: #09090b;
+  background: #09090b;
+  color: #ffffff;
+}
+
+.re-swatch {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px #d4d4d8;
+  cursor: pointer;
+}
+
+.re-swatch.is-on {
+  box-shadow: 0 0 0 2.5px #09090b;
+}
+
+.re-link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #52525b;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---------- Form blocks ---------- */
+.re-block {
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.re-block.is-open {
+  border-color: #a1a1aa;
+}
+
+.re-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  background: none;
+  color: #09090b;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.re-block-head span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.re-block-head ion-icon {
+  font-size: 18px;
+}
+
+.re-block-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 2px 16px 16px;
+}
+
+.re-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.re-field span {
+  color: #52525b;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.re-field input,
+.re-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1.5px solid #e4e4e7;
+  border-radius: 10px;
+  background: #fafafa;
+  color: #09090b;
+  font-family: inherit;
+  font-size: 0.88rem;
+  resize: vertical;
+}
+
+.re-field input:focus,
+.re-field textarea:focus {
+  outline: none;
+  border-color: #09090b;
+  background: #ffffff;
+}
+
+.re-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.re-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: #fafafa;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+}
+
+.re-add,
+.re-remove {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.re-add {
+  border: 1.5px dashed #a1a1aa;
+  background: #ffffff;
+  color: #27272a;
+}
+
+.re-add:hover {
+  border-color: #09090b;
+}
+
+.re-remove {
+  border: none;
+  background: transparent;
+  color: #b91c1c;
+}
+
+.re-tip {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0 0;
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.re-tip ion-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-size: 17px;
+}
+
+/* ---------- Locked ---------- */
+.re-locked {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: #f4f4f5;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.re-locked-card {
+  max-width: 420px;
+  padding: 34px 26px;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgba(9, 9, 11, 0.1);
+}
+
+.re-locked-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 62px;
+  margin-bottom: 14px;
+  border-radius: 18px;
+  background: #09090b;
+  color: #fbbf24;
+  font-size: 30px;
+}
+
+.re-locked-card h1 {
+  margin: 0 0 8px;
+  color: #09090b;
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.35rem;
+}
+
+.re-locked-card p {
+  margin: 0 0 20px;
+  color: #71717a;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.re-locked-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* ---------- Print: only the full-size resume page ---------- */
+.re-print {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  .re-ui {
+    display: none !important;
+  }
+
+  .re-root {
+    min-height: 0;
+    background: #ffffff;
+  }
+
+  .re-print {
+    display: block;
+  }
+}
+
+/* ---------- Phone ---------- */
+@media (max-width: 900px) {
+  .re-tabs {
+    display: flex;
+  }
+
+  .re-layout {
+    display: block;
+    padding-top: 12px;
+  }
+
+  .re-editor,
+  .re-preview {
+    display: none;
+  }
+
+  .re-editor.is-active {
+    display: flex;
+  }
+
+  .re-preview.is-active {
+    display: block;
+    position: static;
+  }
+
+  .re-bar .re-btn span {
+    display: none;
+  }
+
+  .re-bar .re-btn-dark {
+    padding: 10px 13px;
+  }
+}

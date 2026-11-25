@@ -1,0 +1,177 @@
+/* Shared look for the optional reader features (dock, popovers, toast). */
+
+/* Floating buttons on the right edge */
+.rdx-dock {
+  position: absolute;
+  right: 10px;
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  z-index: 4000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.rdx-dock-item {
+  position: relative;
+}
+
+.rdx-fab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #e4e4e7;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #09090b;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(9, 9, 11, 0.16);
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.rdx-fab:hover {
+  transform: translateY(-2px);
+}
+
+.rdx-fab.is-on {
+  border-color: #09090b;
+  background: #09090b;
+  color: #ffffff;
+}
+
+/* Popover opening to the left of a dock button */
+.rdx-pop {
+  position: absolute;
+  right: 54px;
+  bottom: 0;
+  min-width: 190px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(9, 9, 11, 0.22);
+  color: #09090b;
+  font-size: 0.8rem;
+}
+
+.rdx-pop h4 {
+  margin: 0 0 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #71717a;
+}
+
+.rdx-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rdx-chip {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid #e4e4e7;
+  border-radius: 10px;
+  background: #fafafa;
+  color: #27272a;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.rdx-chip:hover {
+  background: #f4f4f5;
+}
+
+.rdx-chip.is-on {
+  border-color: #09090b;
+  background: #09090b;
+  color: #ffffff;
+}
+
+.rdx-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rdx-stack {
+  display: grid;
+  gap: 8px;
+}
+
+/* Toast under the header */
+.rdx-toast {
+  position: absolute;
+  top: calc(var(--rd-header-h, 64px) + var(--rd-safe-top, 0px) + 12px);
+  left: 50%;
+  z-index: 4500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(440px, calc(100vw - 24px));
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: #09090b;
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.4;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+  transform: translateX(-50%);
+}
+
+.rdx-toast button {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  background: #fafafa;
+  color: #09090b;
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Dark mode */
+.rd-root.is-dark .rdx-fab,
+.rd-root.is-dark .rdx-pop,
+.rd-root.is-dark .rdx-chip {
+  border-color: #2e2e33;
+  background: #18181b;
+  color: #fafafa;
+}
+
+.rd-root.is-dark .rdx-pop h4 {
+  color: #a1a1aa;
+}
+
+.rd-root.is-dark .rdx-fab.is-on,
+.rd-root.is-dark .rdx-chip.is-on {
+  border-color: #fafafa;
+  background: #fafafa;
+  color: #09090b;
+}
+
+.rd-root.is-dark .rdx-toast {
+  background: #fafafa;
+  color: #09090b;
+}
+
+.rd-root.is-dark .rdx-toast button {
+  background: #09090b;
+  color: #ffffff;
+}

@@ -1,0 +1,301 @@
+/* A4 resume page + 3 templates. Colors come from --accent. */
+
+.rs-scaled {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.rs-scaled-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+
+.rs-doc {
+  box-sizing: border-box;
+  width: 794px;
+  min-height: 1123px;
+  background: #ffffff;
+  color: #18181b;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.5;
+  text-align: left;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.rs-doc h1,
+.rs-doc h3,
+.rs-doc p,
+.rs-doc ul {
+  margin: 0;
+  padding: 0;
+}
+
+.rs-doc ul {
+  list-style: none;
+}
+
+.rs-doc h1 {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+}
+
+.rs-doc .rs-title {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.rs-doc h3 {
+  margin-bottom: 7px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.rs-section {
+  margin-bottom: 18px;
+  break-inside: avoid;
+}
+
+.rs-section p {
+  color: #3f3f46;
+}
+
+.rs-item {
+  margin-bottom: 10px;
+  break-inside: avoid;
+}
+
+.rs-item-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rs-item-head b {
+  font-size: 13px;
+}
+
+.rs-item-head span {
+  flex-shrink: 0;
+  color: #71717a;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.rs-item-sub {
+  color: #52525b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.rs-item-sub.rs-plain {
+  font-weight: 500;
+}
+
+.rs-points {
+  margin-top: 4px;
+}
+
+.rs-points li {
+  position: relative;
+  padding-left: 14px;
+  color: #3f3f46;
+}
+
+.rs-points li::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.rs-contact li {
+  color: #3f3f46;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Modern ---------- */
+.rs-modern header {
+  padding: 40px 44px 24px;
+  color: #ffffff;
+  background: var(--accent);
+}
+
+.rs-modern .rs-title {
+  opacity: 0.9;
+}
+
+.rs-modern .rs-cols {
+  display: grid;
+  grid-template-columns: 1fr 250px;
+  min-height: 900px;
+}
+
+.rs-modern main {
+  padding: 26px 24px 30px 44px;
+}
+
+.rs-modern aside {
+  padding: 26px 30px 30px 22px;
+  background: #f4f4f5;
+}
+
+.rs-modern h3 {
+  padding-bottom: 5px;
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+}
+
+.rs-modern .rs-contact li {
+  margin-bottom: 4px;
+  font-size: 11.5px;
+}
+
+.rs-modern .rs-skills li {
+  display: inline-block;
+  margin: 0 5px 6px 0;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #d4d4d8;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.rs-modern aside .rs-item-head {
+  display: block;
+}
+
+.rs-modern aside .rs-item-head span {
+  display: block;
+  margin-top: 1px;
+}
+
+/* ---------- Classic ---------- */
+.rs-classic {
+  padding: 48px 56px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 13px;
+}
+
+.rs-classic header {
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  text-align: center;
+  border-bottom: 2px solid var(--accent);
+}
+
+.rs-classic h1 {
+  color: var(--accent);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 32px;
+  letter-spacing: 0.5px;
+}
+
+.rs-classic .rs-title {
+  font-style: italic;
+  color: #52525b;
+}
+
+.rs-classic .rs-contact {
+  margin-top: 8px;
+}
+
+.rs-classic .rs-contact.rs-inline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 14px;
+  font-size: 12px;
+}
+
+.rs-classic h3 {
+  padding-bottom: 3px;
+  margin-bottom: 8px;
+  color: var(--accent);
+  font-family: Georgia, 'Times New Roman', serif;
+  border-bottom: 1px solid #a1a1aa;
+}
+
+.rs-classic .rs-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+}
+
+.rs-classic .rs-skills li::before {
+  content: '\2022';
+  margin-right: 6px;
+  color: var(--accent);
+}
+
+/* ---------- Compact (fresher) ---------- */
+.rs-compact header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 32px 40px 22px;
+  color: #ffffff;
+  background: var(--accent);
+}
+
+.rs-compact h1 {
+  font-size: 28px;
+}
+
+.rs-compact .rs-contact {
+  text-align: right;
+  font-size: 11px;
+}
+
+.rs-compact .rs-contact li {
+  color: #ffffff;
+  opacity: 0.92;
+}
+
+.rs-compact .rs-body {
+  padding: 22px 40px 34px;
+}
+
+.rs-compact h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--accent);
+}
+
+.rs-compact h3::after {
+  content: '';
+  flex: 1;
+  height: 1.5px;
+  background: color-mix(in srgb, var(--accent) 35%, #ffffff);
+}
+
+.rs-compact .rs-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rs-compact .rs-skills li {
+  padding: 3px 11px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent) 12%, #ffffff);
+  color: var(--accent);
+  font-size: 11.5px;
+  font-weight: 800;
+}

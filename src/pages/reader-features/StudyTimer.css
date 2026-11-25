@@ -1,0 +1,123 @@
+/* Study timer pill + panel */
+
+.rdx-timer-wrap {
+  position: absolute;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  left: 10px;
+  z-index: 4000;
+}
+
+.rdx-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid #e4e4e7;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #09090b;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(9, 9, 11, 0.16);
+  backdrop-filter: blur(8px);
+}
+
+.rdx-timer > ion-icon {
+  color: #dc2626;
+  font-size: 16px;
+}
+
+.rdx-timer i {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 2px;
+  padding-left: 8px;
+  border-left: 1px solid #e4e4e7;
+  color: #ea580c;
+  font-style: normal;
+}
+
+.rdx-timer.is-paused {
+  opacity: 0.65;
+}
+
+.rdx-timer.is-break {
+  border-color: #86efac;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.rdx-timer.is-break > ion-icon {
+  color: #16a34a;
+}
+
+.rdx-timer-pop {
+  right: auto;
+  bottom: 48px;
+  left: 0;
+  min-width: 220px;
+}
+
+.rdx-timer-pop dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.rdx-timer-pop dl div {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #f4f4f5;
+}
+
+.rdx-timer-pop dt {
+  color: #71717a;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rdx-timer-pop dd {
+  margin: 2px 0 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.rdx-note {
+  margin: 10px 0 0;
+  color: #71717a;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.rd-root.is-dark .rdx-timer {
+  border-color: #2e2e33;
+  background: rgba(24, 24, 27, 0.95);
+  color: #fafafa;
+}
+
+.rd-root.is-dark .rdx-timer i {
+  border-left-color: #2e2e33;
+  color: #fb923c;
+}
+
+.rd-root.is-dark .rdx-timer.is-break {
+  border-color: #166534;
+  background: #052e16;
+  color: #86efac;
+}
+
+.rd-root.is-dark .rdx-timer-pop dl div {
+  background: #09090b;
+}
+
+.rd-root.is-dark .rdx-timer-pop dt,
+.rd-root.is-dark .rdx-note {
+  color: #a1a1aa;
+}

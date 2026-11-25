@@ -1,76 +1,108 @@
 <?php
 /**
- * Hostinger: public_html/premind/verify_payment.php
- * Frontend calls this after Cashfree redirect to confirm the order was
- * actually PAID (server-side, via Cashfree's Orders API) before granting
- * course access — never trust the redirect alone.
+ * Upload to Hostinger premind/ as: verify_payment.php   (replaces the old one)
+ *
+ * The website calls this after Cashfree sends the buyer back. It never trusts the redirect:
+ * it asks Cashfree whether the order is really PAID, then checks that
+ *   - the order belongs to the logged-in user (signed token),
+ *   - the paid amount is the one we stored when the order was created,
+ * and only then gives the course.
+ *
+ * Request:  POST/GET  ?order_id=ORDER_...        (header X-PM-Session: <login token>)
+ * Response: { "status":"success", "course_id":12 }       paid + course given
+ *           { "status":"pending" }                       money not confirmed yet (ask again in a few seconds)
+ *           { "status":"failed",  "message":"..." }      cancelled / failed / not found
  */
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
 
-require_once __DIR__ . '/pm_load_env.php';
-pm_load_dotenv(__DIR__ . '/.env');
+require_once __DIR__ . '/pm_cors.php';
+pm_cors_json(['GET', 'POST']);
 
-include 'db_connect.php';
+require_once __DIR__ . '/pm_session_token.php';
+require_once __DIR__ . '/pm_orders.php';
+include __DIR__ . '/db_connect.php';
 
-// =============== CASHFREE CREDENTIALS ===============
-// Read from .env only — must match whatever create_order.php uses to
-// actually create the order, or every verification fails after a key
-// rotation on one side but not the other.
-$appId     = pm_env('CASHFREE_APP_ID');
-$secretKey = pm_env('CASHFREE_SECRET_KEY');
-$env       = pm_env('CASHFREE_ENV', 'PROD');
+$data    = pm_request_body();
+$email   = strtolower(trim(pm_session_email(pm_request_token($data))));
+$orderId = trim((string)($_GET['order_id'] ?? $data['order_id'] ?? ''));
 
-if ($appId === '' || $appId === 'CHANGE_ME' || $secretKey === '' || $secretKey === 'CHANGE_ME') {
-    echo json_encode(['status' => 'error', 'message' => 'Payment gateway not configured.']);
-    exit();
+if ($email === '') {
+    http_response_code(401);
+    echo json_encode(['status' => 'error', 'message' => 'Please log in again.', 'code' => 'login_required']);
+    exit;
 }
-// ====================================================
-
-$order_id = $conn->real_escape_string($_GET['order_id'] ?? '');
-$course_id = $conn->real_escape_string($_GET['course_id'] ?? '');
-$user_email = $conn->real_escape_string($_GET['email'] ?? '');
-
-if ($order_id === '' || $course_id === '' || $user_email === '') {
-    echo json_encode(["status" => "error", "message" => "Missing order_id/course_id/email"]);
-    exit();
+if ($orderId === '' || !preg_match('/^[A-Za-z0-9_\-]{6,64}$/', $orderId)) {
+    http_response_code(400);
+    echo json_encode(['status' => 'error', 'message' => 'Order id is missing.']);
+    exit;
 }
 
-$url = ($env == "PROD") ? "https://api.cashfree.com/pg/orders/$order_id" : "https://sandbox.cashfree.com/pg/orders/$order_id";
+pm_orders_ensure_tables($conn);
 
-$ch = curl_init($url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Content-Type: application/json",
-    "x-api-version: 2023-08-01",
-    "x-client-id: $appId",
-    "x-client-secret: $secretKey"
-]);
+// Our record of this order
+$stmt = $conn->prepare('SELECT order_id, user_email, course_id, amount, status FROM orders WHERE order_id = ? LIMIT 1');
+$stmt->bind_param('s', $orderId);
+$stmt->execute();
+$order = $stmt->get_result()->fetch_assoc();
+$stmt->close();
 
-$response = curl_exec($ch);
-curl_close($ch);
+if (!$order || strtolower((string)$order['user_email']) !== $email) {
+    // Not this user's order: say the same thing as for a missing one.
+    echo json_encode(['status' => 'failed', 'message' => 'Order not found.']);
+    exit;
+}
+$courseId = (int)$order['course_id'];
 
-$resData = json_decode($response, true);
+// Already handled earlier (webhook may have been first)
+if ($order['status'] === 'PAID' && pm_user_owns($conn, $email, $courseId)) {
+    echo json_encode(['status' => 'success', 'course_id' => $courseId]);
+    exit;
+}
 
-if (isset($resData['order_status']) && $resData['order_status'] === "PAID") {
-    // Grant from the PAID order's own data (course + customer), not client params.
-    $paidCourse = $conn->real_escape_string((string)($resData['order_tags']['course_id'] ?? ''));
-    $paidEmail  = $conn->real_escape_string(strtolower(trim((string)($resData['customer_details']['customer_email'] ?? ''))));
+// Ask Cashfree
+$cf = pm_cashfree_fetch_order($orderId);
+if ($cf === null) {
+    echo json_encode(['status' => 'pending', 'message' => 'Could not reach the payment gateway. Please check again in a moment.']);
+    exit;
+}
 
-    if ($paidCourse === '' || $paidEmail === '') {
-        echo json_encode(["status" => "error", "message" => "Order is missing course/customer details"]);
-        exit();
+$cfStatus = strtoupper((string)($cf['order_status'] ?? ''));
+if ($cfStatus === 'PAID') {
+    $paidEmail  = strtolower(trim((string)($cf['customer_details']['customer_email'] ?? '')));
+    $paidAmount = round((float)($cf['order_amount'] ?? 0), 2);
+    $paidCourse = (int)($cf['order_tags']['course_id'] ?? 0);
+
+    // The paid order must match what we created.
+    if ($paidEmail !== $email || $paidCourse !== $courseId || abs($paidAmount - (float)$order['amount']) > 0.009) {
+        error_log("verify_payment mismatch for $orderId");
+        echo json_encode(['status' => 'failed', 'message' => 'Payment details do not match. Please contact support with order id ' . $orderId . '.']);
+        exit;
     }
 
-    // 🎉 Database me course update karo (order ke apne course + customer ke liye)
-    $check = $conn->query("SELECT 1 FROM user_courses WHERE user_email='$paidEmail' AND course_id='$paidCourse' LIMIT 1");
-    if ($check && $check->num_rows == 0) {
-        $conn->query("INSERT INTO user_courses (user_email, course_id) VALUES ('$paidEmail', '$paidCourse')");
+    if (!pm_grant_course($conn, $email, $courseId)) {
+        error_log("verify_payment could not grant $courseId to $email ($orderId)");
+        echo json_encode(['status' => 'failed', 'message' => 'Payment received but access could not be saved. Contact support with order id ' . $orderId . '.']);
+        exit;
     }
 
-    // Frontend ko Success signal bhej do
-    echo json_encode(["status" => "success"]);
-} else {
-    // Payment Fail signal
-    echo json_encode(["status" => "error", "message" => "Payment verification failed."]);
+    $stmt = $conn->prepare("UPDATE orders SET status = 'PAID', paid_at = NOW() WHERE order_id = ?");
+    $stmt->bind_param('s', $orderId);
+    $stmt->execute();
+    $stmt->close();
+
+    echo json_encode(['status' => 'success', 'course_id' => $courseId]);
+    exit;
 }
+
+if ($cfStatus === 'ACTIVE') {
+    // Created but not paid (yet)
+    echo json_encode(['status' => 'pending']);
+    exit;
+}
+
+$stmt = $conn->prepare("UPDATE orders SET status = ? WHERE order_id = ? AND status <> 'PAID'");
+$label = substr($cfStatus !== '' ? $cfStatus : 'FAILED', 0, 20);
+$stmt->bind_param('ss', $label, $orderId);
+$stmt->execute();
+$stmt->close();
+
+echo json_encode(['status' => 'failed', 'message' => 'Payment was not completed.']);

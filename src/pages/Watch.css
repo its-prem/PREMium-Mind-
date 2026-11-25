@@ -1,0 +1,515 @@
+/* =========================================================
+   Secure PDF reader - matches PREMium Mind theme
+   ========================================================= */
+
+:root {
+  --rd-header-h: 64px;
+  --rd-safe-top: env(safe-area-inset-top, 0px);
+  --rd-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media print {
+  .rd-root {
+    display: none !important;
+  }
+}
+
+.rd-root {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  overflow: hidden;
+  background: #f4f4f5;
+  color: #09090b;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  text-align: left;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: filter 0.3s ease;
+}
+
+/* Blur the pages when the window loses focus (screenshot deterrent) */
+.rd-root.is-secure .rd-scroll,
+.rd-root.is-secure .rd-watermark {
+  filter: blur(25px) grayscale(100%);
+}
+
+/* ---------- Header ---------- */
+.rd-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5000;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 10px;
+  width: 100%;
+  height: calc(var(--rd-header-h) + var(--rd-safe-top));
+  padding: var(--rd-safe-top) 10px 0;
+  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  border-bottom: 1px solid #ececec;
+  box-shadow: 0 10px 28px rgba(9, 9, 11, 0.05);
+}
+
+.rd-header-start {
+  display: flex;
+  min-width: 0;
+}
+
+.rd-header-end {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.rd-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 12px 0 6px;
+  border: 1px solid #e4e4e7;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #09090b;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(9, 9, 11, 0.05), 0 6px 16px rgba(9, 9, 11, 0.04);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.rd-back:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  transform: translateX(-2px);
+}
+
+.rd-back-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #09090b;
+  color: #ffffff;
+  font-size: 16px;
+  transition: background 0.2s ease;
+}
+
+.rd-back:hover .rd-back-icon {
+  background: #dc2626;
+}
+
+.rd-brand {
+  max-width: 46vw;
+  overflow: hidden;
+  padding: 0 4px;
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(0.88rem, 2.8vw, 1.05rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.rd-brand em {
+  font-style: normal;
+  color: #dc2626;
+}
+
+.rd-brand span {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: #71717a;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.rd-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 44px;
+  min-height: 42px;
+  padding: 0 15px;
+  border: none;
+  border-radius: 12px;
+  background: #09090b;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(9, 9, 11, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.rd-download ion-icon {
+  color: #34d399;
+  font-size: 17px;
+}
+
+.rd-download:hover:not(:disabled):not(.is-locked) {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.28);
+}
+
+.rd-download:hover:not(:disabled):not(.is-locked) ion-icon {
+  color: #ffffff;
+}
+
+.rd-download.is-locked {
+  background: #f4f4f5;
+  color: #a1a1aa;
+  box-shadow: none;
+}
+
+.rd-download.is-locked ion-icon {
+  color: #a1a1aa;
+}
+
+.rd-download:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+/* ---------- Watermark ---------- */
+.rd-watermark {
+  position: absolute;
+  top: calc(var(--rd-header-h) + var(--rd-safe-top));
+  left: 0;
+  z-index: 900;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  align-items: center;
+  justify-items: center;
+  width: 100%;
+  height: calc(100% - var(--rd-header-h) - var(--rd-safe-top));
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rd-wm {
+  color: rgba(9, 9, 11, 0.07);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  line-height: 1.35;
+  text-align: center;
+  white-space: pre;
+  transform: rotate(-32deg);
+}
+
+/* ---------- Loader / error ---------- */
+.rd-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 24px;
+  background:
+    radial-gradient(circle at 50% 35%, #fef2f2, transparent 42%),
+    #ffffff;
+}
+
+.rd-loader p {
+  margin: 0;
+  color: #71717a;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.rd-loader.is-error p {
+  max-width: 300px;
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.rd-spinner {
+  width: 42px;
+  height: 42px;
+  border: 3px solid #eeeeee;
+  border-top-color: #dc2626;
+  border-right-color: #09090b;
+  border-radius: 50%;
+  animation: rdSpin 0.8s linear infinite;
+}
+
+@keyframes rdSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rd-retry {
+  padding: 11px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #09090b;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ---------- Pages ---------- */
+.rd-scroll {
+  position: absolute;
+  top: calc(var(--rd-header-h) + var(--rd-safe-top));
+  right: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  height: calc(100% - var(--rd-header-h) - var(--rd-safe-top));
+  overflow: auto;
+  overscroll-behavior: contain;
+  overflow-anchor: none;
+  background: linear-gradient(180deg, #fafafa 0%, #f4f4f5 100%);
+  touch-action: pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.rd-pages {
+  --pdf-scale: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% * var(--pdf-scale));
+  min-width: 100%;
+  padding: 12px 8px calc(24px + var(--rd-safe-bottom));
+  box-sizing: border-box;
+}
+
+.rd-page {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  box-shadow: 0 6px 22px rgba(9, 9, 11, 0.08);
+  overflow: hidden;
+}
+
+.rd-page canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+/* ---------- Toast ---------- */
+.rd-toast {
+  position: absolute;
+  bottom: calc(70px + var(--rd-safe-bottom));
+  left: 50%;
+  z-index: 6000;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #09090b;
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.45;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+  transform: translateX(-50%);
+}
+
+@media (max-width: 520px) {
+  .rd-back span:last-child {
+    max-width: 78px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .rd-download {
+    padding: 0 12px;
+    font-size: 0.78rem;
+  }
+}
+
+/* ---------- Theme toggle ---------- */
+.rd-header-end {
+  gap: 8px;
+  align-items: center;
+}
+
+.rd-theme {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #09090b;
+  font-size: 19px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.rd-theme:hover {
+  background: #f4f4f5;
+  transform: translateY(-1px);
+}
+
+/* ---------- Dark mode ---------- */
+.rd-root.is-dark {
+  background: #09090b;
+  color: #fafafa;
+}
+
+.rd-root.is-dark .rd-header {
+  background: linear-gradient(180deg, #121214 0%, #0c0c0e 100%);
+  border-bottom-color: #232327;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+
+.rd-root.is-dark .rd-back,
+.rd-root.is-dark .rd-theme {
+  background: #18181b;
+  border-color: #2e2e33;
+  color: #fafafa;
+  box-shadow: none;
+}
+
+.rd-root.is-dark .rd-back:hover,
+.rd-root.is-dark .rd-theme:hover {
+  background: #232327;
+  border-color: #3f3f46;
+}
+
+.rd-root.is-dark .rd-back-icon {
+  background: #fafafa;
+  color: #09090b;
+}
+
+.rd-root.is-dark .rd-back:hover .rd-back-icon {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.rd-root.is-dark .rd-brand {
+  color: #fafafa;
+}
+
+.rd-root.is-dark .rd-brand span {
+  color: #a1a1aa;
+}
+
+.rd-root.is-dark .rd-theme ion-icon {
+  color: #fcd34d;
+}
+
+.rd-root.is-dark .rd-download {
+  background: #fafafa;
+  color: #09090b;
+  box-shadow: none;
+}
+
+.rd-root.is-dark .rd-download ion-icon {
+  color: #059669;
+}
+
+.rd-root.is-dark .rd-download.is-locked {
+  background: #18181b;
+  color: #71717a;
+}
+
+.rd-root.is-dark .rd-download.is-locked ion-icon {
+  color: #71717a;
+}
+
+.rd-root.is-dark .rd-scroll {
+  background: linear-gradient(180deg, #0c0c0e 0%, #09090b 100%);
+}
+
+/* Invert the white PDF pages so they read comfortably on dark */
+.rd-root.is-dark .rd-page {
+  background: #111113;
+  border-color: #27272a;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5);
+}
+
+.rd-root.is-dark .rd-page canvas {
+  filter: invert(0.92) hue-rotate(180deg);
+}
+
+.rd-root.is-dark .rd-wm {
+  color: rgba(255, 255, 255, 0.07);
+}
+
+.rd-root.is-dark .rd-loader {
+  background:
+    radial-gradient(circle at 50% 35%, rgba(220, 38, 38, 0.16), transparent 42%),
+    #09090b;
+}
+
+.rd-root.is-dark .rd-loader p {
+  color: #a1a1aa;
+}
+
+.rd-root.is-dark .rd-loader.is-error p {
+  color: #fca5a5;
+}
+
+.rd-root.is-dark .rd-spinner {
+  border-color: #27272a;
+  border-top-color: #dc2626;
+  border-right-color: #fafafa;
+}
+
+.rd-root.is-dark .rd-retry {
+  background: #fafafa;
+  color: #09090b;
+}
+
+.rd-root.is-dark .rd-toast {
+  background: #fafafa;
+  color: #09090b;
+}
+
+@media (max-width: 420px) {
+  .rd-download span {
+    display: none;
+  }
+
+  .rd-download {
+    padding: 0;
+    width: 42px;
+    justify-content: center;
+  }
+
+  .rd-brand {
+    max-width: 38vw;
+  }
+}

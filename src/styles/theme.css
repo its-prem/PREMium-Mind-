@@ -1,0 +1,73 @@
+:root {
+  --maroon-950: #240207;
+  --maroon-900: #3d040b;
+  --maroon-800: #680915;
+  --maroon-700: #850d1c;
+  --crimson-600: #c81e32;
+  --gold-500: #eab308;
+  --gold-400: #facc15;
+  --whatsapp-green: #22c55e;
+
+  --bg-page: #fbf9fa;
+  --white: #ffffff;
+  --ink-900: #181012;
+  --ink-700: #3f3336;
+  --ink-500: #6e6265;
+  --border-light: #ece4e6;
+  --card-tint: #f4f2f3;
+
+  --smooth: 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  --bounce: 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont,
+    sans-serif;
+  background-color: var(--bg-page);
+  color: var(--ink-900);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+@keyframes floatSlow {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sidebarSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
