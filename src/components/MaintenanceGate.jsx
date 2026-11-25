@@ -152,12 +152,6 @@ export default function MaintenanceGate({ children }) {
 
   return (
     <>
-      {config.enabled === true && bypass && (
-        <div className="mt-owner-banner" role="status">
-          <ion-icon name="construct-outline"></ion-icon>
-          Maintenance mode is ON - only you can see the site
-        </div>
-      )}
       {children}
     </>
   );
