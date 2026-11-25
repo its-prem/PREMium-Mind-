@@ -1,0 +1,5 @@
+# Nothing in uploads/ may ever run as PHP (stops an uploaded script from being executed).
+Options -Indexes
+<FilesMatch "\.(php|phtml|php[0-9]|phar|pl|cgi)$">
+  Require all denied
+</FilesMatch>

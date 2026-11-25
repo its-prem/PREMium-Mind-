@@ -14,7 +14,7 @@
 //  se phir bhi chalega. Abhi `false` = purane clients bhi chalte rahenge.
 // ───────────────────────────────────────────────────────────────────────
 if (!defined('PM_PDF_REQUIRE_IDENTITY')) {
-    define('PM_PDF_REQUIRE_IDENTITY', false);
+    define('PM_PDF_REQUIRE_IDENTITY', true);
 }
 
 if (!function_exists('pm_fb_project_id')) {

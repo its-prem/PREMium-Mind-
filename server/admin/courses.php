@@ -35,6 +35,9 @@ function pm_save_upload(string $field, string $subdir, array $okExt, int $maxByt
     if ($f['size'] > $maxBytes) pm_admin_fail('File is too big (max ' . round($maxBytes / 1048576) . ' MB).');
     $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
     if (!in_array($ext, $okExt, true)) pm_admin_fail('Only ' . implode(', ', $okExt) . ' files are allowed here.');
+    // the content must really be an image / a PDF (a renamed script is refused)
+    if ($subdir === 'thumbnails' && @getimagesize($f['tmp_name']) === false) pm_admin_fail('That file is not a real image.');
+    if ($subdir === 'pdfs' && (string)@file_get_contents($f['tmp_name'], false, null, 0, 5) !== '%PDF-') pm_admin_fail('That file is not a real PDF.');
     $dir = __DIR__ . '/../uploads/' . $subdir . '/';
     if (!is_dir($dir) && !@mkdir($dir, 0755, true)) pm_admin_fail('Could not create the upload folder.', 500);
     $name = time() . '_' . bin2hex(random_bytes(3)) . '.' . $ext;   // a fresh safe name, the original is not trusted

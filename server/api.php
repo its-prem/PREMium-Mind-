@@ -41,19 +41,24 @@ $display_email = $verified_email !== ''
 $courses = array();
 
 if ($display_email !== '') {
-    $e = $conn->real_escape_string($display_email);
     $sql = "SELECT c.*,
             IF(uc.course_id IS NOT NULL, 1, 0) as is_enrolled,
-            (SELECT status FROM course_requests WHERE user_email = '$e' AND course_id = c.id ORDER BY id DESC LIMIT 1) as req_status,
-            (SELECT status FROM reports WHERE email = '$e' AND course_id = c.id ORDER BY id DESC LIMIT 1) as report_status
+            (SELECT status FROM course_requests WHERE user_email = ? AND course_id = c.id ORDER BY id DESC LIMIT 1) as req_status,
+            (SELECT status FROM reports WHERE email = ? AND course_id = c.id ORDER BY id DESC LIMIT 1) as report_status
             FROM courses c
-            LEFT JOIN user_courses uc ON c.id = uc.course_id AND uc.user_email = '$e'
+            LEFT JOIN user_courses uc ON c.id = uc.course_id AND uc.user_email = ?
             ORDER BY c.id DESC";
+    $stmt = $conn->prepare($sql);
+    $result = false;
+    if ($stmt) {
+        $stmt->bind_param('sss', $display_email, $display_email, $display_email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    }
 } else {
     $sql = "SELECT *, 0 as is_enrolled, NULL as req_status, NULL as report_status FROM courses ORDER BY id DESC";
+    $result = $conn->query($sql);
 }
-
-$result = $conn->query($sql);
 
 if ($result) {
     while ($row = $result->fetch_assoc()) {
@@ -78,12 +83,13 @@ if ($result) {
     }
     echo json_encode($courses);
 } else {
-    // SQL Error Handler (same shape as before)
+    // SQL Error Handler (same shape as before). The real reason goes to the server log, not to visitors.
+    error_log('api.php query failed: ' . $conn->error);
     echo json_encode([[
         "id" => 0,
         "title" => "⚠️ Database Error",
         "desc1" => "Query Fail: Check if tables exist.",
-        "desc2" => "Error: " . $conn->error,
+        "desc2" => "Please try again in a moment.",
         "price" => 0,
         "old_price" => 0,
         "image" => "small-logo.png",

@@ -23,15 +23,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 include 'db_connect.php';
 require_once __DIR__ . '/pm_session_token.php';   // PDF session token minter
+require_once __DIR__ . '/pm_rate_limit.php';      // stops password guessing
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = $conn->real_escape_string($_POST['email']);
-    $password = $_POST['password'];
+    $email = strtolower(trim((string)($_POST['email'] ?? '')));
+    $password = (string)($_POST['password'] ?? '');
 
-    $sql = "SELECT * FROM users WHERE email='$email'";
-    $result = $conn->query($sql);
+    if ($email === '' || $password === '') {
+        echo json_encode(["status" => "error", "message" => "Email and password are required."]);
+        exit;
+    }
 
-    if ($result->num_rows > 0) {
+    // at most 8 tries per email and 60 per address in 15 minutes (a bot cannot guess passwords)
+    if (!pm_rate_limit($conn, 'login-email:' . $email, 8, 900) || !pm_rate_limit($conn, 'login-ip:' . pm_client_ip(), 60, 900)) {
+        http_response_code(429);
+        echo json_encode(["status" => "error", "message" => "Too many attempts. Please wait 15 minutes and try again."]);
+        exit;
+    }
+
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
+    $stmt->bind_param('s', $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result && $result->num_rows > 0) {
         $user = $result->fetch_assoc();
 
         if ($user['is_active'] == 0) {

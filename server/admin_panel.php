@@ -729,7 +729,9 @@ if (isset($_POST['ajax_add'])) {
     $image_path = $conn->real_escape_string($existing_image_raw);
     $pdf_path = $conn->real_escape_string(trim((string)($_POST['existing_pdf'] ?? '')));
     
-    if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] == 0) {
+    if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] == 0
+        && in_array(strtolower(pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'webp', 'gif'], true)
+        && @getimagesize($_FILES['image_file']['tmp_name']) !== false) {
         $upload_dir_img = 'uploads/thumbnails/';
         if (!is_dir($upload_dir_img)) @mkdir($upload_dir_img, 0777, true);
         $img_filename = time() . '_' . preg_replace("/[^a-zA-Z0-9.]/", "_", basename($_FILES['image_file']['name']));
@@ -738,7 +740,9 @@ if (isset($_POST['ajax_add'])) {
         }
     }
 
-    if (isset($_FILES['pdf_file']) && $_FILES['pdf_file']['error'] == 0) {
+    if (isset($_FILES['pdf_file']) && $_FILES['pdf_file']['error'] == 0
+        && strtolower(pathinfo($_FILES['pdf_file']['name'], PATHINFO_EXTENSION)) === 'pdf'
+        && (string)@file_get_contents($_FILES['pdf_file']['tmp_name'], false, null, 0, 5) === '%PDF-') {
         $upload_dir_pdf = 'uploads/pdfs/';
         if (!is_dir($upload_dir_pdf)) @mkdir($upload_dir_pdf, 0777, true);
         $pdf_filename = time() . '_' . preg_replace("/[^a-zA-Z0-9.]/", "_", basename($_FILES['pdf_file']['name']));

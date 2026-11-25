@@ -212,17 +212,70 @@ $payload_b64  = rtrim(strtr(base64_encode($payload_json), '+/', '-_'), '=');
 $sig          = hash_hmac('sha256', $payload_b64, $SECRET);
 $token        = $payload_b64 . '.' . $sig;
 
-$pageCount = null;
-if ($purpose === 'page_view' && extension_loaded('imagick')) {
-    try {
-        $im = new Imagick();
-        $im->pingImage(__DIR__ . '/' . $file);
-        $pageCount = $im->getNumberImages();
-        $im->clear();
-        $im->destroy();
-    } catch (Throwable $e) {
-        $pageCount = null;
+/**
+ * Number of pages in a PDF, as reliably as we can get it.
+ * Imagick's pingImage() reports only 1 page for many multi-page PDFs on shared hosting,
+ * which made the reader show a single page. So we take the biggest of three answers:
+ *   1) Imagick ping   2) the page objects / /Count written inside the PDF   3) probing pages one by one
+ */
+function pm_pdf_page_count(string $path): ?int {
+    if (!is_file($path)) return null;
+    $best = 0;
+
+    if (extension_loaded('imagick')) {
+        try {
+            $im = new Imagick();
+            $im->pingImage($path);
+            $best = max($best, (int)$im->getNumberImages());
+            $im->clear();
+            $im->destroy();
+        } catch (Throwable $e) { /* try the next way */ }
     }
+
+    $size = (int)@filesize($path);
+    if ($size > 0 && $size <= 150 * 1024 * 1024) {
+        $raw = @file_get_contents($path);
+        if (is_string($raw) && $raw !== '') {
+            $n = preg_match_all('~/Type\s*/Page(?![A-Za-z])~', $raw);
+            if ($n) $best = max($best, (int)$n);
+            if (preg_match_all('~/Type\s*/Pages\b[^>]*?/Count\s+(\d+)~s', $raw, $m)) {
+                $best = max($best, (int)max($m[1]));
+            }
+        }
+    }
+
+    // Still 1? Check whether page 2 really exists by trying to open it.
+    if ($best <= 1 && extension_loaded('imagick')) {
+        $exists = function (int $index) use ($path): bool {
+            try {
+                $t = new Imagick();
+                $t->setResolution(10, 10);
+                $t->readImage($path . '[' . $index . ']');
+                $t->clear();
+                $t->destroy();
+                return true;
+            } catch (Throwable $e) {
+                return false;
+            }
+        };
+        if ($exists(1)) {
+            $lo = 1;                       // page index $lo exists
+            $hi = 2;
+            while ($hi < 2000 && $exists($hi)) { $lo = $hi; $hi *= 2; }
+            while ($hi - $lo > 1) {        // binary search the last existing page
+                $mid = intdiv($lo + $hi, 2);
+                if ($exists($mid)) $lo = $mid; else $hi = $mid;
+            }
+            $best = $lo + 1;
+        }
+    }
+
+    return $best > 0 ? $best : null;
+}
+
+$pageCount = null;
+if ($purpose === 'page_view') {
+    $pageCount = pm_pdf_page_count(__DIR__ . '/' . $file);
 }
 
 echo json_encode([

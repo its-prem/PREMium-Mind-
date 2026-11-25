@@ -22,11 +22,17 @@ if (!function_exists('pm_d2d_pyq_has_full')) {
     function pm_d2d_pyq_has_full(mysqli $conn, string $email): bool {
         $email = strtolower(trim($email));
         if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) return false;
-        $e = $conn->real_escape_string($email);
 
         // 1) Manual admin grant.
-        $r = @$conn->query("SELECT 1 FROM d2d_pyq_access WHERE email='$e' LIMIT 1");
-        if ($r && $r->num_rows > 0) return true;
+        $st = @$conn->prepare("SELECT 1 FROM d2d_pyq_access WHERE email = ? LIMIT 1");
+        if ($st) {
+            $st->bind_param('s', $email);
+            $st->execute();
+            $st->store_result();
+            $has = $st->num_rows > 0;
+            $st->close();
+            if ($has) return true;
+        }
 
         // 2) Paid for a course flagged as granting D2D PYQ access.
         // NOTE: we intentionally do NOT require the course to be active
@@ -34,13 +40,20 @@ if (!function_exists('pm_d2d_pyq_has_full')) {
         // later trashes/hides the card from the store — same as normal
         // courses. To actually strip access from everyone, use the admin's
         // "Revoke from all" (which deletes the user_courses rows).
-        $r2 = @$conn->query(
+        $st = @$conn->prepare(
             "SELECT 1 FROM user_courses uc
              JOIN courses c ON c.id = uc.course_id
-             WHERE uc.user_email='$e' AND c.grants_pyq=1
+             WHERE uc.user_email = ? AND c.grants_pyq = 1
              LIMIT 1"
         );
-        if ($r2 && $r2->num_rows > 0) return true;
+        if ($st) {
+            $st->bind_param('s', $email);
+            $st->execute();
+            $st->store_result();
+            $has = $st->num_rows > 0;
+            $st->close();
+            if ($has) return true;
+        }
 
         return false;
     }
