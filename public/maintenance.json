@@ -1,8 +1,8 @@
 {
-  "enabled": false,
+  "enabled": true,
   "title": "We'll be back soon",
-  "message": "We're doing some important work on the site. Your notes and courses are safe. Please check back in a little while.",
-  "returnAt": "2026-11-25T08:43:37.597Z",
+  "message": "We're upgrading PREMium Mind with a new look and secure online payments. Your notes and courses are safe. Please check back in a little while.",
+  "returnAt": "",
   "whatsapp": "918709911016",
-  "bypassHash": ""
+  "bypassHash": "b361588cfff1bc0a95be54def3feabd33d4426919e3468b20f65e408301e7dfb"
 }
