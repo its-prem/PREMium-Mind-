@@ -7,6 +7,7 @@ import { getProduct } from '../data/storeData';
 import { usePurchases } from '../lib/purchases';
 import { useCatalog } from '../lib/catalog';
 import { downloadState } from '../lib/downloadMode';
+import { normalizeOpenLink } from '../lib/openLink';
 import {
   clearStoredSession,
   getPdfSession,
