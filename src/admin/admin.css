@@ -246,3 +246,11 @@
 .adm-picbtn:hover .adm-thumb { box-shadow: 0 0 0 3px var(--a-brand-soft); }
 .adm-chipbtn { border: 0; font-family: inherit; cursor: pointer; }
 .adm-chipbtn:hover { filter: brightness(0.95); text-decoration: underline; }
+
+/* admin login */
+.adm-logo { width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, #6366f1, #8b5cf6); margin: 0 auto 14px; }
+.adm-gate-card { width: 100%; max-width: 400px; }
+.adm-google { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 16px; padding: 11px 16px; border: 1px solid var(--a-line); background: #fff; border-radius: 12px; font: inherit; font-weight: 700; color: var(--a-text); cursor: pointer; transition: box-shadow 0.12s, border-color 0.12s; }
+.adm-google:hover:not(:disabled) { border-color: #c5cae0; box-shadow: var(--a-shadow); }
+.adm-google:disabled { opacity: 0.6; cursor: wait; }
+.adm-alert { margin-top: 12px; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; border-radius: 10px; padding: 9px 12px; font-size: 0.85rem; text-align: left; }

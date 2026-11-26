@@ -5,6 +5,8 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { adminGet } from './api';
+import AdminLogin from './AdminLogin';
+import { signOutFirebase } from '../lib/firebase';
 import { clearStoredSession } from '../lib/session';
 import { TABS } from './registry';
 import { Loading, UiProvider } from './ui';
@@ -17,9 +19,13 @@ export default function Admin() {
   const [me, setMe] = useState(null); // { email, options }
   const [error, setError] = useState(null);
 
+  const load = () => {
+    setError(null);
+    adminGet('me.php').then(setMe).catch(setError);
+  };
   useEffect(() => {
     document.title = 'Admin – PREMium Mind';
-    adminGet('me.php').then(setMe).catch(setError);
+    load();
   }, []);
 
   const current = TABS.find((t) => t.id === tab && t.component) || TABS[0];
@@ -29,23 +35,16 @@ export default function Admin() {
   }, [me, tab, current.id, navigate]);
 
   if (error) {
-    const needLogin = error.code === 'unauthenticated';
+    if (error.code === 'unauthenticated' || error.code === 'forbidden') {
+      return <AdminLogin notAdmin={error.code === 'forbidden'} message={error.message} onDone={load} />;
+    }
     return (
       <div className="adm-gate">
         <div className="adm-gate-card">
-          <h2>{needLogin ? 'Please log in' : error.code === 'forbidden' ? 'Not allowed' : 'Cannot open admin'}</h2>
-          <p className="adm-muted">
-            {needLogin
-              ? 'Log in with your admin Google account, then open this page again.'
-              : error.message}
-          </p>
+          <h2>Cannot open admin</h2>
+          <p className="adm-muted">{error.message}</p>
           <div className="adm-row center">
-            {needLogin && (
-              <Link className="adm-btn" to="/login">
-                Go to login
-              </Link>
-            )}
-            <button className="adm-btn ghost" onClick={() => window.location.reload()}>
+            <button className="adm-btn" onClick={load}>
               Try again
             </button>
             <Link className="adm-btn ghost" to="/">
@@ -90,9 +89,14 @@ export default function Admin() {
             </Link>
             <button
               className="adm-nav adm-logout"
-              onClick={() => {
+              onClick={async () => {
+                try {
+                  await signOutFirebase();
+                } catch {
+                  /* not signed in to Firebase */
+                }
                 clearStoredSession();
-                navigate('/login');
+                window.location.assign('/admin');
               }}
             >
               <Icon name="logout" />Log out
