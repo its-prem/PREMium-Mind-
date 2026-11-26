@@ -60,6 +60,8 @@ function rowToProduct(row) {
     rating: '',
     timer: '',
     btnType: blocked ? 'coming_soon' : 'buy',
+    showTnc: Number(row.show_tnc) === 1, // admin switch: the buyer must accept the terms before paying
+    tncText: String(row.tnc_text || ''),
     pdfFile: String(row.pdf_file || ''), // empty unless this user owns it
     demoSrc: '',
     fromServer: true,

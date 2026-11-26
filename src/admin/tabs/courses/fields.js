@@ -7,14 +7,7 @@
  * fill:    { label, text }          a small button that puts ready-made text in the field
  */
 
-// Same sample as the website: used on every product that has no terms text of its own.
-export const DEFAULT_TNC = `1. Non-Refundable: All sales are final. No refunds will be provided once the course access is granted.
-2. No Sharing: Sharing your account details with others is strictly prohibited and will lead to an instant permanent ban without refund.
-3. Personal Use: The study material is for your personal use only. Distribution or piracy will invite legal actions.
-4. Download Policy: You can download the content only one day before the exam at 6:00 PM when the download button unlocks.
-5. Payment Instruction: After successful payment, please wait for 10 seconds on the same page. Then check your profile for access to the purchased content.
-6. Important Notice: This content is based on analysis and predictions; exact exam questions are not guaranteed.
-7. Agreement: By proceeding, you agree to PREMium Mind's standard terms of service.`;
+import { DEFAULT_TNC } from '../../../lib/defaultTerms';
 
 const isOff = (v, f) => !(v[f] == 1 || v[f] === true);
 const isOn = (v, f) => !isOff(v, f);

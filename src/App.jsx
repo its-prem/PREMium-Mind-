@@ -17,6 +17,7 @@ import { ResumeScaled, SAMPLE_RESUME } from './components/ResumeDocument';
 import { usePurchases } from './lib/purchases';
 import { useCatalog } from './lib/catalog';
 import { payForCourse, paymentsBlockedHere } from './lib/payments';
+import { DEFAULT_TNC, parseTerms } from './lib/defaultTerms';
 
 const HERO_ROTATING_WORDS = [
   'Handwritten Notes',
@@ -62,6 +63,7 @@ export default function App() {
 
   // Checkout Modal State
   const [checkoutItem, setCheckoutItem] = useState(null);
+  const [termsOpen, setTermsOpen] = useState(false); // terms list inside the checkout
   const [agree, setAgree] = useState(false);
   const [payState, setPayState] = useState('idle'); // idle | paying | done
   const [payMsg, setPayMsg] = useState('');
@@ -106,6 +108,7 @@ export default function App() {
     setPayState('idle');
     setPayMsg('');
     setAgree(false);
+    setTermsOpen(false);
   };
 
   const closeCheckout = () => {
@@ -449,99 +452,125 @@ export default function App() {
       )}
 
       {/* ================= SECURE CHECKOUT (Cashfree) ================= */}
-      {checkoutItem && (
-        <div className="pm-modal-overlay" onClick={closeCheckout}>
-          <div
-            className="pm-modal-card checkout-card"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="pm-modal-head">
-              <div>
-                <h4>Secure Checkout</h4>
-                <small>{checkoutItem.title}</small>
-              </div>
-              <button type="button" onClick={closeCheckout}>
-                ✕
-              </button>
-            </div>
-
-            {payState !== 'done' ? (
-              <div className="pm-modal-body">
-                <div className="pm-pay-strip">
-                  <span>Total Payable</span>
-                  <strong>₹{checkoutItem.price}</strong>
-                </div>
-
-                {!(getStoredEmail() && getPdfSession()) && (
-                  <p className="pm-err-msg">
-                    Kharidne ke liye pehle Login / Sign Up karein.
-                  </p>
-                )}
-                {paymentsBlockedHere() && (
-                  <p className="pm-sub-note">
-                    Payments sirf live website par chalte hain (localhost par nahi).
-                  </p>
-                )}
-
-                <label className="pm-agree">
-                  <input
-                    type="checkbox"
-                    checked={agree}
-                    onChange={(e) => setAgree(e.target.checked)}
-                  />
-                  <span>
-                    Main <a href="/termcondition" target="_blank" rel="noreferrer">Terms &amp; Conditions</a>{' '}
-                    se sehmat hu. Digital product hai, payment ke baad refund nahi hota.
+      {checkoutItem && (() => {
+        const loggedIn = !!(getStoredEmail() && getPdfSession());
+        const price = Number(checkoutItem.price) || 0;
+        const mrp = Number(checkoutItem.oldPrice) || 0;
+        const saved = mrp > price ? mrp - price : 0;
+        const percent = saved ? Math.round((saved / mrp) * 100) : 0;
+        const needsTerms = !!checkoutItem.showTnc;
+        return (
+          <div className="pm-modal-overlay" onClick={closeCheckout}>
+            <div className="pm-modal-card checkout-card" role="dialog" aria-modal="true" aria-label="Secure checkout" onClick={(e) => e.stopPropagation()}>
+              <div className="co-head">
+                <div className="co-head-top">
+                  <span className="co-secure">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+                    Secure checkout
                   </span>
-                </label>
-
-                {payMsg && <p className="pm-err-msg">{payMsg}</p>}
-
-                {getStoredEmail() && getPdfSession() ? (
-                  <button
-                    type="button"
-                    className="pm-buy-btn"
-                    disabled={payState === 'paying' || !agree || paymentsBlockedHere()}
-                    onClick={startPay}
-                  >
-                    {payState === 'paying'
-                      ? 'Opening payment...'
-                      : `Pay ₹${checkoutItem.price} Securely`}
+                  <button type="button" className="co-close" onClick={closeCheckout} aria-label="Close">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
                   </button>
-                ) : (
-                  <button type="button" className="pm-buy-btn" onClick={() => navigate('/login')}>
-                    Login / Sign Up
-                  </button>
-                )}
+                </div>
+                <h4>{checkoutItem.title}</h4>
+              </div>
 
-                <p className="pm-sub-note">
-                  UPI (GPay, PhonePe, Paytm), cards &amp; netbanking · Secured by Cashfree
-                </p>
-              </div>
-            ) : (
-              <div className="pm-modal-body center">
-                <div className="pm-success-pill">🎉 Payment Successful!</div>
-                <h4>Thank You, {getStoredName() || 'Student'}!</h4>
-                <p className="pm-sub-note">
-                  Aapka access unlock ho gaya hai:
-                </p>
-                <button
-                  type="button"
-                  className="pm-buy-btn link-btn"
-                  onClick={() => openProduct(checkoutItem)}
-                >
-                  {checkoutItem.category === 'resume'
-                    ? '✏️ Open Template Editor'
-                    : '📖 Open & Read Now'}
-                </button>
-                <p className="pm-sub-note">
-                  Ye aapke <b>My Courses</b> me bhi mil jayega.
-                </p>
-              </div>
-            )}
+              {payState !== 'done' ? (
+                <div className="co-body">
+                  <div className="co-price">
+                    <div className="co-price-main">
+                      <span className="co-label">Total payable</span>
+                      <div className="co-amount">
+                        <strong>₹{price}</strong>
+                        {mrp > price && <s>₹{mrp}</s>}
+                      </div>
+                    </div>
+                    {saved > 0 && (
+                      <div className="co-off">
+                        <b>{percent}% OFF</b>
+                        <small>You save ₹{saved}</small>
+                      </div>
+                    )}
+                  </div>
+
+                  <ul className="co-trust">
+                    <li>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" /></svg>
+                      Instant access
+                    </li>
+                    <li>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M3 10h18" /></svg>
+                      UPI &amp; Cards
+                    </li>
+                    <li>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.4 8.2-8 9-4.6-.8-8-4-8-9V6l8-3z" /><path d="M9 12l2 2 4-4" /></svg>
+                      Secure
+                    </li>
+                  </ul>
+
+                  {!loggedIn && <p className="co-alert">Kharidne ke liye pehle Login / Sign Up karein.</p>}
+                  {paymentsBlockedHere() && <p className="co-note">Payments sirf live website par chalte hain (localhost par nahi).</p>}
+
+                  {/* Only when the admin turned "Show T&C checkbox" ON for this product */}
+                  {needsTerms && (
+                    <div className={`co-terms-card${agree ? ' on' : ''}`}>
+                      <label className="co-agree">
+                        <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
+                        <span className="co-check" aria-hidden="true">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-10" /></svg>
+                        </span>
+                        <span>
+                          Main <strong>Terms &amp; Conditions</strong> se sehmat hu
+                        </span>
+                      </label>
+                      <button type="button" className="co-readlink" aria-expanded={termsOpen} onClick={() => setTermsOpen((v) => !v)}>
+                        {termsOpen ? 'Hide' : 'Read'}
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ transform: termsOpen ? 'rotate(180deg)' : 'none' }}><path d="M6 9l6 6 6-6" /></svg>
+                      </button>
+                      {termsOpen && (
+                        <ol className="co-terms" tabIndex={0} aria-label="Terms and conditions">
+                          {parseTerms(checkoutItem.tncText || DEFAULT_TNC).map((t, i) => (
+                            <li key={i}>
+                              {t.title && <strong>{t.title}: </strong>}
+                              {t.text}
+                            </li>
+                          ))}
+                        </ol>
+                      )}
+                    </div>
+                  )}
+
+                  {payMsg && <p className="co-alert">{payMsg}</p>}
+
+                  {loggedIn ? (
+                    <button type="button" className="co-pay" disabled={payState === 'paying' || (needsTerms && !agree) || paymentsBlockedHere()} onClick={startPay}>
+                      {payState === 'paying' ? 'Opening payment…' : needsTerms && !agree ? 'Accept terms to pay' : `Pay ₹${price} securely`}
+                    </button>
+                  ) : (
+                    <button type="button" className="co-pay" onClick={() => navigate('/login')}>
+                      Login / Sign Up
+                    </button>
+                  )}
+
+                  <p className="co-foot">🔒 Payments are processed by Cashfree. We never see your card or UPI details.</p>
+                </div>
+              ) : (
+                <div className="co-body co-done">
+                  <div className="co-tick" aria-hidden="true">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-10" /></svg>
+                  </div>
+                  <h4>Payment successful!</h4>
+                  <p className="co-note">Thank you, {getStoredName() || 'Student'}. Aapka access unlock ho gaya hai.</p>
+                  <button type="button" className="co-pay" onClick={() => openProduct(checkoutItem)}>
+                    {checkoutItem.category === 'resume' ? 'Open template editor' : 'Open & read now'}
+                  </button>
+                  <p className="co-note">Ye aapke <b>My Courses</b> me bhi mil jayega.</p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

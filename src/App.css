@@ -1704,3 +1704,322 @@
   background: #ffffff;
   accent-color: #dc2626;
 }
+
+/* ================= Checkout (new design) ================= */
+.checkout-card {
+  max-width: 440px;
+  border-top: 0;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 30px 80px rgba(9, 9, 11, 0.45);
+}
+.co-head {
+  text-align: left;
+  padding: 14px 18px 14px;
+  border-bottom: 1px solid #f1f1f3;
+  background: #ffffff;
+}
+.co-head-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.co-secure {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
+  background: #ecfdf3;
+  color: #15803d;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.co-head h4 {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.32;
+  font-weight: 800;
+  color: #18181b;
+  letter-spacing: -0.01em;
+}
+.co-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 0;
+  background: #f4f4f5;
+  color: #71717a;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.co-close:hover {
+  background: #e4e4e7;
+  color: #18181b;
+}
+.co-body {
+  padding: 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: #3f3f46;
+}
+.co-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #18181b 0%, #27272a 100%);
+  color: #ffffff;
+}
+.co-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a1a1aa;
+}
+.co-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.co-amount strong {
+  font-size: 1.9rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.co-amount s {
+  color: #71717a;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.co-off {
+  text-align: center;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: rgba(34, 197, 94, 0.16);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  line-height: 1.2;
+}
+.co-off b {
+  display: block;
+  color: #4ade80;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+.co-off small {
+  color: #bbf7d0;
+  font-size: 0.66rem;
+  font-weight: 600;
+}
+.co-trust {
+  list-style: none;
+  margin: -4px 0 0;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+.co-trust li {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 4px;
+  border-radius: 10px;
+  background: #f4f4f5;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #3f3f46;
+  white-space: nowrap;
+}
+.co-trust li svg {
+  color: #16a34a;
+  flex-shrink: 0;
+}
+.co-alert {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.co-note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #71717a;
+  text-align: center;
+}
+.co-terms-card {
+  position: relative;
+  border: 1.5px solid #e4e4e7;
+  border-radius: 14px;
+  padding: 11px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  transition: border-color 0.15s, background 0.15s;
+}
+.co-terms-card.on {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+.co-agree {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #3f3f46;
+  cursor: pointer;
+  text-align: left;
+}
+.co-agree input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.co-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  border: 2px solid #d4d4d8;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: transparent;
+  transition: all 0.15s;
+}
+.co-terms-card.on .co-check {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: #fff;
+}
+.co-agree input:focus-visible + .co-check {
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.25);
+}
+.co-readlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  background: #f4f4f5;
+  color: #dc2626;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.co-readlink:hover {
+  background: #e4e4e7;
+}
+.co-terms {
+  flex-basis: 100%;
+  margin: 2px 0 0;
+  padding: 10px 12px 10px 28px;
+  max-height: 130px;
+  overflow-y: auto;
+  border-radius: 10px;
+  background: #fafafa;
+  border: 1px solid #ececef;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: #52525b;
+  text-align: left;
+  scrollbar-width: thin;
+  scrollbar-color: #d4d4d8 transparent;
+}
+.co-terms::-webkit-scrollbar {
+  width: 6px;
+}
+.co-terms::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 6px;
+}
+.co-terms li {
+  margin-bottom: 5px;
+}
+.co-pay {
+  width: 100%;
+  border: 0;
+  padding: 15px 18px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(220, 38, 38, 0.32);
+  transition: transform 0.12s, box-shadow 0.12s, filter 0.12s;
+}
+.co-pay:hover:not(:disabled) {
+  filter: brightness(1.05);
+  box-shadow: 0 14px 30px rgba(220, 38, 38, 0.4);
+}
+.co-pay:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.co-pay:disabled {
+  background: #d4d4d8;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.co-hint {
+  margin: -6px 0 0;
+  text-align: center;
+  font-size: 0.74rem;
+  color: #a1a1aa;
+  font-weight: 600;
+}
+.co-foot {
+  margin: 0;
+  text-align: center;
+  font-size: 0.72rem;
+  color: #a1a1aa;
+  line-height: 1.4;
+}
+.co-done {
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 26px 20px;
+}
+.co-done h4 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #18181b;
+}
+.co-tick {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #dcfce7;
+  color: #16a34a;
+  box-shadow: 0 0 0 8px #f0fdf4;
+}
