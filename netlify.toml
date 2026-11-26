@@ -13,6 +13,19 @@
   status = 200
   force = true
 
+# D2D PYQ page (a plain HTML page inside public/d2dpyq/)
+[[redirects]]
+  from = "/d2dpyq/d2dpyqv2"
+  to = "/d2dpyq/d2dpyqv2.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/d2dpyq"
+  to = "/d2dpyq/d2dpyqv2.html"
+  status = 200
+  force = true
+
 # Single-page app: every other address opens the React app
 [[redirects]]
   from = "/*"

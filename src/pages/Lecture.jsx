@@ -255,6 +255,17 @@ export default function Lecture() {
       return;
     }
 
+    // The product HAS a PDF but the server did not send its path: the login token is missing or expired
+    // (it is checked on the server for every PDF). Ask for a fresh login instead of saying "not uploaded".
+    if (Number(course.has_pdf) === 1) {
+      setNotice('Security ke liye dobara login karna hoga. Login page khul raha hai...');
+      setTimeout(() => {
+        clearStoredSession();
+        navigate('/login');
+      }, 1800);
+      return;
+    }
+
     setNotice(NO_PDF_MSG);
   };
 

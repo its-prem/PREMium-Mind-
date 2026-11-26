@@ -129,6 +129,13 @@ export default function App() {
       navigate(`/qa/${product.id}`); // Important Questions: read the questions on the website
       return;
     }
+    if (product.fromServer && product.hasPdf && !product.pdfFile) {
+      // it has a PDF but the server did not send its path: the login token is missing or expired
+      window.alert('Security ke liye dobara login karna hoga. Login page khul raha hai.');
+      clearStoredSession();
+      navigate('/login');
+      return;
+    }
     // A product bought from the server is read through the secure reader (login token + watermark).
     // The built-in demo products open their sample PDF instead.
     const query = new URLSearchParams(
