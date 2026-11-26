@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import Highlighter from './Highlighter';
 import PageFlipSound from './PageFlipSound';
 import PageIndicator from './PageIndicator';
 import ReadingModes from './ReadingModes';
-import ResumeReading from './ResumeReading';
 import StudyTimer from './StudyTimer';
 
 /**
@@ -15,11 +13,13 @@ import StudyTimer from './StudyTimer';
  * Every feature receives: scrollRef, pagesRef, docKey, ready, dock.
  */
 const FEATURES = [
-  { id: 'resume', Component: ResumeReading },
+  // The "Page N se aage padh rahe ho" message (ResumeReading) is switched off. To turn it on again: import ResumeReading
+  // from './ResumeReading'; and add { id: 'resume', Component: ResumeReading }, to this list.
   { id: 'pager', Component: PageIndicator },
   { id: 'flip', Component: PageFlipSound },
   { id: 'modes', Component: ReadingModes },
-  { id: 'highlighter', Component: Highlighter },
+  // Highlighter is switched off. To turn it on again: import Highlighter from './Highlighter'; and add
+  // { id: 'highlighter', Component: Highlighter }, back to this list (the files are still in this folder).
   { id: 'timer', Component: StudyTimer },
 ];
 

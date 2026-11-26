@@ -88,7 +88,6 @@ export default function StudyTimer({ ready }) {
       if (before < COUNTS_AS_STUDIED && after >= COUNTS_AS_STUDIED) {
         const streak = computeStreak(log.current.days);
         log.current.best = Math.max(log.current.best || 0, streak);
-        showToast(`Streak ${streak} din! Aaj ki padhai count ho gayi.`);
       }
 
       if (pomodoroRef.current) {
@@ -190,10 +189,6 @@ export default function StudyTimer({ ready }) {
         >
           <ion-icon name={onBreak ? 'cafe-outline' : 'timer-outline'}></ion-icon>
           <span>{onBreak ? `Break ${clock(shown)}` : clock(shown)}</span>
-          <i aria-hidden="true">
-            <ion-icon name="flame"></ion-icon>
-            {stats.streak}
-          </i>
         </button>
       </div>
     </>
