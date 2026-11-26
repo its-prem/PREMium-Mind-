@@ -51,7 +51,10 @@ function pickPdfPath(course) {
 function safeWebsiteLink(value) {
   const link = String(value || '').trim();
   if (!link || link.toLowerCase() === 'null') return '';
-  return /^https?:\/\//i.test(link) ? link : '';
+  if (/^https?:\/\//i.test(link)) return link;
+  // a page of this website, e.g. d2dpyq/d2dpyqv2 or /d2dpyq/d2dpyqv2.html
+  if (/^\/?[a-z0-9_-]+(\/[a-z0-9._-]+)*(\?\S*)?$/i.test(link)) return link.startsWith('/') ? link : '/' + link;
+  return '';
 }
 
 function CourseCard({ course, index, onOpen }) {
@@ -65,7 +68,9 @@ function CourseCard({ course, index, onOpen }) {
   let label = 'Continue Learning';
   if (product) label = isResume ? 'Edit Template' : 'Open & Read';
   else if (appOnly && !inApp) label = 'Open in App';
-  else if (!pickPdfPath(course) && safeWebsiteLink(course.website_link)) {
+  else if (String(course.category || '').trim().toLowerCase() !== 'projects' && safeWebsiteLink(course.website_link)) {
+    label = 'Open';
+  } else if (!pickPdfPath(course) && safeWebsiteLink(course.website_link)) {
     label = 'Open';
   }
 
@@ -201,6 +206,13 @@ export default function Lecture() {
           title: product.title,
         }).toString()}`
       );
+      return;
+    }
+
+    const isProject = String(course.category || '').trim().toLowerCase() === 'projects';
+    const ownLink = isProject ? '' : safeWebsiteLink(course.website_link);
+    if (ownLink) {
+      window.location.href = ownLink; // a link set in the admin (e.g. D2D PYQ) wins over the PDF
       return;
     }
 

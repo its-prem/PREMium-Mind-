@@ -117,6 +117,10 @@ export default function App() {
   // "Open & Read" / "Edit Template" for something the user owns
   const openProduct = (product) => {
     setCheckoutItem(null);
+    if (product.openLink) {
+      window.location.href = product.openLink; // the product has its own page (set in the admin), e.g. D2D PYQ
+      return;
+    }
     if (product.category === 'resume') {
       navigate(`/resume-editor/${product.id}`);
       return;

@@ -17,7 +17,6 @@ export const TABS = [
   { id: 'reports', desc: 'Problems students have sent you', label: 'Reports', icon: 'flag', badge: 'reports', component: lazy(() => import('./tabs/Reports.jsx')) },
   { id: 'microsheet', desc: 'See and edit the A4-boxes micro format of Important Questions products', label: 'Microsheet', icon: 'sheet', component: lazy(() => import('./tabs/Microsheet.jsx')) },
   { id: 'syllabus', desc: 'Paste a subject syllabus as text and upload it to the website', label: 'Syllabus', icon: 'book', component: lazy(() => import('./tabs/Syllabus.jsx')) },
-  { id: 'mocktests', desc: 'Paste MCQ questions as text and upload a mock test to the website', label: 'MCQ tests', icon: 'check', component: lazy(() => import('./tabs/MockTests.jsx')) },
   { id: 'maintenance', desc: 'Close the website for everyone while you update it', label: 'Maintenance', icon: 'tools', component: lazy(() => import('./tabs/Maintenance.jsx')) },
   // A link to a page outside this admin (opens in a new tab). Delete the line to remove it.
   { id: 'd2d-pyq', label: 'D2D PYQ Access', icon: 'lock', href: 'https://premind.diplomawallah.in/d2d_pyq_admin.php' },

@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MOCK_TESTS } from '../data/mockTests';
 import { goBackOrHome } from '../lib/goBack';
-import { useUploadedMocks } from '../lib/mockStore';
 import { cloudGet, cloudPut, stampGet, stampSet } from '../lib/cloud';
 import './Tools.css';
 
@@ -17,11 +16,12 @@ const readBest = () => {
   }
 };
 
+const SHOW_TESTS = false; // false = the page shows "Coming soon" instead of the test list
+
 const fmtTime = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
 export default function MockTests() {
   const navigate = useNavigate();
-  useUploadedMocks(); // tests uploaded from the admin panel
   const [best, setBest] = useState(readBest);
   const [test, setTest] = useState(null); // running test
   const [answers, setAnswers] = useState([]);
@@ -126,23 +126,33 @@ export default function MockTests() {
           <img className="tl-logo" src="/small-logo.png" alt="" />
         </header>
         <main className="tl-wrap">
-          <div className="tl-grid">
-            {MOCK_TESTS.map((t) => (
-              <button key={t.id} type="button" className="tl-pick" style={{ '--tint': t.tint }} onClick={() => start(t)}>
-                <span className="tl-pick-icon"><ion-icon name={t.icon}></ion-icon></span>
-                <b>{t.title}</b>
-                <span className="tl-sub">
-                  {t.questions.length} questions · {t.minutes} min
-                </span>
-                {best[t.id] != null ? (
-                  <span className="tl-chip">Best: {best[t.id]}/{t.questions.length}</span>
-                ) : (
-                  <span className="tl-chip">FREE</span>
-                )}
-              </button>
-            ))}
-          </div>
-          <p className="tl-help">Aur subjects ke tests jaldi add honge.</p>
+          {/* The test list is switched off for now. To show it again, set SHOW_TESTS to true (top of this file). */}
+          {SHOW_TESTS ? (
+            <>
+              <div className="tl-grid">
+                {MOCK_TESTS.map((t) => (
+                  <button key={t.id} type="button" className="tl-pick" style={{ '--tint': t.tint }} onClick={() => start(t)}>
+                    <span className="tl-pick-icon"><ion-icon name={t.icon}></ion-icon></span>
+                    <b>{t.title}</b>
+                    <span className="tl-sub">
+                      {t.questions.length} questions · {t.minutes} min
+                    </span>
+                    {best[t.id] != null ? (
+                      <span className="tl-chip">Best: {best[t.id]}/{t.questions.length}</span>
+                    ) : (
+                      <span className="tl-chip">FREE</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+              <p className="tl-help">Aur subjects ke tests jaldi add honge.</p>
+            </>
+          ) : (
+            <div className="tl-panel" style={{ textAlign: 'center', padding: '48px 20px' }}>
+              <h2>Coming soon</h2>
+              <p className="tl-help">Mock tests are on the way. Please check back soon.</p>
+            </div>
+          )}
         </main>
       </div>
     );

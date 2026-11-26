@@ -34,6 +34,13 @@ const toNumber = (v) => {
   return Number.isFinite(n) ? n : 0;
 };
 
+function safeLink(v) {
+  const l = String(v || '').trim();
+  if (/^https?:\/\//i.test(l)) return l;
+  if (/^\/?[a-z0-9_-]+(\/[a-z0-9._-]+)*(\?\S*)?$/i.test(l)) return l.startsWith('/') ? l : '/' + l; // a page of this website
+  return '';
+}
+
 function rowToProduct(row) {
   const raw = String(row.category || '').trim().toLowerCase();
   let category = 'notes';
@@ -67,6 +74,9 @@ function rowToProduct(row) {
     showTnc: Number(row.show_tnc) === 1, // admin switch: the buyer must accept the terms before paying
     tncText: String(row.tnc_text || ''),
     pdfFile: String(row.pdf_file || ''), // empty unless this user owns it
+    // A link set in the admin (e.g. the D2D PYQ page). The server only sends it to buyers, so "Open" goes there.
+    // (For Projects the link is a public demo, so it is not used as the open link.)
+    openLink: category === 'projects' ? '' : safeLink(row.website_link),
     demoSrc: '',
     fromServer: true,
   };
