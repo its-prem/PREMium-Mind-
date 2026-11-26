@@ -21,7 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 include 'db_connect.php';
 require_once __DIR__ . '/pm_session_token.php';
 
-$ADMIN_EMAILS = ['premku0237@gmail.com', 'ar0319515@gmail.com'];
+require_once __DIR__ . '/pm_admin_emails.php';
+$ADMIN_EMAILS = pm_admin_email_list();   // from .env ADMIN_EMAILS
 
 // --- identity: signed token only ---
 $token = '';

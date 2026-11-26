@@ -11,7 +11,8 @@
 
 require_once __DIR__ . '/pm_load_secrets.php';
 
-$PM_PDF_ADMIN_EMAILS = ['premku0237@gmail.com', 'ar0319515@gmail.com'];
+require_once __DIR__ . '/pm_admin_emails.php';
+$PM_PDF_ADMIN_EMAILS = pm_admin_email_list();   // from .env ADMIN_EMAILS
 
 function pm_pdf_admin_bypass(string $email): bool {
     global $PM_PDF_ADMIN_EMAILS;

@@ -1,9 +1,8 @@
 <?php
 /**
  * Shared secrets loader for PDF token / proxy.
- * Order of preference: .env (server/.env, see .env.example) → pm_secrets.php
- * → legacy hardcoded fallback, so PDFs keep working no matter which of
- * these has actually been uploaded to Hostinger.
+ * Order of preference: .env (server/.env, see .env.example) → pm_secrets.php.
+ * There is NO built-in default secret any more: set PDF_HMAC_SECRET in .env (a long random value).
  */
 
 require_once __DIR__ . '/pm_load_env.php';
@@ -23,7 +22,7 @@ function pm_load_secrets(): array {
     return $cached;
 }
 
-/** Primary signing secret: .env → pm_secrets.php → legacy hardcoded fallback. */
+/** Primary signing secret: .env → pm_secrets.php. Empty string when none is set (callers then refuse). */
 function pm_pdf_hmac_secret(): string {
     $envSecret = pm_env('PDF_HMAC_SECRET');
     if ($envSecret !== '' && $envSecret !== 'CHANGE_ME_TO_A_LONG_RANDOM_SECRET') {
@@ -35,8 +34,9 @@ function pm_pdf_hmac_secret(): string {
     if ($secret !== '' && $secret !== 'CHANGE_ME_TO_A_LONG_RANDOM_SECRET') {
         return $secret;
     }
-    // Legacy fallback (pre-rotation) — keeps PDFs working without .env/pm_secrets.php
-    return 'PREM_MIND_SECURE_2026';
+    // No built-in fallback: the old default secret was written in the public code, so anybody could sign
+    // tokens with it. Without a real secret in .env the callers refuse to work (they answer "not configured").
+    return '';
 }
 
 /** All secrets accepted when verifying tokens (migration-safe). */
@@ -44,11 +44,6 @@ function pm_pdf_hmac_secrets(): array {
     $list = [];
     $primary = pm_pdf_hmac_secret();
     if ($primary !== '') $list[] = $primary;
-
-    $legacy = 'PREM_MIND_SECURE_2026';
-    if (!in_array($legacy, $list, true)) {
-        $list[] = $legacy;
-    }
 
     $cfg = pm_load_secrets();
     $fileSecret = isset($cfg['pdf_hmac_secret']) ? trim((string)$cfg['pdf_hmac_secret']) : '';

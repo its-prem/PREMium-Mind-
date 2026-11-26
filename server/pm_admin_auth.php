@@ -7,10 +7,11 @@
  * PHP session). This file just reads that same session so other tools on the
  * same origin (e.g. d2d_notes.php) can trust it without re-implementing login.
  *
- * Keep $PM_AUTH_ADMIN_EMAILS in sync with $PM_ADMIN_EMAILS in admin_panel.php.
+ * The admin list comes from ADMIN_EMAILS in .env (see pm_admin_emails.php).
  */
 
-$PM_AUTH_ADMIN_EMAILS = ['premku0237@gmail.com', 'ar0319515@gmail.com'];
+require_once __DIR__ . '/pm_admin_emails.php';
+$PM_AUTH_ADMIN_EMAILS = pm_admin_email_list();   // from .env ADMIN_EMAILS
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');

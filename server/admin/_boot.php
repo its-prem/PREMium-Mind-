@@ -4,39 +4,37 @@
  *
  *  - CORS (same rules as the other APIs, see ../pm_cors.php)
  *  - who may use the admin: the signed login token (pm_pdf_session) must belong to an
- *    email listed in $PM_ADMIN_EMAILS below (or ADMIN_EMAILS in .env, comma separated)
+ *    email listed in ADMIN_EMAILS in the server .env (comma separated)
  *  - database connection ($conn) and small helpers
  *
- * To make someone an admin: add their email to the list below. Nothing else to change.
+ * To make someone an admin: add their email to ADMIN_EMAILS in the server .env (comma separated). No code change.
  */
 
 require_once __DIR__ . '/../pm_cors.php';
 require_once __DIR__ . '/../pm_session_token.php';
 require_once __DIR__ . '/../db_connect.php';   // gives $conn
 require_once __DIR__ . '/../pm_orders.php';
-
-$PM_ADMIN_EMAILS = ['premku0237@gmail.com', 'ar0319515@gmail.com'];
+require_once __DIR__ . '/../pm_admin_emails.php';
+require_once __DIR__ . '/../pm_rate_limit.php';
 
 pm_cors_json(['GET', 'POST']);
 
 function pm_admin_list(): array {
-    global $PM_ADMIN_EMAILS;
-    $list = array_map('strtolower', array_map('trim', $PM_ADMIN_EMAILS));
-    foreach (explode(',', pm_env('ADMIN_EMAILS')) as $e) {
-        $e = strtolower(trim($e));
-        if ($e !== '') $list[] = $e;
-    }
-    return array_values(array_unique($list));
+    return pm_admin_email_list();   // from ADMIN_EMAILS in .env; empty list = nobody is an admin
 }
 
 /** Stops with 401/403 unless the request carries an admin's login token. Returns the admin email. */
 function pm_admin_require(): string {
     $body = pm_request_body();
+    global $conn;
     $email = pm_session_email(pm_request_token($body));
-    if ($email === '') {
-        pm_admin_fail('Please log in first.', 401, 'unauthenticated');
-    }
-    if (!in_array($email, pm_admin_list(), true)) {
+    $isAdmin = $email !== '' && in_array($email, pm_admin_list(), true);
+    if (!$isAdmin) {
+        // count the failed try: 30 per 15 minutes per address, then the address is blocked for a while
+        if (!pm_rate_limit($conn, 'admin-fail:' . pm_client_ip(), 30, 900)) {
+            pm_admin_fail('Too many attempts. Please wait a few minutes.', 429, 'rate_limited');
+        }
+        if ($email === '') pm_admin_fail('Please log in first.', 401, 'unauthenticated');
         pm_admin_fail('This account is not an admin.', 403, 'forbidden');
     }
     return $email;

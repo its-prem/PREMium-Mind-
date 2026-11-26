@@ -3,7 +3,8 @@
 //  PREMium Mind — Professional Admin Dashboard
 // ════════════════════════════════════════════════
 
-$PM_ADMIN_EMAILS = ['premku0237@gmail.com', 'ar0319515@gmail.com'];
+require_once __DIR__ . '/pm_admin_emails.php';
+$PM_ADMIN_EMAILS = pm_admin_email_list();   // from .env ADMIN_EMAILS (not written in code)
 $PM_FIREBASE_PROJECT_ID = 'premium-mind-fcb16';
 // Same web API key as website Firebase config (used only to verify ID tokens server-side)
 $PM_FIREBASE_API_KEY = 'AIzaSyBMF_RAmopbnPC7OpNcJCo2CUGS6CDiMEY';
@@ -1876,7 +1877,9 @@ input:checked + .slider:before { transform: translateX(20px); }
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        const AUTHORIZED_ADMIN_EMAILS = ["premku0237@gmail.com", "ar0319515@gmail.com"];
+        // The admin list is no longer sent to the browser. The server decides who is an admin (ADMIN_EMAILS in .env);
+        // this stub only lets the page continue to the server check.
+        const AUTHORIZED_ADMIN_EMAILS = { includes: function () { return true; } };
         const SERVER_SESSION_OK = <?= $pmAdminSessionOk ? 'true' : 'false' ?>;
         const SERVER_SESSION_EMAIL = <?= json_encode($pmAdminSessionEmail, JSON_UNESCAPED_SLASHES) ?>;
         const SERVER_SESSION_NAME = <?= json_encode($pmAdminSessionName, JSON_UNESCAPED_SLASHES) ?>;
