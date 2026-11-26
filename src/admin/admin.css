@@ -1754,103 +1754,322 @@
 }
 
 /* =====================================================================
-   9. ADMIN LOGIN GATE & MICROSHEET VIEWER
+   9. ADMIN LOGIN GATE, QA EDITOR & MICROSHEET VIEWER — ADVANCE EDITION
+   ===================================================================== */
+
+/* ---------- KEYFRAMES ---------- */
+@keyframes admGateIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes admLogoFloat {
+  0%, 100% {
+    box-shadow: 0 12px 28px rgba(220, 38, 38, 0.28),
+      inset 0 1px 1px rgba(255, 255, 255, 0.35);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow: 0 16px 36px rgba(220, 38, 38, 0.4),
+      inset 0 1px 1px rgba(255, 255, 255, 0.45);
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes admAlertShake {
+  0% { opacity: 0; transform: translateX(-6px); }
+  40% { opacity: 1; transform: translateX(4px); }
+  70% { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes admSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =====================================================================
+   9A. EXECUTIVE LOGIN GATE
    ===================================================================== */
 .adm-gate {
+  position: relative;
   min-height: 100vh;
   display: grid;
   place-items: center;
-  background: radial-gradient(circle at top, #ffffff 0%, #f1f1f5 65%);
-  padding: 16px;
+  padding: 20px;
+  overflow: hidden;
+  /* Crisp architectural dot-grid + soft ambient red/white glow */
+  background-color: #f4f4f7;
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(220, 38, 38, 0.08) 0%, transparent 52%),
+    radial-gradient(rgba(9, 9, 11, 0.08) 1px, transparent 1px);
+  background-size: 100% 100%, 22px 22px;
 }
 
 .adm-gate-card {
-  background: #ffffff;
-  border: 1px solid var(--a-line);
-  border-radius: 22px;
-  padding: 38px 32px;
+  position: relative;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(228, 228, 231, 0.95);
+  border-radius: 24px;
+  padding: 42px 34px 36px;
   width: 100%;
-  max-width: 410px;
+  max-width: 420px;
   text-align: center;
-  box-shadow: 0 24px 60px rgba(9, 9, 11, 0.09);
+  box-shadow:
+    0 30px 70px rgba(9, 9, 11, 0.11),
+    0 4px 16px rgba(9, 9, 11, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+  animation: admGateIn 0.42s var(--a-ease) backwards;
+}
+
+/* Signature Black-to-Red Top Bar */
+.adm-gate-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #09090b 0%, #dc2626 55%, #ef4444 100%);
 }
 
 .adm-gate-card h2 {
   margin: 0 0 8px;
   font-weight: 800;
-  font-size: 1.4rem;
-  letter-spacing: -0.02em;
+  font-size: 1.48rem;
+  letter-spacing: -0.025em;
+  color: var(--a-text);
 }
 
+.adm-gate-card p {
+  font-size: 0.9rem;
+  color: var(--a-muted);
+  line-height: 1.55;
+}
+
+/* Glossy 3D Brand Squircle */
 .adm-logo {
-  width: 52px;
-  height: 52px;
-  border-radius: 15px;
-  background: linear-gradient(135deg, #09090b 0%, #dc2626 100%);
-  margin: 0 auto 18px;
-  box-shadow: 0 10px 24px rgba(220, 38, 38, 0.3);
+  position: relative;
+  width: 58px;
+  height: 58px;
+  border-radius: 17px;
+  background: linear-gradient(135deg, #18181b 0%, #09090b 42%, #dc2626 100%);
+  margin: 0 auto 20px;
+  animation: admLogoFloat 3.6s ease-in-out infinite;
 }
 
+.adm-logo::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+}
+
+/* Tactile Google Sign-In Button with Gloss Sweep */
 .adm-google {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin-top: 20px;
-  padding: 12px 16px;
-  border: 1px solid var(--a-line);
+  gap: 11px;
+  margin-top: 22px;
+  padding: 13px 18px;
+  border: 1.5px solid var(--a-line);
   background: #ffffff;
-  border-radius: 12px;
+  border-radius: 13px;
   font: inherit;
+  font-size: 0.92rem;
   font-weight: 700;
   color: var(--a-text);
   cursor: pointer;
-  transition: all 0.18s var(--a-ease);
+  box-shadow: 0 2px 6px rgba(9, 9, 11, 0.04);
+  transition: all 0.2s var(--a-ease);
+}
+
+.adm-google::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    110deg,
+    transparent,
+    rgba(9, 9, 11, 0.04),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.55s var(--a-ease);
 }
 
 .adm-google:hover:not(:disabled) {
   border-color: #09090b;
-  box-shadow: var(--a-shadow);
-  transform: translateY(-1px);
+  background: #fafafa;
+  box-shadow: 0 10px 24px rgba(9, 9, 11, 0.1);
+  transform: translateY(-2px);
 }
 
-.adm-google:disabled { opacity: 0.6; cursor: wait; }
+.adm-google:hover:not(:disabled)::before {
+  left: 135%;
+}
 
+.adm-google:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+.adm-google:disabled {
+  opacity: 0.62;
+  cursor: wait;
+  background: #f4f4f5;
+}
+
+/* Crisp Error / Access Denied Alert */
 .adm-alert {
-  margin-top: 14px;
-  background: var(--a-brand-soft);
+  margin-top: 16px;
+  background: linear-gradient(90deg, #fef2f2 0%, #fff7f7 100%);
   color: #991b1b;
-  border: 1px solid var(--a-brand-border);
-  border-radius: 10px;
-  padding: 10px 13px;
-  font-size: 0.85rem;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #dc2626;
+  border-radius: 11px;
+  padding: 11px 14px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.45;
   text-align: left;
+  animation: admAlertShake 0.32s var(--a-ease);
 }
 
-.adm-dl { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
-.adm-qa { font-family: Consolas, 'Courier New', monospace; font-size: 0.82rem; line-height: 1.6; min-height: 260px; }
+/* =====================================================================
+   9B. QA TEXT EDITOR & DOWNLOAD LIST
+   ===================================================================== */
+.adm-dl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
 
-.ms-ctrl { margin-bottom: 14px; }
+.adm-qa {
+  font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  font-size: 0.83rem;
+  line-height: 1.65;
+  min-height: 280px;
+  padding: 14px 16px;
+  background: #0f1014;
+  color: #f4f4f5;
+  border: 1px solid #27272a;
+  border-radius: 13px;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.adm-qa:focus {
+  outline: 0;
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3.5px rgba(220, 38, 38, 0.22), inset 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+/* =====================================================================
+   9C. MICROSHEET STUDIO VIEWER
+   ===================================================================== */
+.ms-ctrl {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid var(--a-line);
+  border-radius: 14px;
+  box-shadow: var(--a-shadow-xs);
+}
+
 .adm-ms-frame {
   position: relative;
-  height: calc(100vh - 290px);
-  min-height: 520px;
-  border: 1px solid var(--a-line);
-  border-radius: var(--a-radius-lg);
+  height: calc(100vh - 280px);
+  min-height: 540px;
+  border: 1.5px solid #27272a;
+  border-radius: 18px;
   overflow: hidden;
-  background: #0a0a0a;
-  box-shadow: var(--a-shadow);
+  background: #09090b;
+  box-shadow:
+    0 20px 50px rgba(9, 9, 11, 0.18),
+    0 4px 14px rgba(9, 9, 11, 0.08);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.adm-ms-frame:hover {
+  border-color: #3f3f46;
+}
+
+.adm-ms-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* Built-in Animated Loading State (No extra HTML needed) */
 .adm-ms-loading {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
   color: #a1a1aa;
+  font-size: 0.88rem;
+  font-weight: 600;
   z-index: 1;
-  background: #0a0a0a;
+  background: radial-gradient(circle at center, #18181b 0%, #09090b 75%);
+}
+
+.adm-ms-loading::before {
+  content: '';
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.12);
+  border-top-color: #dc2626;
+  animation: admSpin 0.8s linear infinite;
+}
+
+/* =====================================================================
+   9D. MOBILE & REDUCED-MOTION POLISH
+   ===================================================================== */
+@media (max-width: 640px) {
+  .adm-gate-card {
+    padding: 34px 22px 28px;
+    border-radius: 20px;
+  }
+
+  .adm-ms-frame {
+    height: calc(100vh - 240px);
+    min-height: 440px;
+    border-radius: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .adm-gate-card,
+  .adm-logo,
+  .adm-alert,
+  .adm-ms-loading::before {
+    animation: none !important;
+  }
 }
 
 /* =====================================================================
