@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MOCK_TESTS } from '../data/mockTests';
 import { goBackOrHome } from '../lib/goBack';
+import { useUploadedMocks } from '../lib/mockStore';
 import { cloudGet, cloudPut, stampGet, stampSet } from '../lib/cloud';
 import './Tools.css';
 
@@ -20,12 +21,14 @@ const fmtTime = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(
 
 export default function MockTests() {
   const navigate = useNavigate();
+  useUploadedMocks(); // tests uploaded from the admin panel
   const [best, setBest] = useState(readBest);
   const [test, setTest] = useState(null); // running test
   const [answers, setAnswers] = useState([]);
   const [index, setIndex] = useState(0);
   const [left, setLeft] = useState(0);
   const [done, setDone] = useState(false);
+  const [showNav, setShowNav] = useState(false); // the question-number sheet
   const doneRef = useRef(false);
 
   useEffect(() => {
@@ -221,12 +224,48 @@ export default function MockTests() {
           <h1>{test.title}</h1>
           <p>Question {index + 1} of {total}</p>
         </div>
+        <button type="button" className="mt-navbtn" aria-label="All questions" aria-expanded={showNav} onClick={() => setShowNav((v) => !v)}>
+          <ion-icon name="grid-outline"></ion-icon>
+          <span>{answered}/{total}</span>
+        </button>
         <span className={`mt-timer ${left <= 60 ? 'is-low' : ''}`}>{fmtTime(Math.max(0, left))}</span>
       </header>
+
+      {/* question numbers: opens from the grid button, tap a number to jump */}
+      {showNav && (
+        <div className="mt-sheet-back" onClick={() => setShowNav(false)}>
+          <div className="mt-sheet" role="dialog" aria-label="Questions" onClick={(e) => e.stopPropagation()}>
+            <div className="mt-sheet-head">
+              <b>Questions</b>
+              <span>{answered} of {total} answered</span>
+              <button type="button" aria-label="Close" onClick={() => setShowNav(false)}>
+                <ion-icon name="close-outline"></ion-icon>
+              </button>
+            </div>
+            <div className="mk-dots">
+              {test.questions.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className={`mk-dot ${answers[i] !== null ? 'is-done' : ''} ${i === index ? 'is-now' : ''}`}
+                  onClick={() => {
+                    setIndex(i);
+                    setShowNav(false);
+                  }}
+                  aria-label={`Go to question ${i + 1}`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       <main className="tl-wrap">
         <div className="mt-progress"><i style={{ width: `${(answered / total) * 100}%` }} /></div>
         <div className="tl-panel">
-          <p className="mt-q">{q.q}</p>
+          <p className="mt-q">{index + 1}. {q.q}</p>
           <div className="mt-opts">
             {q.options.map((o, oi) => (
               <button
@@ -236,20 +275,6 @@ export default function MockTests() {
                 onClick={() => setAnswers(answers.map((a, i) => (i === index ? oi : a)))}
               >
                 <b>{LETTERS[oi]}</b> {o}
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-dots">
-            {test.questions.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                className={`mt-dot ${answers[i] !== null ? 'is-done' : ''} ${i === index ? 'is-now' : ''}`}
-                onClick={() => setIndex(i)}
-                aria-label={`Go to question ${i + 1}`}
-              >
-                {i + 1}
               </button>
             ))}
           </div>

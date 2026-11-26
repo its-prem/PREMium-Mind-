@@ -22,6 +22,37 @@ Unit 2: Electrochemistry
 Definition of Ionisation
 Electrolysis`;
 
+/** The prompt the admin copies into ChatGPT / Claude together with the raw syllabus, to get text in the right format. */
+const AI_PROMPT = `Convert the syllabus I give below into PLAIN TEXT in exactly this format. Output only the text, inside one code block, nothing else.
+
+FORMAT RULES
+1. First lines (one per line): Subject: <full subject name>, Code: <subject code>, L-T-P: <like 3-1-0>, Semester: <1 to 6>
+2. Then a blank line.
+3. Every unit starts on its own line as: Unit <number>: <unit title>
+4. Under a unit, write every topic on its OWN line. One topic = one line. No bullets, no numbering, no bold, no tables.
+5. If a unit has sub-headings, write the sub-heading on its own line starting with # (example: # Valency), then its topics under it.
+6. Split long paragraphs into separate short topics (split at commas, semicolons or full stops). Keep the original wording; do not add or remove content.
+7. Leave one blank line between units.
+
+EXAMPLE OUTPUT
+Subject: Engineering Chemistry
+Code: 2101
+L-T-P: 3-1-0
+Semester: 1
+
+Unit 1: Atomic Structure
+Definition of Atom
+Isotopes and Isobars
+# Valency
+Electrovalency and Covalency
+
+Unit 2: Electrochemistry
+Definition of Ionisation
+Electrolysis
+
+SYLLABUS (paste below this line)
+`;
+
 const EMPTY = { id: '', title: '', sem: 1, branches: 'all', code: '', ltp: '', icon: 'book-outline', text: '' };
 
 export default function SyllabusTab() {
@@ -29,6 +60,14 @@ export default function SyllabusTab() {
   const { data, error, loading, reload } = useLoad(() => adminGet('syllabus.php'));
   const [form, setForm] = useState(null); // null = list, object = editing
   const [saving, setSaving] = useState(false);
+  const copyPrompt = async () => {
+    try {
+      await navigator.clipboard.writeText(AI_PROMPT);
+      toast('Prompt copied. Paste it in ChatGPT / Claude with your syllabus.');
+    } catch {
+      toast('Could not copy. Select the prompt text and copy it.', 'error');
+    }
+  };
 
   const parsed = useMemo(() => (form ? parseSyllabusText(form.text) : null), [form]);
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
@@ -97,6 +136,15 @@ export default function SyllabusTab() {
         <div className="adm-row between" style={{ marginBottom: 12 }}>
           <b style={{ fontSize: '1.05rem' }}>{form.id ? 'Edit subject' : 'Add a subject'}</b>
           <button className="adm-btn ghost" onClick={() => setForm(null)}>Back</button>
+        </div>
+
+        <div className="adm-card" style={{ marginBottom: 16 }}>
+          <div className="adm-section-head">
+            <h4>Prompt for ChatGPT / Claude</h4>
+            <button type="button" className="adm-btn small" onClick={copyPrompt}>Copy prompt</button>
+          </div>
+          <span className="adm-hint">Copy this prompt, paste it in an AI chat with your raw syllabus under it, then paste the answer in the box below.</span>
+          <pre style={{ margin: '8px 0 0', maxHeight: 180, overflow: 'auto', whiteSpace: 'pre-wrap', fontSize: '0.78rem', background: '#f6f6f8', padding: 10, borderRadius: 10 }}>{AI_PROMPT}</pre>
         </div>
 
         <div className="adm-card">

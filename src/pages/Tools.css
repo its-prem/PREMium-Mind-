@@ -493,14 +493,14 @@
   color: #ffffff;
 }
 
-.mt-dots {
+.mk-dots {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 14px;
 }
 
-.mt-dot {
+.mk-dot {
   width: 30px;
   height: 30px;
   border: 1px solid #d4d4d8;
@@ -513,13 +513,13 @@
   cursor: pointer;
 }
 
-.mt-dot.is-done {
+.mk-dot.is-done {
   border-color: #09090b;
   background: #09090b;
   color: #ffffff;
 }
 
-.mt-dot.is-now {
+.mk-dot.is-now {
   outline: 2px solid #dc2626;
   outline-offset: 1px;
 }
@@ -795,7 +795,7 @@ details.tl-math {
 /* ---------- Header: dark bar matching the site, left-aligned title ---------- */
 .tl-page .tl-top {
   gap: 12px;
-  padding: 12px 16px;
+  padding: 8px 14px;
   border-bottom: 0;
   background:
     radial-gradient(180px 90px at 100% 0%, rgba(220, 38, 38, 0.35), transparent 70%),
@@ -838,8 +838,8 @@ details.tl-math {
 }
 
 .tl-logo {
-  width: 34px;
-  height: 34px;
+  width: 48px;
+  height: 48px;
   margin-left: auto;
   flex-shrink: 0;
   border-radius: 8px;
@@ -1777,4 +1777,84 @@ details.tl-math {
 /* Leave room for the sticky header when we slide down to a tool */
 .tl-toolwrap {
   scroll-margin-top: 78px;
+}
+
+/* grid button in the test header + the question-number sheet (no animation: it appears at once) */
+.mt-navbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.mt-navbtn ion-icon {
+  font-size: 16px;
+}
+.mt-sheet-back {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(9, 9, 11, 0.5);
+}
+.mt-sheet {
+  width: min(520px, 100%);
+  padding: 16px 16px 22px;
+  border-radius: 20px 20px 0 0;
+  background: #ffffff;
+  box-shadow: 0 -10px 30px rgba(9, 9, 11, 0.25);
+}
+.mt-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: #09090b;
+}
+.mt-sheet-head span {
+  flex: 1;
+  color: #71717a;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+.mt-sheet-head button {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: #f4f4f5;
+  color: #09090b;
+  font-size: 18px;
+  cursor: pointer;
+}
+.mt-sheet .mk-dots {
+  margin-bottom: 0;
+  gap: 8px;
+}
+.mt-sheet .mk-dot {
+  width: 40px;
+  height: 40px;
+  font-size: 0.85rem;
+}
+
+/* the title stays on one line so the header keeps the same height for every test */
+.tl-page .tl-top h1,
+.tl-page .tl-top p {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
