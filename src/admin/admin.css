@@ -1301,9 +1301,57 @@
   border-left-color: #ef4444;
   background: #2a0a0c;
 }
+/* =====================================================================
+   8. RANKING, STUDENTS, REPORTS & MAINTENANCE — ULTRA PRO EDITION
+   ===================================================================== */
+
+/* ---------- KEYFRAMES ---------- */
+@keyframes admItemSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes admMaintPulseRed {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.34), 0 12px 32px rgba(220, 38, 38, 0.12);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(220, 38, 38, 0), 0 12px 32px rgba(220, 38, 38, 0.12);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0), 0 12px 32px rgba(220, 38, 38, 0.12);
+  }
+}
+
+@keyframes admMaintPulseGreen {
+  0% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.25);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(22, 163, 74, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+  }
+}
+
+@keyframes admStripeMove {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 0;
+  }
+}
 
 /* =====================================================================
-   8. RANKING, STUDENTS, REPORTS & MAINTENANCE
+   8A. DRAG & DROP RANKING LIST
    ===================================================================== */
 .adm-rank {
   list-style: none;
@@ -1311,62 +1359,398 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .adm-rank li {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 13px;
-  background: #ffffff;
+  gap: 15px;
+  background: linear-gradient(180deg, #ffffff 0%, #fcfcfd 100%);
   border: 1px solid var(--a-line);
-  border-radius: 14px;
-  padding: 12px 16px;
-  box-shadow: var(--a-shadow);
-  transition: transform 0.18s var(--a-ease), border-color 0.18s ease, box-shadow 0.18s ease;
+  border-radius: 16px;
+  padding: 14px 20px;
+  box-shadow: 0 2px 6px rgba(9, 9, 11, 0.035), 0 8px 20px rgba(9, 9, 11, 0.03);
+  overflow: hidden;
+  animation: admItemSlideIn 0.34s var(--a-ease) backwards;
+  transition: transform 0.24s var(--a-ease), border-color 0.2s ease,
+    box-shadow 0.24s var(--a-ease), background 0.2s ease;
+}
+
+/* Staggered entry feel for first 8 items */
+.adm-rank li:nth-child(1) { animation-delay: 0.02s; }
+.adm-rank li:nth-child(2) { animation-delay: 0.05s; }
+.adm-rank li:nth-child(3) { animation-delay: 0.08s; }
+.adm-rank li:nth-child(4) { animation-delay: 0.11s; }
+.adm-rank li:nth-child(5) { animation-delay: 0.14s; }
+.adm-rank li:nth-child(6) { animation-delay: 0.17s; }
+
+/* Left vertical accent bar */
+.adm-rank li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #09090b 0%, #dc2626 100%);
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: transform 0.26s var(--a-ease);
+}
+
+/* Subtle glossy light sweep on hover */
+.adm-rank li::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -110%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(
+    110deg,
+    transparent,
+    rgba(220, 38, 38, 0.04),
+    transparent
+  );
+  transform: skewX(-20deg);
+  pointer-events: none;
+  transition: left 0.65s var(--a-ease);
 }
 
 .adm-rank li:hover {
-  border-color: var(--a-line-strong);
-  box-shadow: var(--a-shadow-lg);
+  transform: translateX(6px);
+  border-color: rgba(220, 38, 38, 0.35);
+  box-shadow: 0 12px 28px rgba(9, 9, 11, 0.08);
 }
 
-.adm-rank li.drag { opacity: 0.45; transform: scale(0.985); }
-.adm-rank li.over { border-color: var(--a-brand); background: var(--a-brand-soft); }
-.adm-grip { cursor: grab; color: #a1a1aa; display: grid; }
-.adm-pos { width: 28px; font-weight: 800; color: var(--a-brand); font-size: 0.95rem; }
+.adm-rank li:hover::before {
+  transform: scaleY(1);
+}
 
+.adm-rank li:hover::after {
+  left: 135%;
+}
+
+/* Dragging & Drop Target States */
+.adm-rank li.drag {
+  opacity: 0.48;
+  transform: scale(0.985);
+  border: 1.5px dashed var(--a-brand);
+  background: #fffafa;
+  box-shadow: none;
+}
+
+.adm-rank li.over {
+  border-color: var(--a-brand);
+  background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%);
+  box-shadow: 0 0 0 3.5px rgba(220, 38, 38, 0.16), 0 12px 24px rgba(220, 38, 38, 0.1);
+  transform: translateX(10px) scale(1.01);
+}
+
+/* Drag Handle Button */
+.adm-grip {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #f4f4f5;
+  border: 1px solid #e4e4e7;
+  color: #71717a;
+  cursor: grab;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: all 0.18s var(--a-ease);
+}
+
+.adm-grip:active {
+  cursor: grabbing;
+  transform: scale(0.94);
+}
+
+.adm-rank li:hover .adm-grip {
+  background: #09090b;
+  border-color: #09090b;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(9, 9, 11, 0.22);
+}
+
+/* Rank Position Number Badge */
+.adm-pos {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: #f4f4f5;
+  border: 1px solid #e4e4e7;
+  color: #18181b;
+  font-weight: 800;
+  font-size: 0.9rem;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: transform 0.2s var(--a-ease);
+}
+
+.adm-rank li:hover .adm-pos {
+  transform: scale(1.06);
+}
+
+/* Top 3 Spotlight Styling */
+.adm-rank li:nth-child(1) {
+  border-color: rgba(9, 9, 11, 0.22);
+}
+
+.adm-rank li:nth-child(1) .adm-pos {
+  background: linear-gradient(135deg, #18181b 0%, #09090b 100%);
+  border-color: #09090b;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(9, 9, 11, 0.32);
+}
+
+.adm-rank li:nth-child(2) .adm-pos {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border-color: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
+}
+
+.adm-rank li:nth-child(3) .adm-pos {
+  background: var(--a-brand-soft);
+  border-color: var(--a-brand-border);
+  color: var(--a-brand-dark);
+}
+
+.adm-rank li .adm-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 11px;
+  box-shadow: 0 2px 8px rgba(9, 9, 11, 0.08);
+}
+
+/* =====================================================================
+   8B. STUDENTS & REPORTS EXECUTIVE CARDS
+   ===================================================================== */
 .adm-cards {
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fill, minmax(315px, 1fr));
+  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(335px, 1fr));
+}
+
+.adm-cards .adm-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #ffffff 0%, #fcfcfd 100%);
+  border: 1px solid var(--a-line);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 2px 8px rgba(9, 9, 11, 0.04), 0 12px 28px rgba(9, 9, 11, 0.045);
+  overflow: hidden;
+  animation: admItemSlideIn 0.36s var(--a-ease) backwards;
+  transition: transform 0.26s var(--a-ease), box-shadow 0.26s var(--a-ease),
+    border-color 0.22s ease;
+}
+
+/* Top Gradient Accent Reveal */
+.adm-cards .adm-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.5px;
+  background: linear-gradient(90deg, #09090b 0%, #dc2626 100%);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.32s var(--a-ease);
 }
 
 .adm-cards .adm-card:hover {
-  box-shadow: var(--a-shadow-lg);
-  transform: translateY(-2px);
+  transform: translateY(-5px);
+  border-color: rgba(220, 38, 38, 0.38);
+  box-shadow: 0 20px 44px rgba(9, 9, 11, 0.1), 0 4px 12px rgba(220, 38, 38, 0.06);
 }
 
+.adm-cards .adm-card:hover::before {
+  transform: scaleX(1);
+}
+
+.adm-cards .adm-card h3,
+.adm-cards .adm-card h4 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+/* Student Access / Permission Toggle Rows */
 .adm-tog {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  padding: 10px 0;
+  gap: 14px;
+  padding: 11px 12px;
+  margin: 2px -10px;
+  border-radius: 11px;
   border-bottom: 1px solid var(--a-line-soft);
-  font-size: 0.88rem;
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--a-text-soft);
+  transition: background 0.18s ease, color 0.18s ease, padding-left 0.18s var(--a-ease);
 }
 
-.adm-tog:last-child { border: 0; }
+.adm-tog::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--a-brand);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
 
+.adm-tog:hover {
+  background: #f8f8fa;
+  color: var(--a-text);
+  padding-left: 16px;
+}
+
+.adm-tog:hover::before {
+  opacity: 1;
+}
+
+.adm-tog:last-child {
+  border-bottom: 0;
+}
+
+/* =====================================================================
+   8C. ONE-CLICK MAINTENANCE MODE COMMAND BANNER
+   ===================================================================== */
 .adm-maint {
-  border-left: 5px solid var(--a-ok);
+  position: relative;
+  overflow: hidden;
+  border: 1.5px solid #bbf7d0;
+  border-left: 6px solid var(--a-ok);
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+  padding: 24px 26px;
+  border-radius: 18px;
+  box-shadow: 0 8px 26px rgba(22, 163, 74, 0.08);
+  transition: all 0.3s var(--a-ease);
 }
 
+/* Live Status Top Micro-Bar */
+.adm-maint::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #16a34a, #4ade80, #16a34a);
+  opacity: 0.55;
+}
+
+/* Active Maintenance ON — Tactical Alert State */
 .adm-maint.on {
+  border-color: #fca5a5;
   border-left-color: var(--a-bad);
-  background: #fff7f7;
-  border-color: var(--a-brand-border);
+  background: linear-gradient(135deg, #ffffff 0%, #fef2f2 68%, #fee2e2 100%);
+  animation: admMaintPulseRed 2.4s infinite;
+}
+
+/* Animated Caution Hazard Strip on Top when Maintenance is ON */
+.adm-maint.on::after {
+  height: 5px;
+  opacity: 1;
+  background: repeating-linear-gradient(
+    -45deg,
+    #dc2626,
+    #dc2626 10px,
+    #09090b 10px,
+    #09090b 20px
+  );
+  background-size: 40px 40px;
+  animation: admStripeMove 1.2s linear infinite;
+}
+
+.adm-maint h3,
+.adm-maint h4 {
+  margin: 0 0 6px;
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.adm-maint.on h3,
+.adm-maint.on h4 {
+  color: #991b1b;
+}
+
+.adm-maint p {
+  font-size: 0.9rem;
+  color: var(--a-text-soft);
+  max-width: 640px;
+}
+
+.adm-maint .adm-switch {
+  transform: scale(1.12);
+}
+
+/* =====================================================================
+   8D. MOBILE & REDUCED-MOTION POLISH
+   ===================================================================== */
+@media (max-width: 680px) {
+  .adm-rank li {
+    padding: 12px 14px;
+    gap: 11px;
+    border-radius: 14px;
+  }
+
+  .adm-rank li:hover {
+    transform: none;
+  }
+
+  .adm-grip {
+    width: 30px;
+    height: 30px;
+  }
+
+  .adm-pos {
+    width: 30px;
+    height: 30px;
+    font-size: 0.82rem;
+  }
+
+  .adm-cards {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .adm-cards .adm-card {
+    padding: 18px;
+  }
+
+  .adm-maint {
+    padding: 20px 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .adm-rank li,
+  .adm-cards .adm-card,
+  .adm-maint.on,
+  .adm-maint.on::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 /* =====================================================================
