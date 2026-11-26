@@ -249,24 +249,28 @@ export default function Syllabus() {
           <>
             {chips}
             {subjectsOfSemester(semNo, branch && branch.id).length ? (
-              <div className="sy-grid">
+              <div className="sy-dks">
                 {subjectsOfSemester(semNo, branch && branch.id).map((s) => (
                   <button
                     key={s.id}
                     type="button"
-                    className="sy-card"
+                    className="sy-dk"
                     style={{ '--tint': (branch && branch.tint) || s.tint || '#fb7185' }}
                     onClick={() => navigate(`/syllabus/${branch ? branch.id : 'all'}/${s.id}`)}
                   >
-                    <span className="sy-icon"><ion-icon name={s.icon}></ion-icon></span>
-                    <span className="sy-text">
-                      <b>{s.title}</b>
-                      <small>
-                        {s.units.length} units · L-T-P {s.ltp}
-                        {s.branches === 'all' ? ' · All branches' : ''}
-                      </small>
+                    <span className="sy-dk-meta">
+                      <span className="sy-dk-units">
+                        <i></i> {s.units.length} UNITS
+                      </span>
+                      <span className="sy-dk-ltp">L-T-P {s.ltp}</span>
                     </span>
-                    <ion-icon name="chevron-forward-outline" class="sy-go"></ion-icon>
+                    <span className="sy-dk-title">{s.title}</span>
+                    <span className="sy-dk-foot">
+                      <span>{s.branches === 'all' ? 'All branches' : 'Selected branches'}</span>
+                      <span className="sy-dk-go">
+                        <ion-icon name="arrow-forward-outline"></ion-icon>
+                      </span>
+                    </span>
                   </button>
                 ))}
               </div>

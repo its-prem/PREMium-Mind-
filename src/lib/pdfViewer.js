@@ -69,14 +69,34 @@ export function createZoomController({ scrollArea, zoomTarget, onZoomEnd }) {
       e.touches[0].clientY - e.touches[1].clientY
     );
 
+  // Double tap (or double click) toggles between normal size and a zoomed-in view at the tapped spot.
+  const DOUBLE_TAP_SCALE = 2.5;
+  let tapStart = null; // { x, y, t } of a one-finger touch that may become a tap
+  let lastTap = null; // { x, y, t } of the previous tap
+
+  const toggleZoomAt = (clientX, clientY) => {
+    const rect = scrollArea.getBoundingClientRect();
+    applyZoom(scale > 1.05 ? 1 : DOUBLE_TAP_SCALE, clientX - rect.left, clientY - rect.top);
+    onZoomEnd?.();
+  };
+  let lastToggle = 0;
+
   const onTouchStart = (e) => {
     if (e.touches.length === 2) {
       pinchStartDist = touchDist(e);
       pinchStartScale = scale;
+      tapStart = null;
+      lastTap = null;
+    } else if (e.touches.length === 1) {
+      tapStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() };
     }
   };
 
   const onTouchMove = (e) => {
+    if (tapStart && e.touches.length === 1) {
+      // a finger that moves is scrolling, not tapping
+      if (Math.hypot(e.touches[0].clientX - tapStart.x, e.touches[0].clientY - tapStart.y) > 10) tapStart = null;
+    }
     if (e.touches.length !== 2 || pinchStartDist <= 0) return;
     e.preventDefault();
     const { x, y } = touchCenter(e);
@@ -94,7 +114,22 @@ export function createZoomController({ scrollArea, zoomTarget, onZoomEnd }) {
     }
   };
 
-  const onTouchEnd = () => {
+  const onTouchEnd = (e) => {
+    if (tapStart && e && e.touches && e.touches.length === 0) {
+      const now = Date.now();
+      if (now - tapStart.t < 300) {
+        if (lastTap && now - lastTap.t < 350 && Math.hypot(tapStart.x - lastTap.x, tapStart.y - lastTap.y) < 40) {
+          lastToggle = now;
+          toggleZoomAt(tapStart.x, tapStart.y);
+          lastTap = null;
+        } else {
+          lastTap = { x: tapStart.x, y: tapStart.y, t: now };
+        }
+      } else {
+        lastTap = null;
+      }
+      tapStart = null;
+    }
     if (pinchStartDist > 0) {
       pinchStartDist = 0;
       pending = null;
@@ -127,6 +162,11 @@ export function createZoomController({ scrollArea, zoomTarget, onZoomEnd }) {
   scrollArea.addEventListener('touchmove', onTouchMove, { passive: false });
   scrollArea.addEventListener('touchend', onTouchEnd, { passive: true });
   scrollArea.addEventListener('wheel', onWheel, { passive: false });
+  const onDblClick = (e) => {
+    if (Date.now() - lastToggle < 700) return; // a touch double tap already did it (phones also send a dblclick)
+    toggleZoomAt(e.clientX, e.clientY); // mouse / trackpad
+  };
+  scrollArea.addEventListener('dblclick', onDblClick);
   document.addEventListener('touchmove', blockPagePinch, { passive: false });
 
   return {
@@ -136,6 +176,7 @@ export function createZoomController({ scrollArea, zoomTarget, onZoomEnd }) {
       scrollArea.removeEventListener('touchmove', onTouchMove);
       scrollArea.removeEventListener('touchend', onTouchEnd);
       scrollArea.removeEventListener('wheel', onWheel);
+      scrollArea.removeEventListener('dblclick', onDblClick);
       document.removeEventListener('touchmove', blockPagePinch);
       if (raf) cancelAnimationFrame(raf);
     },

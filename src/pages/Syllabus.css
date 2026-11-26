@@ -543,3 +543,100 @@
   color: #a1a1aa;
   font-size: 20px;
 }
+
+/* ---------- Subject cards of one semester: big dark cards with a glow in the subject colour ---------- */
+.sy-dks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sy-dk {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  min-height: 150px;
+  padding: 16px 18px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 22px;
+  background:
+    radial-gradient(220px 130px at 100% 0%, color-mix(in srgb, var(--tint) 55%, transparent), transparent 70%),
+    linear-gradient(150deg, #09090b 0%, #18181b 65%, #1c1012 100%);
+  color: #ffffff;
+  font-family: inherit;
+  text-align: left;
+  box-shadow: 0 12px 28px rgba(9, 9, 11, 0.22);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.sy-dk:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 34px rgba(9, 9, 11, 0.3);
+}
+.sy-dk-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.sy-dk-units {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.sy-dk-units i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tint);
+  box-shadow: 0 0 10px var(--tint);
+}
+.sy-dk-ltp {
+  padding: 3px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  color: #d4d4d8;
+  letter-spacing: 0.04em;
+}
+.sy-dk-title {
+  flex: 1;
+  font-family: 'Sora', 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.45rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.sy-dk-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #a1a1aa;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+.sy-dk-go {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--tint);
+  color: #ffffff;
+  font-size: 20px;
+  transition: transform 0.2s ease;
+}
+.sy-dk:hover .sy-dk-go {
+  transform: translateX(3px);
+}
+@media (min-width: 720px) {
+  .sy-dks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

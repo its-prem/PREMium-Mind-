@@ -46,35 +46,41 @@ export default function ReadingModes({ scrollRef, dock }) {
   const button = dock
     ? createPortal(
         <div className="rdx-dock-item" ref={itemRef}>
+          {/* tap the wand: the three mode icons open above it (name shows on long press / hover) */}
           {open && (
-            <div className="rdx-pop">
-              <h4>Reading mode</h4>
-              <div className="rdx-stack">
-                <button
-                  type="button"
-                  className={`rdx-chip ${modes.wide ? 'is-on' : ''}`}
-                  onClick={() => toggle('wide')}
-                >
-                  <ion-icon name="resize-outline"></ion-icon> Wide pages
-                </button>
-                <button
-                  type="button"
-                  className={`rdx-chip ${modes.sepia ? 'is-on' : ''}`}
-                  onClick={() => toggle('sepia')}
-                >
-                  <ion-icon name="cafe-outline"></ion-icon> Sepia
-                </button>
-                <button
-                  type="button"
-                  className="rdx-chip"
-                  onClick={() => {
-                    setFocus(true);
-                    setOpen(false);
-                  }}
-                >
-                  <ion-icon name="expand-outline"></ion-icon> Focus mode
-                </button>
-              </div>
+            <div className="rdx-modes">
+              <button
+                type="button"
+                className={`rdx-fab ${modes.wide ? 'is-on' : ''}`}
+                aria-label="Wide pages"
+                aria-pressed={modes.wide}
+                title="Wide pages"
+                onClick={() => toggle('wide')}
+              >
+                <ion-icon name="resize-outline"></ion-icon>
+              </button>
+              <button
+                type="button"
+                className={`rdx-fab ${modes.sepia ? 'is-on' : ''}`}
+                aria-label="Sepia"
+                aria-pressed={modes.sepia}
+                title="Sepia"
+                onClick={() => toggle('sepia')}
+              >
+                <ion-icon name="cafe-outline"></ion-icon>
+              </button>
+              <button
+                type="button"
+                className="rdx-fab"
+                aria-label="Focus mode"
+                title="Focus mode"
+                onClick={() => {
+                  setFocus(true);
+                  setOpen(false);
+                }}
+              >
+                <ion-icon name="expand-outline"></ion-icon>
+              </button>
             </div>
           )}
           <button
