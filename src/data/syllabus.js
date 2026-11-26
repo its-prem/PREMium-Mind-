@@ -1,20 +1,23 @@
 /**
- * Diploma syllabus: branches -> subjects -> units -> topics.
- * To add a subject: add it to SUBJECTS, then list its id in a branch's `subjects`.
+ * Diploma syllabus: semesters 1-6 -> subjects -> units -> topics.
+ *
+ * To add a subject: add it to SUBJECTS below and set
+ *     sem:      1 to 6                      the semester it belongs to (it shows inside that semester)
+ *     branches: 'all'  or  ['cse', 'ece']   'all' = common to every branch, or the ids of the branches it is for
  * A unit is { title, sections: [{ heading?, topics: [text, ...] }] }.
  * Every topic is a separate line the student can tick as completed.
  */
 
 export const BRANCHES = [
-  { id: 'cse', title: 'Computer Science', desc: 'Notes, Question Banks, Lab Manuals & Resources.', icon: 'laptop-outline', tint: '#38bdf8', subjects: ['chemistry'] },
-  { id: 'mechanical', title: 'Mechanical Engg', desc: 'Thermodynamics, TOM, SOM, and Workshop Technology.', icon: 'cog-outline', tint: '#fb923c', subjects: ['chemistry'] },
-  { id: 'civil', title: 'Civil Engineering', desc: 'Surveying, Construction Materials, and Concrete Tech.', icon: 'business-outline', tint: '#a78bfa', subjects: ['chemistry'] },
-  { id: 'electrical', title: 'Electrical Engg', desc: 'Power Systems, Machines, and Circuit Theory.', icon: 'flash-outline', tint: '#fbbf24', subjects: ['chemistry'] },
-  { id: 'ece', title: 'Electronics (ECE)', desc: 'Analog & Digital Circuits, Communication Systems.', icon: 'hardware-chip-outline', tint: '#34d399', subjects: ['chemistry'] },
-  { id: 'electronics', title: 'Electronics Engg', desc: 'Core Electronics resources and term works.', icon: 'radio-outline', tint: '#2dd4bf', subjects: ['chemistry'] },
-  { id: 'automobile', title: 'Automobile Engg', desc: 'Vehicle Dynamics, Engine Systems and Safety.', icon: 'car-sport-outline', tint: '#f472b6', subjects: ['chemistry'] },
-  { id: 'mining', title: 'Mining Engg', desc: 'Geology, Mine Surveying, and Machinery.', icon: 'diamond-outline', tint: '#94a3b8', subjects: ['chemistry'] },
-  { id: 'metallurgy', title: 'Metallurgy', desc: 'Material Science and metal processing notes.', icon: 'flame-outline', tint: '#f87171', subjects: ['chemistry'] },
+  { id: 'cse', title: 'Computer Science', desc: 'Notes, Question Banks, Lab Manuals & Resources.', icon: 'laptop-outline', tint: '#38bdf8' },
+  { id: 'mechanical', title: 'Mechanical Engg', desc: 'Thermodynamics, TOM, SOM, and Workshop Technology.', icon: 'cog-outline', tint: '#fb923c' },
+  { id: 'civil', title: 'Civil Engineering', desc: 'Surveying, Construction Materials, and Concrete Tech.', icon: 'business-outline', tint: '#a78bfa' },
+  { id: 'electrical', title: 'Electrical Engg', desc: 'Power Systems, Machines, and Circuit Theory.', icon: 'flash-outline', tint: '#fbbf24' },
+  { id: 'ece', title: 'Electronics (ECE)', desc: 'Analog & Digital Circuits, Communication Systems.', icon: 'hardware-chip-outline', tint: '#34d399' },
+  { id: 'electronics', title: 'Electronics Engg', desc: 'Core Electronics resources and term works.', icon: 'radio-outline', tint: '#2dd4bf' },
+  { id: 'automobile', title: 'Automobile Engg', desc: 'Vehicle Dynamics, Engine Systems and Safety.', icon: 'car-sport-outline', tint: '#f472b6' },
+  { id: 'mining', title: 'Mining Engg', desc: 'Geology, Mine Surveying, and Machinery.', icon: 'diamond-outline', tint: '#94a3b8' },
+  { id: 'metallurgy', title: 'Metallurgy', desc: 'Material Science and metal processing notes.', icon: 'flame-outline', tint: '#f87171' },
 ];
 
 export const SUBJECTS = {
@@ -22,6 +25,8 @@ export const SUBJECTS = {
     id: 'chemistry',
     title: 'Engineering Chemistry',
     semester: '1st Semester (common to all branches)',
+    sem: 1,
+    branches: 'all',
     code: '',
     ltp: '3-1-0',
     icon: 'flask-outline',
@@ -119,6 +124,18 @@ export const SUBJECTS = {
     ],
   },
 };
+
+export const SEMESTERS = [1, 2, 3, 4, 5, 6];
+export const semesterName = (n) => ['1st', '2nd', '3rd', '4th', '5th', '6th'][n - 1] + ' Semester';
+
+/** The subjects shown inside one semester. With a branch: the common ones plus that branch's own. Without: all of them. */
+export function subjectsOfSemester(sem, branchId) {
+  return Object.values(SUBJECTS).filter((s) => {
+    if (s.sem !== sem) return false;
+    if (!branchId || s.branches === 'all') return true;
+    return Array.isArray(s.branches) && s.branches.includes(branchId);
+  });
+}
 
 export const getBranch = (id) => BRANCHES.find((b) => b.id === id);
 export const getSubject = (id) => SUBJECTS[id];

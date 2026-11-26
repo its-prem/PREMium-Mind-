@@ -41,28 +41,6 @@
   box-shadow: 0 8px 20px rgba(220, 38, 38, 0.35);
 }
 
-/* question index */
-.qa-index {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 0 0 14px;
-}
-.qa-index a {
-  padding: 5px 11px;
-  border-radius: 999px;
-  background: #fff;
-  border: 1px solid #e4e4e7;
-  font-size: 0.74rem;
-  font-weight: 800;
-  color: #3f3f46;
-  text-decoration: none;
-}
-.qa-index a:hover {
-  border-color: #dc2626;
-  color: #dc2626;
-}
-
 /* one question */
 .qa-card {
   background: #fff;
@@ -70,7 +48,7 @@
   border-radius: 16px;
   padding: 16px 18px;
   margin-bottom: 12px;
-  scroll-margin-top: 14px;
+  scroll-margin-top: calc(var(--rd-header-h) + var(--rd-safe-top) + 62px);
   box-shadow: 0 1px 2px rgba(9, 9, 11, 0.04);
 }
 .qa-q {
@@ -148,9 +126,9 @@
 
 /* the PDF reader's header, kept at the top while the questions scroll */
 .qa-hdr.rd-root {
+  inset: auto; /* (this resets top, so top is set after it) */
   position: sticky;
   top: 0;
-  inset: auto;
   z-index: 40;
   height: calc(var(--rd-header-h) + var(--rd-safe-top));
   overflow: visible;
@@ -189,11 +167,6 @@
 .qa-page.is-dark .qa-no {
   background: #fafafa;
   color: #09090b;
-}
-.qa-page.is-dark .qa-index a {
-  background: #18181b;
-  border-color: #2e2e33;
-  color: #d4d4d8;
 }
 .qa-page.is-dark .qa-card.qa-center {
   color: #e4e4e7;
@@ -246,104 +219,136 @@
   color: #15803d;
 }
 
-/* the small message that opens under the Micro icon */
+
+/* the subject name under the header */
+.qa-headwrap {
+  padding-top: 16px;
+  padding-bottom: 10px;
+}
+.qa-title {
+  margin: 0;
+  /* the heading font: Sora, the same one as the "PREMium Mind" name. To use another font change this line. */
+  font-family: 'Sora', 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 1.2rem;
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #18181b;
+}
+.qa-count {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #71717a;
+}
+
+/* the one-line question strip, kept under the header while the questions scroll */
+.qa-strip {
+  position: sticky;
+  top: calc(var(--rd-header-h) + var(--rd-safe-top));
+  z-index: 30;
+  display: flex;
+  gap: 6px;
+  padding: 8px 14px 10px;
+  overflow-x: auto;
+  background: linear-gradient(180deg, #f4f5f9 70%, rgba(244, 245, 249, 0));
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.qa-strip::-webkit-scrollbar {
+  display: none;
+}
+.qa-chip {
+  flex-shrink: 0;
+  min-width: 44px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid #e4e4e7;
+  background: #ffffff;
+  color: #3f3f46;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.qa-chip:hover {
+  border-color: #dc2626;
+  color: #dc2626;
+}
+.qa-chip.on {
+  background: #18181b;
+  border-color: #18181b;
+  color: #ffffff;
+}
+@media (min-width: 860px) {
+  .qa-strip {
+    padding-left: calc((100% - 820px) / 2 + 14px);
+  }
+}
+.qa-page.is-dark .qa-title {
+  color: #fafafa;
+}
+.qa-page.is-dark .qa-count {
+  color: #8b8b94;
+}
+.qa-page.is-dark .qa-strip {
+  background: linear-gradient(180deg, #09090b 70%, rgba(9, 9, 11, 0));
+}
+.qa-page.is-dark .qa-chip {
+  background: #18181b;
+  border-color: #2e2e33;
+  color: #d4d4d8;
+}
+.qa-page.is-dark .qa-chip.on {
+  background: #fafafa;
+  border-color: #fafafa;
+  color: #09090b;
+}
+
+/* the tiny "Micro format" label under the Micro icon */
 .qa-micro-wrap {
   position: relative;
 }
-.qa-micro-btn.open {
-  border-color: #dc2626;
-}
-.qa-pop {
+.qa-tip {
   position: absolute;
-  top: calc(100% + 12px);
+  top: calc(100% + 8px);
   right: 0;
-  width: 250px;
-  padding: 14px 14px 12px;
-  background: #ffffff;
-  border: 1px solid #e4e4e7;
-  border-radius: 16px;
-  box-shadow: 0 16px 40px rgba(9, 9, 11, 0.18);
-  color: #27272a;
-  text-align: left;
-  z-index: 60;
-  animation: qa-pop-in 0.18s ease;
-}
-.qa-pop::before {
-  content: '';
-  position: absolute;
-  top: -7px;
-  right: 15px;
-  width: 12px;
-  height: 12px;
-  background: #ffffff;
-  border-top: 1px solid #e4e4e7;
-  border-left: 1px solid #e4e4e7;
-  transform: rotate(45deg);
-}
-.qa-pop b {
-  display: block;
-  margin-bottom: 4px;
-  font-size: 0.98rem;
-  color: #18181b;
-}
-.qa-pop p {
-  margin: 0 0 12px;
-  font-size: 0.8rem;
-  line-height: 1.5;
-  color: #52525b;
-}
-.qa-pop p span {
-  font-weight: 700;
-  color: #92400e;
-}
-.qa-pop-btn {
-  width: 100%;
-  border: 0;
-  padding: 10px 14px;
-  border-radius: 12px;
+  padding: 3px 9px;
+  border-radius: 8px;
   background: #18181b;
   color: #ffffff;
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 800;
-  cursor: pointer;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-3px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 60;
 }
-.qa-pop-btn:hover {
-  background: #dc2626;
-}
-.qa-pop-btn.owned {
-  background: #16a34a;
-}
-.qa-page.is-dark .qa-pop {
+.qa-tip::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: 15px;
+  width: 8px;
+  height: 8px;
   background: #18181b;
-  border-color: #2e2e33;
-  color: #e4e4e7;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+  transform: rotate(45deg);
 }
-.qa-page.is-dark .qa-pop::before {
-  background: #18181b;
-  border-color: #2e2e33;
+.qa-micro-wrap:hover .qa-tip,
+.qa-micro-wrap:focus-within .qa-tip,
+.qa-tip.show {
+  opacity: 1;
+  transform: translateY(0);
 }
-.qa-page.is-dark .qa-pop b {
-  color: #fafafa;
-}
-.qa-page.is-dark .qa-pop p {
-  color: #b4b4bb;
-}
-.qa-page.is-dark .qa-pop p span {
-  color: #fbbf24;
-}
-.qa-page.is-dark .qa-pop-btn {
+.qa-page.is-dark .qa-tip,
+.qa-page.is-dark .qa-tip::before {
   background: #fafafa;
-  color: #09090b;
 }
-@keyframes qa-pop-in {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.qa-page.is-dark .qa-tip {
+  color: #09090b;
 }

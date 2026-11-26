@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { BRANCHES, getBranch, getSubject, listTopics } from '../data/syllabus';
+import { BRANCHES, SEMESTERS, getBranch, getSubject, listTopics, semesterName, subjectsOfSemester } from '../data/syllabus';
 import { goBackOrHome } from '../lib/goBack';
 import { loadKept, saveKept } from '../lib/keep';
 import { cloudGet, cloudPut, stampGet, stampSet } from '../lib/cloud';
@@ -136,34 +136,27 @@ function SubjectView({ subject }) {
 
 /**
  * Diploma syllabus pages:
- *   /syllabus                      -> all branches
- *   /syllabus/:branch              -> subjects of that branch
- *   /syllabus/:branch/:subject     -> unit-wise syllabus
+ *   /syllabus                      -> semesters 1-6, each with its subjects inside
+ *   /syllabus/:branch              -> the same list, showing only that branch's subjects (and the common ones)
+ *   /syllabus/:branch/:subject     -> unit-wise syllabus of one subject  (:branch can be "all")
  * The data lives in src/data/syllabus.js.
  */
 export default function Syllabus() {
   const navigate = useNavigate();
   const { branch: branchId, subject: subjectId } = useParams();
-  const branch = branchId ? getBranch(branchId) : null;
+  const branch = branchId && branchId !== 'all' ? getBranch(branchId) : null;
   const subject = subjectId ? getSubject(subjectId) : null;
+  const [openSem, setOpenSem] = useState([1]); // semesters that are open
 
   useEffect(() => {
-    document.title = `${(subject && subject.title) || (branch && branch.title) || 'Diploma Syllabus'} | PREMium Mind`;
+    document.title = `${(subject && subject.title) || 'Diploma Syllabus'} | PREMium Mind`;
     window.scrollTo(0, 0);
   }, [branchId, subjectId]); // eslint-disable-line
 
-  let title = 'Diploma Syllabus';
-  let sub = 'Pick your branch';
-  if (branch) {
-    title = branch.title;
-    sub = 'Subjects & syllabus';
-  }
-  if (branch && subject) {
-    title = subject.title;
-    sub = branch.title;
-  }
-
-  const missing = (branchId && !branch) || (subjectId && (!subject || !branch.subjects.includes(subjectId)));
+  const missing = (branchId && branchId !== 'all' && !branch) || (subjectId && !subject);
+  const title = subject ? subject.title : 'Diploma Syllabus';
+  const sub = subject ? subject.semester.replace(/\s*\(.*\)/, '') : 'Semester wise subjects';
+  const toggleSem = (n) => setOpenSem((cur) => (cur.includes(n) ? cur.filter((x) => x !== n) : [...cur, n]));
 
   return (
     <div className="tl-page">
@@ -182,76 +175,83 @@ export default function Syllabus() {
         {missing && (
           <div className="tl-panel">
             <h2>Not found</h2>
-            <p className="tl-help">This page does not exist. Go back and pick your branch again.</p>
+            <p className="tl-help">This page does not exist. Go back to the syllabus list.</p>
             <button type="button" className="tl-btn" onClick={() => navigate('/syllabus', { replace: true })}>
-              All branches
+              Syllabus
             </button>
           </div>
         )}
 
-        {/* ---------- 1. all branches ---------- */}
-        {!missing && !branch && (
-          <div className="sy-grid">
-            {BRANCHES.map((b) => (
-              <button
-                key={b.id}
-                type="button"
-                className="sy-card"
-                style={{ '--tint': b.tint }}
-                onClick={() => navigate(`/syllabus/${b.id}`)}
-              >
-                <span className="sy-icon"><ion-icon name={b.icon}></ion-icon></span>
-                <span className="sy-text">
-                  <b>{b.title}</b>
-                  <small>{b.desc}</small>
-                </span>
-                <ion-icon name="chevron-forward-outline" class="sy-go"></ion-icon>
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* ---------- 2. subjects of a branch ---------- */}
-        {!missing && branch && !subject && (
+        {/* ---------- semesters 1-6, the subjects are inside them ---------- */}
+        {!missing && !subject && (
           <>
-            <div className="sy-hero" style={{ '--tint': branch.tint }}>
-              <span className="sy-icon"><ion-icon name={branch.icon}></ion-icon></span>
-              <div>
-                <h2>{branch.title}</h2>
-                <p>{branch.desc}</p>
-              </div>
+            <div className="sy-chips" role="group" aria-label="Branch">
+              <button type="button" className={`sy-chip${!branch ? ' on' : ''}`} onClick={() => navigate('/syllabus')}>
+                All branches
+              </button>
+              {BRANCHES.map((b) => (
+                <button key={b.id} type="button" className={`sy-chip${branch && branch.id === b.id ? ' on' : ''}`} onClick={() => navigate(`/syllabus/${b.id}`)}>
+                  {b.title}
+                </button>
+              ))}
             </div>
+            <p className="sy-hint">
+              {branch ? `Showing ${branch.title} subjects and the subjects common to every branch.` : 'Open a semester to see its subjects. Pick your branch above to see only yours.'}
+            </p>
 
-            <p className="sy-label">1st Semester</p>
-            <div className="sy-grid">
-              {branch.subjects.map((sid) => {
-                const s = getSubject(sid);
+            <div className="sy-sems">
+              {SEMESTERS.map((n) => {
+                const subs = subjectsOfSemester(n, branch && branch.id);
+                const isOpen = openSem.includes(n);
                 return (
-                  <button
-                    key={sid}
-                    type="button"
-                    className="sy-card"
-                    style={{ '--tint': branch.tint }}
-                    onClick={() => navigate(`/syllabus/${branch.id}/${sid}`)}
-                  >
-                    <span className="sy-icon"><ion-icon name={s.icon}></ion-icon></span>
-                    <span className="sy-text">
-                      <b>{s.title}</b>
-                      <small>
-                        {s.units.length} units · L-T-P {s.ltp}
-                      </small>
-                    </span>
-                    <ion-icon name="chevron-forward-outline" class="sy-go"></ion-icon>
-                  </button>
+                  <article className={`sy-sem${isOpen ? ' is-open' : ''}`} key={n}>
+                    <button type="button" className="sy-sem-head" aria-expanded={isOpen} onClick={() => toggleSem(n)}>
+                      <span className="sy-sem-no">{n}</span>
+                      <span className="sy-sem-name">
+                        <b>{semesterName(n)}</b>
+                        <small>{subs.length ? `${subs.length} subject${subs.length === 1 ? '' : 's'}` : 'Coming soon'}</small>
+                      </span>
+                      <ion-icon name="chevron-down-outline" class="sy-chev"></ion-icon>
+                    </button>
+
+                    {isOpen && (
+                      <div className="sy-sem-body">
+                        {subs.length ? (
+                          <div className="sy-grid">
+                            {subs.map((s) => (
+                              <button
+                                key={s.id}
+                                type="button"
+                                className="sy-card"
+                                style={{ '--tint': (branch && branch.tint) || s.tint || '#fb7185' }}
+                                onClick={() => navigate(`/syllabus/${branch ? branch.id : 'all'}/${s.id}`)}
+                              >
+                                <span className="sy-icon"><ion-icon name={s.icon}></ion-icon></span>
+                                <span className="sy-text">
+                                  <b>{s.title}</b>
+                                  <small>
+                                    {s.units.length} units · L-T-P {s.ltp}
+                                    {s.branches === 'all' ? ' · All branches' : ''}
+                                  </small>
+                                </span>
+                                <ion-icon name="chevron-forward-outline" class="sy-go"></ion-icon>
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="tl-help sy-soon">Subjects of this semester are being added.</p>
+                        )}
+                      </div>
+                    )}
+                  </article>
                 );
               })}
             </div>
-            <p className="tl-help sy-soon">More subjects for this branch are being added.</p>
           </>
         )}
 
-        {/* ---------- 3. one subject, unit wise ---------- */}
-        {!missing && branch && subject && <SubjectView key={subject.id} subject={subject} />}
+        {/* ---------- one subject, unit wise ---------- */}
+        {!missing && subject && <SubjectView key={subject.id} subject={subject} />}
       </main>
     </div>
   );

@@ -4,7 +4,7 @@
  * What the student sees is like the PDF reader: the same header, and only the finished A4 pages (no editor, no text box).
  * The questions text is loaded into the page but never shown as text; selecting, copying and right-click are blocked,
  * the pages carry the student's own details faintly and blur when the window loses focus.
- * Download (PDF / Word) opens at the time the admin set.
+ * Download (one PDF file) opens at the time the admin set.
  * Only for people who paid for the micro format.
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -28,6 +28,7 @@ export default function MicroSheetPage() {
   const [away, setAway] = useState(false); // the window is not in focus: blur the pages
   const [wm, setWm] = useState(() => getStoredEmail() || '');
   const [toast, setToast] = useState('');
+  const [pdfState, setPdfState] = useState('idle'); // idle | busy | done
   const [dark, setDark] = useState(() => {
     try {
       return localStorage.getItem(THEME_KEY) === '1';
@@ -127,12 +128,26 @@ export default function MicroSheetPage() {
   const canDownload = dl.mode === 'instant';
   const lockedMessage = dl.mode === 'timed' ? `Download unlocks ${formatWhen(dl.at)}` : 'Download is not allowed for this micro sheet';
 
-  const download = (format) => {
+  // "Save PDF": the tool makes the PDF file and the browser downloads it
+  const download = () => {
     if (!canDownload) {
       setToast(lockedMessage);
       return;
     }
-    frameRef.current?.send({ type: 'export', format });
+    if (pdfState === 'busy') return;
+    frameRef.current?.send({ type: 'export', format: 'pdf' });
+  };
+  const onFrameEvent = (d) => {
+    if (d.type !== 'export-state') return;
+    if (d.state === 'busy') setPdfState('busy');
+    else if (d.state === 'done') {
+      setPdfState('done');
+      setToast('PDF downloaded');
+      setTimeout(() => setPdfState('idle'), 2500);
+    } else {
+      setPdfState('idle');
+      setToast(d.message || 'Could not make the PDF. Please try again.');
+    }
   };
 
   return (
@@ -156,12 +171,28 @@ export default function MicroSheetPage() {
           <button type="button" className="rd-theme" aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'} aria-pressed={dark} title={dark ? 'Light mode' : 'Dark mode'} onClick={toggleDark}>
             <ion-icon name={dark ? 'sunny-outline' : 'moon-outline'}></ion-icon>
           </button>
-          <button type="button" className="rd-theme" aria-label="Download as a Word file" title={canDownload ? 'Download as a Word file' : lockedMessage} onClick={() => download('docx')}>
-            <ion-icon name={canDownload ? 'document-text-outline' : 'lock-closed-outline'}></ion-icon>
-          </button>
-          <button type="button" className={`rd-download${canDownload ? '' : ' is-locked'}`} aria-label={canDownload ? 'Save as PDF' : 'Download locked'} title={canDownload ? 'Save as PDF' : lockedMessage} onClick={() => download('pdf')}>
-            <ion-icon name={canDownload ? 'download-outline' : 'lock-closed-outline'}></ion-icon>
-            <span>{canDownload ? 'Save PDF' : 'Locked'}</span>
+          <button type="button" className={`rd-download${canDownload ? '' : ' is-locked'}`} disabled={pdfState === 'busy'} aria-label={canDownload ? 'Download the PDF' : 'Download locked'} title={canDownload ? 'Download the PDF' : lockedMessage} onClick={download}>
+            {!canDownload ? (
+              <ion-icon name="lock-closed-outline"></ion-icon>
+            ) : pdfState === 'busy' ? (
+              <span className="ms-dl-spin" aria-hidden="true" />
+            ) : pdfState === 'done' ? (
+              <svg className="ms-dl-ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12.5l4.5 4.5L19 7.5" />
+              </svg>
+            ) : (
+              // a PDF page with an arrow going down into a tray = "download the PDF"
+              <svg className="ms-dl-ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M13.5 2.5H7A1.5 1.5 0 0 0 5.5 4v8" />
+                <path d="M13.5 2.5L18.5 7.5V12" />
+                <path d="M13.5 2.5V6a1.5 1.5 0 0 0 1.5 1.5h3.5" />
+                <g className="ms-dl-arrow">
+                  <path d="M12 11.5v6.2M9.2 15l2.8 2.8 2.8-2.8" />
+                </g>
+                <path d="M6 20.6h12" />
+              </svg>
+            )}
+            <span>{!canDownload ? 'Locked' : pdfState === 'busy' ? 'Preparing…' : pdfState === 'done' ? 'Saved' : 'Download'}</span>
           </button>
         </div>
       </header>
@@ -169,7 +200,7 @@ export default function MicroSheetPage() {
       {!canDownload && <div className="ms-strip">{lockedMessage}</div>}
 
       <div className="ms-frame">
-        <MicroSheetFrame ref={frameRef} mode="viewer" subject={state.title} text={state.text} canDownload={canDownload} lockedMessage={lockedMessage} dark={dark} watermark={wm} blurred={away} />
+        <MicroSheetFrame ref={frameRef} mode="viewer" subject={state.title} text={state.text} canDownload={canDownload} lockedMessage={lockedMessage} dark={dark} watermark={wm} blurred={away} onEvent={onFrameEvent} />
       </div>
 
       {toast && (

@@ -72,3 +72,44 @@
     text-overflow: ellipsis;
   }
 }
+
+/* the download button's own icon */
+.ms-root .rd-download .ms-dl-ico {
+  color: #34d399;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+.ms-root .rd-download:hover:not(:disabled):not(.is-locked) .ms-dl-ico {
+  color: #ffffff;
+}
+.ms-root .rd-download:hover:not(:disabled):not(.is-locked) .ms-dl-arrow {
+  animation: ms-dl-bounce 0.7s ease-in-out infinite;
+}
+.ms-dl-spin {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid rgba(52, 211, 153, 0.3);
+  border-top-color: #34d399;
+  animation: ms-dl-spin 0.8s linear infinite;
+}
+@keyframes ms-dl-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(1.8px);
+  }
+}
+@keyframes ms-dl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ms-root .rd-download:hover .ms-dl-arrow,
+  .ms-dl-spin {
+    animation: none;
+  }
+}

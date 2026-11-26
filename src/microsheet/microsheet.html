@@ -10,6 +10,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Carlito:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <!--
   MICROSHEET TOOL  (shown inside the website by src/microsheet/MicroSheetFrame.jsx)
 
@@ -539,11 +541,11 @@
 
   .grid {
     position: absolute;
-    /* original default: 10mm on all four sides */
-    left: 10mm;
-    top: 10mm;
-    right: 10mm;
-    bottom: 10mm;
+    /* margins: 0.8 cm on all four sides (top, bottom, left, right) */
+    left: 8mm;
+    top: 8mm;
+    right: 8mm;
+    bottom: 8mm;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
@@ -612,8 +614,8 @@
 
   .page-badge {
     position: absolute;
-    right: 10mm;
-    bottom: 3.5mm;
+    right: 8mm;
+    bottom: 2.5mm;
     font: 600 8pt/1 Carlito, Calibri, sans-serif;
     color: #666;
   }
@@ -836,7 +838,7 @@
     <div class="actions">
       <span class="lock-pill" id="lockPill" hidden><i class="fa fa-lock"></i> <span id="lockText"></span></span>
       <button type="button" class="btn ghost" id="btnFit"><i class="fa fa-compress"></i> Auto-Fit</button>
-      <button type="button" class="btn ghost" id="btnPrint"><i class="fa fa-print"></i> Print / PDF</button>
+      <button type="button" class="btn ghost" id="btnPrint"><i class="fa fa-file-pdf"></i> Download PDF</button>
       <button type="button" class="btn" id="btnDoc"><i class="fa fa-file-word"></i> Export DOCX</button>
       <button type="button" class="btn danger" id="btnClear"><i class="fa fa-trash"></i> Clear</button>
     </div>
@@ -1524,10 +1526,10 @@
   var DXA_PAGE_H = 16838;
   // Word "Narrow" preset — 1.27cm (0.5in = 720 twips) on all four sides
   // original default — 10mm (567 twips) on all four sides
-  var DXA_MARGIN_X = 567;
-  var DXA_MARGIN_Y = 567;
-  var DXA_COL = 3591;       // (11906 - 2*567) / 3
-  var DXA_ROW = 5200;       // just under (16838 - 2*567)/3 so Word never spills a row
+  var DXA_MARGIN_X = 454;   // 0.8 cm on all four sides
+  var DXA_MARGIN_Y = 454;
+  var DXA_COL = 3666;       // (11906 - 2*454) / 3
+  var DXA_ROW = 5300;       // just under (16838 - 2*454)/3 so Word never spills a row
 
   function wTableCell(cell) {
     return (
@@ -1712,6 +1714,72 @@
     }
   }
 
+  /** Downloads the A4 pages as a PDF file (A4, 0.8 cm margins, the same boxes as on screen). */
+  var pdfBusy = false;
+  async function exportPdf() {
+    if (!downloadOk) {
+      setStatus(lockedMessage);
+      sendToHost({ type: "export-state", state: "failed", message: lockedMessage });
+      return;
+    }
+    if (pdfBusy) return;
+    if (!window.html2canvas || !window.jspdf) {
+      var noLib = "PDF library load nahi hui — internet check karke dobara try karo";
+      setStatus(noLib);
+      sendToHost({ type: "export-state", state: "failed", message: noLib });
+      return;
+    }
+    pdfBusy = true;
+    sendToHost({ type: "export-state", state: "busy" });
+    var host = null;
+    try {
+      if (fillTimer) clearTimeout(fillTimer);
+      var items = parseQA(rawInput.value);
+      if (!items.length) {
+        fillBoxes(items);
+        throw new Error("no questions to put in the PDF");
+      }
+      fillBoxes(withCoveredSummary(items));
+      truncateAllCells();
+
+      setStatus("PDF bana rahe hain...");
+      var sheets = stage.querySelectorAll(".sheet");
+      var pdf = new window.jspdf.jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
+
+      // the pages are drawn from copies kept out of sight at full size (the screen view can be scaled down)
+      host = document.createElement("div");
+      host.style.cssText = "position:fixed;left:-20000px;top:0;width:210mm;background:#fff;";
+      document.body.appendChild(host);
+
+      for (var i = 0; i < sheets.length; i++) {
+        var copy = sheets[i].cloneNode(true);
+        copy.style.transform = "none";
+        copy.style.margin = "0";
+        copy.style.boxShadow = "none";
+        copy.style.borderRadius = "0";
+        host.appendChild(copy);
+        await new Promise(function (r) { setTimeout(r, 30); });
+        var canvas = await window.html2canvas(copy, { scale: 3, backgroundColor: "#ffffff", useCORS: true, logging: false });
+        if (i > 0) pdf.addPage();
+        pdf.addImage(canvas.toDataURL("image/jpeg", 0.93), "JPEG", 0, 0, 210, 297, undefined, "FAST");
+        host.removeChild(copy);
+      }
+
+      var pdfName = subjectBaseName() + "_imp-ques.pdf";
+      pdf.save(pdfName);
+      setStatus("Saved: " + pdfName);
+      sendToHost({ type: "export-state", state: "done" });
+    } catch (err) {
+      console.error(err);
+      var failMsg = "PDF export failed: " + (err && err.message ? err.message : "unknown error");
+      setStatus(failMsg);
+      sendToHost({ type: "export-state", state: "failed", message: failMsg });
+    } finally {
+      if (host && host.parentNode) host.parentNode.removeChild(host);
+      pdfBusy = false;
+    }
+  }
+
   function applyFill() {
     fillBoxes(withCoveredSummary(parseQA(rawInput.value)));
     renderQuestionList();
@@ -1838,11 +1906,7 @@
   });
 
   document.getElementById("btnPrint").addEventListener("click", function () {
-    /* WEBSITE LINK: locked until the allowed time */
-    if (!downloadOk) { setStatus(lockedMessage); return; }
-    if (fillTimer) clearTimeout(fillTimer);
-    applyFill();
-    window.print();
+    exportPdf(); // downloads a PDF file (locked until the allowed time)
   });
 
   document.getElementById("btnDoc").addEventListener("click", function () {
@@ -1972,13 +2036,8 @@
       document.body.classList.toggle("secure-blur", !!d.on);
     } else if (d.type === "export") {
       if (!downloadOk) { setStatus(lockedMessage); return; }
-      if (d.format === "pdf") {
-        if (fillTimer) clearTimeout(fillTimer);
-        applyFill();
-        window.print();
-      } else {
-        exportDoc();
-      }
+      if (d.format === "docx") exportDoc();
+      else exportPdf();
     } else if (d.type === "getText") {
       sendToHost({ type: "text", text: rawInput.value, subject: subjectInput.value });
     }

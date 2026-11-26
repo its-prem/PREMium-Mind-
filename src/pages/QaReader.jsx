@@ -21,23 +21,17 @@ export default function QaReader() {
   const navigate = useNavigate();
   const [state, setState] = useState({ status: 'loading' });
   const [checkout, setCheckout] = useState(null);
-  const [tipOpen, setTipOpen] = useState(false); // the small "Micro format" message under the icon
-  const tipRef = useRef(null);
-  useEffect(() => {
-    if (!tipOpen) return undefined;
-    const close = (e) => {
-      if (tipRef.current && !tipRef.current.contains(e.target)) setTipOpen(false);
-    };
-    const esc = (e) => e.key === 'Escape' && setTipOpen(false);
-    document.addEventListener('mousedown', close);
-    document.addEventListener('touchstart', close);
-    document.addEventListener('keydown', esc);
-    return () => {
-      document.removeEventListener('mousedown', close);
-      document.removeEventListener('touchstart', close);
-      document.removeEventListener('keydown', esc);
-    };
-  }, [tipOpen]);
+  const [active, setActive] = useState(0); // the question that is on screen now
+  const stripRef = useRef(null);
+  // the tiny "Micro format" label under the icon: shown on hover / focus, and for a moment after a tap
+  const [tipFlash, setTipFlash] = useState(false);
+  const flashTimer = useRef(null);
+  useEffect(() => () => clearTimeout(flashTimer.current), []);
+  const flashTip = () => {
+    setTipFlash(true);
+    clearTimeout(flashTimer.current);
+    flashTimer.current = setTimeout(() => setTipFlash(false), 1300);
+  };
   const [dark, setDark] = useState(() => {
     try {
       return localStorage.getItem(THEME_KEY) === '1';
@@ -85,6 +79,47 @@ export default function QaReader() {
   }, [load]);
 
   const questions = useMemo(() => (state.status === 'ready' ? parseQuestions(state.text) : []), [state]);
+
+  // highlight the chip of the question that is on screen: the last card whose top has passed the two bars
+  useEffect(() => {
+    if (state.status !== 'ready' || questions.length < 2) return undefined;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const line = 64 + 60 + 40; // the header + the strip + a little
+      let cur = 0;
+      questions.forEach((_, i) => {
+        const el = document.getElementById(`q-${i + 1}`);
+        if (el && el.getBoundingClientRect().top <= line) cur = i;
+      });
+      // at the very bottom the last question counts, even if it is too short to reach the line
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) cur = questions.length - 1;
+      setActive(cur);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [state.status, questions]);
+
+  // keep the active chip in the middle of the strip
+  useEffect(() => {
+    const strip = stripRef.current;
+    const chip = strip?.querySelector('.on');
+    if (strip && chip) strip.scrollTo({ left: chip.offsetLeft - strip.clientWidth / 2 + chip.clientWidth / 2, behavior: 'smooth' });
+  }, [active]);
+
+  const goTo = (i) => {
+    setActive(i);
+    document.getElementById(`q-${i + 1}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   if (state.status === 'loading') {
     return (
@@ -169,7 +204,7 @@ export default function QaReader() {
 
           <div className="rd-brand">
             PREM<em>ium</em> Mind
-            <span>{title || 'Important Questions'}</span>
+            <span>Important Questions</span>
           </div>
 
           <div className="rd-header-end">
@@ -182,14 +217,17 @@ export default function QaReader() {
               </button>
             )}
             {micro.enabled && (
-              <div className="qa-micro-wrap" ref={tipRef}>
+              <div className="qa-micro-wrap">
                 <button
                   type="button"
-                  className={`rd-theme qa-micro-btn${micro.owned ? ' owned' : ''}${tipOpen ? ' open' : ''}`}
-                  onClick={() => setTipOpen((v) => !v)}
-                  aria-expanded={tipOpen}
-                  aria-haspopup="dialog"
-                  aria-label="Micro format"
+                  className={`rd-theme qa-micro-btn${micro.owned ? ' owned' : ''}`}
+                  onClick={() => {
+                    flashTip();
+                    // the icon does the work: a buyer opens the micro format, others get the checkout
+                    if (micro.owned) navigate(`/microsheet/${id}`);
+                    else openMicroCheckout();
+                  }}
+                  aria-label={micro.owned ? 'Open the micro format' : `Micro format, ₹${micro.price}`}
                 >
                   <svg className="qa-micro-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <rect x="4.5" y="2.5" width="15" height="19" rx="2" />
@@ -208,57 +246,34 @@ export default function QaReader() {
                 </svg>
                   <em className={`qa-micro-price${micro.owned ? ' ok' : ''}`}>{micro.owned ? '✓' : `₹${micro.price}`}</em>
                 </button>
-
-                {/* the message that opens under the icon */}
-                {tipOpen && (
-                  <div className="qa-pop" role="dialog" aria-label="Micro format">
-                    <b>Micro format</b>
-                    <p>
-                      All these questions in small A4 boxes, ready to print.
-                      <br />
-                      <span>{dlText.charAt(0).toUpperCase() + dlText.slice(1)}.</span>
-                    </p>
-                    {micro.owned ? (
-                      <button
-                        type="button"
-                        className="qa-pop-btn owned"
-                        onClick={() => {
-                          setTipOpen(false);
-                          navigate(`/microsheet/${id}`);
-                        }}
-                      >
-                        Open micro format
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className="qa-pop-btn"
-                        onClick={() => {
-                          setTipOpen(false);
-                          openMicroCheckout();
-                        }}
-                      >
-                        Buy for ₹{micro.price}
-                      </button>
-                    )}
-                  </div>
-                )}
+                {/* just the name, very small */}
+                <span className={`qa-tip${tipFlash ? ' show' : ''}`} role="tooltip">
+                  Micro format
+                </span>
               </div>
             )}
           </div>
         </header>
       </div>
 
+      {/* the subject name (it used to be in the header) */}
+      <div className="qa-wrap qa-headwrap">
+        <h1 className="qa-title">{title}</h1>
+        <span className="qa-count">{questions.length} question{questions.length === 1 ? '' : 's'}</span>
+      </div>
+
+      {/* one line of question numbers: scroll it sideways, tap one to jump; the one on screen is highlighted */}
+      {questions.length > 1 && (
+        <nav className="qa-strip" ref={stripRef} aria-label="Jump to a question">
+          {questions.map((q, i) => (
+            <button key={i} type="button" className={`qa-chip${i === active ? ' on' : ''}`} onClick={() => goTo(i)}>
+              {q.label || i + 1}
+            </button>
+          ))}
+        </nav>
+      )}
+
       <div className="qa-wrap">
-        {questions.length > 1 && (
-          <nav className="qa-index" aria-label="Questions">
-            {questions.map((q, i) => (
-              <a key={i} href={`#q-${i + 1}`}>
-                {q.label || i + 1}
-              </a>
-            ))}
-          </nav>
-        )}
 
         {questions.map((q, i) => (
           <article key={i} id={`q-${i + 1}`} className="qa-card">

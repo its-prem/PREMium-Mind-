@@ -18,12 +18,14 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } f
 import toolHtml from './microsheet.html?raw';
 
 const MicroSheetFrame = forwardRef(function MicroSheetFrame(
-  { subject = '', text = '', canDownload = false, lockedMessage = '', mode = 'editor', dark = false, watermark = '', blurred = false, className = '' },
+  { subject = '', text = '', canDownload = false, lockedMessage = '', mode = 'editor', dark = false, watermark = '', blurred = false, className = '', onEvent },
   ref
 ) {
   const frameRef = useRef(null);
   const [ready, setReady] = useState(false);
   const waiting = useRef(null);
+  const onEventRef = useRef(onEvent);
+  onEventRef.current = onEvent;
 
   const post = (payload) => {
     frameRef.current?.contentWindow?.postMessage({ source: 'pm-microsheet-host', ...payload }, '*');
@@ -36,6 +38,7 @@ const MicroSheetFrame = forwardRef(function MicroSheetFrame(
       const d = ev.data;
       if (!d || d.source !== 'pm-microsheet') return;
       if (d.type === 'ready') setReady(true);
+      onEventRef.current?.(d); // for example { type: 'export-state', state: 'busy' | 'done' | 'failed', message }
       if (d.type === 'text' && waiting.current) {
         waiting.current({ text: d.text, subject: d.subject });
         waiting.current = null;
