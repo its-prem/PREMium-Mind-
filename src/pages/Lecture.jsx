@@ -202,8 +202,7 @@ export default function Lecture() {
       return;
     }
 
-    const isProject = String(course.category || '').trim().toLowerCase() === 'projects';
-    const ownLink = isProject ? '' : safeWebsiteLink(course.website_link);
+    const ownLink = safeWebsiteLink(course.website_link);
     if (ownLink && !pickPdfPath(course) && Number(course.has_qa) !== 1) {
       window.location.href = ownLink; // no PDF: open the link set in the admin (e.g. D2D PYQ)
       return;

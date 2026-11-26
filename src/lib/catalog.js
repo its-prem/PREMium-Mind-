@@ -71,8 +71,8 @@ function rowToProduct(row) {
     tncText: String(row.tnc_text || ''),
     pdfFile: String(row.pdf_file || ''), // empty unless this user owns it
     // A link set in the admin (e.g. the D2D PYQ page). The server only sends it to buyers, so "Open" goes there.
-    // (For Projects the link is a public demo, so it is not used as the open link.)
-    openLink: category === 'projects' ? '' : safeLink(row.website_link),
+    // Used only when the product has no PDF / questions of its own (the PDF always opens first).
+    openLink: safeLink(row.website_link),
     demoSrc: '',
     fromServer: true,
   };
