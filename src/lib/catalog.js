@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { PRODUCTS } from '../data/storeData';
 import { SITE_API } from './api';
 import { getPdfSession } from './session';
+import { normalizeOpenLink } from './openLink';
 import { setOwned } from './purchases';
 
 /**
@@ -34,12 +35,7 @@ const toNumber = (v) => {
   return Number.isFinite(n) ? n : 0;
 };
 
-function safeLink(v) {
-  const l = String(v || '').trim();
-  if (/^https?:\/\//i.test(l)) return l;
-  if (/^\/?[a-z0-9_-]+(\/[a-z0-9._-]+)+(\?\S*)?$/i.test(l)) return l.startsWith('/') ? l : '/' + l; // a page of this website
-  return '';
-}
+const safeLink = normalizeOpenLink; // see lib/openLink.js
 
 function rowToProduct(row) {
   const raw = String(row.category || '').trim().toLowerCase();

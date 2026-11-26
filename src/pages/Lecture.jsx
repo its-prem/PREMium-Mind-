@@ -49,12 +49,7 @@ function pickPdfPath(course) {
 
 /** Only allow normal web links (blocks javascript: and similar). */
 function safeWebsiteLink(value) {
-  const link = String(value || '').trim();
-  if (!link || link.toLowerCase() === 'null') return '';
-  if (/^https?:\/\//i.test(link)) return link;
-  // a page of this website, e.g. d2dpyq/d2dpyqv2 or /d2dpyq/d2dpyqv2.html
-  if (/^\/?[a-z0-9_-]+(\/[a-z0-9._-]+)+(\?\S*)?$/i.test(link)) return link.startsWith('/') ? link : '/' + link;
-  return '';
+  return normalizeOpenLink(value); // see lib/openLink.js
 }
 
 function CourseCard({ course, index, onOpen }) {
