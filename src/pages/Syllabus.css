@@ -515,3 +515,31 @@
     transform: translateY(0);
   }
 }
+
+/* a semester card: tap it to open the subjects of that semester */
+.sy-semcard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 16px;
+  background: #ffffff;
+  color: #09090b;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.sy-semcard:hover {
+  transform: translateY(-2px);
+  border-color: #d4d4d8;
+  box-shadow: 0 10px 24px rgba(9, 9, 11, 0.08);
+}
+.sy-semcard:hover .sy-sem-no {
+  background: #dc2626;
+}
+.sy-semcard .sy-go {
+  flex-shrink: 0;
+  color: #a1a1aa;
+  font-size: 20px;
+}
