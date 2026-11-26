@@ -149,3 +149,14 @@ export function fmtDate(s) {
   if (Number.isNaN(d.getTime())) return s;
   return d.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
+
+/** Shows a picture big, in a popup. */
+export function ImageViewer({ src, title, onClose }) {
+  return (
+    <Modal title={title || 'Picture'} onClose={onClose} wide>
+      <div style={{ textAlign: 'center', background: '#f1f2f7', borderRadius: 12, padding: 12 }}>
+        <img src={src} alt="" style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: 8 }} />
+      </div>
+    </Modal>
+  );
+}

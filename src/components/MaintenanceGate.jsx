@@ -1,5 +1,7 @@
 import React, { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { SITE_API } from '../lib/api';
+import { isPageClosed } from '../lib/sitePages';
 import './Maintenance.css';
 
 // The maintenance page (cat artwork + styles) is only downloaded when maintenance is really on.
@@ -8,9 +10,9 @@ const MaintenancePage = lazy(() => import('./MaintenancePage'));
 /**
  * Maintenance mode for the WHOLE site.
  *
- * How to switch it on/off: edit public/maintenance.json on the host and set
- * "enabled" to true / false. No rebuild is needed: every visitor's browser
- * re-reads that file once a minute (and on "Check again").
+ * How to switch it on/off: use the "Maintenance" tab in the admin panel (/admin/maintenance).
+ * (Backup way: set "enabled" in public/maintenance.json – used only until the admin saves the setting once.)
+ * Every visitor's browser re-checks once a minute (and on "Check again").
  *
  * Owner preview: open the site with ?bypass=YOUR_SECRET once. The secret is
  * checked against "bypassHash" (SHA-256) in maintenance.json, so you can still
@@ -46,13 +48,32 @@ const writeCache = (v) => {
   }
 };
 
-async function loadConfig(signal) {
-  const res = await fetch(`${CONFIG_URL}?t=${Date.now()}`, {
-    cache: 'no-store',
-    signal,
-  });
+async function getJson(url, signal) {
+  const res = await fetch(url, { cache: 'no-store', signal });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
+}
+
+/**
+ * Two sources, asked together:
+ *   1) the server (the switch in the admin panel) – wins when the admin has saved it once
+ *   2) public/maintenance.json – default text, the owner bypass hash, and the answer if the server is unreachable
+ */
+async function loadConfig(signal) {
+  const t = Date.now();
+  // the server gets its own short timeout, so a slow server never blocks the file answer
+  const serverCtrl = new AbortController();
+  const serverTimer = setTimeout(() => serverCtrl.abort(), 1800);
+  const [file, server] = await Promise.all([
+    getJson(`${CONFIG_URL}?t=${t}`, signal).catch(() => null),
+    getJson(`${SITE_API}/maintenance_status.php?t=${t}`, serverCtrl.signal).catch(() => null),
+  ]);
+  clearTimeout(serverTimer);
+  if (server && server.status === 'success' && server.config) {
+    return { ...(file || {}), ...server.config };
+  }
+  if (!file) throw new Error('no maintenance config');
+  return file;
 }
 
 async function sha256Hex(text) {
@@ -142,11 +163,15 @@ export default function MaintenanceGate({ children }) {
 
   // The admin panel stays reachable during maintenance (it needs an admin login anyway).
   const isAdminPage = location.pathname.startsWith('/admin');
-  if (config.enabled === true && !bypass && !isAdminPage) {
+  // whole site closed, or just this page closed
+  const siteClosed = config.enabled === true;
+  const pageClosed = !siteClosed && isPageClosed(location.pathname, config.pages);
+  if ((siteClosed || pageClosed) && !bypass && !isAdminPage) {
     return (
       <Suspense fallback={<div className="mt-splash" />}>
         <MaintenancePage
           config={config}
+          pageOnly={pageClosed}
           checking={checking}
           onRetry={() => check(0)}
         />

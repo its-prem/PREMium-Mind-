@@ -106,12 +106,11 @@ function pm_scalar(mysqli $conn, string $sql): float {
 function pm_admin_options(): array {
     return [
         'categories' => [
-            ['id' => 'notes',          'label' => 'Notes'],
-            ['id' => 'ebooks',         'label' => 'E-Books'],
-            ['id' => 'resume',         'label' => 'Resume'],
-            ['id' => 'important',      'label' => 'Important Questions'],
-            ['id' => 'projects',       'label' => 'Projects'],
-            ['id' => 'report-writing', 'label' => 'Report Writing'],
+            ['id' => 'notes',     'label' => 'Notes'],
+            ['id' => 'ebooks',    'label' => 'E-Books'],
+            ['id' => 'important', 'label' => 'Important Questions'],
+            ['id' => 'projects',  'label' => 'Projects & Reports'],
+            ['id' => 'resume',    'label' => 'Resume Templates'],
         ],
         'btnTypes' => [
             ['id' => 'normal',        'label' => 'Normal (clickable)'],

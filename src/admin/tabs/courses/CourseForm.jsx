@@ -1,16 +1,43 @@
 /** Add / edit popup for one product. Fields and the order of the blocks come from fields.js. */
-import React, { useState } from 'react';
-import { adminPost } from '../../api';
-import { Modal, Switch, useUi } from '../../ui';
-import { FIELDS, FLAGS, SECTIONS, emptyCourse } from './fields';
+import React, { useEffect, useState } from 'react';
+import { adminPost, openLocalFile, openUploadedPdf } from '../../api';
+import { ImageViewer, Modal, Switch, useUi } from '../../ui';
+import { CATEGORIES, FIELDS, FLAGS, SECTIONS, emptyCourse, normalizeCategory } from './fields';
 
 export default function CourseForm({ course, options, allCourses = [], onClose, onSaved }) {
   const { toast } = useUi();
   const editing = !!course?.id;
-  const [v, setV] = useState({ ...emptyCourse, ...(course || {}) });
+  const [v, setV] = useState(() => {
+    const start = { ...emptyCourse, ...(course || {}) };
+    start.category = normalizeCategory(start.category);
+    return start;
+  });
   const [imageFile, setImageFile] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [viewer, setViewer] = useState(null); // picture shown big
+  const [imgUrl, setImgUrl] = useState(''); // preview of the picture picked now
+
+  // preview address for a picture that is chosen but not uploaded yet
+  useEffect(() => {
+    if (!imageFile) {
+      setImgUrl('');
+      return undefined;
+    }
+    const url = URL.createObjectURL(imageFile);
+    setImgUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [imageFile]);
+
+  const viewPdf = async () => {
+    try {
+      if (pdfFile) openLocalFile(pdfFile);
+      else await openUploadedPdf(v.pdf_file);
+    } catch (err) {
+      toast(err.message, 'error');
+    }
+  };
+  const shownImage = imgUrl || v.image;
 
   const set = (name, value) => setV((p) => ({ ...p, [name]: value }));
   const isResume = v.category === 'resume';
@@ -20,6 +47,7 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
     const src = allCourses.find((c) => String(c.id) === String(id));
     if (!src) return;
     const next = { ...emptyCourse };
+    next.category = normalizeCategory(src.category);
     Object.keys(emptyCourse).forEach((k) => {
       if (src[k] !== undefined && src[k] !== null) next[k] = src[k];
     });
@@ -56,6 +84,17 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
 
   const input = (f) => {
     const common = { id: `f_${f.name}`, value: v[f.name] ?? '', required: f.required, onChange: (e) => set(f.name, e.target.value) };
+    if (f.type === 'choice')
+      return (
+        <div className="adm-choices" role="radiogroup" aria-label={f.label}>
+          {CATEGORIES.map((c) => (
+            <button type="button" key={c.id} role="radio" aria-checked={v.category === c.id} className={`adm-choice${v.category === c.id ? ' on' : ''}`} onClick={() => set('category', c.id)}>
+              <span>{c.icon}</span>
+              {c.label}
+            </button>
+          ))}
+        </div>
+      );
     if (f.type === 'textarea') return <textarea className="adm-textarea" rows={f.rows || 3} {...common} />;
     if (f.type === 'select')
       return (
@@ -125,34 +164,63 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
       <div className="adm-field">
         <label>Card picture</label>
         <div className="adm-drop">
-          {v.image && !imageFile ? <img className="adm-thumb big" src={v.image} alt="" /> : <span className="adm-muted">{imageFile ? imageFile.name : 'No picture yet'}</span>}
+          {shownImage ? (
+            <button type="button" className="adm-picbtn" onClick={() => setViewer(shownImage)} title="Click to see it big">
+              <img className="adm-thumb big" src={shownImage} alt="Card picture" />
+              <span>Click to view big</span>
+            </button>
+          ) : (
+            <span className="adm-muted">No picture yet</span>
+          )}
+          {imageFile && <span className="adm-chip ok">New: {imageFile.name} (saved when you press the button below)</span>}
           <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0] || null)} />
         </div>
         <span className="adm-hint">jpg, png, webp or gif, max 5 MB</span>
-        {v.image && !imageFile && (
-          <div>
-            <button type="button" className="adm-btn ghost small" onClick={() => set('image', '')}>
-              Remove picture
-            </button>
+        {(v.image || imageFile) && (
+          <div className="adm-row">
+            {imageFile && (
+              <button type="button" className="adm-btn ghost small" onClick={() => setImageFile(null)}>
+                Undo new picture
+              </button>
+            )}
+            {v.image && !imageFile && (
+              <button type="button" className="adm-btn ghost small" onClick={() => set('image', '')}>
+                Remove picture
+              </button>
+            )}
           </div>
         )}
       </div>
       <div className="adm-field">
         <label>PDF file</label>
         <div className="adm-drop">
-          {v.pdf_file && !pdfFile ? (
+          {pdfFile ? (
+            <span className="adm-chip ok">New: {pdfFile.name} ({(pdfFile.size / 1048576).toFixed(1)} MB)</span>
+          ) : v.pdf_file ? (
             <span className="adm-chip ok">Uploaded: {String(v.pdf_file).split('/').pop()}</span>
           ) : (
-            <span className="adm-muted">{pdfFile ? pdfFile.name : 'No PDF yet'}</span>
+            <span className="adm-muted">No PDF yet</span>
+          )}
+          {(pdfFile || v.pdf_file) && (
+            <button type="button" className="adm-btn small" onClick={viewPdf}>
+              Open PDF to check
+            </button>
           )}
           <input type="file" accept="application/pdf" onChange={(e) => setPdfFile(e.target.files[0] || null)} />
         </div>
         <span className="adm-hint">max 60 MB</span>
-        {v.pdf_file && !pdfFile && (
-          <div>
-            <button type="button" className="adm-btn ghost small" onClick={() => set('pdf_file', '')}>
-              Remove PDF
-            </button>
+        {(v.pdf_file || pdfFile) && (
+          <div className="adm-row">
+            {pdfFile && (
+              <button type="button" className="adm-btn ghost small" onClick={() => setPdfFile(null)}>
+                Undo new PDF
+              </button>
+            )}
+            {v.pdf_file && !pdfFile && (
+              <button type="button" className="adm-btn ghost small" onClick={() => set('pdf_file', '')}>
+                Remove PDF
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -175,6 +243,7 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
         </>
       }
     >
+      {viewer && <ImageViewer src={viewer} title="Card picture" onClose={() => setViewer(null)} />}
       <form id="course-form" onSubmit={submit} className="adm-sections">
         {!editing && allCourses.length > 0 && (
           <section className="adm-section adm-copybox">

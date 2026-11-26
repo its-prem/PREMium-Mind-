@@ -26,7 +26,7 @@ function useCountdown(returnAt) {
 }
 
 /** Full-screen page shown on every route while maintenance mode is on. */
-export default function MaintenancePage({ config, onRetry, checking }) {
+export default function MaintenancePage({ config, onRetry, checking, pageOnly = false }) {
   const countdown = useCountdown(config.returnAt);
   const [soundOn, setSoundOnState] = useState(() => isSoundOn());
 
@@ -52,7 +52,7 @@ export default function MaintenancePage({ config, onRetry, checking }) {
         <div className="mt-top">
           <img className="mt-logo" src="/small-logo.png" alt="PREMium Mind" />
           <span className="mt-badge">
-            <span className="mt-dot" /> Under maintenance
+            <span className="mt-dot" /> {pageOnly ? 'Page under maintenance' : 'Under maintenance'}
           </span>
           <button
             type="button"
@@ -69,9 +69,11 @@ export default function MaintenancePage({ config, onRetry, checking }) {
         <MaintenanceArt />
         <p className="mt-hint">Tap the cat. Press and hold to make it purr.</p>
 
-        <h1>{config.title || "We'll be back soon"}</h1>
+        <h1>{pageOnly ? 'This page is under maintenance' : config.title || "We'll be back soon"}</h1>
         <p className="mt-message">
-          {config.message ||
+          {pageOnly
+            ? 'We are improving this part of PREMium Mind. The rest of the website works normally. Please check back in a little while.'
+            : config.message ||
             "We're updating the website to make it better. Your notes and courses are safe. Please check back in a little while."}
         </p>
 
@@ -92,6 +94,11 @@ export default function MaintenancePage({ config, onRetry, checking }) {
             <ion-icon name="refresh-outline"></ion-icon>
             {checking ? 'Checking...' : 'Check again'}
           </button>
+          {pageOnly && (
+            <a className="mt-btn" href="/">
+              <ion-icon name="home-outline"></ion-icon> Back to home
+            </a>
+          )}
           {phone && (
             <a
               className="mt-btn mt-btn-wa"

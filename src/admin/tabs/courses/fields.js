@@ -19,9 +19,24 @@ export const DEFAULT_TNC = `1. Non-Refundable: All sales are final. No refunds w
 const isOff = (v, f) => !(v[f] == 1 || v[f] === true);
 const isOn = (v, f) => !isOff(v, f);
 
+// The categories a product can be in (same as the website's store). Add one here to get it in the form.
+// 'report-writing' was an older name of Projects & Reports; the website already treats it as projects.
+export const CATEGORIES = [
+  { id: 'notes', label: 'Notes', icon: '📝' },
+  { id: 'ebooks', label: 'E-Books', icon: '📚' },
+  { id: 'important', label: 'Important Questions', icon: '⭐' },
+  { id: 'projects', label: 'Projects & Reports', icon: '🛠️' },
+  { id: 'resume', label: 'Resume Templates', icon: '📄' },
+];
+export const normalizeCategory = (c) => {
+  const v = String(c || '').trim().toLowerCase();
+  if (v === 'report-writing') return 'projects';
+  return CATEGORIES.some((x) => x.id === v) ? v : 'notes';
+};
+
 export const FIELDS = [
   { name: 'title', label: 'Title', type: 'text', full: true, required: true, hint: 'e.g. Complete Web Development' },
-  { name: 'category', label: 'Category', type: 'select', optionsKey: 'categories', required: true },
+  { name: 'category', label: 'Category', type: 'choice', full: true, required: true, hint: 'Where this card is shown in the store.' },
   { name: 'badge', label: 'Badge (optional)', type: 'text', hint: 'e.g. NEW or Bestseller' },
   { name: 'price', label: 'Selling price (₹)', type: 'number', required: true },
   { name: 'old_price', label: 'Original price (₹, crossed out)', type: 'number' },

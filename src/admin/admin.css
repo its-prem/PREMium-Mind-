@@ -233,3 +233,16 @@
 .adm-modal-body .adm-field > label { text-transform: none; letter-spacing: 0; font-size: 0.82rem; color: var(--a-text); }
 .adm-copybox { background: #eef2ff; border-color: #c7d2fe; }
 .adm-copybox h4 { color: #312e81; }
+
+.adm-maint { border-left: 5px solid var(--a-ok); }
+.adm-maint.on { border-left-color: var(--a-bad); background: #fff7f7; }
+
+.adm-choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.adm-choice { display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid var(--a-line); background: #fff; color: var(--a-text); font: inherit; font-weight: 700; padding: 9px 14px; border-radius: 12px; cursor: pointer; transition: border-color 0.12s, background 0.12s; }
+.adm-choice:hover { border-color: #b9bff0; }
+.adm-choice.on { border-color: var(--a-brand); background: var(--a-brand-soft); color: var(--a-brand-dark); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12); }
+
+.adm-picbtn { border: 0; background: none; padding: 0; cursor: zoom-in; display: inline-flex; flex-direction: column; align-items: flex-start; gap: 4px; font: inherit; color: var(--a-brand); font-size: 0.75rem; font-weight: 700; }
+.adm-picbtn:hover .adm-thumb { box-shadow: 0 0 0 3px var(--a-brand-soft); }
+.adm-chipbtn { border: 0; font-family: inherit; cursor: pointer; }
+.adm-chipbtn:hover { filter: brightness(0.95); text-decoration: underline; }

@@ -63,3 +63,40 @@ async function call(file, { method = 'GET', params, body } = {}) {
 
 export const adminGet = (file, params) => call(file, { params });
 export const adminPost = (file, body) => call(file, { method: 'POST', body });
+
+/**
+ * Opens an uploaded PDF from the server in a new tab. The server folder is private, so the file is
+ * fetched with the admin login and shown from memory.
+ */
+export async function openUploadedPdf(path) {
+  const token = getPdfSession();
+  if (!token) throw new AdminError('Please log in first.', 'unauthenticated');
+  const win = window.open('', '_blank'); // opened first, so the browser does not block it
+  try {
+    const res = await fetch(`${BASE}file.php?path=${encodeURIComponent(path)}`, { headers: { 'X-PM-Session': token }, mode: 'cors', credentials: 'omit' });
+    const type = res.headers.get('Content-Type') || '';
+    if (!res.ok || !type.includes('pdf')) {
+      let msg = 'Could not open the PDF.';
+      try {
+        msg = (await res.json()).message || msg;
+      } catch {
+        /* not JSON */
+      }
+      throw new AdminError(msg, 'file');
+    }
+    const url = URL.createObjectURL(await res.blob());
+    if (win) win.location.href = url;
+    else window.location.href = url;
+    setTimeout(() => URL.revokeObjectURL(url), 5 * 60 * 1000);
+  } catch (e) {
+    win?.close();
+    throw e;
+  }
+}
+
+/** Opens a file the admin just picked (not uploaded yet) in a new tab. */
+export function openLocalFile(file) {
+  const url = URL.createObjectURL(file);
+  window.open(url, '_blank');
+  setTimeout(() => URL.revokeObjectURL(url), 5 * 60 * 1000);
+}

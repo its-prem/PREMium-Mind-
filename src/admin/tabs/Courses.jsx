@@ -1,10 +1,10 @@
 /** Products: add, edit, copy, trash, restore, delete, quick switches. Form fields live in courses/fields.js. */
 import React, { useMemo, useState } from 'react';
-import { adminGet, adminPost } from '../api';
+import { adminGet, adminPost, openUploadedPdf } from '../api';
 import Icon from '../Icon';
-import { Empty, ErrorBox, Loading, Switch, money, useLoad, useUi } from '../ui';
+import { Empty, ErrorBox, ImageViewer, Loading, Switch, money, useLoad, useUi } from '../ui';
 import CourseForm from './courses/CourseForm';
-import { FLAGS } from './courses/fields';
+import { CATEGORIES, FLAGS, normalizeCategory } from './courses/fields';
 
 export default function Courses({ options }) {
   const { toast, confirm } = useUi();
@@ -15,13 +15,14 @@ export default function Courses({ options }) {
   const [form, setForm] = useState(null); // null | {} (new) | course
   const [local, setLocal] = useState({}); // switch values just changed here
   const [busy, setBusy] = useState([]); // switches being saved
+  const [pic, setPic] = useState(null); // picture shown big
   const [picked, setPicked] = useState([]); // ids ticked for “Revoke selected”
 
   const rows = useMemo(() => {
     if (!data) return [];
     return data.courses
       .filter((c) => (view === 'trash' ? c.is_deleted == 1 : c.is_deleted != 1))
-      .filter((c) => cat === 'all' || c.category === cat)
+      .filter((c) => cat === 'all' || normalizeCategory(c.category) === cat)
       .filter((c) => c.title.toLowerCase().includes(q.toLowerCase()));
   }, [data, q, cat, view]);
 
@@ -101,7 +102,7 @@ export default function Courses({ options }) {
         <input className="adm-input grow" placeholder="Search products…" value={q} onChange={(e) => setQ(e.target.value)} />
         <select className="adm-select" style={{ width: 'auto' }} value={cat} onChange={(e) => setCat(e.target.value)}>
           <option value="all">All categories</option>
-          {(options?.categories || []).map((o) => (
+          {CATEGORIES.map((o) => (
             <option key={o.id} value={o.id}>
               {o.label}
             </option>
@@ -150,11 +151,19 @@ export default function Courses({ options }) {
                     <td>
                       <div className="adm-prod">
                         <input type="checkbox" checked={picked.includes(c.id)} onChange={() => togglePick(c.id)} aria-label="Select product" />
-                        <img className="adm-thumb" src={c.image} alt="" onError={(e) => (e.currentTarget.style.visibility = 'hidden')} />
+                        <button type="button" className="adm-picbtn" onClick={() => setPic({ src: c.image, title: c.title })} title="View picture">
+                          <img className="adm-thumb" src={c.image} alt="" onError={(e) => (e.currentTarget.style.visibility = 'hidden')} />
+                        </button>
                         <div>
                           <b>{c.title}</b>
                           <span className="adm-chip">{c.category}</span>{' '}
-                          {c.pdf_file ? <span className="adm-chip ok">PDF</span> : <span className="adm-chip grey">no PDF</span>}{' '}
+                          {c.pdf_file ? (
+                            <button type="button" className="adm-chip ok adm-chipbtn" title="Open the PDF" onClick={() => openUploadedPdf(c.pdf_file).catch((e) => toast(e.message, 'error'))}>
+                              PDF ↗
+                            </button>
+                          ) : (
+                            <span className="adm-chip grey">no PDF</span>
+                          )}{' '}
                           {n > 0 && <span className="adm-chip warn">{n} students</span>}
                           <div className="adm-muted small" style={{ marginBottom: 0 }}>
                             #{c.id} · rank {c.sort_order}
@@ -277,6 +286,8 @@ export default function Courses({ options }) {
           </table>
         </div>
       )}
+
+      {pic && <ImageViewer src={pic.src} title={pic.title} onClose={() => setPic(null)} />}
 
       {form && (
         <CourseForm
