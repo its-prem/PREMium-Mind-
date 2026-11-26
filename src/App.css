@@ -2070,3 +2070,194 @@
   color: #16a34a;
   box-shadow: 0 0 0 8px #f0fdf4;
 }
+
+/* download chip in the checkout */
+.co-trust li.co-dl.instant svg { color: #16a34a; }
+.co-trust li.co-dl.timed { background: #fff4d6; color: #92400e; }
+.co-trust li.co-dl.timed svg { color: #b45309; }
+.co-trust li.co-dl.none { background: #fee2e2; color: #991b1b; }
+.co-trust li.co-dl.none svg { color: #dc2626; }
+.co-trust li.co-dl { white-space: normal; text-align: center; line-height: 1.2; }
+
+/* ---------- slide to pay ---------- */
+.co-slide {
+  /* colours: the track (dark, like the price card) and the handle / glow (green = go) */
+  --slide-track-a: #18181b;
+  --slide-track-b: #2c2c31;
+  --slide-accent: #22c55e;
+  --slide-accent-dark: #16a34a;
+  position: relative;
+  height: 60px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--slide-track-a), var(--slide-track-b));
+  box-shadow: 0 12px 26px rgba(9, 9, 11, 0.32), inset 0 -3px 0 rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.co-slide-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(34, 197, 94, 0.12), rgba(34, 197, 94, 0.55));
+}
+.co-slide-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-left: 52px;
+  color: #ffffff;
+  font-size: 0.96rem;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+}
+.co-slide-label b {
+  font-weight: 800;
+}
+.co-slide.idle .co-slide-label b {
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0.62) 20%, #ffffff 50%, rgba(255, 255, 255, 0.62) 80%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: co-shine 2.4s linear infinite;
+}
+.co-slide-chev {
+  display: inline-flex;
+  color: #4ade80;
+}
+.co-slide-chev svg {
+  margin-left: -5px;
+  opacity: 0.25;
+}
+.co-slide.idle .co-slide-chev svg {
+  animation: co-chev 1.5s ease-in-out infinite;
+}
+.co-slide.idle .co-slide-chev svg:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.co-slide.idle .co-slide-chev svg:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+/* the round handle */
+.co-slide-handle {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #34d399, var(--slide-accent-dark));
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: grab;
+  touch-action: none;
+  box-shadow: 0 5px 16px rgba(22, 163, 74, 0.5);
+}
+.co-slide-handle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(74, 222, 128, 0.9);
+  pointer-events: none;
+  opacity: 0;
+}
+.co-slide.idle .co-slide-handle {
+  animation: co-nudge 2.2s ease-in-out infinite;
+}
+.co-slide.idle .co-slide-handle::after {
+  animation: co-ring 2.2s ease-out infinite;
+}
+.co-slide.drag .co-slide-handle,
+.co-slide-handle:active {
+  cursor: grabbing;
+  box-shadow: 0 8px 22px rgba(22, 163, 74, 0.6);
+}
+.co-slide-handle:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.75);
+  outline-offset: 2px;
+}
+.co-slide.off {
+  background: #d4d4d8;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.06);
+}
+.co-slide.off .co-slide-handle {
+  background: #f4f4f5;
+  color: #a1a1aa;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.co-slide.busy .co-slide-handle {
+  cursor: progress;
+}
+.co-slide-spin {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  animation: co-spin 0.8s linear infinite;
+}
+
+@keyframes co-shine {
+  to {
+    background-position: -220% 0;
+  }
+}
+@keyframes co-chev {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(4px);
+  }
+}
+@keyframes co-nudge {
+  0%,
+  55%,
+  100% {
+    transform: translateX(0);
+  }
+  72% {
+    transform: translateX(12px);
+  }
+  86% {
+    transform: translateX(3px);
+  }
+}
+@keyframes co-ring {
+  0%,
+  50% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  62% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
+}
+@keyframes co-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .co-slide.idle .co-slide-handle,
+  .co-slide.idle .co-slide-handle::after,
+  .co-slide.idle .co-slide-chev svg,
+  .co-slide.idle .co-slide-label b {
+    animation: none;
+  }
+}

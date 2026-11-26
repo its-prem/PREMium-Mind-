@@ -4,6 +4,21 @@ import { adminPost, openLocalFile, openUploadedPdf } from '../../api';
 import { ImageViewer, Modal, Switch, useUi } from '../../ui';
 import { CATEGORIES, FIELDS, FLAGS, SECTIONS, emptyCourse, normalizeCategory } from './fields';
 
+// how many questions the text has (a new one starts with Q.1, Q.2 …)
+const countQuestions = (t) => (String(t || '').match(/^\s*(Q\.?\s*\d+|Question\s*\d+)/gim) || []).length;
+
+// "2026-12-05 18:00:00" -> "2026-12-05T18:00" (the value of a date-time box)
+const toLocalInput = (d) => {
+  const t = String(d || '').trim().replace(' ', 'T');
+  return t.length >= 16 ? t.slice(0, 16) : t;
+};
+// a sensible starting time: tomorrow 6 PM
+const nextEvening = () => {
+  const d = new Date(Date.now() + 86400000);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T18:00`;
+};
+
 export default function CourseForm({ course, options, allCourses = [], onClose, onSaved }) {
   const { toast } = useUi();
   const editing = !!course?.id;
@@ -17,6 +32,22 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
   const [saving, setSaving] = useState(false);
   const [viewer, setViewer] = useState(null); // picture shown big
   const [imgUrl, setImgUrl] = useState(''); // preview of the picture picked now
+  // The questions text is loaded on its own (it can be long). It is sent back only if it loaded, so it is never wiped by mistake.
+  const [qaLoaded, setQaLoaded] = useState(!editing);
+  useEffect(() => {
+    if (!editing) return undefined;
+    let dead = false;
+    adminPost('courses.php', { action: 'qa_get', id: course.id })
+      .then((r) => {
+        if (dead) return;
+        setV((p) => ({ ...p, qa_text: r.text || '' }));
+        setQaLoaded(true);
+      })
+      .catch(() => {});
+    return () => {
+      dead = true;
+    };
+  }, [editing, course?.id]);
 
   // preview address for a picture that is chosen but not uploaded yet
   useEffect(() => {
@@ -42,6 +73,14 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
   const set = (name, value) => setV((p) => ({ ...p, [name]: value }));
   const isResume = v.category === 'resume';
 
+  // Download rule: instant / on time / not allowed (stored as an allow flag plus a time)
+  const modeOf = (allowKey, atKey) => (v[allowKey] == 1 || v[allowKey] === true ? 'instant' : v[atKey] ? 'timed' : 'none');
+  const setModeFor = (allowKey, atKey, m) =>
+    setV((p) => ({ ...p, [allowKey]: m === 'instant' ? 1 : 0, [atKey]: m === 'timed' ? p[atKey] || nextEvening() : '' }));
+  const dlMode = modeOf('allow_download', 'download_at');
+  const microDlMode = modeOf('micro_allow_download', 'micro_download_at');
+  const isImportant = v.category === 'important';
+
   // "Copy from existing card": fills the whole form from another product (new product only)
   const copyFrom = (id) => {
     const src = allCourses.find((c) => String(c.id) === String(id));
@@ -52,7 +91,7 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
       if (src[k] !== undefined && src[k] !== null) next[k] = src[k];
     });
     FLAGS.forEach((f) => {
-      next[f.name] = src[f.name] == 1 ? 1 : 0;
+      next[f.name] = src[f.name] === undefined ? emptyCourse[f.name] ?? 0 : src[f.name] == 1 ? 1 : 0;
     });
     setV(next);
     setImageFile(null);
@@ -68,6 +107,9 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
       fd.append('action', 'save');
       if (editing) fd.append('id', course.id);
       FIELDS.forEach((f) => fd.append(f.name, v[f.name] ?? ''));
+      fd.append('download_at', dlMode === 'timed' ? toLocalInput(v.download_at) : '');
+      fd.append('micro_download_at', microDlMode === 'timed' ? toLocalInput(v.micro_download_at) : '');
+      if (isImportant && qaLoaded) fd.append('qa_text', v.qa_text ?? '');
       FLAGS.forEach((f) => fd.append(f.name, v[f.name] == 1 || v[f.name] === true ? '1' : '0'));
       fd.append('existing_image', v.image || '');
       fd.append('existing_pdf', v.pdf_file || '');
@@ -159,6 +201,84 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
     );
   };
 
+  const renderDownloadControl = (allowKey, atKey, inputId, hints) => {
+    const mode = modeOf(allowKey, atKey);
+    return (
+      <div className="adm-dl">
+        <div className="adm-choices" role="radiogroup" aria-label="Download">
+          {[
+            ['instant', '⚡', 'Instant'],
+            ['timed', '⏰', 'On time'],
+            ['none', '🚫', 'Not allowed'],
+          ].map(([id, icon, label]) => (
+            <button type="button" key={id} role="radio" aria-checked={mode === id} className={`adm-choice${mode === id ? ' on' : ''}`} onClick={() => setModeFor(allowKey, atKey, id)}>
+              <span>{icon}</span>
+              {label}
+            </button>
+          ))}
+        </div>
+        {mode === 'timed' && (
+          <div className="adm-field" style={{ marginTop: 12, maxWidth: 280 }}>
+            <label htmlFor={inputId}>Download unlocks on (India time)</label>
+            <input id={inputId} className="adm-input" type="datetime-local" required value={toLocalInput(v[atKey])} onChange={(e) => set(atKey, e.target.value)} />
+            <span className="adm-hint">{hints.timed}</span>
+          </div>
+        )}
+        {mode === 'instant' && <span className="adm-hint">{hints.instant}</span>}
+        {mode === 'none' && <span className="adm-hint">{hints.none}</span>}
+      </div>
+    );
+  };
+
+  const downloadControl = renderDownloadControl('allow_download', 'download_at', 'f_download_at', {
+    timed: 'The buyer sees this time at checkout. After it, the download button works.',
+    instant: 'Shown at checkout as “Instant download”.',
+    none: 'Shown at checkout as “Download not allowed”.',
+  });
+
+  // ---- Important Questions: the questions text ----
+  const qaBlock = (
+    <div className="adm-field full">
+      <label htmlFor="f_qa_text">Questions &amp; answers</label>
+      <textarea
+        id="f_qa_text"
+        className="adm-textarea adm-qa"
+        rows={14}
+        spellCheck={false}
+        disabled={!qaLoaded}
+        placeholder={qaLoaded ? 'Q.1 Your first question here\nAnswer lines here…\n\nQ.2 Your second question…' : 'Loading the saved text…'}
+        value={v.qa_text ?? ''}
+        onChange={(e) => set('qa_text', e.target.value)}
+      />
+      <span className="adm-hint">
+        Every new question starts with <b>Q.1</b>, <b>Q.2</b> … and the answer follows below it. <b>{countQuestions(v.qa_text)}</b> question(s) found.
+        Buyers read this text on the website. Use the <b>Microsheet</b> tab to see how it looks in the A4 boxes.
+      </span>
+    </div>
+  );
+
+  // ---- Important Questions: the paid micro format ----
+  const microOn = v.micro_enabled == 1 || v.micro_enabled === true;
+  const microBlock = microOn && (
+    <>
+      <div className="adm-form-grid" style={{ marginTop: 12 }}>
+        {renderField('micro_price')}
+        <div className="adm-field full">
+          <label>Micro sheet download</label>
+          {renderDownloadControl('micro_allow_download', 'micro_download_at', 'f_micro_download_at', {
+            timed: 'The micro sheet can be downloaded / printed only after this time. The buyer sees the time before paying.',
+            instant: 'The buyer can download the micro sheet right after paying.',
+            none: 'The buyer can only look at the micro sheet, not download it.',
+          })}
+        </div>
+      </div>
+      <div className="adm-flagrows" style={{ marginTop: 6 }}>
+        {renderFlag('micro_show_tnc')}
+      </div>
+      <div className="adm-form-grid">{renderField('micro_tnc_text')}</div>
+    </>
+  );
+
   const files = (
     <div className="adm-form-grid">
       <div className="adm-field">
@@ -191,39 +311,41 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
           </div>
         )}
       </div>
-      <div className="adm-field">
-        <label>PDF file</label>
-        <div className="adm-drop">
-          {pdfFile ? (
-            <span className="adm-chip ok">New: {pdfFile.name} ({(pdfFile.size / 1048576).toFixed(1)} MB)</span>
-          ) : v.pdf_file ? (
-            <span className="adm-chip ok">Uploaded: {String(v.pdf_file).split('/').pop()}</span>
-          ) : (
-            <span className="adm-muted">No PDF yet</span>
-          )}
-          {(pdfFile || v.pdf_file) && (
-            <button type="button" className="adm-btn small" onClick={viewPdf}>
-              Open PDF to check
-            </button>
-          )}
-          <input type="file" accept="application/pdf" onChange={(e) => setPdfFile(e.target.files[0] || null)} />
-        </div>
-        <span className="adm-hint">max 60 MB</span>
-        {(v.pdf_file || pdfFile) && (
-          <div className="adm-row">
-            {pdfFile && (
-              <button type="button" className="adm-btn ghost small" onClick={() => setPdfFile(null)}>
-                Undo new PDF
+      {(
+        <div className="adm-field">
+          <label>PDF file</label>
+          <div className="adm-drop">
+            {pdfFile ? (
+              <span className="adm-chip ok">New: {pdfFile.name} ({(pdfFile.size / 1048576).toFixed(1)} MB)</span>
+            ) : v.pdf_file ? (
+              <span className="adm-chip ok">Uploaded: {String(v.pdf_file).split('/').pop()}</span>
+            ) : (
+              <span className="adm-muted">No PDF yet</span>
+            )}
+            {(pdfFile || v.pdf_file) && (
+              <button type="button" className="adm-btn small" onClick={viewPdf}>
+                Open PDF to check
               </button>
             )}
-            {v.pdf_file && !pdfFile && (
-              <button type="button" className="adm-btn ghost small" onClick={() => set('pdf_file', '')}>
-                Remove PDF
-              </button>
-            )}
+            <input type="file" accept="application/pdf" onChange={(e) => setPdfFile(e.target.files[0] || null)} />
           </div>
-        )}
-      </div>
+          <span className="adm-hint">max 60 MB</span>
+          {(v.pdf_file || pdfFile) && (
+            <div className="adm-row">
+              {pdfFile && (
+                <button type="button" className="adm-btn ghost small" onClick={() => setPdfFile(null)}>
+                  Undo new PDF
+                </button>
+              )}
+              {v.pdf_file && !pdfFile && (
+                <button type="button" className="adm-btn ghost small" onClick={() => set('pdf_file', '')}>
+                  Remove PDF
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 
@@ -261,13 +383,16 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
             </select>
           </section>
         )}
-        {SECTIONS.map((sec) => (
+        {SECTIONS.filter((sec) => !sec.showIf || sec.showIf(v)).map((sec) => (
           <section key={sec.title} className="adm-section">
             <div className="adm-section-head">
               <h4>{sec.title}</h4>
-              <span className="adm-hint">{sec.hint}</span>
+              <span className="adm-hint">{sec.files && isImportant ? 'For Important Questions the PDF is optional: you can add a PDF, the questions text (below), or both. The buyer gets whatever you add.' : sec.hint}</span>
             </div>
             {sec.flags && <div className="adm-flagrows">{sec.flags.map(renderFlag)}</div>}
+            {sec.download && downloadControl}
+            {sec.qa && qaBlock}
+            {sec.micro && microBlock}
             {sec.files && files}
             {sec.fields && <div className="adm-form-grid">{sec.fields.map(renderField)}</div>}
           </section>

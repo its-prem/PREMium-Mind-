@@ -62,6 +62,13 @@ if ($display_email !== '') {
 
 if ($result) {
     while ($row = $result->fetch_assoc()) {
+        $row['has_pdf'] = (isset($row['pdf_file']) && trim((string)$row['pdf_file']) !== '') ? 1 : 0;
+        // The text of an Important Questions product is served only to its buyers (qa_text.php).
+        // The public list just says whether the product has text.
+        $row['has_qa'] = (isset($row['qa_text']) && trim((string)$row['qa_text']) !== '') ? 1 : 0;
+        unset($row['qa_text']);
+        $row['micro_enabled'] = !empty($row['micro_enabled']) ? 1 : 0;
+        unset($row['micro_tnc_text']);
         // Reveal premium content locators ONLY when the caller owns the course
         // AND identity was proven by the token. Email-only (unverified) callers
         // never get them, so they can't be scraped by spoofing an email.

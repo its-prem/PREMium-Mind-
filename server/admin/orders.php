@@ -13,7 +13,7 @@ pm_orders_ensure_tables($conn);
 function pm_find_order(mysqli $conn): array {
     $oid = trim((string)pm_in('order_id'));
     if ($oid === '') pm_admin_fail('Order id is missing.');
-    $stmt = $conn->prepare('SELECT order_id, user_email, course_id, amount, status FROM orders WHERE order_id = ? LIMIT 1');
+    $stmt = $conn->prepare('SELECT order_id, user_email, course_id, amount, status, kind FROM orders WHERE order_id = ? LIMIT 1');
     $stmt->bind_param('s', $oid);
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($cf === null) pm_admin_fail('Could not reach Cashfree. Try again.', 502);
         $cfStatus = strtoupper((string)($cf['order_status'] ?? ''));
         if ($cfStatus === 'PAID') {
-            if (!pm_grant_course($conn, $o['user_email'], (int)$o['course_id'])) pm_admin_fail('Paid, but access could not be saved.', 500);
+            if (!pm_grant_for_order($conn, $o)) pm_admin_fail('Paid, but access could not be saved.', 500);
             $stmt = $conn->prepare("UPDATE orders SET status = 'PAID', paid_at = COALESCE(paid_at, NOW()) WHERE order_id = ?");
             $stmt->bind_param('s', $o['order_id']);
             $stmt->execute();
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($action === 'grant') {
-        if (!pm_grant_course($conn, $o['user_email'], (int)$o['course_id'])) pm_admin_fail('Could not give access.', 500);
+        if (!pm_grant_for_order($conn, $o)) pm_admin_fail('Could not give access.', 500);
         $stmt = $conn->prepare("UPDATE orders SET status = 'PAID', paid_at = COALESCE(paid_at, NOW()) WHERE order_id = ?");
         $stmt->bind_param('s', $o['order_id']);
         $stmt->execute();
@@ -75,7 +75,7 @@ elseif ($status === 'FAILED') $where = "WHERE o.status NOT IN ('PAID','CREATED')
 
 $total = (int)pm_scalar($conn, "SELECT COUNT(*) FROM orders o $where");
 $stmt = $conn->prepare(
-    "SELECT o.order_id, o.user_email, o.course_id, o.amount, o.status, o.created_at, o.paid_at,
+    "SELECT o.order_id, o.user_email, o.course_id, o.amount, o.status, o.kind, o.created_at, o.paid_at,
             c.title AS course_title, u.name AS user_name
        FROM orders o
        LEFT JOIN courses c ON c.id = o.course_id

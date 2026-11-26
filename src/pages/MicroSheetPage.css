@@ -1,0 +1,74 @@
+/* Micro format page (/microsheet/:id): the PDF reader's header, then the finished A4 pages filling the rest of the screen */
+.ms-page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #0a0a0a;
+  color: #fff;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  z-index: 50;
+}
+.ms-center {
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  padding: 20px;
+}
+.ms-btn {
+  border: 0;
+  background: #dc2626;
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  padding: 10px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+/* the page itself uses the PDF reader's frame (.rd-root): the header is on top, the pages below it */
+.ms-root .ms-frame {
+  position: absolute;
+  top: calc(var(--rd-header-h) + var(--rd-safe-top));
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.ms-strip {
+  position: absolute;
+  top: calc(var(--rd-header-h) + var(--rd-safe-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4000;
+  margin-top: 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #fff4d6;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  font-size: 0.74rem;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(9, 9, 11, 0.15);
+  pointer-events: none;
+}
+@media (max-width: 520px) {
+  .ms-root .rd-header {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  .ms-root .rd-back span:last-child {
+    display: none;
+  }
+  .ms-root .rd-back {
+    padding: 0 6px;
+  }
+  .ms-root .rd-brand {
+    max-width: none;
+  }
+  .ms-strip {
+    max-width: 92vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

@@ -29,6 +29,11 @@ if (!function_exists('pm_orders_ensure_tables')) {
             INDEX idx_orders_email (user_email),
             INDEX idx_orders_course (course_id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        // kind = 'course' (the product) or 'micro' (the extra micro-format of an Important Questions product)
+        $col = @$conn->query("SHOW COLUMNS FROM orders LIKE 'kind'");
+        if ($col && $col->num_rows === 0) {
+            $conn->query("ALTER TABLE orders ADD COLUMN kind VARCHAR(10) NOT NULL DEFAULT 'course'");
+        }
     }
 }
 
@@ -98,5 +103,73 @@ if (!function_exists('pm_cashfree_fetch_order')) {
         if ($resp === false) return null;
         $data = json_decode($resp, true);
         return is_array($data) ? $data : null;
+    }
+}
+
+/* ---------------- micro format (A4 boxes) of an Important Questions product ---------------- */
+
+/** Who bought the micro format of which product. */
+if (!function_exists('pm_micro_ensure_table')) {
+    function pm_micro_ensure_table(mysqli $conn): void {
+        static $done = false;
+        if ($done) return;
+        $done = true;
+        $conn->query("CREATE TABLE IF NOT EXISTS user_micro (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_email VARCHAR(190) NOT NULL,
+            course_id INT NOT NULL,
+            purchased_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE KEY uniq_user_course (user_email, course_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    }
+}
+
+if (!function_exists('pm_user_owns_micro')) {
+    function pm_user_owns_micro(mysqli $conn, string $email, int $courseId): bool {
+        pm_micro_ensure_table($conn);
+        $stmt = $conn->prepare('SELECT 1 FROM user_micro WHERE user_email = ? AND course_id = ? LIMIT 1');
+        if (!$stmt) return false;
+        $stmt->bind_param('si', $email, $courseId);
+        $stmt->execute();
+        $stmt->store_result();
+        $has = $stmt->num_rows > 0;
+        $stmt->close();
+        return $has;
+    }
+}
+
+if (!function_exists('pm_grant_micro')) {
+    function pm_grant_micro(mysqli $conn, string $email, int $courseId): bool {
+        $email = strtolower(trim($email));
+        if ($email === '' || $courseId <= 0) return false;
+        pm_micro_ensure_table($conn);
+        $stmt = $conn->prepare('INSERT IGNORE INTO user_micro (user_email, course_id) VALUES (?, ?)');
+        if (!$stmt) return false;
+        $stmt->bind_param('si', $email, $courseId);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok || pm_user_owns_micro($conn, $email, $courseId);
+    }
+}
+
+/** Gives what an order paid for: the product, or its micro format. $order needs user_email, course_id and (optional) kind. */
+if (!function_exists('pm_grant_for_order')) {
+    function pm_grant_for_order(mysqli $conn, array $order): bool {
+        $email = (string)($order['user_email'] ?? '');
+        $cid = (int)($order['course_id'] ?? 0);
+        return (($order['kind'] ?? 'course') === 'micro')
+            ? pm_grant_micro($conn, $email, $cid)
+            : pm_grant_course($conn, $email, $cid);
+    }
+}
+
+/** Does the buyer already own what this order is for? */
+if (!function_exists('pm_order_owned')) {
+    function pm_order_owned(mysqli $conn, array $order): bool {
+        $email = strtolower(trim((string)($order['user_email'] ?? '')));
+        $cid = (int)($order['course_id'] ?? 0);
+        return (($order['kind'] ?? 'course') === 'micro')
+            ? pm_user_owns_micro($conn, $email, $cid)
+            : pm_user_owns($conn, $email, $cid);
     }
 }

@@ -72,7 +72,7 @@ export async function verifyOrder(orderId, { tries = 6, delayMs = 2000 } = {}) {
   for (let i = 0; i < tries; i += 1) {
     try {
       const { data } = await post('/verify_payment.php', { order_id: orderId }, token);
-      last = { status: data.status || 'failed', message: data.message || '', courseId: data.course_id };
+      last = { status: data.status || 'failed', message: data.message || '', courseId: data.course_id, kind: data.kind || 'course' };
       if (last.status === 'success' || last.status === 'failed') break;
     } catch {
       last = { status: 'pending', message: 'Network problem while checking the payment.' };
@@ -92,7 +92,7 @@ export async function verifyOrder(orderId, { tries = 6, delayMs = 2000 } = {}) {
  *   { status: 'cancelled' }          the buyer closed the payment window
  * and throws PaymentError for everything else (not logged in, already owned, gateway problem...).
  */
-export async function payForCourse(courseId) {
+export async function payForCourse(courseId, { kind = 'course' } = {}) {
   if (paymentsBlockedHere()) {
     throw new PaymentError(
       'Payments do not work on localhost. Open the live website (for example premind.netlify.app) to pay.',
@@ -104,7 +104,7 @@ export async function payForCourse(courseId) {
 
   const { res, data } = await post(
     '/create_order.php',
-    { course_id: Number(courseId), return_origin: window.location.origin, from_app: false },
+    { course_id: Number(courseId), kind, return_origin: window.location.origin, from_app: false },
     token
   );
   if (!res.ok || data.status !== 'success' || !data.payment_session_id) {
@@ -125,10 +125,10 @@ export async function payForCourse(courseId) {
   }
   if (result && result.paymentDetails) {
     const verified = await verifyOrder(data.order_id);
-    if (verified.status === 'success') return { status: 'success', courseId: verified.courseId || courseId };
+    if (verified.status === 'success') return { status: 'success', courseId: verified.courseId || courseId, kind };
     if (verified.status === 'pending') {
       throw new PaymentError(
-        `Payment is being confirmed. Your course will unlock in a minute. Order id: ${data.order_id}`,
+        `Payment is being confirmed. It will unlock in a minute. Order id: ${data.order_id}`,
         'pending'
       );
     }

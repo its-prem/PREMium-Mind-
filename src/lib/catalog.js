@@ -60,6 +60,10 @@ function rowToProduct(row) {
     rating: '',
     timer: '',
     btnType: blocked ? 'coming_soon' : 'buy',
+    allowDownload: Number(row.allow_download) === 1, // admin: download rule (see lib/downloadMode.js)
+    downloadAt: String(row.download_at || ''),
+    hasPdf: Number(row.has_pdf) === 1 || !!row.pdf_file,
+    hasQa: Number(row.has_qa) === 1, // Important Questions product with text to read (the text itself is served to buyers only)
     showTnc: Number(row.show_tnc) === 1, // admin switch: the buyer must accept the terms before paying
     tncText: String(row.tnc_text || ''),
     pdfFile: String(row.pdf_file || ''), // empty unless this user owns it

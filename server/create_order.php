@@ -49,7 +49,7 @@ if ($appId === '' || $appId === 'CHANGE_ME' || $secretKey === '' || $secretKey =
 $courseId = (int)($data['course_id'] ?? $data['courseId'] ?? 0);
 if ($courseId <= 0) pm_fail('Course id is missing.', 'bad_course');
 
-$stmt = $conn->prepare('SELECT id, title, price, is_deleted, btn_type, app_only FROM courses WHERE id = ? LIMIT 1');
+$stmt = $conn->prepare('SELECT * FROM courses WHERE id = ? LIMIT 1');
 $stmt->bind_param('i', $courseId);
 $stmt->execute();
 $course = $stmt->get_result()->fetch_assoc();
@@ -66,14 +66,29 @@ if ((int)($course['app_only'] ?? 0) === 1 && !$fromApp) {
     pm_fail('This course can be bought only in the PREMium Mind app.', 'app_only', 403);
 }
 
-// ---- already bought? ----
+// ---- what is being bought: the product, or the micro format of an Important Questions product ----
+$kind = (($data['kind'] ?? '') === 'micro') ? 'micro' : 'course';
 pm_orders_ensure_tables($conn);
-if (pm_user_owns($conn, $email, $courseId)) {
-    pm_fail('You already own this product.', 'already_owned', 409);
+if ($kind === 'micro') {
+    if (strtolower((string)($course['category'] ?? '')) !== 'important' || empty($course['micro_enabled'])) {
+        pm_fail('The micro format is not available for this product.', 'micro_unavailable', 403);
+    }
+    if (!pm_user_owns($conn, $email, $courseId)) {
+        pm_fail('Please buy this product first, then you can buy its micro format.', 'buy_first', 403);
+    }
+    if (pm_user_owns_micro($conn, $email, $courseId)) {
+        pm_fail('You already own the micro format.', 'already_owned', 409);
+    }
+    $priceRaw = (string)($course['micro_price'] ?? '');
+} else {
+    if (pm_user_owns($conn, $email, $courseId)) {
+        pm_fail('You already own this product.', 'already_owned', 409);
+    }
+    $priceRaw = (string)$course['price'];
 }
 
 // ---- price from the database ----
-$price = preg_replace('/[^0-9.]/', '', (string)$course['price']);
+$price = preg_replace('/[^0-9.]/', '', $priceRaw);
 $price = round((float)$price, 2);
 if ($price < 1) pm_fail('This product has no valid price. Please contact support.', 'bad_price', 500);
 
@@ -100,7 +115,7 @@ if ($returnOrigin === '' || !pm_origin_ok($returnOrigin) || strpos($returnOrigin
     $returnOrigin = rtrim(pm_env('SITE_URL', 'https://premind.netlify.app'), '/');
 }
 // Cashfree replaces {order_id} itself
-$returnUrl = $returnOrigin . '/payment-return?oid={order_id}&cid=' . $courseId;
+$returnUrl = $returnOrigin . '/payment-return?oid={order_id}&cid=' . $courseId . ($kind === 'micro' ? '&kind=micro' : '');
 
 $orderId = 'ORDER_' . time() . '_' . random_int(100000, 999999);
 $customerId = 'CUST_' . substr(preg_replace('/[^a-zA-Z0-9]/', '', $email), 0, 40);
@@ -117,7 +132,7 @@ $payload = [
         'customer_phone' => $phone,
     ],
     'order_meta' => ['return_url' => $returnUrl],
-    'order_tags' => ['course_id' => (string)$courseId],
+    'order_tags' => ['course_id' => (string)$courseId, 'kind' => $kind],
 ];
 
 $url = ($env === 'PROD') ? 'https://api.cashfree.com/pg/orders' : 'https://sandbox.cashfree.com/pg/orders';
@@ -147,8 +162,8 @@ if (!is_array($cf) || empty($cf['payment_session_id'])) {
 }
 
 // ---- remember the attempt ----
-$stmt = $conn->prepare("INSERT INTO orders (order_id, user_email, course_id, amount, status) VALUES (?, ?, ?, ?, 'CREATED')");
-$stmt->bind_param('ssid', $orderId, $email, $courseId, $price);
+$stmt = $conn->prepare("INSERT INTO orders (order_id, user_email, course_id, amount, status, kind) VALUES (?, ?, ?, ?, 'CREATED', ?)");
+$stmt->bind_param('ssids', $orderId, $email, $courseId, $price, $kind);
 $stmt->execute();
 $stmt->close();
 
@@ -158,5 +173,6 @@ echo json_encode([
     'payment_session_id' => $cf['payment_session_id'],
     'amount'             => $price,
     'course_id'          => $courseId,
+    'kind'               => $kind,
     'env'                => ($env === 'PROD') ? 'production' : 'sandbox',
 ]);

@@ -42,7 +42,17 @@ export default function PaymentReturn() {
 
   const product = getProduct(result.courseId || courseId);
 
+  const isMicro = (result.kind || params.get('kind')) === 'micro';
+
   const openNow = () => {
+    if (isMicro) {
+      navigate(`/microsheet/${result.courseId || courseId}`);
+      return;
+    }
+    if (product && product.hasQa) {
+      navigate(`/qa/${product.id}`);
+      return;
+    }
     if (!product) {
       navigate('/lecture');
       return;
@@ -79,9 +89,9 @@ export default function PaymentReturn() {
           <>
             <div className="pr-icon is-ok"><ion-icon name="checkmark-circle"></ion-icon></div>
             <h1>Payment Successful!</h1>
-            <p>{product ? <><b>{product.title}</b> ab aapke account me hai.</> : 'Aapka course unlock ho gaya hai.'}</p>
+            <p>{isMicro ? 'Aapka micro format unlock ho gaya hai.' : product ? <><b>{product.title}</b> ab aapke account me hai.</> : 'Aapka course unlock ho gaya hai.'}</p>
             <button type="button" className="pr-btn is-dark" onClick={openNow}>
-              {product && product.category === 'resume' ? 'Open Template Editor' : 'Open Now'}
+              {isMicro ? 'Open Micro Format' : product && product.category === 'resume' ? 'Open Template Editor' : 'Open Now'}
             </button>
             <Link to="/lecture" className="pr-btn">My Courses</Link>
           </>

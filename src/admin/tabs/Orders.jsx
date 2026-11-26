@@ -81,7 +81,14 @@ export default function Orders() {
                       <b>{o.user_name || '—'}</b>
                       <div className="adm-muted small">{o.user_email}</div>
                     </td>
-                    <td>{o.course_title || `Product #${o.course_id}`}</td>
+                    <td>
+                      {o.course_title || `Product #${o.course_id}`}
+                      {o.kind === "micro" && (
+                        <div>
+                          <span className="adm-chip warn">Micro format</span>
+                        </div>
+                      )}
+                    </td>
                     <td>{money(o.amount)}</td>
                     <td>
                       <span className={`adm-chip ${CHIP[o.status] || 'bad'}`}>{o.status}</span>

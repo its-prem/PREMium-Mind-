@@ -7,7 +7,7 @@
  * fill:    { label, text }          a small button that puts ready-made text in the field
  */
 
-import { DEFAULT_TNC } from '../../../lib/defaultTerms';
+import { DEFAULT_MICRO_TNC, DEFAULT_TNC } from '../../../lib/defaultTerms';
 
 const isOff = (v, f) => !(v[f] == 1 || v[f] === true);
 const isOn = (v, f) => !isOff(v, f);
@@ -61,6 +61,17 @@ export const FIELDS = [
     showIf: (v) => isOff(v, 'allow_download'),
     hint: 'Download is OFF: the student sees this when they press Download. Empty = default text.',
   },
+  { name: 'micro_price', label: 'Micro format price (₹)', type: 'number', hint: 'What the buyer pays for the micro format, on top of this product.' },
+  {
+    name: 'micro_tnc_text',
+    label: 'Terms for the micro format',
+    type: 'textarea',
+    full: true,
+    rows: 7,
+    showIf: (v) => v.micro_show_tnc == 1 || v.micro_show_tnc === true,
+    fill: { label: 'Load default sample', text: DEFAULT_MICRO_TNC },
+    hint: 'One point per line, like “1. Title: rest of the text”. Empty = the default sample is used.',
+  },
   {
     name: 'tnc_text',
     label: 'Custom terms & conditions',
@@ -79,13 +90,26 @@ export const SECTIONS = [
   { title: 'Price', hint: 'Shown on the store card.', fields: ['price', 'old_price'] },
   { title: 'Card text', hint: 'The two short lines under the title.', fields: ['desc1', 'desc2'] },
   { title: 'Picture & PDF', hint: 'Upload the card picture and the file students read.', files: true },
+  { title: 'Questions text', hint: 'Write or paste the questions here, instead of a PDF. The buyer reads this text on the website.', qa: true, showIf: (v) => v.category === 'important' },
+  {
+    title: 'Micro format (A4 boxes)',
+    hint: 'A paid extra: the same text in small A4 boxes the buyer can download or print.',
+    micro: true,
+    flags: ['micro_enabled'],
+    showIf: (v) => v.category === 'important',
+  },
   { title: 'Links & button', hint: 'Where the buy / preview button goes and how it looks.', fields: ['website_link', 'link', 'demo_link', 'btn_text', 'btn_type'] },
-  { title: 'Behaviour', hint: 'Switch things on or off for this product.', flags: ['allow_download', 'app_only', 'show_preview', 'grants_pyq', 'show_report_btn'], fields: ['download_msg'] },
+  { title: 'Download', hint: 'When can the buyer download the PDF?', download: true, fields: ['download_msg'] },
+  { title: 'Behaviour', hint: 'Switch things on or off for this product.', flags: ['app_only', 'show_preview', 'grants_pyq', 'show_report_btn'] },
   { title: 'Terms & conditions', hint: 'Ask the buyer to accept terms before paying.', flags: ['show_tnc'], fields: ['tnc_text'] },
 ];
 
 // on/off switches (inside the form and, when inList is true, as quick switches in the product list)
 export const FLAGS = [
+  // micro format of an Important Questions product (shown in its own section, not in Behaviour)
+  { name: 'micro_enabled', label: 'Sell the micro format', hint: 'ON = buyers see a “Micro format” button above the questions and can pay for it.' },
+  { name: 'micro_allow_download', label: 'Micro download allowed', hint: '' },
+  { name: 'micro_show_tnc', label: 'Ask for terms before paying for the micro format', hint: 'ON = a separate terms box is shown when the buyer pays for the micro format.' },
   { name: 'allow_download', label: 'Show Download button', hint: 'ON = download works. OFF = a message box opens for the student.', inList: true, listLabel: 'Download' },
   { name: 'app_only', label: 'App only (buy & access)', hint: 'ON = the website only lists it; buying and opening happen in the Android app.', inList: true, listLabel: 'App only' },
   { name: 'show_preview', label: 'Show Preview card', hint: 'ON = the store card shows a Preview (only the 1st page of the PDF).', inList: true, listLabel: 'Preview' },
@@ -111,4 +135,10 @@ export const emptyCourse = {
   download_msg: '',
   image: '',
   pdf_file: '',
+  download_at: '',
+  qa_text: '',
+  micro_price: '',
+  micro_download_at: '',
+  micro_tnc_text: '',
+  micro_allow_download: 1,
 };

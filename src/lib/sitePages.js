@@ -10,6 +10,8 @@ export const SITE_PAGES = [
   { path: '/syllabus', label: 'Syllabus' },
   { path: '/lecture', label: 'My Courses / Lecture' },
   { path: '/watch', label: 'PDF Reader' },
+  { path: '/qa', label: 'Important Questions reader' },
+  { path: '/microsheet', label: 'Micro format (A4 boxes)' },
   { path: '/resume-editor', label: 'Resume Editor' },
   { path: '/app-download', label: 'App Download' },
   { path: '/termcondition', label: 'Terms & Conditions' },

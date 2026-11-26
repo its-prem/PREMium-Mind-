@@ -39,7 +39,7 @@ if ($orderId === '' || !preg_match('/^[A-Za-z0-9_\-]{6,64}$/', $orderId)) {
 pm_orders_ensure_tables($conn);
 
 // Our record of this order
-$stmt = $conn->prepare('SELECT order_id, user_email, course_id, amount, status FROM orders WHERE order_id = ? LIMIT 1');
+$stmt = $conn->prepare('SELECT order_id, user_email, course_id, amount, status, kind FROM orders WHERE order_id = ? LIMIT 1');
 $stmt->bind_param('s', $orderId);
 $stmt->execute();
 $order = $stmt->get_result()->fetch_assoc();
@@ -51,10 +51,11 @@ if (!$order || strtolower((string)$order['user_email']) !== $email) {
     exit;
 }
 $courseId = (int)$order['course_id'];
+$kind = ($order['kind'] ?? 'course') === 'micro' ? 'micro' : 'course';
 
 // Already handled earlier (webhook may have been first)
-if ($order['status'] === 'PAID' && pm_user_owns($conn, $email, $courseId)) {
-    echo json_encode(['status' => 'success', 'course_id' => $courseId]);
+if ($order['status'] === 'PAID' && pm_order_owned($conn, $order)) {
+    echo json_encode(['status' => 'success', 'course_id' => $courseId, 'kind' => $kind]);
     exit;
 }
 
@@ -78,7 +79,7 @@ if ($cfStatus === 'PAID') {
         exit;
     }
 
-    if (!pm_grant_course($conn, $email, $courseId)) {
+    if (!pm_grant_for_order($conn, $order)) {
         error_log("verify_payment could not grant $courseId to $email ($orderId)");
         echo json_encode(['status' => 'failed', 'message' => 'Payment received but access could not be saved. Contact support with order id ' . $orderId . '.']);
         exit;
@@ -89,7 +90,7 @@ if ($cfStatus === 'PAID') {
     $stmt->execute();
     $stmt->close();
 
-    echo json_encode(['status' => 'success', 'course_id' => $courseId]);
+    echo json_encode(['status' => 'success', 'course_id' => $courseId, 'kind' => $kind]);
     exit;
 }
 

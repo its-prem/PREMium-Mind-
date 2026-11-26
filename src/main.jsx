@@ -19,6 +19,9 @@ const Syllabus = lazy(() => import('./pages/Syllabus.jsx'))
 const PaymentReturn = lazy(() => import('./pages/PaymentReturn.jsx'))
 // Login pulls in the Firebase SDK, so it is loaded only when /login is opened.
 const Login = lazy(() => import('./pages/Login.jsx'))
+// Important Questions: the text reader and the micro format (A4 boxes) page
+const QaReader = lazy(() => import('./pages/QaReader.jsx'))
+const MicroSheetPage = lazy(() => import('./pages/MicroSheetPage.jsx'))
 // The admin panel (src/admin) is its own download, opened only at /admin
 const Admin = lazy(() => import('./admin/Admin.jsx'))
 
@@ -38,7 +41,7 @@ function Pets() {
     const id = setTimeout(start, 2500)
     return () => clearTimeout(id)
   }, [])
-  if (!on || pathname.startsWith('/admin')) return null // no pets in the admin panel
+  if (!on || pathname.startsWith('/admin') || pathname.startsWith('/microsheet')) return null // no pets in the admin panel
   return (
     <Suspense fallback={null}>
       <Butterfly />
@@ -71,6 +74,8 @@ createRoot(document.getElementById('root')).render(
             <Route path="/syllabus/:branch/:subject" element={<Syllabus />} />
             <Route path="/resume-editor/:productId" element={<ResumeEditor />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/qa/:id" element={<QaReader />} />
+            <Route path="/microsheet/:id" element={<MicroSheetPage />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/:tab" element={<Admin />} />
             <Route path="*" element={<App />} />

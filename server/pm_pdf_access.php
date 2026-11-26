@@ -56,15 +56,22 @@ function pm_pdf_matches(string $dbValue, string $wantFile): bool {
 function pm_find_courses_for_pdf(mysqli $conn, string $file): array {
     if ($file === '') return [];
 
-    $result = $conn->query("SELECT id, pdf_file, allow_download, app_only FROM courses WHERE pdf_file IS NOT NULL AND pdf_file <> '' AND is_deleted = 0");
+    // download_at = the time (India time) when a "download on time" product unlocks its download. The column may not exist yet.
+    $hasAt = false;
+    $col = @$conn->query("SHOW COLUMNS FROM courses LIKE 'download_at'");
+    if ($col && $col->num_rows > 0) $hasAt = true;
+    $result = $conn->query("SELECT id, pdf_file, allow_download, app_only" . ($hasAt ? ", download_at" : "") . " FROM courses WHERE pdf_file IS NOT NULL AND pdf_file <> '' AND is_deleted = 0");
     if (!$result) return [];
+    $nowIst = new DateTime('now', new DateTimeZone('Asia/Kolkata'));
 
     $matches = [];
     while ($row = $result->fetch_assoc()) {
         if (pm_pdf_matches((string)$row['pdf_file'], $file)) {
             $matches[] = [
                 'id' => (int)$row['id'],
-                'allow_download' => !empty($row['allow_download']) && (int)$row['allow_download'] === 1,
+                'allow_download' => (!empty($row['allow_download']) && (int)$row['allow_download'] === 1)
+                    || (!empty($row['download_at']) && strpos((string)$row['download_at'], '0000') !== 0
+                        && (new DateTime((string)$row['download_at'], new DateTimeZone('Asia/Kolkata'))) <= $nowIst),
                 'app_only' => !empty($row['app_only']) && (int)$row['app_only'] === 1,
             ];
         }

@@ -23,3 +23,10 @@ export function parseTerms(raw) {
       return n ? { no: n[1], title: '', text: n[2] } : { no: '', title: '', text: line };
     });
 }
+
+/** Terms shown when the buyer pays for the micro format (A4 boxes) of an Important Questions product. */
+export const DEFAULT_MICRO_TNC = `1. Non-Refundable: The micro format is a digital product. Once paid, no refund will be given.
+2. Personal Use: The micro sheet is for your own exam preparation only. Sharing, selling or posting it online is not allowed.
+3. Download Time: You can download or print the micro sheet only when the download unlocks. The time is shown before you pay.
+4. Content: The questions and answers are prepared from exam analysis. Exact exam questions are not guaranteed.
+5. Agreement: By paying, you agree to PREMium Mind's standard terms of service.`;

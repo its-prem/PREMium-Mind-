@@ -254,3 +254,12 @@
 .adm-google:hover:not(:disabled) { border-color: #c5cae0; box-shadow: var(--a-shadow); }
 .adm-google:disabled { opacity: 0.6; cursor: wait; }
 .adm-alert { margin-top: 12px; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; border-radius: 10px; padding: 9px 12px; font-size: 0.85rem; text-align: left; }
+
+.adm-dl { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+
+.adm-qa { font-family: Consolas, 'Courier New', monospace; font-size: 0.82rem; line-height: 1.6; min-height: 260px; }
+
+/* Microsheet dashboard */
+.ms-ctrl { margin-bottom: 14px; }
+.adm-ms-frame { position: relative; height: calc(100vh - 290px); min-height: 520px; border: 1px solid var(--a-line); border-radius: 14px; overflow: hidden; background: #0a0a0a; }
+.adm-ms-loading { position: absolute; inset: 0; display: grid; place-items: center; color: #a1a1aa; z-index: 1; background: #0a0a0a; }

@@ -6,6 +6,7 @@ import { ResumeScaled, SAMPLE_RESUME } from '../components/ResumeDocument';
 import { getProduct } from '../data/storeData';
 import { usePurchases } from '../lib/purchases';
 import { useCatalog } from '../lib/catalog';
+import { downloadState } from '../lib/downloadMode';
 import {
   clearStoredSession,
   getPdfSession,
@@ -203,6 +204,11 @@ export default function Lecture() {
       return;
     }
 
+    if (Number(course.has_qa) === 1) {
+      navigate(`/qa/${course.id}`); // Important Questions: read the questions on the website
+      return;
+    }
+
     const pdfPath = pickPdfPath(course);
 
     if (isAppOnlyCourse(course) && !isNativeApp()) {
@@ -212,10 +218,7 @@ export default function Lecture() {
     }
 
     if (pdfPath) {
-      const canDownload =
-        course.allow_download == 1 ||
-        course.allow_download === '1' ||
-        course.allow_download === true;
+      const canDownload = downloadState(course).mode === 'instant'; // instant, or the admin's unlock time has passed
       const dlMsg =
         (course.download_msg && String(course.download_msg).trim()) ||
         'Download abhi available nahi hai. Exam se 1 din pehle unlock hoga.';

@@ -17,9 +17,48 @@ require_once __DIR__ . '/_boot.php';
 $adminEmail = pm_admin_require();
 
 $TEXT_FIELDS = ['title', 'category', 'badge', 'desc1', 'desc2', 'price', 'old_price', 'link',
-                'demo_link', 'website_link', 'btn_text', 'btn_type', 'tnc_text', 'download_msg'];
-$FLAG_FIELDS = ['allow_download', 'show_tnc', 'show_report_btn', 'app_only', 'show_preview', 'grants_pyq'];
+                'demo_link', 'website_link', 'btn_text', 'btn_type', 'tnc_text', 'download_msg', 'download_at',
+                'micro_price', 'micro_download_at', 'micro_tnc_text'];
+$FLAG_FIELDS = ['allow_download', 'show_tnc', 'show_report_btn', 'app_only', 'show_preview', 'grants_pyq',
+                'micro_enabled', 'micro_allow_download', 'micro_show_tnc'];
 $BTN_TYPES   = ['normal', 'coming_soon', 'disabled_look', 'preview_buy', 'disabled'];
+
+/**
+ * Columns that older databases do not have yet. They are added the first time a product is saved.
+ *   download_at                     "download on time": when the download unlocks (India time)
+ *   qa_text                         the questions & answers text of an Important Questions product
+ *   micro_*                         the paid extra "micro format" (A4 boxes) of that product
+ */
+function pm_ensure_course_columns(mysqli $conn): void {
+    static $done = false;
+    if ($done) return;
+    $done = true;
+    $cols = [
+        'download_at'          => 'DATETIME NULL DEFAULT NULL',
+        'qa_text'              => 'MEDIUMTEXT NULL',
+        'micro_enabled'        => 'TINYINT(1) NOT NULL DEFAULT 0',
+        'micro_price'          => 'DECIMAL(10,2) NULL DEFAULT NULL',
+        'micro_allow_download' => 'TINYINT(1) NOT NULL DEFAULT 1',
+        'micro_download_at'    => 'DATETIME NULL DEFAULT NULL',
+        'micro_tnc_text'       => 'TEXT NULL',
+        'micro_show_tnc'       => 'TINYINT(1) NOT NULL DEFAULT 0',
+    ];
+    foreach ($cols as $name => $def) {
+        if (!pm_has_column($conn, 'courses', $name)) {
+            $conn->query("ALTER TABLE courses ADD COLUMN `$name` $def");
+        }
+    }
+}
+
+/** "2026-12-05T18:00" (from the admin form, India time) -> "2026-12-05 18:00:00", or null when empty / invalid. */
+function pm_clean_datetime(string $v): ?string {
+    $v = trim($v);
+    if ($v === '') return null;
+    $v = str_replace('T', ' ', $v);
+    if (strlen($v) === 16) $v .= ':00';
+    $d = DateTime::createFromFormat('Y-m-d H:i:s', $v);
+    return ($d && $d->format('Y-m-d H:i:s') === $v) ? $v : null;
+}
 
 function pm_course_id(): int {
     $id = pm_in_int('id');
@@ -46,10 +85,17 @@ function pm_save_upload(string $field, string $subdir, array $okExt, int $maxByt
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    pm_admin_ok(['courses' => pm_rows($conn->query(
+    $rows = pm_rows($conn->query(
         'SELECT c.*, (SELECT COUNT(*) FROM user_courses uc WHERE uc.course_id = c.id) AS enrolled_count
            FROM courses c ORDER BY c.is_deleted ASC, c.sort_order ASC, c.id DESC'
-    ))]);
+    ));
+    foreach ($rows as &$r) {
+        // the questions text can be long: the list only says whether there is one (the form loads it when you edit)
+        $r['has_qa'] = (isset($r['qa_text']) && trim((string)$r['qa_text']) !== '') ? 1 : 0;
+        unset($r['qa_text']);
+    }
+    unset($r);
+    pm_admin_ok(['courses' => $rows]);
 }
 
 $action = (string)pm_in('action');
@@ -62,6 +108,18 @@ if ($action === 'save') {
     foreach ($FLAG_FIELDS as $f) {
         if ($f === 'grants_pyq' && !pm_has_column($conn, 'courses', 'grants_pyq')) continue;
         $vals[$f] = pm_in_flag($f);
+    }
+    pm_ensure_course_columns($conn);
+    $vals['download_at'] = pm_clean_datetime((string)$vals['download_at']);   // empty -> NULL
+    // micro format (only meaningful for Important Questions products)
+    $mp = trim((string)$vals['micro_price']);
+    $vals['micro_price'] = ($mp === '' || !is_numeric($mp)) ? null : round((float)$mp, 2);
+    $vals['micro_download_at'] = pm_clean_datetime((string)$vals['micro_download_at']);
+    // the questions text: changed only when the form really sent it (it is loaded separately, so never wipe it by accident)
+    if (isset($_POST['qa_text'])) {
+        $qa = str_replace("\r\n", "\n", (string)$_POST['qa_text']);
+        if (strlen($qa) > 600000) pm_admin_fail('The text is too long (max about 600,000 characters).');
+        $vals['qa_text'] = trim($qa) === '' ? null : $qa;
     }
     if ($vals['title'] === '') pm_admin_fail('Title is required.');
     if (!in_array($vals['btn_type'], $BTN_TYPES, true)) $vals['btn_type'] = 'normal';
@@ -101,6 +159,34 @@ if ($action === 'save') {
     $stmt->bind_param($types, ...$params);
     if (!$stmt->execute()) pm_admin_fail('Save failed: ' . $stmt->error, 500);
     pm_admin_ok(['id' => $id > 0 ? $id : $stmt->insert_id]);
+}
+
+/* ---------- the questions text of one product ---------- */
+if ($action === 'qa_get') {
+    $id = pm_course_id();
+    pm_ensure_course_columns($conn);
+    $stmt = $conn->prepare('SELECT title, category, qa_text, micro_enabled, micro_price, micro_allow_download, micro_download_at FROM courses WHERE id = ? LIMIT 1');
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    if (!$row) pm_admin_fail('Product not found.', 404);
+    pm_admin_ok(['title' => $row['title'], 'category' => $row['category'], 'text' => (string)($row['qa_text'] ?? ''), 'micro' => [
+        'enabled' => !empty($row['micro_enabled']), 'price' => $row['micro_price'],
+        'allowDownload' => (int)$row['micro_allow_download'] === 1, 'downloadAt' => $row['micro_download_at'],
+    ]]);
+}
+
+if ($action === 'qa_save') {
+    $id = pm_course_id();
+    pm_ensure_course_columns($conn);
+    $qa = str_replace("\r\n", "\n", (string)pm_in('text', ''));
+    if (strlen($qa) > 600000) pm_admin_fail('The text is too long (max about 600,000 characters).');
+    $val = trim($qa) === '' ? null : $qa;
+    $stmt = $conn->prepare('UPDATE courses SET qa_text = ? WHERE id = ?');
+    $stmt->bind_param('si', $val, $id);
+    if (!$stmt->execute()) pm_admin_fail('Save failed: ' . $stmt->error, 500);
+    pm_admin_ok();
 }
 
 /* ---------- one switch / dropdown ---------- */

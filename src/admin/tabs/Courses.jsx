@@ -164,6 +164,7 @@ export default function Courses({ options }) {
                           ) : (
                             <span className="adm-chip grey">no PDF</span>
                           )}{' '}
+                          {c.category === 'important' && (Number(c.has_qa) ? <span className="adm-chip ok">Text</span> : <span className="adm-chip bad">no text yet</span>)}{' '}
                           {n > 0 && <span className="adm-chip warn">{n} students</span>}
                           <div className="adm-muted small" style={{ marginBottom: 0 }}>
                             #{c.id} · rank {c.sort_order}

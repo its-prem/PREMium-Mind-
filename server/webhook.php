@@ -60,7 +60,7 @@ if ($orderId === '') {
 include __DIR__ . '/db_connect.php';
 pm_orders_ensure_tables($conn);
 
-$stmt = $conn->prepare('SELECT user_email, course_id, amount, status FROM orders WHERE order_id = ? LIMIT 1');
+$stmt = $conn->prepare('SELECT user_email, course_id, amount, status, kind FROM orders WHERE order_id = ? LIMIT 1');
 $stmt->bind_param('s', $orderId);
 $stmt->execute();
 $order = $stmt->get_result()->fetch_assoc();
@@ -87,7 +87,7 @@ if ($email === '' || $courseId <= 0) {
     exit;
 }
 
-if (pm_grant_course($conn, $email, $courseId)) {
+if ($order ? pm_grant_for_order($conn, $order) : pm_grant_course($conn, $email, $courseId)) {
     $log("Course $courseId given to $email ($orderId)");
     if ($order) {
         $stmt = $conn->prepare("UPDATE orders SET status = 'PAID', paid_at = NOW() WHERE order_id = ?");
