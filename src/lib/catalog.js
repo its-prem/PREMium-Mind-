@@ -37,7 +37,7 @@ const toNumber = (v) => {
 function safeLink(v) {
   const l = String(v || '').trim();
   if (/^https?:\/\//i.test(l)) return l;
-  if (/^\/?[a-z0-9_-]+(\/[a-z0-9._-]+)*(\?\S*)?$/i.test(l)) return l.startsWith('/') ? l : '/' + l; // a page of this website
+  if (/^\/?[a-z0-9_-]+(\/[a-z0-9._-]+)+(\?\S*)?$/i.test(l)) return l.startsWith('/') ? l : '/' + l; // a page of this website
   return '';
 }
 
