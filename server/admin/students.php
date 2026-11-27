@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (pm_in_flag('online')) {
     $rows = pm_rows($conn->query(
         'SELECT a.email, a.last_seen, a.last_ip, a.last_ua, TIMESTAMPDIFF(SECOND, a.last_seen, NOW()) AS seen_ago,
-                (SELECT name FROM users u WHERE u.email = a.email LIMIT 1) AS name
+                (SELECT name FROM users u WHERE CONVERT(u.email USING utf8mb4) COLLATE utf8mb4_general_ci = a.email COLLATE utf8mb4_general_ci LIMIT 1) AS name
            FROM pm_user_activity a WHERE a.last_seen > DATE_SUB(NOW(), INTERVAL 5 MINUTE) ORDER BY a.last_seen DESC LIMIT 100'
     ));
     pm_admin_ok(['online' => $rows]);
@@ -151,17 +151,23 @@ if ($stmt) {
 }
 
 $sql = 'SELECT u.id, u.name, u.email, u.phone, u.is_active, u.created_at, GROUP_CONCAT(uc.course_id) AS enrolled_ids,
-                 (SELECT a.last_seen FROM pm_user_activity a WHERE a.email = u.email LIMIT 1) AS last_seen,
-                 (SELECT TIMESTAMPDIFF(SECOND, a.last_seen, NOW()) FROM pm_user_activity a WHERE a.email = u.email LIMIT 1) AS seen_ago,
-                 (SELECT a.last_ip FROM pm_user_activity a WHERE a.email = u.email LIMIT 1) AS last_ip,
-                 (SELECT a.last_ua FROM pm_user_activity a WHERE a.email = u.email LIMIT 1) AS last_ua,
-                 (SELECT COUNT(*) FROM pm_user_ips i WHERE i.email = u.email AND i.last_seen > DATE_SUB(NOW(), INTERVAL 30 DAY)) AS ip_count,
-                 (SELECT COUNT(*) FROM pm_blocked_users b WHERE b.email = u.email) AS is_blocked,
-                 (SELECT b.reason FROM pm_blocked_users b WHERE b.email = u.email LIMIT 1) AS block_reason
+                 (SELECT a.last_seen FROM pm_user_activity a WHERE a.email COLLATE utf8mb4_general_ci = CONVERT(u.email USING utf8mb4) COLLATE utf8mb4_general_ci LIMIT 1) AS last_seen,
+                 (SELECT TIMESTAMPDIFF(SECOND, a.last_seen, NOW()) FROM pm_user_activity a WHERE a.email COLLATE utf8mb4_general_ci = CONVERT(u.email USING utf8mb4) COLLATE utf8mb4_general_ci LIMIT 1) AS seen_ago,
+                 (SELECT a.last_ip FROM pm_user_activity a WHERE a.email COLLATE utf8mb4_general_ci = CONVERT(u.email USING utf8mb4) COLLATE utf8mb4_general_ci LIMIT 1) AS last_ip,
+                 (SELECT a.last_ua FROM pm_user_activity a WHERE a.email COLLATE utf8mb4_general_ci = CONVERT(u.email USING utf8mb4) COLLATE utf8mb4_general_ci LIMIT 1) AS last_ua,
+                 (SELECT COUNT(*) FROM pm_user_ips i WHERE i.email COLLATE utf8mb4_general_ci = CONVERT(u.email USING utf8mb4) COLLATE utf8mb4_general_ci AND i.last_seen > DATE_SUB(NOW(), INTERVAL 30 DAY)) AS ip_count,
+                 (SELECT COUNT(*) FROM pm_blocked_users b WHERE b.email COLLATE utf8mb4_general_ci = CONVERT(u.email USING utf8mb4) COLLATE utf8mb4_general_ci) AS is_blocked,
+                 (SELECT b.reason FROM pm_blocked_users b WHERE b.email COLLATE utf8mb4_general_ci = CONVERT(u.email USING utf8mb4) COLLATE utf8mb4_general_ci LIMIT 1) AS block_reason
           FROM users u LEFT JOIN user_courses uc ON uc.user_email = u.email '
      . ($search !== '' ? 'WHERE u.name LIKE ? OR u.email LIKE ? ' : '')
      . 'GROUP BY u.id ORDER BY u.id DESC LIMIT ? OFFSET ?';
 $stmt = $conn->prepare($sql);
+if (!$stmt) {   // the activity tables could not be read: still show the students (without the online / blocked columns)
+    error_log('students.php: activity columns failed: ' . $conn->error);
+    $sql = preg_replace('/,\s*\(SELECT a\.last_seen.*?AS block_reason\s*FROM users u/s', ' FROM users u', $sql);
+    $stmt = $conn->prepare($sql);
+}
+if (!$stmt) pm_admin_fail('Database error: ' . $conn->error, 500);   // the real reason is shown to the admin, not a blank page
 if ($search !== '') $stmt->bind_param('ssii', $like, $like, $per, $offset);
 else $stmt->bind_param('ii', $per, $offset);
 $stmt->execute();

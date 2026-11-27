@@ -33,7 +33,7 @@ $stmt = $conn->prepare(
     'SELECT r.*, c.title AS course_title, u.name AS user_name, u.phone AS user_phone
        FROM reports r
        LEFT JOIN courses c ON r.course_id = c.id
-       LEFT JOIN users u ON r.email = u.email
+       LEFT JOIN users u ON CONVERT(r.email USING utf8mb4) COLLATE utf8mb4_general_ci = CONVERT(u.email USING utf8mb4) COLLATE utf8mb4_general_ci
       WHERE r.status = ? ORDER BY r.id ' . ($status === 'pending' ? 'ASC' : 'DESC') . ' LIMIT 200'
 );
 $stmt->bind_param('s', $status);

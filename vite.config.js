@@ -8,15 +8,15 @@ import { defineConfig } from 'vite'
  *
  * It is added to the built index.html only (not to `npm run dev`). Every address below is used by the site:
  *   premind.diplomawallah.in  our PHP server          gstatic / googleapis / apis.google / firebaseapp / accounts.google  Google login
- *   sdk.cashfree.com + *.cashfree.com  payments       fonts.googleapis / fonts.gstatic  fonts      cdnjs  PDF tools of the micro format
+ *   sdk.cashfree.com + *.cashfree.com  payments       fonts.googleapis / fonts.gstatic  fonts      cdnjs  PDF tools and the Font Awesome icons of the micro format
  * To allow one more address, add it to the right line. 'unsafe-inline' is needed for the tiny inline handlers of the
  * page and for the micro-format tool, which runs inside the page.
  */
 const CSP = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://sdk.cashfree.com https://cdnjs.cloudflare.com",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' data: https://fonts.gstatic.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
+  "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
   "img-src 'self' data: blob: https:",
   "media-src 'self' blob: https:",
   "connect-src 'self' blob: https://premind.diplomawallah.in https://*.googleapis.com https://www.gstatic.com https://*.cashfree.com https://cdnjs.cloudflare.com",

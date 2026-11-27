@@ -79,9 +79,10 @@ $stmt = $conn->prepare(
             c.title AS course_title, u.name AS user_name
        FROM orders o
        LEFT JOIN courses c ON c.id = o.course_id
-       LEFT JOIN users u ON u.email = o.user_email
+       LEFT JOIN users u ON CONVERT(u.email USING utf8mb4) COLLATE utf8mb4_general_ci = CONVERT(o.user_email USING utf8mb4) COLLATE utf8mb4_general_ci
        $where ORDER BY o.id DESC LIMIT ? OFFSET ?"
 );
+if (!$stmt) pm_admin_fail('Database error: ' . $conn->error, 500);   // the real reason is shown to the admin, not a blank page
 $stmt->bind_param('ii', $per, $offset);
 $stmt->execute();
 pm_admin_ok(['orders' => pm_rows($stmt->get_result()), 'total' => $total, 'page' => $page, 'perPage' => $per]);

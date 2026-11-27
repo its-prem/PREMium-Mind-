@@ -45,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $blocked = pm_rows($conn->query('SELECT ip, reason, blocked_by, created_at, expires_at FROM pm_blocked_ips WHERE expires_at IS NULL OR expires_at > NOW() ORDER BY created_at DESC LIMIT 500'));
 $suspicious = pm_rows($conn->query(
     'SELECT e.ip, SUM(e.hits) AS hits, GROUP_CONCAT(CONCAT(e.kind, " x", e.hits) SEPARATOR ", ") AS what, MAX(e.last_seen) AS last_seen,
-            (b.ip IS NOT NULL AND (b.expires_at IS NULL OR b.expires_at > NOW())) AS is_blocked
-       FROM pm_ip_events e LEFT JOIN pm_blocked_ips b ON b.ip = e.ip
+            (SELECT COUNT(*) FROM pm_blocked_ips b WHERE b.ip = e.ip AND (b.expires_at IS NULL OR b.expires_at > NOW())) AS is_blocked
+       FROM pm_ip_events e
       WHERE e.last_seen > DATE_SUB(NOW(), INTERVAL 14 DAY)
       GROUP BY e.ip ORDER BY hits DESC, last_seen DESC LIMIT 100'
 ));

@@ -25,7 +25,7 @@ if (!function_exists('pm_user_tables')) {
             last_ip VARCHAR(45) NOT NULL DEFAULT \'\',
             last_ua VARCHAR(200) NOT NULL DEFAULT \'\',
             seen_count INT NOT NULL DEFAULT 1
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci');
         $conn->query('CREATE TABLE IF NOT EXISTS pm_user_ips (
             email VARCHAR(190) NOT NULL,
             ip VARCHAR(45) NOT NULL,
@@ -33,13 +33,13 @@ if (!function_exists('pm_user_tables')) {
             first_seen DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             last_seen DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (email, ip)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci');
         $conn->query('CREATE TABLE IF NOT EXISTS pm_blocked_users (
             email VARCHAR(190) NOT NULL PRIMARY KEY,
             reason VARCHAR(200) NOT NULL DEFAULT \'\',
             blocked_by VARCHAR(190) NOT NULL DEFAULT \'\',
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci');
         $done = true;
     }
 }

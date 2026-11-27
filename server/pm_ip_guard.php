@@ -24,7 +24,7 @@ if (!function_exists('pm_ip_tables')) {
             blocked_by VARCHAR(190) NOT NULL DEFAULT \'\',
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             expires_at DATETIME NULL DEFAULT NULL
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci');
         $conn->query('CREATE TABLE IF NOT EXISTS pm_ip_events (
             ip VARCHAR(45) NOT NULL,
             kind VARCHAR(40) NOT NULL,
@@ -32,7 +32,7 @@ if (!function_exists('pm_ip_tables')) {
             first_seen DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             last_seen DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (ip, kind)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci');
         $done = true;
     }
 }

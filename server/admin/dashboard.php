@@ -46,7 +46,7 @@ $purchases = pm_rows($conn->query(
     'SELECT uc.user_email, uc.course_id, ' . ($hasAt ? 'uc.purchased_at' : 'NULL') . ' AS purchased_at,
             u.name AS user_name, c.title AS course_title, c.price AS course_price, c.image AS course_image
        FROM user_courses uc
-       LEFT JOIN users u ON u.email = uc.user_email
+       LEFT JOIN users u ON CONVERT(u.email USING utf8mb4) COLLATE utf8mb4_general_ci = CONVERT(uc.user_email USING utf8mb4) COLLATE utf8mb4_general_ci
        LEFT JOIN courses c ON c.id = uc.course_id
       ORDER BY ' . implode(', ', $order) . ' LIMIT 15'
 ));
