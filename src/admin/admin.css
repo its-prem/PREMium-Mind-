@@ -2164,3 +2164,27 @@
 .sya-chips span { padding: 2px 9px; border-radius: 999px; background: var(--a-line-soft); color: #52525b; font-size: 0.7rem; font-weight: 700; }
 .sya-btns { grid-column: 1 / -1; display: flex; gap: 8px; padding-top: 10px; border-top: 1px solid var(--a-line-soft); }
 .sya-btns .adm-btn { flex: 1; }
+
+/* Syllabus tab: branch filter and the branch groups inside a semester */
+.sya-filter { display: flex; gap: 6px; margin: 0 -2px 16px; padding: 2px 2px 6px; overflow-x: auto; scrollbar-width: none; }
+.sya-filter::-webkit-scrollbar { display: none; }
+.sya-filter button { flex-shrink: 0; padding: 6px 13px; border: 1px solid var(--a-line); border-radius: 999px; background: var(--a-card); color: #3f3f46; font: inherit; font-size: 0.78rem; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.sya-filter button.on { background: var(--a-text); border-color: var(--a-text); color: #fff; }
+.sya-group { margin-bottom: 14px; }
+.sya-group-head { display: flex; align-items: center; gap: 8px; margin: 4px 0 8px 4px; font-size: 0.82rem; }
+.sya-group-head i { width: 9px; height: 9px; border-radius: 50%; }
+.sya-group-head span { padding: 0 8px; border-radius: 999px; background: var(--a-line-soft); color: var(--a-muted); font-size: 0.7rem; font-weight: 700; }
+
+/* Syllabus tab: semesters and branch groups open like drop-downs */
+.sya-sem { background: var(--a-card); border: 1px solid var(--a-line); border-radius: 16px; padding: 0; overflow: hidden; }
+.sya-sem.is-open { border-color: #d4d4d8; box-shadow: 0 8px 22px rgba(9, 9, 11, 0.06); }
+button.sya-sem-head { width: 100%; margin: 0; padding: 12px 14px; border: 0; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.sya-sem.is-open .sya-sem-no { background: var(--a-brand); }
+.sya-sem.is-open > .sya-group { padding: 0 12px; }
+.sya-sem.is-open > .sya-group:last-child { padding-bottom: 6px; }
+.sya-sem.is-open > button.sya-sem-head { border-bottom: 1px solid var(--a-line-soft); margin-bottom: 10px; }
+.sya-chev { flex-shrink: 0; font-size: 20px; color: var(--a-muted); transition: transform 0.2s; }
+.sya-sem.is-open > button.sya-sem-head .sya-chev { transform: rotate(180deg); }
+button.sya-group-head { width: 100%; padding: 8px 10px; margin: 0 0 8px; border: 1px solid var(--a-line-soft); border-radius: 12px; background: #fafafa; font: inherit; text-align: left; cursor: pointer; }
+.sya-group-head .sya-chev { margin-left: auto; font-size: 18px; }
+.sya-group-head .sya-chev.up { transform: rotate(180deg); }

@@ -62,6 +62,9 @@ export default function SyllabusTab() {
   const [form, setForm] = useState(null); // null = list, object = editing
   const [saving, setSaving] = useState(false);
   const [bulk, setBulk] = useState(false); // the "add many subjects" screen
+  const [openSem, setOpenSem] = useState([]); // semesters that are open (all closed at first)
+  const [shut, setShut] = useState([]); // branch groups ("sem-branch") that are closed inside an open semester
+  const [fBranch, setFBranch] = useState(''); // list filter: '' = every branch, 'all' = common subjects, or a branch id
   const copyPrompt = async () => {
     try {
       await navigator.clipboard.writeText(AI_PROMPT);
@@ -250,16 +253,56 @@ export default function SyllabusTab() {
     );
   }
 
-  /* ---------------- the list ---------------- */
+  /* ---------------- the list: semester -> branch -> subject cards ---------------- */
   const list = data.subjects || [];
-  const branchLabel = (b) => (b === 'all' ? 'All branches' : b.map((id) => BRANCHES.find((x) => x.id === id)?.title || id).join(', '));
+  const branchName = (id) => BRANCHES.find((x) => x.id === id)?.title || id;
+  const branchLabel = (b) => (b === 'all' ? 'All branches' : b.map(branchName).join(', '));
+
+  // the groups inside a semester: common subjects first, then one group per branch (a subject for two branches shows in both)
+  const groupsOf = (subs) => {
+    const groups = [];
+    const common = subs.filter((x) => x.branches === 'all');
+    if (common.length) groups.push({ id: 'all', title: 'Common to all branches', tint: '#71717a', subs: common });
+    BRANCHES.forEach((b) => {
+      const own = subs.filter((x) => Array.isArray(x.branches) && x.branches.includes(b.id));
+      if (own.length) groups.push({ id: b.id, title: b.title, tint: b.tint, subs: own });
+    });
+    return groups;
+  };
+  const usedBranches = BRANCHES.filter((b) => list.some((x) => Array.isArray(x.branches) && x.branches.includes(b.id)));
+  const hasCommon = list.some((x) => x.branches === 'all');
+
+  const toggleSem = (n) => setOpenSem((cur) => (cur.includes(n) ? cur.filter((x) => x !== n) : [...cur, n]));
+  const toggleGroup = (key) => setShut((cur) => (cur.includes(key) ? cur.filter((x) => x !== key) : [...cur, key]));
+
+  const card = (s, groupId) => (
+    <article key={s.id + groupId} className="sya-card">
+      <span className="sya-ico">
+        <ion-icon name={s.icon || 'book-outline'}></ion-icon>
+      </span>
+      <div className="sya-info">
+        <b>{s.title}</b>
+        <div className="sya-chips">
+          <span>{s.units.length} unit{s.units.length === 1 ? '' : 's'}</span>
+          <span>{countTopics(s.units)} topic{countTopics(s.units) === 1 ? '' : 's'}</span>
+          {s.code ? <span>Code {s.code}</span> : null}
+          {Array.isArray(s.branches) && s.branches.length > 1 && <span>Also in: {s.branches.filter((id) => id !== groupId).map(branchName).join(', ')}</span>}
+        </div>
+      </div>
+      <div className="sya-btns">
+        <button className="adm-btn small" onClick={() => edit(s)}>Edit</button>
+        <button className="adm-btn danger small" onClick={() => remove(s)}>Delete</button>
+      </div>
+    </article>
+  );
+
   return (
     <>
       <div className="sya-top">
         <div>
           <p>
             {list.length
-              ? `${list.length} subject${list.length === 1 ? '' : 's'} live on the website, grouped by semester.`
+              ? `${list.length} subject${list.length === 1 ? '' : 's'} live on the website, grouped by semester and branch.`
               : "Subjects you add here show on the website's Diploma Syllabus page."}
           </p>
         </div>
@@ -269,41 +312,53 @@ export default function SyllabusTab() {
         </div>
       </div>
 
+      {list.length > 0 && (
+        <div className="sya-filter" role="group" aria-label="Branch filter">
+          <button type="button" className={fBranch === '' ? 'on' : ''} onClick={() => setFBranch('')}>All</button>
+          {hasCommon && (
+            <button type="button" className={fBranch === 'all' ? 'on' : ''} onClick={() => setFBranch('all')}>Common</button>
+          )}
+          {usedBranches.map((b) => (
+            <button key={b.id} type="button" className={fBranch === b.id ? 'on' : ''} onClick={() => setFBranch(b.id)}>
+              {b.title}
+            </button>
+          ))}
+        </div>
+      )}
+
       {!list.length ? (
         <Empty text='No subject uploaded yet. Click "Add subject" or "Add many" and paste a syllabus.' />
       ) : (
         SEMESTERS.map((n) => {
           const subs = list.filter((s) => s.sem === n);
-          if (!subs.length) return null;
+          const groups = groupsOf(subs).filter((g) => !fBranch || g.id === fBranch);
+          if (!groups.length) return null;
+          const shown = new Set(groups.flatMap((g) => g.subs.map((x) => x.id))).size;
+          const isOpen = openSem.includes(n) || !!fBranch; // a branch filter opens every semester
           return (
-            <section key={n} className="sya-sem">
-              <header className="sya-sem-head">
+            <section key={n} className={`sya-sem${isOpen ? ' is-open' : ''}`}>
+              <button type="button" className="sya-sem-head" aria-expanded={isOpen} onClick={() => toggleSem(n)}>
                 <span className="sya-sem-no">{n}</span>
                 <b>{semesterName(n)}</b>
-                <span className="sya-sem-count">{subs.length} subject{subs.length === 1 ? '' : 's'}</span>
-              </header>
-              <div className="sya-cards">
-                {subs.map((s) => (
-                  <article key={s.id} className="sya-card">
-                    <span className="sya-ico">
-                      <ion-icon name={s.icon || 'book-outline'}></ion-icon>
-                    </span>
-                    <div className="sya-info">
-                      <b>{s.title}</b>
-                      <div className="sya-chips">
-                        <span>{s.units.length} unit{s.units.length === 1 ? '' : 's'}</span>
-                        <span>{countTopics(s.units)} topic{countTopics(s.units) === 1 ? '' : 's'}</span>
-                        <span>{branchLabel(s.branches)}</span>
-                        {s.code ? <span>Code {s.code}</span> : null}
-                      </div>
+                <span className="sya-sem-count">{shown} subject{shown === 1 ? '' : 's'}</span>
+                <ion-icon name="chevron-down-outline" class="sya-chev"></ion-icon>
+              </button>
+              {isOpen &&
+                groups.map((g) => {
+                  const key = `${n}-${g.id}`;
+                  const groupOpen = !shut.includes(key);
+                  return (
+                    <div key={g.id} className="sya-group">
+                      <button type="button" className="sya-group-head" aria-expanded={groupOpen} onClick={() => toggleGroup(key)}>
+                        <i style={{ background: g.tint }} />
+                        <b>{g.title}</b>
+                        <span>{g.subs.length}</span>
+                        <ion-icon name="chevron-down-outline" class={`sya-chev${groupOpen ? ' up' : ''}`}></ion-icon>
+                      </button>
+                      {groupOpen && <div className="sya-cards">{g.subs.map((x) => card(x, g.id))}</div>}
                     </div>
-                    <div className="sya-btns">
-                      <button className="adm-btn small" onClick={() => edit(s)}>Edit</button>
-                      <button className="adm-btn danger small" onClick={() => remove(s)}>Delete</button>
-                    </div>
-                  </article>
-                ))}
-              </div>
+                  );
+                })}
             </section>
           );
         })
