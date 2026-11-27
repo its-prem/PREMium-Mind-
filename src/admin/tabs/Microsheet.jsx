@@ -5,6 +5,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import MicroSheetFrame from '../../microsheet/MicroSheetFrame';
+import QaAddOne from './courses/QaAddOne';
+import QaFormatHelp from './courses/QaFormatHelp';
 import { adminGet, adminPost } from '../api';
 import { downloadState, formatWhen } from '../../lib/downloadMode';
 import { Empty, ErrorBox, Loading, money, useLoad, useUi } from '../ui';
@@ -110,6 +112,30 @@ export default function Microsheet() {
           This is the same tool buyers get. Here the download is always open for you. To change the tool itself, edit <code>src/microsheet/microsheet.html</code>.
         </p>
       </div>
+
+      {doc && (
+        <div className="adm-card" style={{ marginBottom: 14 }}>
+          <QaFormatHelp
+            hasText={!!String(doc.text || '').trim()}
+            toast={toast}
+            onUseExample={(t) => setDoc((d) => ({ ...d, text: t }))}
+          />
+          <QaAddOne
+            toast={toast}
+            // the text as it is in the tool right now (with the changes not saved yet), so nothing is lost
+            getText={async () => {
+              try {
+                const got = await frameRef.current.requestText();
+                return got && typeof got.text === 'string' ? got.text : doc.text;
+              } catch {
+                return doc.text;
+              }
+            }}
+            onChange={(t) => setDoc((d) => ({ ...d, text: t }))}
+          />
+          <p className="adm-hint" style={{ marginTop: 6 }}>After adding, press <b>Save text to product</b> to keep it.</p>
+        </div>
+      )}
 
       <div className="adm-ms-frame">
         {loadingText && <div className="adm-ms-loading">Loading the text…</div>}

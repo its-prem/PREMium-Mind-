@@ -2224,3 +2224,11 @@ button.sya-group-head { width: 100%; padding: 8px 10px; margin: 0 0 8px; border:
   .adm-stack .adm-actions .adm-btn { flex: 1 1 0; min-width: 0; justify-content: center; padding: 11px 10px; }
   .adm-stack .adm-actions .adm-btn:first-child { flex: 2 1 0; }
 }
+
+/* the "how to write the questions" box in the product form */
+.adm-qahelp { margin: 4px 0 8px; border: 1px solid var(--a-line); border-radius: 14px; background: #fafafa; overflow: hidden; }
+.adm-qahelp-head { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 14px; border: 0; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+.adm-qahelp-head span { padding: 2px 10px; border-radius: 999px; background: var(--a-line-soft); color: var(--a-muted); font-size: 0.72rem; font-weight: 700; }
+.adm-qahelp-body { padding: 4px 14px 14px; display: flex; flex-direction: column; gap: 10px; font-size: 0.84rem; line-height: 1.55; }
+.adm-qahelp-body ol { margin: 0; padding-left: 18px; }
+.adm-qahelp-example { margin: 0; padding: 10px; max-height: 220px; overflow: auto; white-space: pre-wrap; font-size: 0.78rem; background: #fff; border: 1px solid var(--a-line-soft); border-radius: 10px; }

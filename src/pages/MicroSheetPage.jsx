@@ -165,6 +165,7 @@ export default function MicroSheetPage() {
         <div className="rd-brand">
           PREM<em>ium</em> Mind
           <span>{state.title || 'Micro format'}</span>
+          {state.micro?.adminPreview && <span style={{ color: '#fbbf24' }}>Admin preview · students must pay</span>}
         </div>
 
         <div className="rd-header-end">

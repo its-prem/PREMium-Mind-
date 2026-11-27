@@ -60,6 +60,7 @@ echo json_encode([
         'enabled'       => !empty($row['micro_enabled']),
         'price'         => ($row['micro_price'] ?? null) === null ? 0 : (float)$row['micro_price'],
         'owned'         => $microOwned,
+        'adminPreview'  => $isAdmin && !pm_user_owns_micro($conn, $email, $courseId),   // an admin sees it without paying
         'showTnc'       => !empty($row['micro_show_tnc']),
         'tncText'       => (string)($row['micro_tnc_text'] ?? ''),
         'allowDownload' => !isset($row['micro_allow_download']) || (int)$row['micro_allow_download'] === 1,

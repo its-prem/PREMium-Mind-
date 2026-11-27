@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { adminPost, openLocalFile, openUploadedPdf } from '../../api';
 import { ImageViewer, Modal, Switch, useUi } from '../../ui';
 import { CATEGORIES, FIELDS, FLAGS, SECTIONS, emptyCourse, normalizeCategory } from './fields';
+import QaFormatHelp from './QaFormatHelp';
+import QaAddOne from './QaAddOne';
 
 // how many questions the text has (a new one starts with Q.1, Q.2 …)
 const countQuestions = (t) => (String(t || '').match(/^\s*(Q\.?\s*\d+|Question\s*\d+)/gim) || []).length;
@@ -247,6 +249,7 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
   const qaBlock = (
     <div className="adm-field full">
       <label htmlFor="f_qa_text">Questions &amp; answers</label>
+      <QaFormatHelp hasText={!!String(v.qa_text || '').trim()} onUseExample={(t) => set('qa_text', t)} toast={toast} />
       <textarea
         id="f_qa_text"
         className="adm-textarea adm-qa"
@@ -257,6 +260,7 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
         value={v.qa_text ?? ''}
         onChange={(e) => set('qa_text', e.target.value)}
       />
+      <QaAddOne getText={() => v.qa_text} onChange={(t) => set('qa_text', t)} toast={toast} />
       <span className="adm-hint">
         Every new question starts with <b>Q.1</b>, <b>Q.2</b> … and the answer follows below it. <b>{countQuestions(v.qa_text)}</b> question(s) found.
         Buyers read this text on the website. Use the <b>Microsheet</b> tab to see how it looks in the A4 boxes.
