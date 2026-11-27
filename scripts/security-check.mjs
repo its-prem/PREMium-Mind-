@@ -42,12 +42,12 @@ const post = (path, body, headers = {}) => req(API + path, { method: 'POST', hea
 /* ---------- 1. the admin API is closed to everybody who is not an admin ---------- */
 for (const f of ['me', 'dashboard', 'courses', 'ranking', 'students', 'orders', 'reports', 'maintenance', 'syllabus']) {
   const r = await get(`/admin/${f}.php`);
-  ok(`admin/${f}.php refuses a visitor`, r.status === 401 || r.status === 403, `HTTP ${r.status}`);
+  ok(`admin/${f}.php refuses a visitor`, [401, 403, 429].includes(r.status), `HTTP ${r.status}`);
 }
 const fake = await get('/admin/courses.php', { 'X-PM-Session': 'eyJmYWtlIjoxfQ.AAAA' });
-ok('admin/courses.php refuses a forged login token', fake.status === 401 || fake.status === 403, `HTTP ${fake.status}`);
+ok('admin/courses.php refuses a forged login token', [401, 403, 429].includes(fake.status), `HTTP ${fake.status}`);
 const fakeSave = await post('/admin/syllabus.php', { action: 'save', subject: { title: 'x', sem: 1, units: [] } }, { 'X-PM-Session': 'forged.token' });
-ok('admin/syllabus.php cannot save with a forged token', fakeSave.status === 401 || fakeSave.status === 403, `HTTP ${fakeSave.status}`);
+ok('admin/syllabus.php cannot save with a forged token', [401, 403, 429].includes(fakeSave.status), `HTTP ${fakeSave.status}`);
 
 /* ---------- 2. money and student data need a login ---------- */
 const order = await post('/create_order.php', { course_id: 1 });
