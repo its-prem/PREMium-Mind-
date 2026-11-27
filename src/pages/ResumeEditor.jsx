@@ -11,6 +11,7 @@ import { usePurchases } from '../lib/purchases';
 import { useCatalog } from '../lib/catalog';
 import { cloudGet, cloudPut, stampGet, stampSet } from '../lib/cloud';
 import { getStoredEmail } from '../lib/session';
+import { goBack } from '../lib/goBack';
 import './ResumeEditor.css';
 
 const newId = () => Math.random().toString(36).slice(2, 8);
@@ -195,7 +196,7 @@ export default function ResumeEditor() {
     <div className="re-root">
       {/* ================= TOP BAR ================= */}
       <header className="re-bar re-ui">
-        <button type="button" className="re-btn re-icon" onClick={() => navigate('/lecture')} aria-label="Back to My Courses">
+        <button type="button" className="re-btn re-icon" onClick={() => goBack(navigate, '/lecture')} aria-label="Back">
           <ion-icon name="chevron-back-outline"></ion-icon>
         </button>
         <div className="re-bar-title">

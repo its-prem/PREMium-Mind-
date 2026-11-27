@@ -2143,3 +2143,24 @@
     font-size: 1.35rem;
   }
 }
+
+/* ---------- Syllabus tab: the list of uploaded subjects, grouped by semester ---------- */
+.sya-top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.sya-top h3 { margin: 0 0 2px; font-size: 1.15rem; }
+.sya-top p { margin: 0; color: var(--a-muted); font-size: 0.86rem; }
+.sya-actions { display: flex; gap: 8px; }
+.sya-sem { margin-bottom: 20px; }
+.sya-sem-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.sya-sem-head b { font-size: 0.98rem; }
+.sya-sem-no { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: var(--a-text); color: #fff; font-weight: 800; font-size: 0.85rem; }
+.sya-sem-count { margin-left: auto; padding: 2px 10px; border-radius: 999px; background: var(--a-line-soft); color: var(--a-muted); font-size: 0.72rem; font-weight: 700; }
+.sya-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
+.sya-card { display: grid; grid-template-columns: auto 1fr; gap: 12px 12px; align-items: center; padding: 14px; background: var(--a-card); border: 1px solid var(--a-line); border-radius: 16px; transition: box-shadow 0.15s, border-color 0.15s; }
+.sya-card:hover { border-color: #d4d4d8; box-shadow: 0 8px 20px rgba(9, 9, 11, 0.07); }
+.sya-ico { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(145deg, #dc2626, #7f1d1d); color: #fff; font-size: 24px; }
+.sya-info { min-width: 0; }
+.sya-info b { display: block; font-size: 0.98rem; line-height: 1.3; }
+.sya-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.sya-chips span { padding: 2px 9px; border-radius: 999px; background: var(--a-line-soft); color: #52525b; font-size: 0.7rem; font-weight: 700; }
+.sya-btns { grid-column: 1 / -1; display: flex; gap: 8px; padding-top: 10px; border-top: 1px solid var(--a-line-soft); }
+.sya-btns .adm-btn { flex: 1; }

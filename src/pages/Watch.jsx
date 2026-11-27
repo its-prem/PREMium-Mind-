@@ -13,6 +13,7 @@ import {
   renderPageImages,
   renderPdfDocument,
 } from '../lib/pdfViewer';
+import { goBack } from '../lib/goBack';
 import { getStoredEmail } from '../lib/session';
 import ReaderFeatures from './reader-features';
 import './Watch.css';
@@ -390,7 +391,7 @@ export default function Watch() {
             type="button"
             className="rd-back"
             aria-label="Back to My Courses"
-            onClick={() => navigate(backTarget(params))}
+            onClick={() => goBack(navigate, backTarget(params))}
           >
             <span className="rd-back-icon" aria-hidden="true">
               <ion-icon name="chevron-back-outline"></ion-icon>
@@ -444,7 +445,7 @@ export default function Watch() {
           {status === 'loading' && <div className="rd-spinner" />}
           <p>{status === 'error' ? errorText : loadingText}</p>
           {status === 'error' && (
-            <button type="button" className="rd-retry" onClick={() => navigate(backTarget(params))}>
+            <button type="button" className="rd-retry" onClick={() => goBack(navigate, backTarget(params))}>
               Back to My Courses
             </button>
           )}

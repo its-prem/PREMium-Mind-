@@ -4,6 +4,7 @@ import { adminGet, adminPost } from '../api';
 import { Empty, ErrorBox, Loading, useLoad, useUi } from '../ui';
 import { BRANCHES, SEMESTERS, semesterName } from '../../data/syllabus';
 import { loadUploadedSyllabus } from '../../lib/syllabusStore';
+import SyllabusBulk from './SyllabusBulk';
 import { countTopics, parseSyllabusText, unitsToText } from '../../lib/syllabusParse';
 
 const ICONS = ['book-outline', 'flask-outline', 'calculator-outline', 'laptop-outline', 'code-slash-outline', 'cog-outline', 'construct-outline', 'flash-outline', 'hardware-chip-outline', 'radio-outline', 'business-outline', 'library-outline', 'school-outline', 'document-text-outline', 'create-outline', 'flame-outline'];
@@ -60,6 +61,7 @@ export default function SyllabusTab() {
   const { data, error, loading, reload } = useLoad(() => adminGet('syllabus.php'));
   const [form, setForm] = useState(null); // null = list, object = editing
   const [saving, setSaving] = useState(false);
+  const [bulk, setBulk] = useState(false); // the "add many subjects" screen
   const copyPrompt = async () => {
     try {
       await navigator.clipboard.writeText(AI_PROMPT);
@@ -128,6 +130,20 @@ export default function SyllabusTab() {
 
   if (loading) return <Loading />;
   if (error) return <ErrorBox error={error} onRetry={reload} />;
+
+  /* ---------------- add many subjects at once ---------------- */
+  if (bulk) {
+    return (
+      <SyllabusBulk
+        existing={data.subjects || []}
+        onClose={() => setBulk(false)}
+        onDone={(stay) => {
+          if (!stay) setBulk(false);
+          reload();
+        }}
+      />
+    );
+  }
 
   /* ---------------- the add / edit screen ---------------- */
   if (form) {
@@ -236,40 +252,61 @@ export default function SyllabusTab() {
 
   /* ---------------- the list ---------------- */
   const list = data.subjects || [];
+  const branchLabel = (b) => (b === 'all' ? 'All branches' : b.map((id) => BRANCHES.find((x) => x.id === id)?.title || id).join(', '));
   return (
     <>
-      <div className="adm-row between" style={{ marginBottom: 12 }}>
-        <span className="adm-muted">Subjects you upload here show on the website's Diploma Syllabus page, inside their semester.</span>
-        <button className="adm-btn good" onClick={() => setForm({ ...EMPTY })}>+ Add subject</button>
+      <div className="sya-top">
+        <div>
+          <p>
+            {list.length
+              ? `${list.length} subject${list.length === 1 ? '' : 's'} live on the website, grouped by semester.`
+              : "Subjects you add here show on the website's Diploma Syllabus page."}
+          </p>
+        </div>
+        <div className="sya-actions">
+          <button className="adm-btn" onClick={() => setBulk(true)}>+ Add many</button>
+          <button className="adm-btn good" onClick={() => setForm({ ...EMPTY })}>+ Add subject</button>
+        </div>
       </div>
+
       {!list.length ? (
-        <Empty text='No subject uploaded yet. Click "Add subject" and paste a syllabus.' />
+        <Empty text='No subject uploaded yet. Click "Add subject" or "Add many" and paste a syllabus.' />
       ) : (
-        <div className="adm-card">
-          {SEMESTERS.map((n) => {
-            const subs = list.filter((s) => s.sem === n);
-            if (!subs.length) return null;
-            return (
-              <div key={n} style={{ marginBottom: 14 }}>
+        SEMESTERS.map((n) => {
+          const subs = list.filter((s) => s.sem === n);
+          if (!subs.length) return null;
+          return (
+            <section key={n} className="sya-sem">
+              <header className="sya-sem-head">
+                <span className="sya-sem-no">{n}</span>
                 <b>{semesterName(n)}</b>
+                <span className="sya-sem-count">{subs.length} subject{subs.length === 1 ? '' : 's'}</span>
+              </header>
+              <div className="sya-cards">
                 {subs.map((s) => (
-                  <div key={s.id} className="adm-flagrow">
-                    <div>
+                  <article key={s.id} className="sya-card">
+                    <span className="sya-ico">
+                      <ion-icon name={s.icon || 'book-outline'}></ion-icon>
+                    </span>
+                    <div className="sya-info">
                       <b>{s.title}</b>
-                      <span className="adm-hint">
-                        {s.units.length} units · {countTopics(s.units)} topics · {s.branches === 'all' ? 'All branches' : s.branches.join(', ')}
-                      </span>
+                      <div className="sya-chips">
+                        <span>{s.units.length} unit{s.units.length === 1 ? '' : 's'}</span>
+                        <span>{countTopics(s.units)} topic{countTopics(s.units) === 1 ? '' : 's'}</span>
+                        <span>{branchLabel(s.branches)}</span>
+                        {s.code ? <span>Code {s.code}</span> : null}
+                      </div>
                     </div>
-                    <div className="adm-row" style={{ flexWrap: 'nowrap' }}>
+                    <div className="sya-btns">
                       <button className="adm-btn small" onClick={() => edit(s)}>Edit</button>
                       <button className="adm-btn danger small" onClick={() => remove(s)}>Delete</button>
                     </div>
-                  </div>
+                  </article>
                 ))}
               </div>
-            );
-          })}
-        </div>
+            </section>
+          );
+        })
       )}
     </>
   );

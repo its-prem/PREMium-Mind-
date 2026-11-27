@@ -11,6 +11,7 @@ import { DEFAULT_MICRO_TNC } from '../lib/defaultTerms';
 import { downloadState, formatWhen } from '../lib/downloadMode';
 import { parseQuestions, splitLine } from '../lib/qaParse';
 import { getPdfSession } from '../lib/session';
+import { goBack } from '../lib/goBack';
 import './Watch.css'; // the header below is the PDF reader's header (same look)
 import './QaReader.css';
 
@@ -194,7 +195,7 @@ export default function QaReader() {
       <div className={`rd-root qa-hdr${dark ? ' is-dark' : ''}`}>
         <header className="rd-header">
           <div className="rd-header-start">
-            <button type="button" className="rd-back" aria-label="Back to My Courses" onClick={() => navigate('/lecture')}>
+            <button type="button" className="rd-back" aria-label="Back to My Courses" onClick={() => goBack(navigate, '/lecture')}>
               <span className="rd-back-icon" aria-hidden="true">
                 <ion-icon name="chevron-back-outline"></ion-icon>
               </span>

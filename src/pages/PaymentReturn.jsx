@@ -50,15 +50,15 @@ export default function PaymentReturn() {
       return;
     }
     if (product && product.hasQa) {
-      navigate(`/qa/${product.id}`);
+      navigate(`/qa/${product.id}`, { replace: true });
       return;
     }
     if (!product) {
-      navigate('/lecture');
+      navigate('/lecture', { replace: true });
       return;
     }
     if (product.category === 'resume') {
-      navigate(`/resume-editor/${product.id}`);
+      navigate(`/resume-editor/${product.id}`, { replace: true });
       return;
     }
     if (product.pdfFile) {
@@ -68,10 +68,10 @@ export default function PaymentReturn() {
       } catch {
         /* storage blocked */
       }
-      navigate(`/watch?${q.toString()}`);
+      navigate(`/watch?${q.toString()}`, { replace: true });
       return;
     }
-    navigate('/lecture');
+    navigate('/lecture', { replace: true });
   };
 
   return (
