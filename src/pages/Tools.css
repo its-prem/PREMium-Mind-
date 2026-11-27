@@ -1858,3 +1858,103 @@ details.tl-math {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+/* ---------- Tool / test cards: a coloured icon tile in the tool's own colour (white icon, soft glow) ---------- */
+.tl-pick {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tint, #fb7185) 13%, #ffffff) 0%, #ffffff 58%);
+}
+.tl-pick:hover {
+  border-color: color-mix(in srgb, var(--tint, #fb7185) 55%, #e4e4e7);
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--tint, #fb7185) 22%, transparent);
+}
+.tl-pick-icon {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+  border-radius: 15px;
+  background: linear-gradient(145deg, var(--tint, #fb7185), color-mix(in srgb, var(--tint, #fb7185) 55%, #09090b));
+  color: #ffffff;
+  font-size: 25px;
+  box-shadow: 0 8px 16px color-mix(in srgb, var(--tint, #fb7185) 38%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.tl-pick-icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(60% 50% at 30% 18%, rgba(255, 255, 255, 0.35), transparent 70%);
+  pointer-events: none;
+}
+@media (max-width: 600px) {
+  .tl-pick-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 23px;
+    border-radius: 14px;
+  }
+}
+
+/* ---------- Page header (Tools, Syllabus, Mock tests): the same look as the home page's top bar
+   (white frosted bar, thin grey line, soft shadow, the rounded white button box, the logo) ---------- */
+.tl-page .tl-top {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  overflow: visible;
+  gap: 12px;
+  margin: 0;
+  min-height: 68px;
+  padding: 0 16px;
+  border: 0;
+  border-bottom: 1px solid #e4e4e7;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  box-shadow: 0 4px 20px rgba(9, 9, 11, 0.05);
+}
+.tl-page .tl-top::before,
+.tl-page .tl-top::after {
+  content: none;
+}
+/* the back button: the same box as the menu button of the home page */
+.tl-page .tl-top .tl-back {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e4e4e7;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #09090b;
+  box-shadow: none;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.tl-page .tl-top .tl-back:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+  transform: translateY(-1px);
+}
+.tl-page .tl-top .tl-back:active {
+  transform: scale(0.95);
+}
+.tl-page .tl-top h1 {
+  color: #09090b;
+  font-size: 1.12rem;
+  letter-spacing: -0.01em;
+}
+.tl-page .tl-top p {
+  color: #71717a;
+  font-weight: 700;
+}
+.tl-page .tl-top .tl-logo {
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+  object-fit: contain;
+}
