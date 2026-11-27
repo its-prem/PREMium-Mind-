@@ -27,20 +27,24 @@ const iconFor = (title) => (ICON_BY_WORD.find(([re]) => re.test(title)) || [null
 const AI_PROMPT = `Convert the syllabus of the subjects I give below into PLAIN TEXT in exactly this format. Output only the text, inside one code block, nothing else.
 
 FORMAT RULES
-1. Write the semester on its own line before its subjects: Semester: 2   (it applies to every subject after it, until the next Semester line)
-2. Every subject starts with these lines: Subject: <full subject name>, Code: <subject code>, L-T-P: <like 3-1-0>, Branches: <All, or the branch names separated by commas>
-3. Every unit starts on its own line as: Unit <number>: <unit title>   (numbers start again from 1 in every subject)
-4. Under a unit, write every topic on its OWN line. One topic = one line. No bullets, no numbering, no bold, no tables.
-5. If a unit has sub-headings, write the sub-heading on its own line starting with # (example: # Valency), then its topics under it.
-6. Split long paragraphs into separate short topics (split at commas, semicolons or full stops). Keep the original wording; do not add or remove content.
-7. Put a line of ---- between two subjects.
+1. BRANCH: write the branch name on its own line, with an empty line before and after it, before the subjects of that branch. Use one of these names exactly: Computer Science, Mechanical Engineering, Civil Engineering, Electrical Engineering, Electronics (ECE), Electronics Engineering, Automobile Engineering, Mining Engineering, Metallurgy. For subjects that every branch studies (usually 1st year), write: Common to all branches. The branch applies to every subject after it, until the next branch line.
+2. SEMESTER: write the semester on its own line before its subjects, like: Semester: 2   It applies to every subject after it, until the next Semester line.
+3. SUBJECT: every subject starts with these lines, one per line: Subject: <full subject name>, Code: <subject code>, L-T-P: <like 3-1-0>
+4. UNITS: every unit starts on its own line as: Unit <number>: <unit title>   (the numbers start again from 1 in every subject)
+5. TOPICS: under a unit, write every topic on its OWN line. One topic = one line. No bullets, no numbering, no bold, no tables.
+6. If a unit has sub-headings, write the sub-heading on its own line starting with # (example: # Valency), then its topics under it.
+7. Split long paragraphs into separate short topics (split at commas, semicolons or full stops). Keep the original wording; do not add or remove content.
+8. Put a line of ---- between two subjects.
+9. If a subject is for more than one branch, add a line under L-T-P like: Branches: Computer Science, Mechanical Engineering (this overrides the branch line above it).
 
 EXAMPLE OUTPUT
 Semester: 1
+
+Common to all branches
+
 Subject: Engineering Chemistry
 Code: 2101
 L-T-P: 3-1-0
-Branches: All
 
 Unit 1: Atomic Structure
 Definition of Atom
@@ -51,15 +55,34 @@ Electrovalency and Covalency
 Unit 2: Electrochemistry
 Definition of Ionisation
 ----
-Semester: 2
-Subject: Applied Mathematics
-Code: 2201
-L-T-P: 3-1-0
-Branches: CSE, Mechanical
+Semester: 3
 
-Unit 1: Matrices
-Types of matrices
-Determinant
+Computer Science
+
+Subject: Data Structures
+Code: 3301
+L-T-P: 3-0-2
+
+Unit 1: Arrays
+Types of arrays
+Operations on arrays
+----
+Subject: Database Management
+Code: 3302
+L-T-P: 3-0-2
+
+Unit 1: ER Model
+Entities and attributes
+
+Mechanical Engineering
+
+Subject: Thermodynamics
+Code: 3401
+L-T-P: 3-1-0
+Branches: Mechanical Engineering, Automobile Engineering
+
+Unit 1: Basic Concepts
+Laws of thermodynamics
 
 SYLLABUS (paste below this line)
 `;
@@ -70,6 +93,7 @@ export default function SyllabusBulk({ existing, onClose, onDone }) {
   const [rows, setRows] = useState(null); // detected subjects, editable
   const [saving, setSaving] = useState(false);
   const [progress, setProgress] = useState('');
+  const [editBr, setEditBr] = useState(null); // key of the row whose branches are being changed
 
   const copyPrompt = async () => {
     try {
@@ -197,10 +221,37 @@ export default function SyllabusBulk({ existing, onClose, onDone }) {
                 </div>
                 <div className="adm-hint" style={{ marginTop: 4 }}>
                   {r.units.length} units · {countTopics(r.units)} topics · {branchText(r.branches)}
+                  <button type="button" className="adm-btn ghost small" style={{ marginLeft: 6, padding: '0 8px' }} onClick={() => setEditBr(editBr === r.key ? null : r.key)}>
+                    change
+                  </button>
                   {r.code ? ` · Code ${r.code}` : ''}
                   {r.ltp ? ` · L-T-P ${r.ltp}` : ''}
                   {r.updates && <span className="adm-chip" style={{ marginLeft: 6 }}>already uploaded: will be updated</span>}
                 </div>
+                {editBr === r.key && (
+                  <div className="adm-row" style={{ gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+                    <button type="button" className={`adm-btn small ${r.branches === 'all' ? '' : 'ghost'}`} onClick={() => patch(r.key, { branches: 'all' })}>
+                      All branches
+                    </button>
+                    {BRANCHES.map((b) => {
+                      const on = r.branches !== 'all' && r.branches.includes(b.id);
+                      return (
+                        <button
+                          key={b.id}
+                          type="button"
+                          className={`adm-btn small ${on ? '' : 'ghost'}`}
+                          onClick={() => {
+                            const cur = r.branches === 'all' ? [] : r.branches;
+                            const next = on ? cur.filter((x) => x !== b.id) : [...cur, b.id];
+                            patch(r.key, { branches: next.length ? next : 'all' });
+                          }}
+                        >
+                          {b.title}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           ))}

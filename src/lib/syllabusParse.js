@@ -122,10 +122,32 @@ export function parseBranches(text) {
   v.split(/[,&/+]|\band\b/).forEach((tok) => {
     const t = tok.trim();
     if (!t) return;
-    const hit = BRANCHES.find((b) => b.id === t || b.title.toLowerCase().includes(t) || b.id === ALIASES[t]);
+    const plain = t.replace(/\b(engineering|engg\.?)\b/g, '').replace(/\s+/g, ' ').trim();
+    const hit = BRANCHES.find((b) => b.id === t || b.id === plain || b.id === ALIASES[plain] || b.title.toLowerCase().includes(plain) || b.title.toLowerCase().includes(t) || b.id === ALIASES[t]);
     if (hit && !found.includes(hit.id)) found.push(hit.id);
   });
   return found.length ? found : 'all';
+}
+
+/**
+ * Is this whole line a branch heading, like "Computer Science", "Mechanical Engineering" or "Diploma in Civil Engg"?
+ * Returns ['cse'] / 'all' (for "common to all branches") / null when the line is not a branch heading.
+ */
+export function branchHeading(line) {
+  const raw = String(line || '').trim();
+  if (!raw || raw.length > 70) return null;
+  if (/^(common\s+to\s+all|all\s+branches|common\s+subjects?|all\s+engineering)/i.test(raw)) return 'all';
+  const t = raw
+    .toLowerCase()
+    .replace(/^[#*\s-]+|[#*\s:-]+$/g, '')
+    .replace(/^(diploma\s+in|department\s+of|dept\.?\s+of|branch)\s*[:-]?\s*/, '')
+    .replace(/\b(engineering|engg\.?|department|dept\.?|branch|diploma)\b/g, '')
+    .replace(/[()]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!t) return null;
+  const hit = BRANCHES.find((b) => b.id === t || b.id === ALIASES[t] || b.title.toLowerCase().replace(/[()]/g, ' ').replace(/\b(engineering|engg)\b/g, '').replace(/\s+/g, ' ').trim() === t);
+  return hit ? [hit.id] : null;
 }
 
 const SUBJECT_LINE = /^\s*(subject|title)\s*[:=]\s*\S/i;
@@ -144,9 +166,11 @@ export function parseSyllabusBulk(text) {
   const blocks = [];
   let cur = null;
   let carrySem = 0;
+  let carryBranches = 'all';
+  let prevBlank = true; // the line before was empty / a separator / the start
 
   const start = () => {
-    cur = { lines: [], units: 0, sem: carrySem };
+    cur = { lines: [], units: 0, sem: carrySem, branches: carryBranches };
     blocks.push(cur);
     return cur;
   };
@@ -157,11 +181,24 @@ export function parseSyllabusBulk(text) {
       const line = raw.trim();
       if (!line) {
         if (cur) cur.lines.push('');
+        prevBlank = true;
         return;
       }
       if (SEP_LINE.test(line)) {
         cur = null;
+        prevBlank = true;
         return;
+      }
+      const wasBlank = prevBlank;
+      prevBlank = false;
+      // a line that is only a branch name (after a blank line) sets the branch of the subjects after it
+      if (wasBlank && !SUBJECT_LINE.test(line) && !UNIT_RE.test(line) && !SEM_LINE.test(line)) {
+        const bh = branchHeading(line);
+        if (bh) {
+          carryBranches = bh;
+          cur = null;
+          return;
+        }
       }
       const semOnly = line.match(SEM_LINE);
       if (semOnly) {
@@ -192,7 +229,7 @@ export function parseSyllabusBulk(text) {
   return blocks
     .map((b) => {
       const { meta, units } = parseSyllabusText(b.lines.join('\n'));
-      return { title: meta.title || '', code: meta.code || '', ltp: meta.ltp || '', sem: meta.sem || b.sem || 0, branches: meta.branches || 'all', units };
+      return { title: meta.title || '', code: meta.code || '', ltp: meta.ltp || '', sem: meta.sem || b.sem || 0, branches: meta.branches || b.branches || 'all', units };
     })
     .filter((x) => x.units.length);
 }
