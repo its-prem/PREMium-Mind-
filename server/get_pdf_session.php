@@ -53,6 +53,15 @@ if ($email === '') {
     exit;
 }
 
+include __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/pm_user_guard.php';
+if (pm_user_is_blocked($conn, $email)) {
+    http_response_code(403);
+    echo json_encode(['status' => 'error', 'message' => 'This account is blocked. Please contact support.', 'code' => 'user_blocked']);
+    exit;
+}
+pm_user_touch($conn, $email);   // note the login (time, address, device)
+
 $token = pm_session_make($email);
 if ($token === '') {
     http_response_code(500);

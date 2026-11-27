@@ -152,6 +152,8 @@ if (!pm_rate_limit($conn, 'pdftoken:' . $email, 150, 600) || !pm_rate_limit($con
     echo json_encode(['status' => 'error', 'message' => 'Too many requests. Please wait a few minutes.']);
     exit;
 }
+require_once __DIR__ . '/pm_user_guard.php';
+pm_user_check($conn, $email);
 
 // Friendlier message for the common case — only shown when EVERY course
 // tied to this file requires the app (if even one matching course doesn't,

@@ -36,6 +36,8 @@ if (!pm_rate_limit($conn, 'verify:' . $email, 60, 600)) {
     echo json_encode(['status' => 'error', 'message' => 'Too many checks. Please wait a minute.', 'code' => 'rate_limited']);
     exit;
 }
+require_once __DIR__ . '/pm_user_guard.php';
+pm_user_check($conn, $email);
 if ($orderId === '' || !preg_match('/^[A-Za-z0-9_\-]{6,64}$/', $orderId)) {
     http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'Order id is missing.']);

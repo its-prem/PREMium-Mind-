@@ -40,7 +40,7 @@ const get = (path, headers = {}) => req(API + path, { headers });
 const post = (path, body, headers = {}) => req(API + path, { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(body) });
 
 /* ---------- 1. the admin API is closed to everybody who is not an admin ---------- */
-for (const f of ['me', 'dashboard', 'courses', 'ranking', 'students', 'orders', 'reports', 'maintenance', 'syllabus']) {
+for (const f of ['me', 'dashboard', 'courses', 'ranking', 'students', 'orders', 'reports', 'maintenance', 'syllabus', 'blocklist']) {
   const r = await get(`/admin/${f}.php`);
   ok(`admin/${f}.php refuses a visitor`, [401, 403, 429].includes(r.status), `HTTP ${r.status}`);
 }

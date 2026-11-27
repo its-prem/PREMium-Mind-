@@ -6,9 +6,15 @@
  *   POST admin/students.php action=revoke  {email, course_id}   take one product (a copy is kept)
  *   POST admin/students.php action=verify  {email, value}       mark verified / pending
  *   POST admin/students.php action=delete  {email}              delete the student and their access
+ *   POST admin/students.php action=history {email}              last seen, device and every address the student used
+ *   POST admin/students.php action=block_user   {email, reason}  the account can no longer log in or use the website
+ *   POST admin/students.php action=unblock_user {email}
+ *   GET  admin/students.php?online=1                            the students who were online in the last 5 minutes
  */
 require_once __DIR__ . '/_boot.php';
 $adminEmail = pm_admin_require();
+require_once __DIR__ . '/../pm_user_guard.php';
+pm_user_tables($conn);
 
 function pm_student_email(): string {
     $e = strtolower(trim((string)pm_in('email')));
@@ -73,7 +79,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         pm_admin_ok();
     }
 
+    if ($action === 'history') {
+        $st = $conn->prepare('SELECT first_seen, last_seen, last_ip, last_ua, seen_count FROM pm_user_activity WHERE email = ? LIMIT 1');
+        $st->bind_param('s', $email);
+        $st->execute();
+        $act = $st->get_result()->fetch_assoc();
+        $st->close();
+        $st = $conn->prepare('SELECT ip, hits, first_seen, last_seen FROM pm_user_ips WHERE email = ? ORDER BY last_seen DESC LIMIT 30');
+        $st->bind_param('s', $email);
+        $st->execute();
+        $ips = pm_rows($st->get_result());
+        $st->close();
+        $st = $conn->prepare('SELECT reason, created_at FROM pm_blocked_users WHERE email = ? LIMIT 1');
+        $st->bind_param('s', $email);
+        $st->execute();
+        $blk = $st->get_result()->fetch_assoc();
+        $st->close();
+        pm_admin_ok(['activity' => $act ?: null, 'ips' => $ips, 'blocked' => $blk ?: null]);
+    }
+
+    if ($action === 'block_user') {
+        if (in_array($email, pm_admin_list(), true)) pm_admin_fail('An admin account cannot be blocked.');
+        $reason = mb_substr(trim((string)pm_in('reason', '')), 0, 200);
+        $st = $conn->prepare('REPLACE INTO pm_blocked_users (email, reason, blocked_by) VALUES (?, ?, ?)');
+        $st->bind_param('sss', $email, $reason, $adminEmail);
+        if (!$st->execute()) pm_admin_fail('Could not block.', 500);
+        $st->close();
+        pm_admin_ok();
+    }
+
+    if ($action === 'unblock_user') {
+        $st = $conn->prepare('DELETE FROM pm_blocked_users WHERE email = ?');
+        $st->bind_param('s', $email);
+        $st->execute();
+        $st->close();
+        pm_admin_ok();
+    }
+
     pm_admin_fail('Unknown action.');
+}
+
+// who is online right now (the last 5 minutes)
+if (pm_in_flag('online')) {
+    $rows = pm_rows($conn->query(
+        'SELECT a.email, a.last_seen, a.last_ip, a.last_ua, TIMESTAMPDIFF(SECOND, a.last_seen, NOW()) AS seen_ago,
+                (SELECT name FROM users u WHERE u.email = a.email LIMIT 1) AS name
+           FROM pm_user_activity a WHERE a.last_seen > DATE_SUB(NOW(), INTERVAL 5 MINUTE) ORDER BY a.last_seen DESC LIMIT 100'
+    ));
+    pm_admin_ok(['online' => $rows]);
 }
 
 $search = trim((string)pm_in('search'));
@@ -97,7 +150,14 @@ if ($stmt) {
     $total = (int)pm_scalar($conn, 'SELECT COUNT(*) FROM users');
 }
 
-$sql = 'SELECT u.id, u.name, u.email, u.phone, u.is_active, u.created_at, GROUP_CONCAT(uc.course_id) AS enrolled_ids
+$sql = 'SELECT u.id, u.name, u.email, u.phone, u.is_active, u.created_at, GROUP_CONCAT(uc.course_id) AS enrolled_ids,
+                 (SELECT a.last_seen FROM pm_user_activity a WHERE a.email = u.email LIMIT 1) AS last_seen,
+                 (SELECT TIMESTAMPDIFF(SECOND, a.last_seen, NOW()) FROM pm_user_activity a WHERE a.email = u.email LIMIT 1) AS seen_ago,
+                 (SELECT a.last_ip FROM pm_user_activity a WHERE a.email = u.email LIMIT 1) AS last_ip,
+                 (SELECT a.last_ua FROM pm_user_activity a WHERE a.email = u.email LIMIT 1) AS last_ua,
+                 (SELECT COUNT(*) FROM pm_user_ips i WHERE i.email = u.email AND i.last_seen > DATE_SUB(NOW(), INTERVAL 30 DAY)) AS ip_count,
+                 (SELECT COUNT(*) FROM pm_blocked_users b WHERE b.email = u.email) AS is_blocked,
+                 (SELECT b.reason FROM pm_blocked_users b WHERE b.email = u.email LIMIT 1) AS block_reason
           FROM users u LEFT JOIN user_courses uc ON uc.user_email = u.email '
      . ($search !== '' ? 'WHERE u.name LIKE ? OR u.email LIKE ? ' : '')
      . 'GROUP BY u.id ORDER BY u.id DESC LIMIT ? OFFSET ?';
@@ -115,4 +175,5 @@ unset($s);
 
 $courses = pm_rows($conn->query('SELECT id, title, category FROM courses WHERE is_deleted = 0 ORDER BY sort_order ASC, id DESC'));
 
-pm_admin_ok(['students' => $students, 'courses' => $courses, 'total' => (int)$total, 'page' => $page, 'perPage' => $per]);
+$onlineNow = (int)pm_scalar($conn, 'SELECT COUNT(*) FROM pm_user_activity WHERE last_seen > DATE_SUB(NOW(), INTERVAL 5 MINUTE)');
+pm_admin_ok(['students' => $students, 'courses' => $courses, 'total' => (int)$total, 'page' => $page, 'perPage' => $per, 'onlineNow' => $onlineNow]);

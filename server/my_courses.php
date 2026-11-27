@@ -23,6 +23,9 @@ if ($email === '') {
     exit;
 }
 
+require_once __DIR__ . '/pm_user_guard.php';
+pm_user_check($conn, $email);
+
 $hasPurchasedAt = false;
 $col = @$conn->query("SHOW COLUMNS FROM user_courses LIKE 'purchased_at'");
 if ($col && $col->num_rows > 0) $hasPurchasedAt = true;

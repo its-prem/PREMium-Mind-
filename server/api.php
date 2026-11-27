@@ -30,6 +30,11 @@ if (!empty($_SERVER['HTTP_X_PM_SESSION'])) $token = (string)$_SERVER['HTTP_X_PM_
 if ($token === '' && isset($_GET['pdf_session']))  $token = (string)$_GET['pdf_session'];
 if ($token === '' && isset($_POST['pdf_session'])) $token = (string)$_POST['pdf_session'];
 $verified_email = ($token !== '') ? pm_session_email($token) : '';
+if ($verified_email !== '') {
+    require_once __DIR__ . '/pm_user_guard.php';
+    if (pm_user_is_blocked($conn, $verified_email)) $verified_email = '';   // a blocked student sees the store like a visitor
+    else pm_user_touch($conn, strtolower($verified_email));
+}
 
 // For owned-state display we may use the token email, or fall back to the raw
 // ?email= (so a logged-in user without a fresh token still sees their courses).

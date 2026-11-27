@@ -33,6 +33,9 @@ if ($identity === '') {
     exit;
 }
 
+require_once __DIR__ . '/pm_user_guard.php';
+pm_user_check($conn, strtolower($identity));
+
 // Self by default. An admin may look up another email via ?email=.
 $isAdmin   = in_array(strtolower($identity), array_map('strtolower', $ADMIN_EMAILS), true);
 $requested = strtolower(trim((string)($_GET['email'] ?? $_POST['email'] ?? '')));

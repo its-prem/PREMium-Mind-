@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { adminGet, adminPost } from '../api';
 import { Empty, ErrorBox, Loading, Modal, Switch, fmtDate, useLoad, useUi } from '../ui';
+import { ActivityPanel, SeenLine, ago, deviceName } from './students/activity';
 
 export default function Students() {
   const { toast, confirm } = useUi();
@@ -11,6 +12,7 @@ export default function Students() {
   const [search, setSearch] = useState(params.get('search') || '');
   const [page, setPage] = useState(1);
   const [open, setOpen] = useState(null); // student whose access popup is open
+  const [online, setOnline] = useState(null); // the "online now" list (null = closed)
   const { data, error, loading, reload } = useLoad(() => adminGet('students.php', { search, page }), [search, page]);
 
   // wait a moment after typing before searching
@@ -54,6 +56,23 @@ export default function Students() {
         <input className="adm-input grow" placeholder="Search by name or email…" value={q} onChange={(e) => setQ(e.target.value)} />
         {data && <span className="adm-muted">{data.total} students</span>}
       </div>
+      {data && (
+        <button
+          type="button"
+          className="adm-chip ok"
+          style={{ border: 0, cursor: 'pointer', marginBottom: 10, padding: '6px 12px', fontSize: '0.8rem' }}
+          onClick={async () => {
+            try {
+              const r = await adminGet('students.php', { online: 1 });
+              setOnline(r.online);
+            } catch (e) {
+              toast(e.message, 'error');
+            }
+          }}
+        >
+          ● {data.onlineNow || 0} online now (last 5 minutes)
+        </button>
+      )}
 
       {loading && !data ? (
         <Loading />
@@ -71,13 +90,17 @@ export default function Students() {
                     <span className="adm-avatar big">{(s.name || s.email || '?').charAt(0).toUpperCase()}</span>
                     <b className="adm-ellipsis">{s.name || '—'}</b>
                   </div>
-                  <span className={`adm-chip ${s.is_active == 1 ? 'ok' : 'warn'}`}>{s.is_active == 1 ? 'Verified' : 'Pending'}</span>
+                  {Number(s.is_blocked) === 1 ? <span className="adm-chip bad">Blocked</span> : <span className={`adm-chip ${s.is_active == 1 ? 'ok' : 'warn'}`}>{s.is_active == 1 ? 'Verified' : 'Pending'}</span>}
                 </div>
                 <div className="adm-muted small" style={{ marginTop: 4 }}>
                   {s.email}
                   {s.phone ? ` · ${s.phone}` : ''}
                   <br />
                   Joined: {s.created_at ? fmtDate(s.created_at) : 'Google sign-in'}
+                </div>
+                <div style={{ marginTop: 6 }}>
+                  <SeenLine s={s} />
+                  {Number(s.ip_count) >= 3 && <span className="adm-chip warn" style={{ marginLeft: 6 }}>{s.ip_count} addresses</span>}
                 </div>
                 <div className="adm-row between" style={{ marginTop: 8 }}>
                   <span>
@@ -104,6 +127,36 @@ export default function Students() {
         </>
       )}
 
+      {online && (
+        <Modal title={`Online now (${online.length})`} onClose={() => setOnline(null)}>
+          {!online.length ? (
+            <Empty text="Nobody was online in the last 5 minutes." />
+          ) : (
+            online.map((o) => (
+              <div key={o.email} className="adm-tog">
+                <span style={{ minWidth: 0 }}>
+                  <b className="adm-ellipsis" style={{ display: 'block' }}>{o.name || o.email}</b>
+                  <span className="adm-muted small">
+                    {o.name ? `${o.email} · ` : ''}
+                    {ago(o.seen_ago)} · {deviceName(o.last_ua)} · {o.last_ip}
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  className="adm-btn ghost small"
+                  onClick={() => {
+                    setOnline(null);
+                    setQ(o.email);
+                  }}
+                >
+                  Open
+                </button>
+              </div>
+            ))
+          )}
+        </Modal>
+      )}
+
       {open && (
         <AccessModal
           student={data.students.find((x) => x.id === open.id) || open}
@@ -117,13 +170,16 @@ export default function Students() {
             if (await run({ action: 'verify', email: open.email, value: v ? 1 : 0 }, 'Saved')) reload();
           }}
           onDelete={() => del(open)}
+          toast={toast}
+          confirm={confirm}
+          onChanged={reload}
         />
       )}
     </>
   );
 }
 
-function AccessModal({ student, courses, onClose, onToggle, onVerify, onDelete }) {
+function AccessModal({ student, courses, onClose, onToggle, onVerify, onDelete, toast, confirm, onChanged }) {
   const [filter, setFilter] = useState('');
   const owned = new Set(student.enrolled);
   const shown = courses.filter((c) => c.title.toLowerCase().includes(filter.toLowerCase()));
@@ -134,6 +190,7 @@ function AccessModal({ student, courses, onClose, onToggle, onVerify, onDelete }
         <span>Verified account</span>
         <Switch checked={student.is_active == 1} onChange={onVerify} />
       </div>
+      <ActivityPanel student={student} toast={toast} confirm={confirm} onChanged={onChanged} />
       <input className="adm-input" style={{ margin: '12px 0 6px' }} placeholder="Find a product…" value={filter} onChange={(e) => setFilter(e.target.value)} />
       <div style={{ maxHeight: '45vh', overflowY: 'auto' }}>
         {shown.map((c) => (

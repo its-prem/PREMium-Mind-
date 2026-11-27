@@ -18,6 +18,8 @@ require_once __DIR__ . '/../pm_admin_emails.php';
 require_once __DIR__ . '/../pm_rate_limit.php';
 
 pm_cors_json(['GET', 'POST']);
+require_once __DIR__ . '/../pm_ip_guard.php';
+pm_ip_guard_or_die($conn);   // a blocked address cannot use the admin API (an admin token always passes)
 
 function pm_admin_list(): array {
     return pm_admin_email_list();   // from ADMIN_EMAILS in .env; empty list = nobody is an admin

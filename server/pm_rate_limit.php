@@ -20,6 +20,9 @@ if (!function_exists('pm_client_ip')) {
 if (!function_exists('pm_rate_limit')) {
     /** Counts this try. Returns true while the caller is still inside the limit. */
     function pm_rate_limit(mysqli $conn, string $bucket, int $max, int $windowSec): bool {
+        // a blocked IP address (Admin -> IP block) is refused here, before anything is counted
+        require_once __DIR__ . '/pm_ip_guard.php';
+        pm_ip_guard_or_die($conn);
         static $ready = false;
         if (!$ready) {
             $conn->query('CREATE TABLE IF NOT EXISTS pm_rate_limits (
@@ -57,6 +60,11 @@ if (!function_exists('pm_rate_limit')) {
             $cut = $now - 86400;
             $conn->query('DELETE FROM pm_rate_limits WHERE started < ' . (int)$cut);
         }
-        return (int)$hits <= $max;
+        if ((int)$hits > $max) {
+            // note the address in the "suspicious" list of the admin panel (it is never blocked automatically)
+            pm_ip_event($conn, pm_client_ip(), explode(':', $bucket)[0]);
+            return false;
+        }
+        return true;
     }
 }

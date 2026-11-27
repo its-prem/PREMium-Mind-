@@ -55,6 +55,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         if (password_verify($password, $user['password'])) {
+            require_once __DIR__ . '/pm_user_guard.php';
+            if (pm_user_is_blocked($conn, $user['email'])) {
+                echo json_encode(["status" => "error", "message" => "This account is blocked. Please contact support."]);
+                exit;
+            }
+            pm_user_touch($conn, strtolower($user['email']));   // note the login (time, address, device)
 
             session_set_cookie_params([
                 'lifetime' => 86400,

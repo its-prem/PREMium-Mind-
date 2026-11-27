@@ -30,6 +30,9 @@ if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
+require_once __DIR__ . '/pm_user_guard.php';
+pm_user_check($conn, $email);
+
 $conn->query("CREATE TABLE IF NOT EXISTS user_progress (
     user_email VARCHAR(190) NOT NULL,
     kind VARCHAR(40) NOT NULL,

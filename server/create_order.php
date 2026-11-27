@@ -41,6 +41,8 @@ if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
 if (!pm_rate_limit($conn, 'order:' . $email, 12, 3600) || !pm_rate_limit($conn, 'order-ip:' . pm_client_ip(), 40, 3600)) {
     pm_fail('Too many payment attempts. Please wait a while and try again.', 'rate_limited', 429);
 }
+require_once __DIR__ . '/pm_user_guard.php';
+pm_user_check($conn, $email);
 
 // ---- Cashfree keys (server only, from .env) ----
 $appId     = pm_env('CASHFREE_APP_ID');

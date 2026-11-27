@@ -29,6 +29,8 @@ $email = strtolower(trim(pm_session_email(pm_request_token($body))));
 if ($email === '') pm_qa_fail('Please log in first.', 401, 'login_required');
 require_once __DIR__ . '/pm_rate_limit.php';
 if (!pm_rate_limit($conn, 'qatext:' . $email, 120, 600)) pm_qa_fail('Too many requests. Please wait a few minutes.', 429, 'rate_limited');
+require_once __DIR__ . '/pm_user_guard.php';
+pm_user_check($conn, $email);
 
 $courseId = (int)($_GET['course_id'] ?? $body['course_id'] ?? 0);
 if ($courseId <= 0) pm_qa_fail('Bad product id.', 400, 'bad_course');

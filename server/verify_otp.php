@@ -46,6 +46,9 @@ if (!$found) {
     pm_otp_fail('Invalid OTP. Please check and try again.');
 }
 
+require_once __DIR__ . '/pm_user_guard.php';
+if (pm_user_is_blocked($conn, $email)) pm_otp_fail('This account is blocked. Please contact support.', 403);
+
 // OTP is right: activate the account and clear the otp (it works only once).
 $stmt = $conn->prepare("UPDATE users SET is_active = 1, otp = '' WHERE email = ?");
 $stmt->bind_param('s', $email);
