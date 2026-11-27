@@ -408,3 +408,14 @@
   border-color: #dc2626;
   color: #ffffff;
 }
+
+/* admin only: opens the micro format for free (students see the price and pay) */
+.qa-micro-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.qa-admin-eye {
+  border-style: dashed;
+  color: #b45309;
+}

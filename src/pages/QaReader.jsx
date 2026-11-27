@@ -161,7 +161,11 @@ export default function QaReader() {
     );
   }
 
-  const { micro, title } = state;
+  const { micro: serverMicro, title } = state;
+  // an admin is "owner" on the server (so the admin can look at everything), but this page shows the admin what a STUDENT sees:
+  // the price and the payment. The small eye button next to it opens the micro format for free.
+  const adminPreview = !!serverMicro.adminPreview;
+  const micro = adminPreview ? { ...serverMicro, owned: false } : serverMicro;
   const dl = downloadState({ allow_download: micro.allowDownload, download_at: micro.downloadAt });
   const dlText = dl.mode === 'instant' ? 'download right after paying' : dl.mode === 'timed' ? `download from ${formatWhen(dl.at)}` : 'view only, no download';
 
@@ -247,6 +251,11 @@ export default function QaReader() {
                 </svg>
                   <em className={`qa-micro-price${micro.owned ? ' ok' : ''}`}>{micro.owned ? '✓' : `₹${micro.price}`}</em>
                 </button>
+                {adminPreview && micro.enabled && (
+                  <button type="button" className="rd-theme qa-admin-eye" aria-label="Admin preview of the micro format (free)" title="Admin preview (free)" onClick={() => navigate(`/microsheet/${id}`)}>
+                    <ion-icon name="eye-outline"></ion-icon>
+                  </button>
+                )}
                 {/* just the name, very small */}
                 <span className={`qa-tip${tipFlash ? ' show' : ''}`} role="tooltip">
                   Micro format

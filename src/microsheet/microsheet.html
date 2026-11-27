@@ -806,9 +806,10 @@
     height: 100dvh;
     padding: 14px 8px 70px;
     overflow: auto;
+    -webkit-overflow-scrolling: touch;
     background: var(--viewer-bg);
   }
-  body.viewer .stage { gap: 16px; overflow-x: hidden; }
+  body.viewer .stage { gap: 16px; overflow: visible; } /* the zoomed pages may be wider than the screen: the column slides */
   body.viewer .sheet { box-shadow: 0 6px 22px rgba(0,0,0,.2); }
   body.viewer.vdark .sheet { box-shadow: 0 6px 22px rgba(0,0,0,.65); }
   body.viewer.secure-blur .preview-col { filter: blur(24px) grayscale(1); }
