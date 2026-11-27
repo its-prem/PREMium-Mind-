@@ -1,11 +1,13 @@
 import React, { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SITE_API } from '../lib/api';
+import { getPdfSession } from '../lib/session';
 import { isPageClosed } from '../lib/sitePages';
 import './Maintenance.css';
 
 // The maintenance page (cat artwork + styles) is only downloaded when maintenance is really on.
 const MaintenancePage = lazy(() => import('./MaintenancePage'));
+const BlockedPage = lazy(() => import('./BlockedPage'));
 
 /**
  * Maintenance mode for the WHOLE site.
@@ -48,8 +50,8 @@ const writeCache = (v) => {
   }
 };
 
-async function getJson(url, signal) {
-  const res = await fetch(url, { cache: 'no-store', signal });
+async function getJson(url, signal, headers) {
+  const res = await fetch(url, { cache: 'no-store', signal, headers });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
@@ -66,11 +68,13 @@ async function loadConfig(signal) {
   const serverTimer = setTimeout(() => serverCtrl.abort(), 1800);
   const [file, server] = await Promise.all([
     getJson(`${CONFIG_URL}?t=${t}`, signal).catch(() => null),
-    getJson(`${SITE_API}/maintenance_status.php?t=${t}`, serverCtrl.signal).catch(() => null),
+    // the login token is sent too, so the server can tell whether this student's account is blocked
+    getJson(`${SITE_API}/maintenance_status.php?t=${t}`, serverCtrl.signal, getPdfSession() ? { 'X-PM-Session': getPdfSession() } : undefined).catch(() => null),
   ]);
   clearTimeout(serverTimer);
-  if (server && server.status === 'success' && server.config) {
-    return { ...(file || {}), ...server.config };
+  if (server && server.status === 'success') {
+    // blocked: '' | 'ip' | 'user' (the admin blocked this address / this student)
+    return { ...(file || {}), ...(server.config || {}), blocked: server.blocked || '' };
   }
   if (!file) throw new Error('no maintenance config');
   return file;
@@ -163,6 +167,16 @@ export default function MaintenanceGate({ children }) {
 
   // The admin panel stays reachable during maintenance (it needs an admin login anyway).
   const isAdminPage = location.pathname.startsWith('/admin');
+
+  // blocked by the admin: nothing of the site is shown (the server refuses this visitor as well)
+  if (config.blocked && !isAdminPage) {
+    return (
+      <Suspense fallback={<div className="mt-splash" />}>
+        <BlockedPage why={config.blocked} whatsapp={config.whatsapp} />
+      </Suspense>
+    );
+  }
+
   // whole site closed, or just this page closed
   const siteClosed = config.enabled === true;
   const pageClosed = !siteClosed && isPageClosed(location.pathname, config.pages);

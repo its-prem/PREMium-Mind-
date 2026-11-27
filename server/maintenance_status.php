@@ -11,6 +11,11 @@ pm_cors_json(['GET'], true);
 
 include __DIR__ . '/db_connect.php';
 require_once __DIR__ . '/pm_settings.php';
+require_once __DIR__ . '/pm_rate_limit.php';      // pm_client_ip()
+require_once __DIR__ . '/pm_ip_guard.php';
+require_once __DIR__ . '/pm_user_guard.php';
+require_once __DIR__ . '/pm_session_token.php';
+require_once __DIR__ . '/pm_admin_emails.php';
 
 $cfg = pm_setting_get($conn, 'maintenance');
 if ($cfg !== null) {
@@ -24,4 +29,13 @@ if ($cfg !== null) {
         'pages'    => array_values(array_filter((array)($cfg['pages'] ?? []), 'is_string')),
     ];
 }
-echo json_encode(['status' => 'success', 'config' => $cfg]);
+// Is THIS visitor blocked by the admin? 'ip' = the address, 'user' = the logged-in student. The website then shows a
+// "blocked" page instead of the site. An admin (valid admin token) is never reported as blocked.
+$blocked = '';
+$who = strtolower(trim(pm_session_email(pm_request_token([]))));
+$isAdmin = $who !== '' && in_array($who, pm_admin_email_list(), true);
+if (!$isAdmin) {
+    if (pm_ip_is_blocked($conn, pm_client_ip())) $blocked = 'ip';
+    elseif ($who !== '' && pm_user_is_blocked($conn, $who)) $blocked = 'user';
+}
+echo json_encode(['status' => 'success', 'config' => $cfg, 'blocked' => $blocked]);
