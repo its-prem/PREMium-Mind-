@@ -1,0 +1,14 @@
+# UPLOAD THIS FILE INTO THE FOLDER  premind/d2d_pyq_data/   AND RENAME IT TO:   .htaccess
+#
+# Why: the paid D2D PYQ questions (data_2017.json ... data_2026.json) are given out only by d2d_pyq_data.php after it
+# checks the student's login and purchase. If this folder can be opened directly from the web, anybody can download
+# every year for free by typing the address. This file closes the folder. d2d_pyq_data.php still reads the files
+# from the disk, so the website keeps working.
+Options -Indexes
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

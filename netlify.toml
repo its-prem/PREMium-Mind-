@@ -76,3 +76,16 @@
   for = "/*.webp"
   [headers.values]
     Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
+
+# Security headers for every page (the Content-Security-Policy itself is in the built index.html, see vite.config.js)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), usb=(), payment=(self)"
+    Cross-Origin-Opener-Policy = "same-origin-allow-popups"
+    X-Permitted-Cross-Domain-Policies = "none"
+

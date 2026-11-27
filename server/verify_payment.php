@@ -20,6 +20,7 @@ pm_cors_json(['GET', 'POST']);
 require_once __DIR__ . '/pm_session_token.php';
 require_once __DIR__ . '/pm_orders.php';
 include __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/pm_rate_limit.php';
 
 $data    = pm_request_body();
 $email   = strtolower(trim(pm_session_email(pm_request_token($data))));
@@ -28,6 +29,11 @@ $orderId = trim((string)($_GET['order_id'] ?? $data['order_id'] ?? ''));
 if ($email === '') {
     http_response_code(401);
     echo json_encode(['status' => 'error', 'message' => 'Please log in again.', 'code' => 'login_required']);
+    exit;
+}
+if (!pm_rate_limit($conn, 'verify:' . $email, 60, 600)) {
+    http_response_code(429);
+    echo json_encode(['status' => 'error', 'message' => 'Too many checks. Please wait a minute.', 'code' => 'rate_limited']);
     exit;
 }
 if ($orderId === '' || !preg_match('/^[A-Za-z0-9_\-]{6,64}$/', $orderId)) {

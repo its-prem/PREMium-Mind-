@@ -24,6 +24,7 @@ pm_load_dotenv(__DIR__ . '/.env');
 require_once __DIR__ . '/pm_session_token.php';
 require_once __DIR__ . '/pm_orders.php';
 include __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/pm_rate_limit.php';
 
 function pm_fail(string $message, string $code, int $http = 400, array $extra = []): void {
     http_response_code($http);
@@ -35,6 +36,10 @@ $data  = pm_request_body();
 $email = strtolower(trim(pm_session_email(pm_request_token($data))));
 if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     pm_fail('Please log in again, then try the payment.', 'login_required', 401);
+}
+// at most 12 orders per student and 40 per address in an hour (a bot cannot spam Cashfree orders)
+if (!pm_rate_limit($conn, 'order:' . $email, 12, 3600) || !pm_rate_limit($conn, 'order-ip:' . pm_client_ip(), 40, 3600)) {
+    pm_fail('Too many payment attempts. Please wait a while and try again.', 'rate_limited', 429);
 }
 
 // ---- Cashfree keys (server only, from .env) ----

@@ -146,6 +146,12 @@ if (strpos($file, 'uploads/pdfs/') !== 0 || strpos($file, '..') !== false) {
 require_once __DIR__ . '/pm_pdf_access.php';
 require_once __DIR__ . '/db_connect.php';
 $conn->set_charset('utf8mb4');
+require_once __DIR__ . '/pm_rate_limit.php';
+if (!pm_rate_limit($conn, 'pdftoken:' . $email, 150, 600) || !pm_rate_limit($conn, 'pdftoken-ip:' . pm_client_ip(), 400, 600)) {
+    http_response_code(429);
+    echo json_encode(['status' => 'error', 'message' => 'Too many requests. Please wait a few minutes.']);
+    exit;
+}
 
 // Friendlier message for the common case — only shown when EVERY course
 // tied to this file requires the app (if even one matching course doesn't,

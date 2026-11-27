@@ -63,6 +63,11 @@ if ($courseId <= 0) {
 
 require_once __DIR__ . '/db_connect.php';
 $conn->set_charset('utf8mb4');
+require_once __DIR__ . '/pm_rate_limit.php';
+if (!pm_rate_limit($conn, 'preview-ip:' . pm_client_ip(), 90, 600)) {
+    http_response_code(429);
+    exit;
+}
 
 // Ensure column exists (safe if admin_panel not hit yet)
 $colCheck = @$conn->query("SHOW COLUMNS FROM courses LIKE 'show_preview'");

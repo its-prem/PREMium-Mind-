@@ -11,12 +11,8 @@
  * (header X-PM-Session, or ?pdf_session=, or POST). No valid token -> 401.
  */
 error_reporting(0);
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, X-PM-Session");
-header("Content-Type: application/json; charset=UTF-8");
-header("Cache-Control: no-store");
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
+require_once __DIR__ . '/pm_cors.php';
+pm_cors_json(['GET', 'POST']);   // only the PREMium Mind websites may read a profile (it holds a phone number)
 
 include 'db_connect.php';
 require_once __DIR__ . '/pm_session_token.php';
@@ -42,8 +38,10 @@ $isAdmin   = in_array(strtolower($identity), array_map('strtolower', $ADMIN_EMAI
 $requested = strtolower(trim((string)($_GET['email'] ?? $_POST['email'] ?? '')));
 $target    = ($isAdmin && $requested !== '') ? $requested : $identity;
 
-$e = $conn->real_escape_string($target);
-$res = $conn->query("SELECT name, email, phone FROM users WHERE email='$e' LIMIT 1");
+$stmt = $conn->prepare('SELECT name, email, phone FROM users WHERE email = ? LIMIT 1');
+$stmt->bind_param('s', $target);
+$stmt->execute();
+$res = $stmt->get_result();
 if ($res && $res->num_rows > 0) {
     $row = $res->fetch_assoc();
     echo json_encode([

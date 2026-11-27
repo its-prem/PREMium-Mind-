@@ -231,7 +231,7 @@ if ($action === 'save') {
     } catch (Throwable $e) {
         $conn->rollback();
         error_log('d2d_mcq save failed: ' . $e->getMessage());
-        mcq_err('Save failed: ' . $e->getMessage(), 500);
+        mcq_err('Save failed (see the server log).', 500);
     }
 
     $ts = $conn->query("SELECT updated_at FROM d2d_mcq_sheets WHERE id = $id")->fetch_assoc();

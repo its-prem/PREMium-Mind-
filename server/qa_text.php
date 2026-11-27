@@ -27,6 +27,8 @@ function pm_qa_fail(string $msg, int $http, string $code): void {
 $body  = pm_request_body();
 $email = strtolower(trim(pm_session_email(pm_request_token($body))));
 if ($email === '') pm_qa_fail('Please log in first.', 401, 'login_required');
+require_once __DIR__ . '/pm_rate_limit.php';
+if (!pm_rate_limit($conn, 'qatext:' . $email, 120, 600)) pm_qa_fail('Too many requests. Please wait a few minutes.', 429, 'rate_limited');
 
 $courseId = (int)($_GET['course_id'] ?? $body['course_id'] ?? 0);
 if ($courseId <= 0) pm_qa_fail('Bad product id.', 400, 'bad_course');

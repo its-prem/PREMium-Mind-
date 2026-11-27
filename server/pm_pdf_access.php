@@ -239,3 +239,19 @@ function pm_user_can_download_pdf(mysqli $conn, string $email, string $file): bo
     $chk->close();
     return false;
 }
+
+/**
+ * The real path of a PDF, but only when it sits inside uploads/pdfs (no ../, no symlink out of the folder).
+ * Returns the safe real path, or '' when the file is outside / missing.
+ */
+if (!function_exists('pm_pdf_contain')) {
+    function pm_pdf_contain(string $fullPath): string {
+        $real = realpath($fullPath);
+        if ($real === false) return '';
+        foreach ([__DIR__, getcwd() ?: __DIR__] as $base) {
+            $root = realpath($base . '/uploads/pdfs');
+            if ($root !== false && strpos($real, $root . DIRECTORY_SEPARATOR) === 0) return $real;
+        }
+        return '';
+    }
+}

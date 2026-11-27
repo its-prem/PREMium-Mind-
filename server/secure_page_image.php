@@ -187,6 +187,12 @@ if (!is_file($fullPath) || !is_readable($fullPath)) {
     exit('Error: Document not found');
 }
 
+$fullPath = pm_pdf_contain($fullPath);
+if ($fullPath === '') {
+    http_response_code(404);
+    exit('Error: Document not found');
+}
+
 if (!extension_loaded('imagick')) {
     http_response_code(500);
     exit('Error: Image renderer unavailable');

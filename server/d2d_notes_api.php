@@ -247,7 +247,7 @@ if ($action === 'save') {
     } catch (Throwable $e) {
         $conn->rollback();
         error_log('d2d_notes save failed: ' . $e->getMessage());
-        d2d_err('Save failed: ' . $e->getMessage(), 500);
+        d2d_err('Save failed (see the server log).', 500);
     }
 
     $ts = $conn->query("SELECT updated_at FROM d2d_notes WHERE id = $id")->fetch_assoc();

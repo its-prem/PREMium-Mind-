@@ -138,6 +138,12 @@ if (!is_file($fullPath) || !is_readable($fullPath)) {
     $fullPath = $file;
 }
 
+$fullPath = pm_pdf_contain($fullPath);
+if ($fullPath === '') {
+    http_response_code(404);
+    exit('Document not found');
+}
+
 $size = filesize($fullPath);
 header('Content-Type: application/pdf');
 header('Content-Disposition: inline; filename="PREMium_Secure_Doc.pdf"');
