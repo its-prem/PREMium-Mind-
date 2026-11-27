@@ -107,6 +107,14 @@ export default function MicroSheetPage() {
   }, []);
 
   useEffect(() => {
+    const block = (e) => {
+      if (e.touches && e.touches.length > 1) e.preventDefault();
+    };
+    document.addEventListener('touchmove', block, { passive: false });
+    return () => document.removeEventListener('touchmove', block);
+  }, []);
+
+  useEffect(() => {
     if (!toast) return undefined;
     const t = setTimeout(() => setToast(''), 3200);
     return () => clearTimeout(t);
@@ -197,8 +205,6 @@ export default function MicroSheetPage() {
           </button>
         </div>
       </header>
-
-      {!canDownload && <div className="ms-strip">{lockedMessage}</div>}
 
       <div className="ms-frame">
         <MicroSheetFrame ref={frameRef} mode="viewer" subject={state.title} text={state.text} canDownload={canDownload} lockedMessage={lockedMessage} dark={dark} watermark={wm} blurred={away} onEvent={onFrameEvent} />

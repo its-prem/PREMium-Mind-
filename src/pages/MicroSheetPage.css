@@ -113,3 +113,20 @@
     animation: none;
   }
 }
+
+/* the download button is small: just the icon (the words are not needed); a locked one shows its message when tapped */
+.ms-root .rd-download {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  padding: 0;
+  justify-content: center;
+  gap: 0;
+}
+.ms-root .rd-download span:not(.ms-dl-spin) {
+  display: none;
+}
+.ms-root .rd-download .ms-dl-ico {
+  width: 20px;
+  height: 20px;
+}

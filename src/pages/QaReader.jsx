@@ -81,13 +81,13 @@ export default function QaReader() {
 
   const questions = useMemo(() => (state.status === 'ready' ? parseQuestions(state.text) : []), [state]);
 
-  // highlight the chip of the question that is on screen: the last card whose top has passed the two bars
+  // highlight the chip of the question that is on screen: the last card whose top has passed the header
   useEffect(() => {
     if (state.status !== 'ready' || questions.length < 2) return undefined;
     let raf = 0;
     const update = () => {
       raf = 0;
-      const line = 64 + 60 + 40; // the header + the strip + a little
+      const line = 64 + 40; // the header + a little (the number bar is at the bottom now)
       let cur = 0;
       questions.forEach((_, i) => {
         const el = document.getElementById(`q-${i + 1}`);

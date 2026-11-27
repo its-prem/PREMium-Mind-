@@ -352,3 +352,59 @@
 .qa-page.is-dark .qa-tip {
   color: #09090b;
 }
+
+/* The question numbers: a floating bar at the BOTTOM of the screen (it was under the header before).
+   Scroll it sideways, tap a number to jump; the number of the question on screen is highlighted. */
+.qa-strip {
+  position: fixed;
+  top: auto;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 40;
+  width: min(calc(100% - 24px), 560px);
+  box-sizing: border-box;
+  padding: 7px 8px;
+  gap: 6px;
+  border: 1px solid rgba(228, 228, 231, 0.9);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 12px 32px rgba(9, 9, 11, 0.2);
+  scroll-padding: 0 20px;
+}
+.qa-strip .qa-chip {
+  min-width: 40px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+.qa-strip .qa-chip.on {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(220, 38, 38, 0.4);
+}
+.qa-page {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+}
+.qa-card {
+  scroll-margin-top: calc(var(--rd-header-h) + var(--rd-safe-top) + 14px);
+}
+@media (min-width: 860px) {
+  .qa-strip {
+    padding-left: 8px;
+  }
+}
+.qa-page.is-dark .qa-strip {
+  background: rgba(24, 24, 27, 0.92);
+  border-color: #2e2e33;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+.qa-page.is-dark .qa-strip .qa-chip.on {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+}

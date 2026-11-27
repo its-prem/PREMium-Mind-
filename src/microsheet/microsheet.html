@@ -792,6 +792,7 @@
     -webkit-touch-callout: none;
   }
   body.viewer.vdark { --viewer-bg: #0a0a0a; }
+  body.viewer, body.viewer .preview-col { touch-action: pan-x pan-y; } /* one finger scrolls; two fingers are handled by the pinch code */
   body.viewer .toolbar,
   body.viewer .side-tab,
   body.viewer .scrim,
@@ -1368,6 +1369,69 @@
     else if (e.key === "-" || e.key === "_") { e.preventDefault(); setZoom(sheetZoom / 1.15); }
     else if (e.key === "0") { e.preventDefault(); setZoom(1); }
   });
+
+  /* Phone (students' viewer): two fingers zoom the A4 pages only, never the whole screen; a double tap zooms in / back.
+     The pages stay under the fingers (the scroll position follows the zoom). */
+  (function () {
+    var col = document.querySelector(".preview-col");
+    if (!col) return;
+    var pinch = null;
+    var tap = null;
+    var lastTap = null;
+    function dist(t) { return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY); }
+    function zoomAt(next, cx, cy) {
+      var old = sheetZoom;
+      sheetZoom = Math.min(ZOOM_MAX, Math.max(viewerMode ? 1 : ZOOM_MIN, next)); // the viewer never goes smaller than "fit the screen"
+      updateMobileScale();
+      var r = sheetZoom / old;
+      if (r === 1) return;
+      col.scrollLeft = (col.scrollLeft + cx) * r - cx;
+      col.scrollTop = (col.scrollTop + cy) * r - cy;
+    }
+    document.addEventListener("touchstart", function (e) {
+      if (!viewerMode) return;
+      if (e.touches.length === 2) {
+        pinch = { d: dist(e.touches), z: sheetZoom };
+        tap = null;
+        lastTap = null;
+      } else if (e.touches.length === 1) {
+        tap = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() };
+      }
+    }, { passive: true });
+    document.addEventListener("touchmove", function (e) {
+      if (!viewerMode) return;
+      if (e.touches.length === 2 && pinch) {
+        e.preventDefault(); // no browser page zoom
+        var r = col.getBoundingClientRect();
+        var cx = (e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left;
+        var cy = (e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top;
+        zoomAt(pinch.z * (dist(e.touches) / pinch.d), cx, cy);
+      } else if (tap && e.touches.length === 1 && Math.hypot(e.touches[0].clientX - tap.x, e.touches[0].clientY - tap.y) > 10) {
+        tap = null; // the finger moved: it is scrolling, not tapping
+      }
+    }, { passive: false });
+    document.addEventListener("touchend", function (e) {
+      if (!viewerMode) return;
+      if (pinch && e.touches.length < 2) pinch = null;
+      if (tap && e.touches.length === 0) {
+        var now = Date.now();
+        if (now - tap.t < 300) {
+          if (lastTap && now - lastTap.t < 350 && Math.hypot(tap.x - lastTap.x, tap.y - lastTap.y) < 40) {
+            var r = col.getBoundingClientRect();
+            zoomAt(sheetZoom > 1.05 ? 1 : 2.2, tap.x - r.left, tap.y - r.top);
+            lastTap = null;
+          } else {
+            lastTap = { x: tap.x, y: tap.y, t: now };
+          }
+        } else {
+          lastTap = null;
+        }
+        tap = null;
+      }
+    }, { passive: true });
+    // iPhone / iPad: its own pinch gesture would zoom the whole page
+    document.addEventListener("gesturestart", function (e) { if (viewerMode) e.preventDefault(); });
+  })();
 
   var toolbarEl = document.querySelector(".toolbar");
   function updateToolbarOffset() {

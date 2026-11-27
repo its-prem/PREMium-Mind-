@@ -41,7 +41,9 @@ function Pets() {
     const id = setTimeout(start, 2500)
     return () => clearTimeout(id)
   }, [])
-  if (!on || pathname.startsWith('/admin') || pathname.startsWith('/microsheet')) return null // no pets in the admin panel
+  // no pets in the admin panel and on the reading pages (PDF reader, micro format, questions reader)
+  const quiet = ['/admin', '/watch', '/microsheet', '/qa'].some((p) => pathname.startsWith(p))
+  if (!on || quiet) return null
   return (
     <Suspense fallback={null}>
       <Butterfly />
