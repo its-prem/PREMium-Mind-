@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
+import { getCustomTemplate } from '../lib/resumeTemplates';
 import './ResumeDocument.css';
 
 /** Realistic sample used for template previews (the buyer replaces it). */
@@ -74,13 +75,17 @@ const bullets = (text) =>
     .map((t) => t.trim())
     .filter(Boolean);
 
+// data-edit="path" marks a text the student can click in the editor and change in place (see ResumeEditor.jsx).
+// Path examples: name, summary, skills.2, experience.0.role, experience.0.points#1 (the 2nd line of the points).
 function Contact({ data, className = '' }) {
-  const items = [data.email, data.phone, data.location, data.link].filter(Boolean);
+  const items = ['email', 'phone', 'location', 'link'].filter((k) => data[k]);
   if (!items.length) return null;
   return (
     <ul className={`rs-contact ${className}`}>
-      {items.map((item) => (
-        <li key={item}>{item}</li>
+      {items.map((k) => (
+        <li key={k} data-edit={k}>
+          {data[k]}
+        </li>
       ))}
     </ul>
   );
@@ -88,17 +93,19 @@ function Contact({ data, className = '' }) {
 
 function Experience({ items }) {
   if (!items.length) return null;
-  return items.map((e) => (
+  return items.map((e, i) => (
     <div className="rs-item" key={e.id}>
       <div className="rs-item-head">
-        <b>{e.role}</b>
-        <span>{e.period}</span>
+        <b data-edit={`experience.${i}.role`}>{e.role}</b>
+        <span data-edit={`experience.${i}.period`}>{e.period}</span>
       </div>
-      <div className="rs-item-sub">{e.company}</div>
+      <div className="rs-item-sub" data-edit={`experience.${i}.company`}>{e.company}</div>
       {bullets(e.points).length > 0 && (
         <ul className="rs-points">
-          {bullets(e.points).map((pt) => (
-            <li key={pt}>{pt}</li>
+          {bullets(e.points).map((pt, j) => (
+            <li key={pt + j} data-edit={`experience.${i}.points#${j}`}>
+              {pt}
+            </li>
           ))}
         </ul>
       )}
@@ -108,15 +115,20 @@ function Experience({ items }) {
 
 function Education({ items }) {
   if (!items.length) return null;
-  return items.map((e) => (
+  return items.map((e, i) => (
     <div className="rs-item" key={e.id}>
       <div className="rs-item-head">
-        <b>{e.degree}</b>
-        <span>{e.period}</span>
+        <b data-edit={`education.${i}.degree`}>{e.degree}</b>
+        <span data-edit={`education.${i}.period`}>{e.period}</span>
       </div>
       <div className="rs-item-sub">
-        {e.school}
-        {e.score ? ` | ${e.score}` : ''}
+        <span data-edit={`education.${i}.school`}>{e.school}</span>
+        {e.score ? (
+          <>
+            {' | '}
+            <span data-edit={`education.${i}.score`}>{e.score}</span>
+          </>
+        ) : null}
       </div>
     </div>
   ));
@@ -124,12 +136,12 @@ function Education({ items }) {
 
 function Projects({ items }) {
   if (!items.length) return null;
-  return items.map((p) => (
+  return items.map((p, i) => (
     <div className="rs-item" key={p.id}>
       <div className="rs-item-head">
-        <b>{p.name}</b>
+        <b data-edit={`projects.${i}.name`}>{p.name}</b>
       </div>
-      <div className="rs-item-sub rs-plain">{p.desc}</div>
+      <div className="rs-item-sub rs-plain" data-edit={`projects.${i}.desc`}>{p.desc}</div>
     </div>
   ));
 }
@@ -150,7 +162,17 @@ export default function ResumeDocument({ template = 'modern', data, accent = '#0
   const d = { ...BLANK_RESUME, ...data };
   const style = { '--accent': accent };
 
-  const summary = <Section title="Summary" show={!!d.summary}><p>{d.summary}</p></Section>;
+  // a template dropped into src/templates/resume/ (loaded only now, see lib/resumeTemplates.js)
+  const Custom = getCustomTemplate(template);
+  if (Custom) {
+    return (
+      <Suspense fallback={<div className="rs-doc" style={style} />}>
+        <Custom data={d} accent={accent} />
+      </Suspense>
+    );
+  }
+
+  const summary = <Section title="Summary" show={!!d.summary}><p data-edit="summary" data-multiline="1">{d.summary}</p></Section>;
   const experience = (
     <Section title="Experience" show={d.experience.length > 0}>
       <Experience items={d.experience} />
@@ -169,8 +191,10 @@ export default function ResumeDocument({ template = 'modern', data, accent = '#0
   const skills = (
     <Section title="Skills" show={d.skills.length > 0}>
       <ul className="rs-skills">
-        {d.skills.map((s) => (
-          <li key={s}>{s}</li>
+        {d.skills.map((s, i) => (
+          <li key={s + i} data-edit={`skills.${i}`}>
+            {s}
+          </li>
         ))}
       </ul>
     </Section>
@@ -180,8 +204,8 @@ export default function ResumeDocument({ template = 'modern', data, accent = '#0
     return (
       <div className="rs-doc rs-classic" style={style}>
         <header>
-          <h1>{d.name || 'Your Name'}</h1>
-          {d.title && <p className="rs-title">{d.title}</p>}
+          <h1 data-edit="name">{d.name || 'Your Name'}</h1>
+          {d.title && <p className="rs-title" data-edit="title">{d.title}</p>}
           <Contact data={d} className="rs-inline" />
         </header>
         {summary}
@@ -198,8 +222,8 @@ export default function ResumeDocument({ template = 'modern', data, accent = '#0
       <div className="rs-doc rs-compact" style={style}>
         <header>
           <div>
-            <h1>{d.name || 'Your Name'}</h1>
-            {d.title && <p className="rs-title">{d.title}</p>}
+            <h1 data-edit="name">{d.name || 'Your Name'}</h1>
+            {d.title && <p className="rs-title" data-edit="title">{d.title}</p>}
           </div>
           <Contact data={d} />
         </header>
@@ -218,8 +242,8 @@ export default function ResumeDocument({ template = 'modern', data, accent = '#0
   return (
     <div className="rs-doc rs-modern" style={style}>
       <header>
-        <h1>{d.name || 'Your Name'}</h1>
-        {d.title && <p className="rs-title">{d.title}</p>}
+        <h1 data-edit="name">{d.name || 'Your Name'}</h1>
+        {d.title && <p className="rs-title" data-edit="title">{d.title}</p>}
       </header>
       <div className="rs-cols">
         <main>

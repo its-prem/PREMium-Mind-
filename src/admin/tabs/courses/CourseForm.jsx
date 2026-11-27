@@ -182,6 +182,13 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
           </div>
         )}
         {f.hint && <span className="adm-hint">{f.hint}</span>}
+        {f.name === 'price' && v.category === 'resume' && (
+          <span className={`adm-chip ${Number(v.price) === 0 && String(v.price) !== '' ? 'ok' : ''}`} style={{ alignSelf: 'flex-start' }}>
+            {Number(v.price) === 0 && String(v.price) !== ''
+              ? 'FREE template: students download it without paying'
+              : `Students customize free and pay ₹${Number(v.price) || 0} to download. Write 0 to make it FREE.`}
+          </span>
+        )}
       </div>
     );
   };

@@ -3,6 +3,7 @@ import { PRODUCTS } from '../data/storeData';
 import { SITE_API } from './api';
 import { getPdfSession } from './session';
 import { normalizeOpenLink } from './openLink';
+import { isKnownTemplate } from './resumeTemplates';
 import { setOwned } from './purchases';
 
 /**
@@ -44,7 +45,7 @@ function rowToProduct(row) {
   else if (raw === 'projects' || raw === 'report-writing') category = 'projects';
 
   const tpl = (/template:\s*([a-z0-9_-]+)/i.exec(String(row.demo_link || '')) || [])[1];
-  const template = category === 'resume' ? (ACCENTS[tpl] ? tpl : 'modern') : undefined;
+  const template = category === 'resume' ? (isKnownTemplate(tpl) ? String(tpl).toLowerCase() : 'modern') : undefined;
   const blocked = ['coming_soon', 'disabled', 'disabled_look'].includes(String(row.btn_type || ''));
   const image = toAbsoluteImage(row.image);
 
@@ -52,7 +53,7 @@ function rowToProduct(row) {
     id: Number(row.id),
     category,
     template,
-    accent: template ? ACCENTS[template] : undefined,
+    accent: template ? ACCENTS[template] || '#2563eb' : undefined,
     badge: String(row.badge || ''),
     title: String(row.title || ''),
     desc1: String(row.desc1 || ''),

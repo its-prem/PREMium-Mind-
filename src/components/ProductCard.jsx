@@ -1,9 +1,13 @@
 import React from 'react';
 import { ResumeScaled, SAMPLE_RESUME } from './ResumeDocument';
+import { isCustomTemplate } from '../lib/resumeTemplates';
 import './ProductCard.css';
 
 export default function ProductCard({ course, index, onPreview, onBuy, onOpen, owned = false }) {
   const isResume = course.category === 'resume';
+  // the built-in templates are drawn live; a dropped-in one is shown as a picture so its code is not loaded for visitors
+  const free = isResume && Number(course.price) === 0; // a free template: nothing to pay
+  const liveResume = isResume && !isCustomTemplate(course.template);
   const discount =
     course.oldPrice && course.oldPrice > course.price
       ? Math.round(((course.oldPrice - course.price) / course.oldPrice) * 100)
@@ -17,7 +21,7 @@ export default function ProductCard({ course, index, onPreview, onBuy, onOpen, o
       <div className="pm-card-shine" aria-hidden="true" />
 
       {/* Tall Cover Thumbnail */}
-      <div className={`pm-card-thumb ${isResume ? 'pm-thumb-resume' : ''}`}>
+      <div className={`pm-card-thumb ${liveResume ? 'pm-thumb-resume' : ''}`}>
         {course.badge && !owned && (
           <span className="pm-ribbon-badge">{course.badge}</span>
         )}
@@ -27,7 +31,7 @@ export default function ProductCard({ course, index, onPreview, onBuy, onOpen, o
           </span>
         ) : null}
 
-        {isResume ? (
+        {liveResume ? (
           <ResumeScaled
             template={course.template}
             data={SAMPLE_RESUME}
@@ -96,8 +100,8 @@ export default function ProductCard({ course, index, onPreview, onBuy, onOpen, o
         <div className="pm-card-bottom">
           <div className="pm-card-meta">
             <div className="pm-price-group">
-              <span className="pm-sale-price">₹{course.price}</span>
-              {course.oldPrice && (
+              <span className="pm-sale-price">{free ? 'FREE' : `₹${course.price}`}</span>
+              {!free && course.oldPrice && (
                 <span className="pm-old-price">₹{course.oldPrice}</span>
               )}
             </div>
@@ -105,7 +109,13 @@ export default function ProductCard({ course, index, onPreview, onBuy, onOpen, o
               <span className="pm-owned-note">Yours to keep</span>
             ) : (
               <div className="pm-offer-group">
-                {discount && <span className="pm-off-chip">{discount}% OFF</span>}
+                {!free && discount && <span className="pm-off-chip">{discount}% OFF</span>}
+                {isResume && !free && (
+                  <span className="pm-offer-chip" title="Customizing is free">
+                    Pay when you download
+                  </span>
+                )}
+                {free && <span className="pm-off-chip">Free download</span>}
                 {course.timer && (
                   <span className="pm-offer-chip" title="Limited offer">
                     <ion-icon name="time-outline"></ion-icon>
@@ -131,6 +141,17 @@ export default function ProductCard({ course, index, onPreview, onBuy, onOpen, o
               <button type="button" className="pm-coming-soon-btn" disabled>
                 <ion-icon name="time-outline"></ion-icon>
                 <span>Coming Soon</span>
+              </button>
+            ) : isResume ? (
+              // A resume template is free to customize; the price is asked when the student downloads the PDF
+              <button
+                type="button"
+                className="pm-buy-btn"
+                onClick={() => onOpen(course)}
+              >
+                <ion-icon name="create-outline"></ion-icon>
+                <span>Customize</span>
+                <span className="pm-buy-arrow">→</span>
               </button>
             ) : (
               <button

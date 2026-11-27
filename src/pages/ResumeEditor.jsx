@@ -7,11 +7,14 @@ import ResumeDocument, {
   SAMPLE_RESUME,
 } from '../components/ResumeDocument';
 import { PRODUCTS, getProduct } from '../data/storeData';
-import { usePurchases } from '../lib/purchases';
+import { refreshPurchases, usePurchases } from '../lib/purchases';
+import { isCustomTemplate } from '../lib/resumeTemplates';
+import CheckoutModal from '../components/CheckoutModal';
 import { useCatalog } from '../lib/catalog';
 import { cloudGet, cloudPut, stampGet, stampSet } from '../lib/cloud';
-import { getStoredEmail } from '../lib/session';
+import { getPdfSession, getStoredEmail } from '../lib/session';
 import { goBack } from '../lib/goBack';
+import { ADMIN_MADE_EXTRA, buildResumeMessage, whatsappLink } from '../lib/resumeService';
 import './ResumeEditor.css';
 
 const newId = () => Math.random().toString(36).slice(2, 8);
@@ -59,7 +62,28 @@ export default function ResumeEditor() {
   const { status: catalogStatus } = useCatalog(); // the products come from the server
   const product = getProduct(productId);
   const { owns } = usePurchases();
-  const allowed = !!product && product.category === 'resume' && owns(product.id);
+  const allowed = !!product && product.category === 'resume'; // anyone can customize it
+  // Only a buyer can download the PDF. The purchase is confirmed by the SERVER (not the copy kept in the browser),
+  // so changing the browser's storage does not unlock the clean PDF.
+  const [confirmed, setConfirmed] = useState(null); // null = still checking
+  const free = !!product && Number(product.price) === 0; // a free template: nothing to pay
+  const paid = !!product && (free || confirmed === true);
+  const loggedIn = !!(getPdfSession() && getStoredEmail());
+  useEffect(() => {
+    let dead = false;
+    if (!product) return undefined;
+    if (!getPdfSession()) {
+      setConfirmed(false);
+      return undefined;
+    }
+    refreshPurchases().then((ids) => {
+      if (!dead) setConfirmed(Array.isArray(ids) ? ids.map(String).includes(String(product.id)) : false);
+    });
+    return () => {
+      dead = true;
+    };
+  }, [product?.id, owns(product?.id)]); // eslint-disable-line
+  const [pay, setPay] = useState(null); // the checkout popup (for the download amount)
 
   const email = getStoredEmail();
   const storeKey = `pm_resume_data:${(email || 'guest').toLowerCase()}`;
@@ -135,6 +159,71 @@ export default function ResumeEditor() {
   }, []); // eslint-disable-line
 
   const set = (patch) => setData((prev) => ({ ...prev, ...patch }));
+
+  // Change one text of the resume by its path, e.g. "experience.0.role" or "experience.0.points#1"
+  const setByPath = (path, value) => {
+    setData((prev) => {
+      const next = JSON.parse(JSON.stringify(prev));
+      const [main, line] = path.split('#');
+      const keys = main.split('.');
+      let node = next;
+      for (let i = 0; i < keys.length - 1; i += 1) node = node?.[keys[i]];
+      const last = keys[keys.length - 1];
+      if (node == null || !(last in node)) return prev;
+      if (line !== undefined) {
+        // points are one text with a line for each point: change just this line
+        const lines = String(node[last] || '').split('\n').filter((t) => t.trim());
+        lines[Number(line)] = value;
+        node[last] = lines.filter((t) => t.trim()).join('\n');
+      } else {
+        node[last] = value;
+      }
+      if (keys[0] === 'skills') setSkillsText(next.skills.join(', '));
+      return next;
+    });
+  };
+
+  // Click on a text in the preview: it becomes editable right there; leaving it (or Enter) saves it
+  const onPreviewClick = (e) => {
+    const el = e.target.closest('[data-edit]');
+    if (!el || el.isContentEditable) return;
+    const path = el.getAttribute('data-edit');
+    const multiline = el.getAttribute('data-multiline') === '1';
+    const before = el.textContent;
+    el.contentEditable = 'plaintext-only';
+    if (el.contentEditable !== 'plaintext-only') el.contentEditable = 'true';
+    el.classList.add('re-editing');
+    el.focus();
+    const sel = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    const finish = (save) => {
+      el.removeEventListener('blur', onBlur);
+      el.removeEventListener('keydown', onKey);
+      const typed = (el.innerText || '').replace(/\u00a0/g, ' ').replace(/\r?\n+/g, multiline ? '\n' : ' ').trim();
+      el.contentEditable = 'false';
+      el.removeAttribute('contenteditable');
+      el.classList.remove('re-editing');
+      el.textContent = before; // put the page back exactly as React drew it, then let React redraw the new text
+      if (save && typed !== before.trim()) setByPath(path, typed);
+    };
+    const onBlur = () => finish(true);
+    const onKey = (ev) => {
+      if (ev.key === 'Escape') {
+        ev.preventDefault();
+        finish(false);
+      } else if (ev.key === 'Enter' && !multiline) {
+        ev.preventDefault();
+        el.blur();
+      }
+    };
+    el.addEventListener('blur', onBlur);
+    el.addEventListener('keydown', onKey);
+  };
   const updateItem = (key, id, patch) =>
     setData((prev) => ({
       ...prev,
@@ -146,6 +235,36 @@ export default function ResumeEditor() {
     setData((prev) => ({ ...prev, [key]: prev[key].filter((it) => it.id !== id) }));
 
   const toggle = (id) => setOpen((cur) => (cur === id ? '' : id));
+
+  // Download PDF: free for a buyer; everybody else pays the price set in the admin first
+  const openPay = (after) =>
+    setPay({
+      courseId: product.id,
+      kind: 'course',
+      title: product.title,
+      price: product.price,
+      mrp: product.oldPrice,
+      showTnc: product.showTnc,
+      tncText: product.tncText,
+      openLabel: after === 'whatsapp' ? 'Send details on WhatsApp' : 'Download my resume',
+      doneText: after === 'whatsapp' ? 'Payment done. Your details can go to the admin on WhatsApp now.' : 'Payment done. You can download your resume now.',
+      after,
+      product,
+    });
+
+  const download = () => {
+    if (paid) window.print();
+    else openPay('print');
+  };
+
+  // The WhatsApp message goes only after the template is paid
+  const openWhatsapp = () => {
+    window.location.href = whatsappLink(buildResumeMessage(product, data));
+  };
+  const sendWhatsapp = () => {
+    if (paid) openWhatsapp();
+    else openPay('whatsapp');
+  };
 
   const reset = (next) => {
     // eslint-disable-next-line no-alert
@@ -161,6 +280,30 @@ export default function ResumeEditor() {
         <div className="re-locked-card">
           <h1>Loading...</h1>
           <p>Aapka template check ho raha hai.</p>
+        </div>
+      </main>
+    );
+  }
+
+  const needsLogin = allowed && isCustomTemplate(product.template) && !loggedIn;
+
+  if (needsLogin) {
+    return (
+      <main className="re-locked">
+        <div className="re-locked-card">
+          <div className="re-locked-icon">
+            <ion-icon name="lock-closed-outline"></ion-icon>
+          </div>
+          <h1>Login required</h1>
+          <p>Is template ko customize karne ke liye pehle login karo.</p>
+          <div className="re-locked-actions">
+            <Link to="/login" className="re-btn re-btn-dark">
+              Login
+            </Link>
+            <Link to="/#our-store" className="re-btn">
+              Back to Store
+            </Link>
+          </div>
         </div>
       </main>
     );
@@ -206,9 +349,11 @@ export default function ResumeEditor() {
         <span className="re-saved" aria-live="polite">
           {saved}
         </span>
-        <button type="button" className="re-btn re-btn-dark" onClick={() => window.print()}>
+        <button type="button" className={`re-btn re-dl${paid ? ' is-paid' : ''}`} onClick={download} aria-label={paid ? 'Download PDF' : `Download PDF for ₹${product.price}`}>
           <ion-icon name="download-outline"></ion-icon>
-          <span>Download PDF</span>
+          <em>{paid ? 'Download PDF' : 'Download'}</em>
+          {!paid && <b className="re-dl-price">₹{product.price}</b>}
+          {free && <b className="re-dl-price">FREE</b>}
         </button>
       </header>
 
@@ -356,27 +501,88 @@ export default function ResumeEditor() {
             </button>
           </Block>
 
+          {/* the admin makes the resume: the filled data goes into the WhatsApp message */}
+          <section className="re-wa">
+            <div className="re-wa-head">
+              <ion-icon name="logo-whatsapp"></ion-icon>
+              <b>Resume khud nahi banana?</b>
+            </div>
+            <p>
+              Details bhar do aur neeche ka button dabao. <b>Payment ke baad</b> aapka saara data WhatsApp message mein chala jayega
+              aur <b>admin aapka resume banakar dega</b>.
+            </p>
+            <p className="re-wa-price">
+              {free ? (
+                <>
+                  Ye template <b>free</b> hai. Admin se banwane par sirf admin charge <b>₹{ADMIN_MADE_EXTRA}</b> admin ko dena hoga.
+                </>
+              ) : paid ? (
+                <>
+                  Template payment ho chuka hai ✓. Admin charge <b>₹{ADMIN_MADE_EXTRA}</b> admin ko alag se dena hoga.
+                </>
+              ) : (
+                <>
+                  Pehle template ka <b>₹{product.price}</b> online dena hoga. Uske upar admin charge <b>₹{ADMIN_MADE_EXTRA}</b> admin ko
+                  alag se dena hoga.
+                </>
+              )}
+            </p>
+            <button type="button" className="re-wa-btn" onClick={sendWhatsapp}>
+              <ion-icon name={paid ? 'logo-whatsapp' : 'lock-closed-outline'}></ion-icon>
+              <span>{paid ? 'Send on WhatsApp' : `Pay ₹${product.price} & send`}</span>
+              <b>+₹{ADMIN_MADE_EXTRA}</b>
+            </button>
+          </section>
+
           <p className="re-tip">
             <ion-icon name="information-circle-outline"></ion-icon>
             <span>
-              <b>Download PDF</b> dabane par print window khulegi: wahan <b>&ldquo;Save as PDF&rdquo;</b> chunein.
-              Aapka kaam is device par apne aap save hota hai.
+              {paid ? (
+                <>
+                  {free && <>Ye template <b>free</b> hai. </>}
+                  <b>Download PDF</b> dabane par print window khulegi: wahan <b>&ldquo;Save as PDF&rdquo;</b> chunein.
+                  Aapka kaam is device par apne aap save hota hai.
+                </>
+              ) : (
+                <>
+                  Resume customize karna <b>free</b> hai. PDF download karne par <b>₹{product.price}</b> lagenge. Aapka kaam is device par apne aap save hota hai.
+                </>
+              )}
             </span>
           </p>
         </div>
 
         {/* ================= LIVE PREVIEW ================= */}
         <div className={`re-preview ${tab === 'preview' ? 'is-active' : ''}`}>
-          <div className="re-sheet">
+          <div className={`re-sheet${paid ? '' : ' is-locked'}`} onClick={onPreviewClick} onContextMenu={(e) => !paid && e.preventDefault()}>
             <ResumeScaled template={template} data={data} accent={accent} />
+            {!paid && <div className="re-wm" aria-hidden="true" />}
           </div>
         </div>
       </div>
 
-      {/* Full-size copy used only when printing / saving as PDF */}
-      <div className="re-print" aria-hidden="true">
-        <ResumeDocument template={template} data={data} accent={accent} />
-      </div>
+      {/* Full-size copy used only when printing / saving as PDF (it exists only after the payment) */}
+      {paid && (
+        <div className="re-print" aria-hidden="true">
+          <ResumeDocument template={template} data={data} accent={accent} />
+        </div>
+      )}
+
+      {pay && (
+        <CheckoutModal
+          item={pay}
+          onClose={() => setPay(null)}
+          onOpen={async () => {
+            setPay(null);
+            const ids = await refreshPurchases(); // ask the server again
+            const ok = Array.isArray(ids) && ids.map(String).includes(String(product.id));
+            setConfirmed(ok);
+            if (!ok) return;
+            if (pay.after === 'whatsapp') openWhatsapp();
+            else setTimeout(() => window.print(), 400); // the clean PDF copy appears once the purchase is confirmed
+          }}
+        />
+      )}
     </div>
   );
 }

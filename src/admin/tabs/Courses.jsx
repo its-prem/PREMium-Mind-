@@ -127,8 +127,8 @@ export default function Courses({ options }) {
       {rows.length === 0 ? (
         <Empty text={view === 'trash' ? 'Trash is empty.' : 'No products found.'} />
       ) : (
-        <div className="adm-table-wrap">
-          <table className="adm-table">
+        <div className="adm-table-wrap adm-stack-wrap">
+          <table className="adm-table adm-stack">
             <thead>
               <tr>
                 <th>
@@ -173,7 +173,7 @@ export default function Courses({ options }) {
                       </div>
                     </td>
                     <td style={{ whiteSpace: 'nowrap' }}>
-                      <b>{money(c.price)}</b>
+                      {String(c.category).toLowerCase() === 'resume' && Number(c.price) === 0 ? <span className="adm-chip ok">FREE</span> : <b>{money(c.price)}</b>}
                       {c.old_price > 0 && (
                         <div className="adm-muted small">
                           <s>{money(c.old_price)}</s>

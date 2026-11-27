@@ -497,3 +497,152 @@
     padding: 10px 13px;
   }
 }
+/* the amount shown on the Download PDF button (also on a phone, where the words are hidden) */
+.re-price {
+  margin-left: 2px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #34d399;
+  color: #052e16;
+  font-size: 0.78rem;
+}
+
+.re-bar-title { min-width: 0; }
+.re-bar-title strong,
+.re-bar-title small { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* preview of a resume that is not bought yet: a watermark all over it, and it cannot be selected */
+.re-sheet {
+  position: relative;
+}
+.re-sheet.is-locked {
+  user-select: none;
+  -webkit-user-select: none;
+}
+.re-wm {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='170'><text x='130' y='90' text-anchor='middle' transform='rotate(-28 130 85)' font-family='Arial' font-size='17' font-weight='700' fill='rgba(9,9,11,0.16)'>PREMium Mind · Preview</text></svg>");
+  background-size: 260px 170px;
+}
+
+/* click a text in the preview to change it in place */
+.re-sheet [data-edit] {
+  cursor: text;
+}
+.re-sheet [data-edit]:hover {
+  outline: 1px dashed rgba(37, 99, 235, 0.7);
+  outline-offset: 2px;
+  background: rgba(37, 99, 235, 0.06);
+}
+.re-sheet [data-edit].re-editing {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+  background: #ffffff;
+  user-select: text;
+  -webkit-user-select: text;
+}
+.re-sheet.is-locked [data-edit].re-editing {
+  user-select: text;
+}
+
+/* the Download PDF button: green, with the words (also on a phone) and the price */
+.re-bar .re-dl {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #10b981, #047857);
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+  white-space: nowrap;
+}
+.re-bar .re-dl ion-icon {
+  color: #ffffff;
+  font-size: 18px;
+}
+.re-bar .re-dl em {
+  font-style: normal;
+  font-size: 0.86rem;
+}
+.re-bar .re-dl .re-dl-price {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #047857;
+  font-size: 0.82rem;
+}
+.re-bar .re-dl:hover {
+  background: linear-gradient(135deg, #059669, #065f46);
+}
+
+/* WhatsApp: get the resume made by the admin */
+.re-wa {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid #bbf7d0;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f0fdf4, #ffffff);
+}
+.re-wa-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.98rem;
+}
+.re-wa-head ion-icon {
+  color: #16a34a;
+  font-size: 22px;
+}
+.re-wa p {
+  margin: 8px 0 0;
+  color: #3f3f46;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.re-wa .re-wa-price {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #fef9c3;
+  color: #713f12;
+  font-weight: 600;
+}
+.re-wa-btn {
+  width: 100%;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 12px;
+  padding: 13px 14px;
+  border-radius: 14px;
+  background: #16a34a;
+  color: #ffffff;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 8px 18px rgba(22, 163, 74, 0.35);
+}
+.re-wa-btn ion-icon {
+  font-size: 22px;
+}
+.re-wa-btn b {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #15803d;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 900px) {
+  .re-saved { display: none; } /* keeps room for the title and the Download button on a phone */
+}

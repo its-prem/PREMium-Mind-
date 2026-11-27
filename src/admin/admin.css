@@ -2188,3 +2188,39 @@ button.sya-sem-head { width: 100%; margin: 0; padding: 12px 14px; border: 0; bac
 button.sya-group-head { width: 100%; padding: 8px 10px; margin: 0 0 8px; border: 1px solid var(--a-line-soft); border-radius: 12px; background: #fafafa; font: inherit; text-align: left; cursor: pointer; }
 .sya-group-head .sya-chev { margin-left: auto; font-size: 18px; }
 .sya-group-head .sya-chev.up { transform: rotate(180deg); }
+
+/* Products on a phone: every product is one vertical card (no sideways scrolling) */
+@media (max-width: 900px) {
+  .adm-stack-wrap { max-height: none; overflow: visible; background: transparent; border: 0; box-shadow: none; }
+  .adm-stack, .adm-stack tbody, .adm-stack tr, .adm-stack td { display: block; width: 100%; }
+  .adm-stack thead { display: none; }
+
+  .adm-stack tbody tr { position: relative; margin: 0 0 14px; padding: 14px; background: var(--a-card); border: 1px solid var(--a-line); border-radius: 20px; box-shadow: 0 6px 20px rgba(9, 9, 11, 0.06); }
+  .adm-stack tbody tr:hover { background: var(--a-card); }
+  .adm-stack tr.dim { background: #fff5f5; }
+  .adm-stack td { padding: 0; border: 0; }
+
+  /* 1. the product: big picture, name, chips */
+  .adm-stack td:nth-child(1) { padding: 0 0 12px; }
+  .adm-stack .adm-prod { min-width: 0; align-items: flex-start; padding-right: 74px; }
+  .adm-stack .adm-prod .adm-thumb { width: 64px; height: 64px; border-radius: 14px; }
+  .adm-stack .adm-prod b { font-size: 1rem; margin-bottom: 6px; }
+
+  /* 2. the price: a pill in the top right corner */
+  .adm-stack td:nth-child(2) { position: absolute; top: 14px; right: 14px; width: auto; padding: 0; text-align: right; white-space: nowrap !important; }
+  .adm-stack td:nth-child(2) b { display: inline-block; padding: 5px 11px; border-radius: 999px; background: var(--a-text); color: #fff; font-size: 0.9rem; }
+  .adm-stack td:nth-child(2) .adm-chip { font-size: 0.8rem; padding: 5px 11px; }
+  .adm-stack td:nth-child(2) .adm-muted { margin-top: 3px; }
+
+  /* 3. the switches: two small tiles in a row */
+  .adm-stack td:nth-child(3) { padding: 12px 0; border-top: 1px dashed var(--a-line); }
+  .adm-stack .adm-flags { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-width: 0; }
+  .adm-stack .adm-flag { padding: 9px 11px; border: 1px solid var(--a-line); border-radius: 12px; background: #fafafa; }
+  .adm-stack .adm-flags .adm-select { grid-column: 1 / -1; }
+
+  /* 4. the buttons */
+  .adm-stack td:nth-child(4) { padding-top: 12px; border-top: 1px dashed var(--a-line); }
+  .adm-stack .adm-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .adm-stack .adm-actions .adm-btn { flex: 1 1 0; min-width: 0; justify-content: center; padding: 11px 10px; }
+  .adm-stack .adm-actions .adm-btn:first-child { flex: 2 1 0; }
+}
