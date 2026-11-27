@@ -25,7 +25,6 @@ function merge(list) {
       sem: s.sem,
       branches: s.branches === 'all' || !Array.isArray(s.branches) ? 'all' : s.branches,
       code: s.code || '',
-      ltp: s.ltp || '-',
       icon: s.icon || 'book-outline',
       units: s.units,
     };

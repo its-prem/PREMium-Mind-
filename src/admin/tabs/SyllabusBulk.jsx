@@ -9,7 +9,7 @@ import { adminPost } from '../api';
 import { useUi } from '../ui';
 import { BRANCHES, SEMESTERS, semesterName } from '../../data/syllabus';
 import { loadUploadedSyllabus } from '../../lib/syllabusStore';
-import { countTopics, parseSyllabusBulk } from '../../lib/syllabusParse';
+import { countTopics, findSameSubject, mergeBranches, parseSyllabusBulk } from '../../lib/syllabusParse';
 
 const ICON_BY_WORD = [
   [/chem/i, 'flask-outline'],
@@ -29,13 +29,13 @@ const AI_PROMPT = `Convert the syllabus of the subjects I give below into PLAIN 
 FORMAT RULES
 1. BRANCH: write the branch name on its own line, with an empty line before and after it, before the subjects of that branch. Use one of these names exactly: Computer Science, Mechanical Engineering, Civil Engineering, Electrical Engineering, Electronics (ECE), Electronics Engineering, Automobile Engineering, Mining Engineering, Metallurgy. For subjects that every branch studies (usually 1st year), write: Common to all branches. The branch applies to every subject after it, until the next branch line.
 2. SEMESTER: write the semester on its own line before its subjects, like: Semester: 2   It applies to every subject after it, until the next Semester line.
-3. SUBJECT: every subject starts with these lines, one per line: Subject: <full subject name>, Code: <subject code>, L-T-P: <like 3-1-0>
+3. SUBJECT: every subject starts with these lines, one per line: Subject: <full subject name>, Code: <subject code> (leave the Code line out when there is no code)
 4. UNITS: every unit starts on its own line as: Unit <number>: <unit title>   (the numbers start again from 1 in every subject)
 5. TOPICS: under a unit, write every topic on its OWN line. One topic = one line. No bullets, no numbering, no bold, no tables.
 6. If a unit has sub-headings, write the sub-heading on its own line starting with # (example: # Valency), then its topics under it.
 7. Split long paragraphs into separate short topics (split at commas, semicolons or full stops). Keep the original wording; do not add or remove content.
 8. Put a line of ---- between two subjects.
-9. If a subject is for more than one branch, add a line under L-T-P like: Branches: Computer Science, Mechanical Engineering (this overrides the branch line above it).
+9. If a subject is for more than one branch, add a line under the Subject line like: Branches: Computer Science, Mechanical Engineering (this overrides the branch line above it).
 
 EXAMPLE OUTPUT
 Semester: 1
@@ -44,7 +44,6 @@ Common to all branches
 
 Subject: Engineering Chemistry
 Code: 2101
-L-T-P: 3-1-0
 
 Unit 1: Atomic Structure
 Definition of Atom
@@ -61,7 +60,6 @@ Computer Science
 
 Subject: Data Structures
 Code: 3301
-L-T-P: 3-0-2
 
 Unit 1: Arrays
 Types of arrays
@@ -69,7 +67,6 @@ Operations on arrays
 ----
 Subject: Database Management
 Code: 3302
-L-T-P: 3-0-2
 
 Unit 1: ER Model
 Entities and attributes
@@ -78,7 +75,6 @@ Mechanical Engineering
 
 Subject: Thermodynamics
 Code: 3401
-L-T-P: 3-1-0
 Branches: Mechanical Engineering, Automobile Engineering
 
 Unit 1: Basic Concepts
@@ -105,9 +101,19 @@ export default function SyllabusBulk({ existing, onClose, onDone }) {
   };
 
   const find = () => {
-    const found = parseSyllabusBulk(text).map((b, i) => {
-      const same = existing.find((e) => b.title && e.title.trim().toLowerCase() === b.title.trim().toLowerCase() && Number(e.sem) === Number(b.sem || 1));
-      return { ...b, key: i, on: true, sem: b.sem || 1, id: same ? same.id : '', icon: same?.icon || iconFor(b.title), updates: !!same };
+    const merged = [];
+    parseSyllabusBulk(text).forEach((b) => {
+      const sem = b.sem || 1;
+      const twin = merged.find((m) => b.title && m.title.trim().toLowerCase() === b.title.trim().toLowerCase() && Number(m.sem) === Number(sem));
+      if (twin) {
+        twin.branches = mergeBranches(twin.branches, b.branches); // same subject under another branch
+        if (!twin.code && b.code) twin.code = b.code;
+      }
+      else merged.push({ ...b, sem });
+    });
+    const found = merged.map((b, i) => {
+      const same = findSameSubject(existing, b.title, b.sem);
+      return { ...b, key: i, on: true, id: same ? same.id : '', icon: same?.icon || iconFor(b.title), updates: !!same, oldBranches: same ? same.branches : null };
     });
     setRows(found);
     if (!found.length) toast('No subjects found. Check that units start with "Unit 1: Title".', 'error');
@@ -123,13 +129,24 @@ export default function SyllabusBulk({ existing, onClose, onDone }) {
     if (unnamed) return toast(`${unnamed} subject(s) have no name. Write the name in the red box.`, 'error');
     setSaving(true);
     let ok = 0;
+    let pool = existing; // the subjects that are already uploaded, kept fresh after every save
     try {
       for (const r of chosen) {
         setProgress(`Uploading ${ok + 1} of ${chosen.length}: ${r.title}`);
-        await adminPost('syllabus.php', {
+        const same = findSameSubject(pool, r.title, r.sem);
+        const res = await adminPost('syllabus.php', {
           action: 'save',
-          subject: { id: r.id, title: r.title, sem: Number(r.sem), branches: r.branches, code: r.code, ltp: r.ltp, icon: r.icon, units: r.units },
+          subject: {
+            id: same ? same.id : '',
+            title: r.title,
+            sem: Number(r.sem),
+            branches: same ? mergeBranches(same.branches, r.branches) : r.branches,
+            code: r.code,
+            icon: same?.icon || r.icon,
+            units: r.units,
+          },
         });
+        if (Array.isArray(res.subjects)) pool = res.subjects;
         ok += 1;
       }
       toast(`${ok} subject${ok === 1 ? '' : 's'} uploaded. Live on the website.`);
@@ -225,8 +242,11 @@ export default function SyllabusBulk({ existing, onClose, onDone }) {
                     change
                   </button>
                   {r.code ? ` · Code ${r.code}` : ''}
-                  {r.ltp ? ` · L-T-P ${r.ltp}` : ''}
-                  {r.updates && <span className="adm-chip" style={{ marginLeft: 6 }}>already uploaded: will be updated</span>}
+                  {r.updates && (
+                    <span className="adm-chip" style={{ marginLeft: 6 }}>
+                      already there: the new branch is added to it
+                    </span>
+                  )}
                 </div>
                 {editBr === r.key && (
                   <div className="adm-row" style={{ gap: 6, flexWrap: 'wrap', marginTop: 8 }}>

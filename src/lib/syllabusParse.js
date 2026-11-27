@@ -2,9 +2,8 @@
  * Turns the syllabus text the admin pastes into units -> sections -> topics (and back).
  *
  * Text format (one item per line):
- *   Subject: Engineering Chemistry     (optional lines: Subject / Code / L-T-P / Semester)
+ *   Subject: Engineering Chemistry     (optional lines: Subject / Code / Semester)
  *   Code: 2101
- *   L-T-P: 3-1-0
  *
  *   Unit 1: Atomic Structure           <- starts a unit  ("Unit 1 Atomic Structure", "UNIT-1 - Title", "Chapter 2: ..." also work)
  *   # Fundamental ideas                <- optional heading inside the unit (a line starting with #)
@@ -19,6 +18,9 @@ import { BRANCHES } from '../data/syllabus';
 const UNIT_RE = /^\s*(?:unit|chapter|module)\s*[-–—.:]?\s*([0-9]+|[ivxIVX]+)\s*[:\-–—.)]*\s*(.*)$/i;
 const BULLET_RE = /^\s*(?:[-–—•·▪●*]+\s+|\d+(?:\.\d+)+[.)]?\s+|\d+[.)]\s+)/;
 const META_RE = /^\s*(subject|title|code|l-?t-?p|ltp|sem|semester|branch|branches)\s*[:=]\s*(.+)$/i;
+
+// "N/A", "-", "none" ... mean there is nothing there
+const EMPTY_WORDS = /^(n\/?a|na|-+|none|nil|null|not available|not applicable)\.?$/i;
 
 const clean = (s) => s.replace(/\s+/g, ' ').trim();
 
@@ -53,7 +55,7 @@ export function parseSyllabusText(text) {
         const k = m[1].toLowerCase().replace(/-/g, '');
         const v = m[2].trim();
         if (k === 'subject' || k === 'title') meta.title = v;
-        else if (k === 'code') meta.code = v;
+        else if (k === 'code') meta.code = EMPTY_WORDS.test(v) ? '' : v;
         else if (k === 'ltp') meta.ltp = v.replace(/\s+/g, '');
         else if (k === 'branch' || k === 'branches') meta.branches = parseBranches(v);
         else if (k === 'sem' || k === 'semester') {
@@ -160,7 +162,7 @@ const SEP_LINE = /^\s*(?:-{3,}|={3,}|\*{3,}|_{3,})\s*$/;
  *   - a line of ---- or ==== ,
  *   - a "Unit 1" that comes after units of the previous subject (the numbers started again).
  * A line like "Semester: 2" or "3rd Semester" on its own sets the semester of the subjects after it.
- * Returns [{ title, code, ltp, sem, branches, units }] (sem is 0 when the text does not say).
+ * Returns [{ title, code, sem, branches, units }] (sem is 0 when the text does not say).
  */
 export function parseSyllabusBulk(text) {
   const blocks = [];
@@ -229,7 +231,20 @@ export function parseSyllabusBulk(text) {
   return blocks
     .map((b) => {
       const { meta, units } = parseSyllabusText(b.lines.join('\n'));
-      return { title: meta.title || '', code: meta.code || '', ltp: meta.ltp || '', sem: meta.sem || b.sem || 0, branches: meta.branches || b.branches || 'all', units };
+      return { title: meta.title || '', code: meta.code || '', sem: meta.sem || b.sem || 0, branches: meta.branches || b.branches || 'all', units };
     })
     .filter((x) => x.units.length);
+}
+
+/** Two branch lists joined: "all" wins, otherwise every branch of both (no repeats). */
+export function mergeBranches(a, b) {
+  if (a === 'all' || b === 'all' || !Array.isArray(a) || !Array.isArray(b)) return 'all';
+  return [...new Set([...a, ...b])];
+}
+
+/** The uploaded subject with the same name in the same semester (so the same subject is never added twice). */
+export function findSameSubject(list, title, sem) {
+  const t = String(title || '').trim().toLowerCase();
+  if (!t) return null;
+  return (list || []).find((e) => String(e.title).trim().toLowerCase() === t && Number(e.sem) === Number(sem)) || null;
 }

@@ -5,13 +5,12 @@ import { Empty, ErrorBox, Loading, useLoad, useUi } from '../ui';
 import { BRANCHES, SEMESTERS, semesterName } from '../../data/syllabus';
 import { loadUploadedSyllabus } from '../../lib/syllabusStore';
 import SyllabusBulk from './SyllabusBulk';
-import { countTopics, parseSyllabusText, unitsToText } from '../../lib/syllabusParse';
+import { countTopics, findSameSubject, mergeBranches, parseSyllabusText, unitsToText } from '../../lib/syllabusParse';
 
 const ICONS = ['book-outline', 'flask-outline', 'calculator-outline', 'laptop-outline', 'code-slash-outline', 'cog-outline', 'construct-outline', 'flash-outline', 'hardware-chip-outline', 'radio-outline', 'business-outline', 'library-outline', 'school-outline', 'document-text-outline', 'create-outline', 'flame-outline'];
 
 const EXAMPLE = `Subject: Engineering Chemistry
 Code: 2101
-L-T-P: 3-1-0
 
 Unit 1: Atomic Structure
 Definition of Atom
@@ -27,7 +26,7 @@ Electrolysis`;
 const AI_PROMPT = `Convert the syllabus I give below into PLAIN TEXT in exactly this format. Output only the text, inside one code block, nothing else.
 
 FORMAT RULES
-1. First lines (one per line): Subject: <full subject name>, Code: <subject code>, L-T-P: <like 3-1-0>, Semester: <1 to 6>
+1. First lines (one per line): Subject: <full subject name>, Code: <subject code>, Semester: <1 to 6>
 2. Then a blank line.
 3. Every unit starts on its own line as: Unit <number>: <unit title>
 4. Under a unit, write every topic on its OWN line. One topic = one line. No bullets, no numbering, no bold, no tables.
@@ -38,7 +37,6 @@ FORMAT RULES
 EXAMPLE OUTPUT
 Subject: Engineering Chemistry
 Code: 2101
-L-T-P: 3-1-0
 Semester: 1
 
 Unit 1: Atomic Structure
@@ -54,7 +52,7 @@ Electrolysis
 SYLLABUS (paste below this line)
 `;
 
-const EMPTY = { id: '', title: '', sem: 1, branches: 'all', code: '', ltp: '', icon: 'book-outline', text: '' };
+const EMPTY = { id: '', title: '', sem: 1, branches: 'all', code: '', icon: 'book-outline', text: '' };
 
 export default function SyllabusTab() {
   const { toast, confirm } = useUi();
@@ -77,7 +75,7 @@ export default function SyllabusTab() {
   const parsed = useMemo(() => (form ? parseSyllabusText(form.text) : null), [form]);
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
-  // pasted text may carry Subject / Code / L-T-P / Semester lines: fill the empty boxes from them
+  // pasted text may carry Subject / Code / Semester lines: fill the empty boxes from them
   const onText = (text) => {
     const { meta } = parseSyllabusText(text);
     setForm((f) => ({
@@ -85,7 +83,6 @@ export default function SyllabusTab() {
       text,
       title: f.title || meta.title || '',
       code: f.code || meta.code || '',
-      ltp: f.ltp || meta.ltp || '',
       sem: meta.sem && !f.id && Number(f.sem) === 1 ? meta.sem : f.sem,
     }));
   };
@@ -98,14 +95,21 @@ export default function SyllabusTab() {
   const save = async () => {
     if (!form.title.trim()) return toast('Write the subject name.', 'error');
     if (!parsed.units.length) return toast('No units found. Start each unit with "Unit 1: Title".', 'error');
-    const branches = form.branches === 'all' || !form.branches.length ? 'all' : form.branches;
+    let branches = form.branches === 'all' || !form.branches.length ? 'all' : form.branches;
+    let id = form.id;
+    // the same subject (same name, same semester) is already there for another branch: add this branch to it, no copy
+    const same = !form.id ? findSameSubject(data.subjects, form.title, form.sem) : null;
+    if (same) {
+      id = same.id;
+      branches = mergeBranches(same.branches, branches);
+    }
     setSaving(true);
     try {
       await adminPost('syllabus.php', {
         action: 'save',
-        subject: { id: form.id, title: form.title, sem: Number(form.sem), branches, code: form.code, ltp: form.ltp, icon: form.icon, units: parsed.units },
+        subject: { id, title: form.title, sem: Number(form.sem), branches, code: form.code, icon: form.icon, units: parsed.units },
       });
-      toast('Uploaded. It is live on the website.');
+      toast(same ? 'This subject was already there. The new branch is added to it.' : 'Uploaded. It is live on the website.');
       loadUploadedSyllabus(true);
       setForm(null);
       reload();
@@ -129,7 +133,7 @@ export default function SyllabusTab() {
   };
 
   const edit = (s) =>
-    setForm({ id: s.id, title: s.title, sem: s.sem, branches: s.branches === 'all' ? 'all' : s.branches, code: s.code || '', ltp: s.ltp || '', icon: s.icon || 'book-outline', text: unitsToText(s.units) });
+    setForm({ id: s.id, title: s.title, sem: s.sem, branches: s.branches === 'all' ? 'all' : s.branches, code: s.code || '', icon: s.icon || 'book-outline', text: unitsToText(s.units) });
 
   if (loading) return <Loading />;
   if (error) return <ErrorBox error={error} onRetry={reload} />;
@@ -172,7 +176,7 @@ export default function SyllabusTab() {
               <label htmlFor="sy_text">Syllabus text</label>
               <textarea id="sy_text" className="adm-textarea" rows={14} value={form.text} onChange={(e) => onText(e.target.value)} placeholder={EXAMPLE} spellCheck={false} style={{ fontFamily: 'ui-monospace, Consolas, monospace', fontSize: '0.82rem' }} />
               <span className="adm-hint">
-                Start every unit with <b>Unit 1: Title</b>. Each next line is one topic. A line starting with <b>#</b> is a heading inside the unit. Lines like <b>Subject:</b>, <b>Code:</b>, <b>L-T-P:</b> fill the boxes below.
+                Start every unit with <b>Unit 1: Title</b>. Each next line is one topic. A line starting with <b>#</b> is a heading inside the unit. Lines like <b>Subject:</b> and <b>Code:</b> fill the boxes below.
               </span>
             </div>
             <div className="adm-field">
@@ -190,10 +194,6 @@ export default function SyllabusTab() {
             <div className="adm-field">
               <label htmlFor="sy_code">Subject code (optional)</label>
               <input id="sy_code" className="adm-input" value={form.code} onChange={(e) => set('code', e.target.value)} maxLength={30} />
-            </div>
-            <div className="adm-field">
-              <label htmlFor="sy_ltp">L-T-P (optional)</label>
-              <input id="sy_ltp" className="adm-input" value={form.ltp} onChange={(e) => set('ltp', e.target.value)} placeholder="3-1-0" maxLength={20} />
             </div>
             <div className="adm-field full">
               <label>Which branches</label>

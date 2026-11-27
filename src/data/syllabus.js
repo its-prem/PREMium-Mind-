@@ -28,7 +28,6 @@ export const SUBJECTS = {
     sem: 1,
     branches: 'all',
     code: '',
-    ltp: '3-1-0',
     icon: 'flask-outline',
     units: [
       {

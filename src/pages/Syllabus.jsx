@@ -68,7 +68,7 @@ function SubjectView({ subject }) {
             <b>{percent}%</b>
           </div>
           <p>
-            {semester} · L-T-P {subject.ltp} · {subject.units.length} units · {total} topics
+            {semester} · {subject.units.length} units · {total} topics
           </p>
           <div className="sy-bar"><i style={{ width: `${percent}%` }} /></div>
           <small>{doneCount} of {total} topics completed</small>
@@ -262,7 +262,6 @@ export default function Syllabus() {
                       <span className="sy-dk-units">
                         <i></i> {s.units.length} UNITS
                       </span>
-                      <span className="sy-dk-ltp">L-T-P {s.ltp}</span>
                     </span>
                     <span className="sy-dk-title">{s.title}</span>
                     <span className="sy-dk-foot">
