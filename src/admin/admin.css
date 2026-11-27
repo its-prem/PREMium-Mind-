@@ -2232,3 +2232,18 @@ button.sya-group-head { width: 100%; padding: 8px 10px; margin: 0 0 8px; border:
 .adm-qahelp-body { padding: 4px 14px 14px; display: flex; flex-direction: column; gap: 10px; font-size: 0.84rem; line-height: 1.55; }
 .adm-qahelp-body ol { margin: 0; padding-left: 18px; }
 .adm-qahelp-example { margin: 0; padding: 10px; max-height: 220px; overflow: auto; white-space: pre-wrap; font-size: 0.78rem; background: #fff; border: 1px solid var(--a-line-soft); border-radius: 10px; }
+
+/* the light / dark switch in the top bar */
+.adm-theme-btn { display: inline-grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--a-line); border-radius: 10px; background: var(--a-card); color: var(--a-text); font-size: 18px; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+.adm-theme-btn:hover { border-color: var(--a-line-strong); }
+
+/* phones: the top bar must not be wider than the screen (the theme button was added) */
+@media (max-width: 520px) {
+  .adm-live-pill { display: none; }
+  .adm-cmd-trigger { gap: 8px; padding: 7px 9px; }
+  .adm-cmd-trigger .adm-cmd-label { display: none; }
+}
+@media (max-width: 520px) {
+  .adm-bc-root, .adm-bc-sep { display: none; }
+  .adm-cmd-trigger kbd { display: none; }
+}

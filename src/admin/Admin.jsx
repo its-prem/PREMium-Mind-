@@ -13,6 +13,7 @@ import { TABS } from './registry';
 import { Loading, UiProvider } from './ui';
 import Icon from './Icon';
 import './admin.css';
+import './admin-dark.css'; // the dark mode (made by scripts/make-admin-dark.mjs)
 
 export default function Admin() {
   const { tab } = useParams();
@@ -24,6 +25,25 @@ export default function Admin() {
   const [cmdOpen, setCmdOpen] = useState(false);
   const [cmdQuery, setCmdQuery] = useState('');
   const cmdInputRef = useRef(null);
+  // dark mode: remembered on this device, set on <html> so popups and messages follow it too
+  const [dark, setDark] = useState(() => {
+    try {
+      return localStorage.getItem('pm_admin_theme') === 'dark';
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    const el = document.documentElement;
+    if (dark) el.setAttribute('data-adm-theme', 'dark');
+    else el.removeAttribute('data-adm-theme');
+    try {
+      localStorage.setItem('pm_admin_theme', dark ? 'dark' : 'light');
+    } catch {
+      /* storage blocked */
+    }
+    return () => el.removeAttribute('data-adm-theme'); // leaving the admin: the website stays as it is
+  }, [dark]);
 
   const load = () => {
     setError(null);
@@ -260,6 +280,10 @@ export default function Admin() {
               >
                 <span className="adm-cmd-label">Quick jump…</span>
                 <kbd>Ctrl K</kbd>
+              </button>
+
+              <button type="button" className="adm-theme-btn" aria-label={dark ? 'Light mode' : 'Dark mode'} title={dark ? 'Light mode' : 'Dark mode'} aria-pressed={dark} onClick={() => setDark((d) => !d)}>
+                <ion-icon name={dark ? 'sunny-outline' : 'moon-outline'}></ion-icon>
               </button>
 
               <span className="adm-live-pill" title="Backend connected">
