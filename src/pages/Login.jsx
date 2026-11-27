@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { goBack } from '../lib/goBack';
 import { SITE_API, apiPost } from '../lib/api';
 import {
   finishRedirectSignIn,
@@ -502,10 +503,10 @@ export default function Login() {
             </div>
           )}
 
-          <Link to="/" className="lg-back lg-back-home">
+          <button type="button" className="lg-back lg-back-home" onClick={() => goBack(navigate, "/")}>
             <ion-icon name="arrow-back-outline"></ion-icon>
             <span>Back to Home</span>
-          </Link>
+          </button>
         </section>
       </div>
     </div>

@@ -16,7 +16,6 @@ import Store from './components/Store';
 import { ResumeScaled, SAMPLE_RESUME } from './components/ResumeDocument';
 import { usePurchases } from './lib/purchases';
 import { useCatalog } from './lib/catalog';
-import { useHomeRoot } from './lib/goBack';
 import CheckoutModal from './components/CheckoutModal';
 
 const HERO_ROTATING_WORDS = [
@@ -28,7 +27,6 @@ const HERO_ROTATING_WORDS = [
 
 export default function App() {
   const navigate = useNavigate();
-  useHomeRoot(); // Home is the start: the pages visited before are forgotten, so back on Home closes the app
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // true shortly after the page is ready (or at once if the menu is opened sooner)

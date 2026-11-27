@@ -9,6 +9,7 @@
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { goBack } from '../lib/goBack';
 import { SITE_API } from '../lib/api';
 import { downloadState, formatWhen } from '../lib/downloadMode';
 import { fetchPhone } from '../lib/pdfApi';
@@ -162,7 +163,7 @@ export default function MicroSheetPage() {
     <div className={`rd-root ms-root${dark ? ' is-dark' : ''}`} onContextMenu={(e) => e.preventDefault()}>
       <header className="rd-header">
         <div className="rd-header-start">
-          <button type="button" className="rd-back" aria-label="Back to the questions" onClick={() => navigate(`/qa/${id}`)}>
+          <button type="button" className="rd-back" aria-label="Back to the questions" onClick={() => goBack(navigate, `/qa/${id}`)}>
             <span className="rd-back-icon" aria-hidden="true">
               <ion-icon name="chevron-back-outline"></ion-icon>
             </span>

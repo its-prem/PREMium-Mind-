@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { BRANCHES, SEMESTERS, getBranch, getSubject, listTopics, semesterName, subjectsOfSemester } from '../data/syllabus';
-import { goBackOrHome } from '../lib/goBack';
+import { goBack } from '../lib/goBack';
 import { useUploadedSyllabus } from '../lib/syllabusStore';
 import { loadKept, saveKept } from '../lib/keep';
 import { cloudGet, cloudPut, stampGet, stampSet } from '../lib/cloud';
@@ -176,7 +176,7 @@ export default function Syllabus() {
     sub = subject.semester.replace(/\s*\(.*\)/, '');
   }
 
-  const pickBranch = (id) => navigate(isSemPage ? `/syllabus/sem/${semNo}${id ? `?b=${id}` : ''}` : `/syllabus${id ? `?b=${id}` : ''}`);
+  const pickBranch = (id) => navigate(isSemPage ? `/syllabus/sem/${semNo}${id ? `?b=${id}` : ''}` : `/syllabus${id ? `?b=${id}` : ''}`, { replace: true });
 
   const chips = (
     <>
@@ -199,7 +199,7 @@ export default function Syllabus() {
   return (
     <div className="tl-page">
       <header className="tl-top">
-        <button type="button" className="tl-back" aria-label="Back" onClick={() => goBackOrHome(navigate)}>
+        <button type="button" className="tl-back" aria-label="Back" onClick={() => goBack(navigate, subject ? `/syllabus/sem/${subject.sem}${bq}` : isSemPage ? `/syllabus${bq}` : "/")}>
           <ion-icon name="arrow-back-outline"></ion-icon>
         </button>
         <div>
