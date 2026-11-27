@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { isSoundOn, playClick, playPiano, setSoundOn } from '../lib/uiSounds';
 import CatAvatar from './CatAvatar';
+import { useSiteTheme } from '../lib/siteTheme';
 import './Sidebar.css';
 
 const STORE_CATEGORIES = [
@@ -24,6 +25,7 @@ export default function Sidebar({
   const [storeOpen, setStoreOpen] = useState(false);
   const [customAvatar, setCustomAvatar] = useState(null);
   const [soundOn, setSoundOnState] = useState(() => isSoundOn());
+  const [night, toggleNight] = useSiteTheme();
   const photoInputRef = useRef(null);
 
   const toggleSound = () => {
@@ -245,6 +247,17 @@ export default function Sidebar({
               <ion-icon
                 name={soundOn ? 'volume-high-outline' : 'volume-mute-outline'}
               ></ion-icon>
+            </button>
+            {/* night mode: a small moon next to the sound button */}
+            <button
+              type="button"
+              className="pm-sb-sound-toggle pm-sb-night-toggle"
+              onClick={toggleNight}
+              aria-label={night ? 'Switch to day mode' : 'Switch to night mode'}
+              aria-pressed={night}
+              title={night ? 'Day mode' : 'Night mode'}
+            >
+              <ion-icon name={night ? 'sunny-outline' : 'moon-outline'}></ion-icon>
             </button>
           </div>
 

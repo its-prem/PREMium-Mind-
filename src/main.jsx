@@ -1,4 +1,6 @@
 import { StrictMode, Suspense, lazy, useEffect, useState } from 'react'
+import { initSiteTheme } from './lib/siteTheme'
+import './styles/site-dark.css' // night mode (generated)
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import './index.css'
@@ -52,6 +54,7 @@ function Pets() {
   )
 }
 
+initSiteTheme() // night mode: set before the first paint
 installClickSound()
 installHoverNotes()
 

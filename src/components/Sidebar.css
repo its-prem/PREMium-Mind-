@@ -911,3 +911,14 @@
 .pm-sb-sound-toggle[aria-pressed="false"] {
   color: #a1a1aa;
 }
+
+/* the night mode button sits right after the sound button */
+.pm-sb-night-toggle {
+  order: 4;
+  margin-left: 6px;
+}
+.pm-sb-night-toggle[aria-pressed="true"] {
+  background: #18181b;
+  border-color: #facc15;
+  color: #facc15;
+}
