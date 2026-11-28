@@ -73,5 +73,6 @@ echo json_encode([
         'tncText'       => (string)($row['micro_tnc_text'] ?? ''),
         'allowDownload' => !isset($row['micro_allow_download']) || (int)$row['micro_allow_download'] === 1,
         'downloadAt'    => (string)($row['micro_download_at'] ?? ''),
+        'serverTime'    => time() * 1000,   // the unlock time is judged with THIS clock, not the phone's (a phone clock can be changed)
     ],
 ]);

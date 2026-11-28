@@ -1773,14 +1773,19 @@
       setStatus("DOCX bana rahe hain...");
       var fileName = docFileName();
       var blob = await buildDocxBlob(pages);
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+      if (window.parent && window.parent !== window) {
+        // inside the website: the page that holds this frame saves the file (downloads from inside a frame are blocked on some phones)
+        window.parent.postMessage({ source: "pm-microsheet", type: "file", name: fileName, mime: blob.type, buffer: await blob.arrayBuffer() }, "*");
+      } else {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+      }
       setStatus("Saved: " + fileName + " (Word me 3×3 same page)");
     } catch (err) {
       console.error(err);

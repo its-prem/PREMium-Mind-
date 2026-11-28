@@ -26,6 +26,7 @@ export default function MicroSheetPage() {
   const frameRef = useRef(null);
   const [state, setState] = useState({ status: 'loading' });
   const [now, setNow] = useState(() => Date.now());
+  const clockSkew = useRef(0); // server time minus this phone's time, so a changed phone clock cannot unlock the download early
   const [away, setAway] = useState(false); // the window is not in focus: blur the pages
   const [wm, setWm] = useState(() => getStoredEmail() || '');
   const [toast, setToast] = useState('');
@@ -69,6 +70,8 @@ export default function MicroSheetPage() {
         navigate(`/qa/${id}`, { replace: true }); // not bought: back to the questions, where the buy button is
         return;
       }
+      if (Number(data.micro?.serverTime) > 0) clockSkew.current = Number(data.micro.serverTime) - Date.now();
+      setNow(Date.now() + clockSkew.current);
       setState({ status: 'ready', title: data.title, text: data.text, micro: data.micro });
     } catch {
       setState({ status: 'error', message: 'Could not reach the server. Check your internet and try again.' });
@@ -89,7 +92,7 @@ export default function MicroSheetPage() {
 
   // re-check the unlock time every 15 seconds, so the download opens by itself
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 15000);
+    const t = setInterval(() => setNow(Date.now() + clockSkew.current), 15000);
     return () => clearInterval(t);
   }, []);
 
