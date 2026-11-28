@@ -1,6 +1,6 @@
 /* PREMium Mind service worker - keeps the app opening fast / offline-friendly. It NEVER touches the API,
    PDFs, payments or login: only this site's own page shell and its hashed /assets files. */
-const CACHE = 'pm-shell-v1';
+const CACHE = 'pm-shell-v2';
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['/', '/pm-logo.png'])).then(() => self.skipWaiting()));
 });
