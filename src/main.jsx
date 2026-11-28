@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import './index.css'
 import { installClickSound, installHoverNotes } from './lib/uiSounds'
 import MaintenanceGate from './components/MaintenanceGate.jsx'
+import { useSiteConfig } from './lib/siteConfig'
 import App from './App.jsx'
 
 // Every other page is a separate download that starts only when the page is opened,
@@ -33,6 +34,7 @@ const Ant = lazy(() => import('./components/Ant.jsx'))
 
 function Pets() {
   const { pathname } = useLocation()
+  const site = useSiteConfig()
   const [on, setOn] = useState(false)
   useEffect(() => {
     const start = () => setOn(true)
@@ -48,8 +50,8 @@ function Pets() {
   if (!on || quiet) return null
   return (
     <Suspense fallback={null}>
-      <Butterfly />
-      <Ant />
+      {site.butterfly && <Butterfly />}
+      {site.ant && <Ant />}
     </Suspense>
   )
 }

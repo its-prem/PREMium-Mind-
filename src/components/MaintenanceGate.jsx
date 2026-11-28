@@ -45,6 +45,7 @@ const readCache = () => {
 const writeCache = (v) => {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(v));
+    window.dispatchEvent(new Event('pm-site-config'));
   } catch {
     /* storage blocked */
   }
@@ -74,7 +75,7 @@ async function loadConfig(signal) {
   clearTimeout(serverTimer);
   if (server && server.status === 'success') {
     // blocked: '' | 'ip' | 'user' (the admin blocked this address / this student)
-    return { ...(file || {}), ...(server.config || {}), blocked: server.blocked || '' };
+    return { ...(file || {}), ...(server.config || {}), blocked: server.blocked || '', site: server.site || null };
   }
   if (!file) throw new Error('no maintenance config');
   return file;

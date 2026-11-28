@@ -38,4 +38,12 @@ if (!$isAdmin) {
     if (pm_ip_is_blocked($conn, pm_client_ip())) $blocked = 'ip';
     elseif ($who !== '' && pm_user_is_blocked($conn, $who)) $blocked = 'user';
 }
-echo json_encode(['status' => 'success', 'config' => $cfg, 'blocked' => $blocked]);
+// home page photo + ant / butterfly switches (Admin -> Site look)
+$siteCfg = pm_setting_get($conn, 'site');
+$siteCfg = is_array($siteCfg) ? $siteCfg : [];
+$site = [
+    'heroImage' => (string)($siteCfg['heroImage'] ?? ''),
+    'ant'       => !isset($siteCfg['ant']) || !empty($siteCfg['ant']),
+    'butterfly' => !isset($siteCfg['butterfly']) || !empty($siteCfg['butterfly']),
+];
+echo json_encode(['status' => 'success', 'config' => $cfg, 'blocked' => $blocked, 'site' => $site]);

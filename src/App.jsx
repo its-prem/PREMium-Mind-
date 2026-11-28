@@ -17,6 +17,7 @@ import { ResumeScaled, SAMPLE_RESUME } from './components/ResumeDocument';
 import { usePurchases } from './lib/purchases';
 import { useCatalog } from './lib/catalog';
 import CheckoutModal from './components/CheckoutModal';
+import { useSiteConfig } from './lib/siteConfig';
 
 const HERO_ROTATING_WORDS = [
   'Handwritten Notes',
@@ -28,6 +29,7 @@ const HERO_ROTATING_WORDS = [
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
+  const site = useSiteConfig();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // true shortly after the page is ready (or at once if the menu is opened sooner)
   const [lowerReady, setLowerReady] = useState(false);
@@ -189,7 +191,7 @@ export default function App() {
 
         {/* Photo Stage */}
         <div className="pm-hero-photo-stage" aria-hidden="true">
-          <img src="/mh.jpg" alt="PREMium Mind" className="pm-hero-clear-img" />
+          <img src={site.heroImage || '/mh.jpg'} alt="PREMium Mind" className="pm-hero-clear-img" />
           <div className="pm-hero-seamless-blend" />
         </div>
 
