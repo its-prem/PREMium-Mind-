@@ -55,11 +55,22 @@ export const FIELDS = [
   { name: 'btn_type', label: 'Button style', type: 'select', optionsKey: 'btnTypes' },
   {
     name: 'download_msg',
-    label: 'Download locked message',
+    label: 'Message or time for the student (optional)',
     type: 'textarea',
     full: true,
+    placeholder: 'e.g. Download opens on Sunday 6 PM',
     showIf: (v) => isOff(v, 'allow_download'),
-    hint: 'Download is OFF: the student sees this when they press Download. Empty = default text.',
+    hint: 'Type your own message or time. The student sees exactly this when the download is locked (not allowed, or waiting for the time above). Empty = the automatic text.',
+  },
+  {
+    name: 'micro_download_msg',
+    label: 'Message or time for the student (optional)',
+    type: 'textarea',
+    full: true,
+    rows: 2,
+    placeholder: 'e.g. Micro sheet download opens on Sunday 6 PM',
+    showIf: (v) => isOff(v, 'micro_allow_download'),
+    hint: 'Type your own message or time. The student sees exactly this when the micro download is locked. Empty = the automatic text.',
   },
   { name: 'micro_price', label: 'Micro format price (₹)', type: 'number', hint: 'What the buyer pays for the micro format, on top of this product.' },
   {
@@ -139,6 +150,7 @@ export const emptyCourse = {
   qa_text: '',
   micro_price: '',
   micro_download_at: '',
+  micro_download_msg: '',
   micro_tnc_text: '',
   micro_allow_download: 1,
 };

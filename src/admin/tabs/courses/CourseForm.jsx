@@ -127,7 +127,7 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
   };
 
   const input = (f) => {
-    const common = { id: `f_${f.name}`, value: v[f.name] ?? '', required: f.required, onChange: (e) => set(f.name, e.target.value) };
+    const common = { id: `f_${f.name}`, value: v[f.name] ?? '', required: f.required, placeholder: f.placeholder, onChange: (e) => set(f.name, e.target.value) };
     if (f.type === 'choice')
       return (
         <div className="adm-choices" role="radiogroup" aria-label={f.label}>
@@ -282,6 +282,7 @@ export default function CourseForm({ course, options, allCourses = [], onClose, 
             none: 'The buyer can only look at the micro sheet, not download it.',
           })}
         </div>
+        {renderField('micro_download_msg')}
       </div>
       <div className="adm-flagrows" style={{ marginTop: 6 }}>
         {renderFlag('micro_show_tnc')}

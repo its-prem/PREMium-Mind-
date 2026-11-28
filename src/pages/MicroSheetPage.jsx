@@ -138,7 +138,8 @@ export default function MicroSheetPage() {
 
   const dl = downloadState({ allow_download: state.micro.allowDownload, download_at: state.micro.downloadAt }, now);
   const canDownload = dl.mode === 'instant';
-  const lockedMessage = dl.mode === 'timed' ? `Download unlocks ${formatWhen(dl.at)}` : 'Download is not allowed for this micro sheet';
+  const autoLocked = dl.mode === 'timed' ? `Download unlocks ${formatWhen(dl.at)}` : 'Download is not allowed for this micro sheet';
+  const lockedMessage = String(state.micro.downloadMsg || '').trim() || autoLocked; // the admin's own message / time, if one was typed
 
   // "Save PDF": the tool makes the PDF file and the browser downloads it
   const download = () => {

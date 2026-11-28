@@ -18,7 +18,7 @@ $adminEmail = pm_admin_require();
 
 $TEXT_FIELDS = ['title', 'category', 'badge', 'desc1', 'desc2', 'price', 'old_price', 'link',
                 'demo_link', 'website_link', 'btn_text', 'btn_type', 'tnc_text', 'download_msg', 'download_at',
-                'micro_price', 'micro_download_at', 'micro_tnc_text'];
+                'micro_price', 'micro_download_at', 'micro_tnc_text', 'micro_download_msg'];
 $FLAG_FIELDS = ['allow_download', 'show_tnc', 'show_report_btn', 'app_only', 'show_preview', 'grants_pyq',
                 'micro_enabled', 'micro_allow_download', 'micro_show_tnc'];
 $BTN_TYPES   = ['normal', 'coming_soon', 'disabled_look', 'preview_buy', 'disabled'];
@@ -41,6 +41,7 @@ function pm_ensure_course_columns(mysqli $conn): void {
         'micro_allow_download' => 'TINYINT(1) NOT NULL DEFAULT 1',
         'micro_download_at'    => 'DATETIME NULL DEFAULT NULL',
         'micro_tnc_text'       => 'TEXT NULL',
+        'micro_download_msg'   => 'TEXT NULL',
         'micro_show_tnc'       => 'TINYINT(1) NOT NULL DEFAULT 0',
     ];
     foreach ($cols as $name => $def) {
