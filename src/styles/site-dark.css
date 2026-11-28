@@ -1415,3 +1415,22 @@ html[data-theme="dark"] .pr-btn {
     background: #131313;
     color: #f1f1f3
 }
+html[data-theme="dark"] .pf-field span {
+    color: #d0d0d5
+}
+html[data-theme="dark"] .pf-field input {
+    border: 1.5px solid #464649;
+    background: #131313;
+    color: #f1f1f3
+}
+html[data-theme="dark"] .pf-field input:disabled {
+    background: #18181a
+}
+html[data-theme="dark"] .pf-msg.ok {
+    background: #102b19;
+    color: #cbe0d3
+}
+html[data-theme="dark"] .pf-msg.bad {
+    background: #290d0d;
+    color: #d4b8b8
+}

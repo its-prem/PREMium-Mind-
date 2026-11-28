@@ -1,0 +1,84 @@
+/* My Profile: the form inside the same card as the App Version page */
+.pf-card {
+  text-align: left;
+}
+.pf-avatar {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #09090b;
+  color: #ffffff;
+  font: 800 1.7rem 'Sora', 'Plus Jakarta Sans', sans-serif;
+  box-shadow: 0 8px 20px rgba(9, 9, 11, 0.18);
+}
+.pf-field {
+  display: block;
+  margin-bottom: 16px;
+}
+.pf-field span {
+  display: block;
+  margin-bottom: 6px;
+  color: #3f3f46;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.pf-field input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1.5px solid #d4d4d8;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #09090b;
+  font: 600 1rem 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+.pf-field input:focus {
+  outline: none;
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+.pf-field input:disabled {
+  background: #f4f4f5;
+  color: #71717a;
+}
+.pf-field small {
+  display: block;
+  margin-top: 5px;
+  color: #71717a;
+  font-size: 0.74rem;
+  line-height: 1.4;
+}
+.pf-msg {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.pf-msg.ok {
+  background: #dcfce7;
+  color: #166534;
+}
+.pf-msg.bad {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.pf-save {
+  width: 100%;
+  min-height: 50px;
+  border: 0;
+  border-radius: 14px;
+  background: #09090b;
+  color: #ffffff;
+  font: 800 1rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  cursor: pointer;
+}
+.pf-save:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

@@ -18,6 +18,7 @@ const Watch = lazy(() => import('./pages/Watch.jsx'))
 const Terms = lazy(() => import('./pages/Terms.jsx'))
 const AppDownload = lazy(() => import('./pages/AppDownload.jsx'))
 const ResumeEditor = lazy(() => import('./pages/ResumeEditor.jsx'))
+const Profile = lazy(() => import('./pages/Profile.jsx'))
 const Tools = lazy(() => import('./pages/Tools.jsx'))
 const MockTests = lazy(() => import('./pages/MockTests.jsx'))
 const Syllabus = lazy(() => import('./pages/Syllabus.jsx'))
@@ -82,6 +83,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/watch" element={<Watch />} />
             <Route path="/termcondition" element={<Terms />} />
             <Route path="/app-download" element={<AppDownload />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/tools" element={<Tools />} />
             <Route path="/mock-tests" element={<MockTests />} />
             <Route path="/payment-return" element={<PaymentReturn />} />

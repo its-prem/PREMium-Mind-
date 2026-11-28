@@ -19,7 +19,7 @@ import postcss from 'postcss';
 const FILES = [
   'src/index.css', 'src/App.css', 'src/components/Navbar.css', 'src/components/Sidebar.css', 'src/components/Footer.css',
   'src/components/Store.css', 'src/components/ProductCard.css', 'src/pages/Login.css', 'src/pages/Lecture.css',
-  'src/pages/Tools.css', 'src/pages/Syllabus.css', 'src/pages/Terms.css', 'src/pages/AppDownload.css', 'src/pages/PaymentReturn.css',
+  'src/pages/Tools.css', 'src/pages/Syllabus.css', 'src/pages/Terms.css', 'src/pages/AppDownload.css', 'src/pages/PaymentReturn.css', 'src/pages/Profile.css',
 ];
 const OUT = 'src/styles/site-dark.css';
 const PREFIX = 'html[data-theme="dark"] ';

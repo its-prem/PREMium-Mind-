@@ -325,6 +325,26 @@ export default function Sidebar({
               </div>
             </li>
 
+            {user && (
+              <li className="pm-sb-row" style={{ '--delay': '0.13s' }}>
+                <a
+                  href="/profile"
+                  className="pm-sb-nav-btn"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (onClose) onClose();
+                    if (onNavigate) onNavigate('/profile');
+                  }}
+                >
+                  <span className="pm-sb-icon-circle">
+                    <ion-icon name="person-circle-outline"></ion-icon>
+                  </span>
+                  <span className="pm-sb-nav-text">My Profile</span>
+                  <ion-icon name="chevron-forward-outline" className="pm-sb-arrow-right"></ion-icon>
+                </a>
+              </li>
+            )}
+
             <li className="pm-sb-row" style={{ '--delay': '0.15s' }}>
               <a
                 href="/lecture"
