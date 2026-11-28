@@ -47,8 +47,9 @@ if (!$isAdmin && !pm_user_owns($conn, $email, $courseId)) {
     pm_qa_fail('Buy this product to read it.', 403, 'not_owned');
 }
 
-// "app only" product: the text is given only to the real app (or an admin)
-if (!$isAdmin && (int)($row['app_only'] ?? 0) === 1) {
+// "app only" product: the text (and its micro format) is given ONLY to the real Android app. This holds for an admin too,
+// so a test in Chrome shows what a student gets: to look at it, open it in the app.
+if ((int)($row['app_only'] ?? 0) === 1) {
     require_once __DIR__ . '/pm_pdf_access.php';
     if (!pm_is_native_app_request()) pm_qa_fail('This product can be opened only in the PREMium Mind app.', 403, 'app_only');
 }
