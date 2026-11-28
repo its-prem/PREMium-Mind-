@@ -21,7 +21,7 @@ if (!pm_auth_admin_ok()):
   a:hover { background: #6f1220; transform: translateY(-1px); }
 </style></head><body>
 <div class="box"><h1>MCQ <span>D2D</span></h1>
-<p>Ye tool admin ke liye hai. Pehle Admin Panel me Google se login karo, phir is page ko dobara kholo.</p>
+<p>This tool is for the admin. Log in with Google in the Admin Panel first, then open this page again.</p>
 <a href="admin_panel.php">Admin Panel → Login</a></div>
 </body></html>
 <?php
@@ -530,7 +530,7 @@ $pmAdminEmail = pm_auth_admin_email();
           <a href="d2d_notes.php" data-self="notes"><span class="ic"><i class="fa fa-book-open"></i></span><span class="tx"><b>Notes</b><small>Chapter-wise short notes</small></span><span class="cur-mark"></span></a>
           <a href="d2d_mcq.php" data-self="mcq"><span class="ic"><i class="fa fa-list-check"></i></span><span class="tx"><b>MCQ</b><small>PYQ practice sheets</small></span><span class="cur-mark"></span></a>
           <div class="menu-sep"></div>
-          <button type="button" id="menuNewFolder"><span class="ic"><i class="fa fa-folder-plus"></i></span><span class="tx"><b>Naya folder</b><small>Dono jagah dikhega</small></span></button>
+          <button type="button" id="menuNewFolder"><span class="ic"><i class="fa fa-folder-plus"></i></span><span class="tx"><b>New folder</b><small>Shown in both places</small></span></button>
         </div>
       </div>
       <button type="button" class="btn" id="btnHeaderNew" title="New sheet (Ctrl+Alt+N)"><i class="fa fa-plus"></i> New sheet</button>
@@ -576,7 +576,7 @@ $pmAdminEmail = pm_auth_admin_email();
               </div>
               <div class="lib-list" id="libList"><div class="lib-empty">Loading…</div></div>
               <div class="lib-tools">
-                <button type="button" id="btnNewFolder" title="Naya folder banao"><i class="fa fa-folder-plus"></i> Folder</button>
+                <button type="button" id="btnNewFolder" title="Make a new folder"><i class="fa fa-folder-plus"></i> Folder</button>
                 <button type="button" id="btnLibRefresh" title="Reload list from server"><i class="fa fa-rotate"></i> Refresh</button>
                 <button type="button" id="btnDuplicate" title="Copy current sheet as a new one"><i class="fa fa-copy"></i> Duplicate</button>
                 <button type="button" id="btnTrash" title="Show deleted sheets"><i class="fa fa-trash-can"></i> Trash</button>
@@ -622,7 +622,7 @@ Ans: 2</pre>
             <div class="field"><label class="field-label" for="titleInput">Sheet title</label><input class="inp" id="titleInput" type="text" value="Atomic Structure" autocomplete="off"></div>
           </div>
           <div class="field">
-            <label class="field-label">Subject logo <span style="color:var(--text-muted);text-transform:none;letter-spacing:0">(pehle page ke header par)</span></label>
+            <label class="field-label">Subject logo <span style="color:var(--text-muted);text-transform:none;letter-spacing:0">(in the header of the first page)</span></label>
             <div class="subj-pick" id="subjPick">
               <button type="button" data-icon="auto" title="Folder ke naam se khud chun lega">Auto</button>
               <button type="button" data-icon="physics" title="Physics">Physics</button>
@@ -689,7 +689,7 @@ Ans: 2</pre>
       <div class="pick-bd"><div class="pgrid" id="pickGrid"></div></div>
     </div>
   </div>
-  <div class="modal-scrim" id="modalScrim"><div class="modal"><h3><i class="fa fa-triangle-exclamation"></i> <span id="modalTitle">Unsaved draft mila</span></h3><p id="modalBody"></p><div class="row" id="modalRow"></div></div></div>
+  <div class="modal-scrim" id="modalScrim"><div class="modal"><h3><i class="fa fa-triangle-exclamation"></i> <span id="modalTitle">Unsaved draft found</span></h3><p id="modalBody"></p><div class="row" id="modalRow"></div></div></div>
 </div>
 
 <script>
@@ -1015,7 +1015,7 @@ Ans: 2</pre>
   function figHtml(b) {
     var im = findImage(b.name);
     if (!im && b.slot) return '<figure class="fig slot"><i class="fa fa-image"></i> Image slot: <b>' + esc(b.name) + "</b></figure>";
-    if (!im) return '<figure class="fig missing"><i class="fa fa-image"></i> Image <b>' + esc(b.name) + "</b> nahi mili</figure>";
+    if (!im) return '<figure class="fig missing"><i class="fa fa-image"></i> Image <b>' + esc(b.name) + "</b> not found</figure>";
     var w = b.w || "100%";
     return '<figure class="fig al-' + esc(b.align) + '" style="width:' + esc(w) + '">' +
       '<img src="' + im.data + '" width="' + im.w + '" height="' + im.h + '" alt="' + esc(b.name) + '">' +
@@ -1158,7 +1158,7 @@ Ans: 2</pre>
 
     if (!entries.length && !(keyEntries && keyEntries.length)) {
       var p0 = newPage(1, false);
-      p0.body.innerHTML = '<div class="empty-paper">Editor me MCQs paste karo.<br><b>Year: 2026</b> → <b>Q1.</b> → <b>A) B) C) D)</b></div>';
+      p0.body.innerHTML = '<div class="empty-paper">Paste the MCQs in the editor.<br><b>Year: 2026</b> → <b>Q1.</b> → <b>A) B) C) D)</b></div>';
       fitTitle(p0.el.querySelector(".hdr"));
       finish(p0); stage.appendChild(done);
       return 1;
@@ -1252,7 +1252,7 @@ Ans: 2</pre>
   function renderList(items) {
     var qs = items.filter(function (i) { return i.type === "q"; });
     $("qCount").textContent = qs.length;
-    if (!qs.length) { $("qList").innerHTML = '<div class="lib-empty">Koi question nahi mila.</div>'; return; }
+    if (!qs.length) { $("qList").innerHTML = '<div class="lib-empty">No question found.</div>'; return; }
     var year = "", html = "";
     items.forEach(function (it) {
       if (it.type === "year") { year = it.year; return; }
@@ -1393,7 +1393,7 @@ Ans: 2</pre>
     if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
     if (!dirty) return Promise.resolve(true);
     if (saving) { pendingSave = true; return Promise.resolve(false); }
-    if (!online) { syncUI("offline", "Offline — draft local me safe hai, net aate hi save hoga"); armRetry(); return Promise.resolve(false); }
+    if (!online) { syncUI("offline", "Offline — your draft is safe on this device and will be saved when the internet is back"); armRetry(); return Promise.resolve(false); }
 
     saving = true; syncUI("saving", "Saving…");
     var payload = collect(true), sentImages = "images" in payload;
@@ -1410,7 +1410,7 @@ Ans: 2</pre>
         if (pendingSave) { pendingSave = false; dirty = true; return saveToServer("auto"); }
         return true;
       }
-      if (r.status === 401) { syncUI("error", "Login expire ho gaya — admin_panel.php me dobara login karo. Draft local me safe hai."); return false; }
+      if (r.status === 401) { syncUI("error", "Login expired — log in again in admin_panel.php. Your draft is safe on this device."); return false; }
       if (r.status === 409 && r.json && r.json.code === "version_conflict") { showConflict(r.json.server_version); return false; }
       syncUI("error", "Save failed: " + ((r.json && r.json.msg) || ("HTTP " + r.status)) + " — retrying");
       armRetry(); return false;
@@ -1426,7 +1426,7 @@ Ans: 2</pre>
       api("ping").then(function (r) { if (r.ok) { online = true; if (dirty) saveToServer("retry"); } else armRetry(); }, armRetry);
     }, retryDelay);
   }
-  window.addEventListener("online", function () { online = true; toast("Wapas online"); if (dirty) saveToServer("reconnect"); });
+  window.addEventListener("online", function () { online = true; toast("Back online"); if (dirty) saveToServer("reconnect"); });
   window.addEventListener("offline", function () { online = false; syncUI("offline", "Offline — draft local me safe hai"); });
   window.addEventListener("beforeunload", function (e) { if (dirty) { saveLocal(); e.preventDefault(); e.returnValue = ""; } });
   document.addEventListener("visibilitychange", function () { if (document.hidden && dirty) { saveLocal(); saveToServer("blur"); } });
@@ -1443,11 +1443,11 @@ Ans: 2</pre>
   function hideModal() { $("modalScrim").classList.remove("show"); }
   function showConflict(serverVersion) {
     syncUI("error", "Conflict — server pe nayi copy hai");
-    showModal("Server pe nayi version hai",
-      "Is sheet ko kisi doosre tab/device se save kiya gaya (v" + serverVersion + "). Aap kya rakhna chahte ho?<br><br><b>Mera rakho</b> — server wali overwrite hogi.<br><b>Server wala lo</b> — aapke abhi ke changes local draft me rahenge.",
+    showModal("A newer version is on the server",
+      "This sheet was saved from another tab/device (v" + serverVersion + "). Which one do you want to keep?<br><br><b>Keep mine</b> — the server copy will be overwritten.<br><b>Take the server copy</b> — your current changes stay in the local draft.",
       [
-        { html: '<i class="fa fa-cloud-arrow-down"></i> Server wala lo', ghost: true, fn: function () { try { localStorage.setItem("mcq_conflict_backup_" + cur.id + "_" + Date.now(), JSON.stringify(collect())); } catch (e) {} loadSheet(cur.id, { ignoreDraft: true }); } },
-        { html: '<i class="fa fa-cloud-arrow-up"></i> Mera rakho', fn: function () { cur.version = serverVersion; dirty = true; imagesDirty = true; saveToServer("force"); } }
+        { html: '<i class="fa fa-cloud-arrow-down"></i> Take the server copy', ghost: true, fn: function () { try { localStorage.setItem("mcq_conflict_backup_" + cur.id + "_" + Date.now(), JSON.stringify(collect())); } catch (e) {} loadSheet(cur.id, { ignoreDraft: true }); } },
+        { html: '<i class="fa fa-cloud-arrow-up"></i> Keep mine', fn: function () { cur.version = serverVersion; dirty = true; imagesDirty = true; saveToServer("force"); } }
       ]);
   }
 
@@ -1462,11 +1462,11 @@ Ans: 2</pre>
       var draft = opts.ignoreDraft ? null : readDraft(sheet.id);
       if (draft && draft.dirty && draft.version === sheet.version && draft.mcq_text !== sheet.mcq_text) {
         applySheet(sheet, imgs); dirty = false; syncUI("saved", "Loaded · server copy");
-        showModal("Unsaved draft mila",
-          "Is sheet ka ek <b>local draft</b> hai jo server copy se naya hai (" + fmtAgo(new Date(draft.savedAt).toISOString()) + "). Shayad pichli baar net kat gaya tha ya tab band ho gaya tha.",
+        showModal("Unsaved draft found",
+          "This sheet has a <b>local draft</b> that is newer than the server copy (" + fmtAgo(new Date(draft.savedAt).toISOString()) + "). The internet may have dropped last time, or the tab was closed.",
           [
-            { html: '<i class="fa fa-trash"></i> Draft hatao', ghost: true, fn: function () { clearDraft(sheet.id); } },
-            { html: '<i class="fa fa-rotate-left"></i> Draft restore karo', fn: function () { applySheet(draft, draft._images || imgs); imagesDirty = !!draft._images; dirty = true; syncUI("dirty", "Draft restored — saving…"); saveToServer("restore"); } }
+            { html: '<i class="fa fa-trash"></i> Remove draft', ghost: true, fn: function () { clearDraft(sheet.id); } },
+            { html: '<i class="fa fa-rotate-left"></i> Restore draft', fn: function () { applySheet(draft, draft._images || imgs); imagesDirty = !!draft._images; dirty = true; syncUI("dirty", "Draft restored — saving…"); saveToServer("restore"); } }
           ]);
       } else {
         applySheet(sheet, imgs); dirty = false; clearDraft(sheet.id); saveLocal();
@@ -1493,30 +1493,30 @@ Ans: 2</pre>
     applySheet(base, (prefill && prefill.images) || []);
     var d = readDraft(0);
     if (!prefill && d && d.dirty && d.mcq_text) {
-      showModal("Naya sheet — unsaved draft mila", "Pichli baar ek naya sheet likhte waqt save nahi hua tha. Restore karein?",
-        [{ html: "Nahi, blank", ghost: true, fn: function () { clearDraft(0); } },
+      showModal("New sheet — unsaved draft found", "The last new sheet was not saved while you were writing it. Restore it?",
+        [{ html: "No, blank", ghost: true, fn: function () { clearDraft(0); } },
          { html: '<i class="fa fa-rotate-left"></i> Restore', fn: function () { applySheet(d, d._images || []); imagesDirty = true; dirty = true; syncUI("dirty", "Draft restored"); scheduleSave(); } }]);
     }
     dirty = !!prefill;
     if (prefill) { imagesDirty = true; syncUI("dirty", "Duplicate ready — saving…"); scheduleSave(); }
-    else syncUI("saved", "New sheet — MCQs paste karo, auto-save ON");
+    else syncUI("saved", "New sheet — paste the MCQs; auto-save is ON");
     highlightLib(); $("titleInput").focus(); setStatus("New sheet.");
   }
-  function startNewSheet() { if (dirty) { saveLocal(); saveToServer("switch"); } newSheet(); setDrawer(true); $("titleInput").focus(); toast("Naya sheet — title likho, MCQs paste karo"); }
+  function startNewSheet() { if (dirty) { saveLocal(); saveToServer("switch"); } newSheet(); setDrawer(true); $("titleInput").focus(); toast("New sheet — write a title and paste the MCQs"); }
 
   function deleteSheet(id, title) {
     if (!confirm("\"" + (title || "Sheet") + "\" ko trash me daalein? (Baad me Trash se restore ho sakta hai)")) return;
     api("delete", { id: id }).then(function (r) {
-      if (r.ok) { toast("Trash me gaya"); if (cur.id === id) newSheet(); loadList(false); } else toast("Delete failed");
+      if (r.ok) { toast("Moved to trash"); if (cur.id === id) newSheet(); loadList(false); } else toast("Delete failed");
     });
   }
-  function restoreSheet(id) { api("restore", { id: id }).then(function (r) { if (r.ok) { toast("Restore ho gaya"); loadList(false); } }); }
+  function restoreSheet(id) { api("restore", { id: id }).then(function (r) { if (r.ok) { toast("Restored"); loadList(false); } }); }
 
   function loadList(quiet) {
     if (!quiet) $("libList").innerHTML = '<div class="lib-empty">Loading…</div>';
     return api(showingTrash ? "trash" : "list", undefined, "GET").then(function (r) {
-      if (r.status === 401) { syncUI("error", "Login required — admin_panel.php me login karo"); $("libList").innerHTML = '<div class="lib-empty">Login required</div>'; return; }
-      if (!r.ok || !r.json) { $("libList").innerHTML = '<div class="lib-empty">List load nahi hui</div>'; return; }
+      if (r.status === 401) { syncUI("error", "Login required — log in in admin_panel.php"); $("libList").innerHTML = '<div class="lib-empty">Login required</div>'; return; }
+      if (!r.ok || !r.json) { $("libList").innerHTML = '<div class="lib-empty">Could not load the list</div>'; return; }
       libSheets = r.json.sheets || []; if (r.json.folders) folders = r.json.folders; renderLib(); fillSubjectList();
       if (!showingTrash && !quiet) { online = true; if (!dirty) syncUI("saved", cur.id ? "Saved · " + fmtAgo(cur.updated_at) : "Ready · DB connected"); }
     }).catch(function () { $("libList").innerHTML = '<div class="lib-empty">Offline — list unavailable</div>'; online = false; });
@@ -1544,7 +1544,7 @@ Ans: 2</pre>
     list.forEach(function (n) { bucket(((n.subject || "General").trim() || "General")).push(n); });
     if (!order.length) {
       host.className = "lib-list";
-      host.innerHTML = '<div class="lib-empty">' + (showingTrash ? "Trash khali hai." : "Abhi kuch nahi. <b>Folder</b> banao, phir <b>New</b> dabao.") + "</div>";
+      host.innerHTML = '<div class="lib-empty">' + (showingTrash ? "The trash is empty." : "Nothing yet. Make a <b>Folder</b>, then press <b>New</b>.") + "</div>";
       return;
     }
     host.className = "lib-list lib-tree";
@@ -1559,7 +1559,7 @@ Ans: 2</pre>
             '<button type="button" class="fold-act" data-frename="' + esc(name) + '" title="Rename folder"><i class="fa fa-pen"></i></button>' +
             '<button type="button" class="fold-act" data-fdel="' + esc(name) + '" title="Delete folder"><i class="fa fa-trash"></i></button>') +
         '</div>' +
-        '<div class="lib-fold-body">' + (items.length ? items.map(libItemHtml).join("") : '<div class="lib-fold-empty">Khali folder — yahan nayi sheet banao</div>') + '</div>' +
+        '<div class="lib-fold-body">' + (items.length ? items.map(libItemHtml).join("") : '<div class="lib-fold-empty">Empty folder — make a new sheet here</div>') + '</div>' +
       '</div>';
     }).join("");
   }
@@ -1611,7 +1611,7 @@ Ans: 2</pre>
   $("btnTrash").addEventListener("click", function () { showingTrash = !showingTrash; this.innerHTML = showingTrash ? '<i class="fa fa-folder"></i> Library' : '<i class="fa fa-trash-can"></i> Trash'; loadList(false); });
   $("btnDuplicate").addEventListener("click", function () {
     var c = collect().sheet; c.title = (c.title || "Untitled") + " (Copy)"; c.chapter_no = ""; c.images = images.slice();
-    newSheet(c); toast("Duplicate bana — chapter number set karo");
+    newSheet(c); toast("Duplicate created — set the chapter number");
   });
   $("btnSaveNow").addEventListener("click", function () { dirty = true; saveToServer("manual"); });
   /* Library button ab menu kholta hai - dekho TOP-BAR LIBRARY MENU */
@@ -1642,16 +1642,16 @@ Ans: 2</pre>
   }
   function addImageFiles(files, then) {
     var list = [].slice.call(files || []).filter(function (f) { return /^image\//.test(f.type); });
-    if (!list.length) { toast("Image file choose karo"); return; }
+    if (!list.length) { toast("Choose an image file"); return; }
     var added = [];
     list.reduce(function (p, f) {
       return p.then(function () {
         return compressFile(f).then(function (r) { var nm = uniqueName(slug(f.name)); images.push({ name: nm, data: r.data, w: r.w, h: r.h }); added.push(nm); },
-                                    function () { toast(f.name + " load nahi hui"); });
+                                    function () { toast(f.name + " could not be loaded"); });
       });
     }, Promise.resolve()).then(function () {
       saveImages(); renderImages(); render();
-      if (added.length) toast(added.length + " image add ho gayi");
+      if (added.length) toast(added.length + " image(s) added");
       if (pendingSlot != null && added.length) {      /* slot se picker khola tha */
         var ps = pendingSlot; pendingSlot = null;
         fillSlot(ps.line, ps.name, added[0]);
@@ -1821,7 +1821,7 @@ Ans: 2</pre>
   }
   function fillSlot(line, name, imgName) {
     var at = resolveSlot(line, name);
-    if (at < 0) { toast("Ye slot text me nahi mila — text badal gaya hai"); render(); return false; }
+    if (at < 0) { toast("This slot was not found in the text — the text has changed"); render(); return false; }
     putImage(imgName, "slot:" + at, "100%", "center", "", { move: !!findImgTag(imgName), restoreSlot: true });
     renderImages();
     return true;
@@ -1858,7 +1858,7 @@ Ans: 2</pre>
     var pk = e.target.closest(".pk"); if (!pk || !pickTarget) return;
     var nm = pk.getAttribute("data-img"), t = pickTarget, moved = !!findImgTag(nm);
     closePicker();
-    if (fillSlot(t.line, t.name, nm)) toast(moved ? "Image is slot me shift ho gayi" : "Image slot me lag gayi");
+    if (fillSlot(t.line, t.name, nm)) toast(moved ? "Image moved into this slot" : "Image placed in the slot");
   });
   $("slotList").addEventListener("click", function (e) {
     if (!e.target.closest(".pickbtn")) return;
@@ -1929,7 +1929,7 @@ Ans: 2</pre>
       return;
     }
     if (e.target.closest(".del")) {
-      if (!confirm("Image \"" + im.name + "\" delete karein?")) return;
+      if (!confirm("Delete image \"" + im.name + "\"?")) return;
       images.splice(images.indexOf(im), 1); delete openImg[im.name]; saveImages(); renderImages(); render(); return;
     }
     var btn = e.target.closest(".ins");
@@ -1937,13 +1937,13 @@ Ans: 2</pre>
       var w = card.querySelector(".imgW").value, al = card.querySelector(".imgAl").value, cap = card.querySelector(".imgCap").value.trim();
       var line = imgLine(im.name, w, al, cap);
       if (btn.classList.contains("upd")) {
-        if (updateImgTag(im.name, line)) { toast("Image update ho gayi"); focusImageInPreview(im.name); renderImages(); }
-        else toast("Tag nahi mila — Insert karo");
+        if (updateImgTag(im.name, line)) { toast("Image updated"); focusImageInPreview(im.name); renderImages(); }
+        else toast("Tag not found — press Insert");
         return;
       }
       var sel = card.querySelector(".imgPos");
       putImage(im.name, sel ? sel.value : "end", w, al, cap, { move: btn.classList.contains("mv") });
-      toast(btn.classList.contains("mv") ? "Image shift ho gayi" : "Image insert ho gayi");
+      toast(btn.classList.contains("mv") ? "Image moved" : "Image inserted");
       renderImages();
     }
   });
@@ -2073,7 +2073,7 @@ Ans: 2</pre>
     try { localStorage.setItem("mcq_nav_hidden", hidden ? "1" : "0"); } catch (e) {}
     setTimeout(function () { updateScale(); }, 50);
   }
-  $("btnNavHide").addEventListener("click", function () { setNav(true); toast("Top bar hidden — upar \"Menu\" se wapas lao"); });
+  $("btnNavHide").addEventListener("click", function () { setNav(true); toast("Top bar hidden — bring it back from the \"Menu\" above"); });
   $("btnNavShow").addEventListener("click", function () { setNav(false); });
   try { if (localStorage.getItem("mcq_nav_hidden") === "1") document.body.classList.add("nav-hidden"); } catch (e) {}
 
@@ -2245,7 +2245,7 @@ Ans: 2</pre>
       if (!j) return;
       foldOpen[n.toLowerCase()] = true; saveFoldOpen(); renderLib();
       $("subjInput").value = n; saveState();
-      toast("Folder bana: " + n);
+      toast("Folder created: " + n);
     });
   }
   function renameFolder(old) {
@@ -2254,12 +2254,12 @@ Ans: 2</pre>
     folderApi("folder_rename", n, { old: old }).then(function (j) {
       if (!j) return;
       if (($("subjInput").value || "").trim() === old) { $("subjInput").value = n; saveState(); }
-      loadList(true); toast("Folder rename ho gaya");
+      loadList(true); toast("Folder renamed");
     });
   }
   function removeFolder(name) {
-    if (!confirm('Folder "' + name + '" delete karein? (khali hona chahiye)')) return;
-    folderApi("folder_delete", name).then(function (j) { if (j) toast("Folder hat gaya"); });
+    if (!confirm('Delete folder "' + name + '"? (it must be empty)')) return;
+    folderApi("folder_delete", name).then(function (j) { if (j) toast("Folder deleted"); });
   }
 
   /* =====================================================================

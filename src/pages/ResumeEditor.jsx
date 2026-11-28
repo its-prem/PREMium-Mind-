@@ -268,7 +268,7 @@ export default function ResumeEditor() {
 
   const reset = (next) => {
     // eslint-disable-next-line no-alert
-    if (!window.confirm(next === SAMPLE_RESUME ? 'Sample data wapas laayein?' : 'Sab kuch saaf karein?')) return;
+    if (!window.confirm(next === SAMPLE_RESUME ? 'Bring back the sample data?' : 'Clear everything?')) return;
     setData(next);
     setSkillsText(next.skills.join(', '));
   };
@@ -279,7 +279,7 @@ export default function ResumeEditor() {
       <main className="re-locked">
         <div className="re-locked-card">
           <h1>Loading...</h1>
-          <p>Aapka template check ho raha hai.</p>
+          <p>Checking your template.</p>
         </div>
       </main>
     );
@@ -295,7 +295,7 @@ export default function ResumeEditor() {
             <ion-icon name="lock-closed-outline"></ion-icon>
           </div>
           <h1>Login required</h1>
-          <p>Is template ko customize karne ke liye pehle login karo.</p>
+          <p>Log in first to customize this template.</p>
           <div className="re-locked-actions">
             <Link to="/login" className="re-btn re-btn-dark">
               Login
@@ -319,8 +319,8 @@ export default function ResumeEditor() {
           <h1>{product ? 'Template locked' : 'Template not found'}</h1>
           <p>
             {product
-              ? 'Ye resume template abhi aapke paas nahi hai. Store se kharidne ke baad aap ise edit karke PDF download kar sakte ho.'
-              : 'Ye link galat hai. Store se apna template chuno.'}
+              ? 'You do not have this resume template yet. After buying it from the store you can edit it and download the PDF.'
+              : 'This link is not correct. Choose your template from the store.'}
           </p>
           <div className="re-locked-actions">
             <Link to="/#our-store" className="re-btn re-btn-dark">
@@ -505,25 +505,25 @@ export default function ResumeEditor() {
           <section className="re-wa">
             <div className="re-wa-head">
               <ion-icon name="logo-whatsapp"></ion-icon>
-              <b>Resume khud nahi banana?</b>
+              <b>Do not want to make the resume yourself?</b>
             </div>
             <p>
-              Details bhar do aur neeche ka button dabao. <b>Payment ke baad</b> aapka saara data WhatsApp message mein chala jayega
-              aur <b>admin aapka resume banakar dega</b>.
+              Fill in your details and press the button below. <b>After payment</b> all your data goes into a WhatsApp message
+              and <b>the admin will make your resume for you</b>.
             </p>
             <p className="re-wa-price">
               {free ? (
                 <>
-                  Ye template <b>free</b> hai. Admin se banwane par sirf admin charge <b>₹{ADMIN_MADE_EXTRA}</b> admin ko dena hoga.
+                  This template is <b>free</b>. If the admin makes it for you, you only pay the admin charge of <b>₹{ADMIN_MADE_EXTRA}</b> to the admin.
                 </>
               ) : paid ? (
                 <>
-                  Template payment ho chuka hai ✓. Admin charge <b>₹{ADMIN_MADE_EXTRA}</b> admin ko alag se dena hoga.
+                  Template payment is done ✓. The admin charge of <b>₹{ADMIN_MADE_EXTRA}</b> is paid to the admin separately.
                 </>
               ) : (
                 <>
-                  Pehle template ka <b>₹{product.price}</b> online dena hoga. Uske upar admin charge <b>₹{ADMIN_MADE_EXTRA}</b> admin ko
-                  alag se dena hoga.
+                  First pay <b>₹{product.price}</b> for the template online. On top of that, the admin charge of <b>₹{ADMIN_MADE_EXTRA}</b> is paid to the admin
+                  separately.
                 </>
               )}
             </p>
@@ -545,7 +545,7 @@ export default function ResumeEditor() {
                 </>
               ) : (
                 <>
-                  Resume customize karna <b>free</b> hai. PDF download karne par <b>₹{product.price}</b> lagenge. Aapka kaam is device par apne aap save hota hai.
+                  Customizing the resume is <b>free</b>. Downloading the PDF costs <b>₹{product.price}</b>. Your work is saved on this device automatically.
                 </>
               )}
             </span>

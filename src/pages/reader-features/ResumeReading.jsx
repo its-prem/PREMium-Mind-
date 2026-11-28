@@ -37,7 +37,7 @@ export default function ResumeReading({ scrollRef, pagesRef, docKey, ready }) {
       );
       if (done) {
         restored.current = true;
-        showToast(`Page ${saved.page + 1} se aage padh rahe ho`, {
+        showToast(`Continuing from page ${saved.page + 1}`, {
           label: 'Shuru se',
           run: () => scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' }),
         });

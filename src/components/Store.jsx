@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { CATEGORIES, PRODUCTS, getCategory } from '../data/storeData';
 import './Store.css';
+import { isNativeApp } from '../lib/session';
+
+/** An app-only product is shown only inside the Android app. */
+const visibleHere = (p) => !p.appOnly || isNativeApp();
 
 /**
  * The store: first 4 big category cards (Notes, E-Books, Resume Templates,
@@ -26,7 +30,7 @@ export default function Store({
     on?.scrollIntoView?.({ inline: 'center', block: 'nearest' });
   }, [activeCategory]);
   const products = category
-    ? PRODUCTS.filter((p) => p.category === category.id)
+    ? PRODUCTS.filter((p) => p.category === category.id && visibleHere(p))
     : [];
 
   /* ---------- Level 1: category cards ---------- */
@@ -34,7 +38,7 @@ export default function Store({
     return (
       <div className="st-cats">
         {CATEGORIES.map((cat) => {
-          const items = PRODUCTS.filter((p) => p.category === cat.id);
+          const items = PRODUCTS.filter((p) => p.category === cat.id && visibleHere(p));
           const ownedCount = items.filter((p) => owns(p.id)).length;
           return (
             <button
@@ -121,7 +125,7 @@ export default function Store({
             <h3>New {category.title} Coming Soon!</h3>
             <p>
               {category.soonNote ||
-                'Hum is category ke high-quality resources upload kar rahe hain. Tab tak baaki categories dekhein.'}
+                'We are adding high-quality resources to this category. Meanwhile, have a look at the other categories.'}
             </p>
             {category.whatsapp && (
               <a

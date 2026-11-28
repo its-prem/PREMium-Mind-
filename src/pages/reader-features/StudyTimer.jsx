@@ -72,7 +72,7 @@ export default function StudyTimer({ ready }) {
         if (phaseSec.current >= BREAK_SECONDS) {
           phase.current = 'focus';
           phaseSec.current = 0;
-          showToast('Break khatam. Wapas padhai shuru karte hain!');
+          showToast('Break over. Back to studying!');
         }
         setTick((t) => t + 1);
         return;
@@ -177,7 +177,7 @@ export default function StudyTimer({ ready }) {
                 {paused ? 'Resume timer' : 'Pause timer'}
               </button>
             </div>
-            <p className="rdx-note">Sirf tab count hota hai jab ye page khula dikh raha ho.</p>
+            <p className="rdx-note">Counted only while this page is open and visible.</p>
           </div>
         )}
         <button

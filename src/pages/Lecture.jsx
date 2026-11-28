@@ -21,7 +21,7 @@ import './Lecture.css';
 
 const API_URL = 'https://premind.diplomawallah.in/api.php';
 const NO_PDF_MSG =
-  'PDF abhi upload nahi hui. Admin panel me pdf_file column check karo (uploads/pdfs/...)';
+  'The PDF is not uploaded yet. Check the pdf_file column in the admin panel (uploads/pdfs/...)';
 
 /** Pull a usable "uploads/pdfs/..." path out of the course record. */
 function pickPdfPath(course) {
@@ -226,7 +226,7 @@ export default function Lecture() {
       const canDownload = downloadState(course).mode === 'instant'; // instant, or the admin's unlock time has passed
       const dlMsg =
         (course.download_msg && String(course.download_msg).trim()) ||
-        'Download abhi available nahi hai. Exam se 1 din pehle unlock hoga.';
+        'Download is not available yet. It unlocks 1 day before the exam.';
 
       try {
         sessionStorage.setItem('pmWatchReturn', '/lecture');
@@ -253,7 +253,7 @@ export default function Lecture() {
     // The product HAS a PDF but the server did not send its path: the login token is missing or expired
     // (it is checked on the server for every PDF). Ask for a fresh login instead of saying "not uploaded".
     if (Number(course.has_pdf) === 1) {
-      setNotice('Security ke liye dobara login karna hoga. Login page khul raha hai...');
+      setNotice('For your security you need to log in again. Opening the login page...');
       setTimeout(() => {
         clearStoredSession();
         navigate('/login');
@@ -335,8 +335,8 @@ export default function Lecture() {
           <p className="lc-login-note">
             <ion-icon name="information-circle-outline"></ion-icon>
             <span>
-              Ye aapke is device ki khareedari hai. <Link to="/login">Login karo</Link> taaki
-              account ke baaki courses bhi dikhein.
+              These are the purchases made on this device. <Link to="/login">Log in</Link> to see
+              the other courses of your account too.
             </span>
           </p>
         )}
@@ -347,7 +347,7 @@ export default function Lecture() {
               <ion-icon name="lock-closed-outline"></ion-icon>
             </div>
             <h2>Login Required</h2>
-            <p>Apne purchased courses dekhne ke liye pehle login karo.</p>
+            <p>Log in first to see your purchased courses.</p>
             <div className="lc-empty-actions">
               <Link to="/login" className="lc-btn-primary">
                 <ion-icon name="log-in-outline"></ion-icon> Login / Sign Up
@@ -365,7 +365,7 @@ export default function Lecture() {
               <ion-icon name="cloud-offline-outline"></ion-icon>
             </div>
             <h2>Couldn&apos;t load courses</h2>
-            <p>Connection check karke dobara try karo.</p>
+            <p>Check your connection and try again.</p>
             <div className="lc-empty-actions">
               <button
                 type="button"
@@ -385,8 +385,8 @@ export default function Lecture() {
             </div>
             <h2>No Courses Yet</h2>
             <p>
-              Aapne abhi tak koi premium course enroll nahi kiya. Store explore
-              karke apni skills upgrade karo!
+              You have not enrolled in any premium course yet. Explore the store
+              and upgrade your skills!
             </p>
             <div className="lc-empty-actions">
               <Link to="/#our-store" className="lc-btn-primary">

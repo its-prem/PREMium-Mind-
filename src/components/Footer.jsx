@@ -69,7 +69,7 @@ export default function Footer() {
   };
 
   const directWa = `https://wa.me/${PHONE_RAW}?text=${encodeURIComponent(
-    "Hello PREMium Mind! Mujhe notes/courses ke bare me help chahiye."
+    "Hello PREMium Mind! I need help with your notes / courses."
   )}`;
 
   return (
@@ -111,8 +111,8 @@ export default function Footer() {
           </a>
 
           <p className="pm-rbw-desc">
-            Polytechnic &amp; Engineering students ke liye exam-ready handwritten
-            notes, solved PYQs, ATS resumes aur ready-to-submit projects.
+            Exam-ready handwritten notes for Polytechnic &amp; Engineering students,
+            solved PYQs, ATS resumes and ready-to-submit projects.
           </p>
 
           {/* Direct Contact Cards */}
@@ -206,7 +206,7 @@ export default function Footer() {
             <div className="pm-rbw-form-head">
               <div>
                 <h3>Send Us a Message</h3>
-                <p>Koi bhi doubt ya notes query ho — direct WhatsApp karein</p>
+                <p>Any doubt or notes query? Message us directly on WhatsApp</p>
               </div>
               <span className="pm-rbw-head-icon">
                 <ion-icon name="logo-whatsapp"></ion-icon>

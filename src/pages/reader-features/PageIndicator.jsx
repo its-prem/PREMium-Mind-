@@ -64,7 +64,7 @@ export default function PageIndicator({ scrollRef, pagesRef, ready }) {
     if (n > loaded) {
       // Pages load one after another; go as far as is ready.
       scrollToPage(scrollRef.current, pagesRef.current, loaded - 1);
-      setHint(`Page ${n} abhi load ho raha hai...`);
+      setHint(`Page ${n} is still loading...`);
       setTimeout(() => setHint(''), 2200);
       return;
     }

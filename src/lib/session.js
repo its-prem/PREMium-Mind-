@@ -148,7 +148,7 @@ export function isNativeApp() {
   } catch {
     /* storage blocked */
   }
-  if (window.__PM_NATIVE_APP__) return true;
+  if (window.__PM_NATIVE_APP__ || window.PMAppSigner) return true; // PMAppSigner = the app's own native signer (AppSigner.java)
   try {
     if (window.Capacitor?.isNativePlatform?.()) return true;
   } catch {

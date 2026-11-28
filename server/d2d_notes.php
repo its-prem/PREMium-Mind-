@@ -21,7 +21,7 @@ if (!pm_auth_admin_ok()):
   a:hover { background: #6f1220; transform: translateY(-1px); }
 </style></head><body>
 <div class="box"><h1>Notes <span>D2D</span></h1>
-<p>Ye tool admin ke liye hai. Pehle Admin Panel me Google se login karo, phir is page ko dobara kholo.</p>
+<p>This tool is for the admin. Log in with Google in the Admin Panel first, then open this page again.</p>
 <a href="admin_panel.php">Admin Panel → Login</a></div>
 </body></html>
 <?php
@@ -643,7 +643,7 @@ $pmAdminEmail = pm_auth_admin_email();
           <a href="d2d_notes.php" data-self="notes"><span class="ic"><i class="fa fa-book-open"></i></span><span class="tx"><b>Notes</b><small>Chapter-wise short notes</small></span><span class="cur-mark"></span></a>
           <a href="d2d_mcq.php" data-self="mcq"><span class="ic"><i class="fa fa-list-check"></i></span><span class="tx"><b>MCQ</b><small>PYQ practice sheets</small></span><span class="cur-mark"></span></a>
           <div class="menu-sep"></div>
-          <button type="button" id="menuNewFolder"><span class="ic"><i class="fa fa-folder-plus"></i></span><span class="tx"><b>Naya folder</b><small>Dono jagah dikhega</small></span></button>
+          <button type="button" id="menuNewFolder"><span class="ic"><i class="fa fa-folder-plus"></i></span><span class="tx"><b>New folder</b><small>Shown in both places</small></span></button>
         </div>
       </div>
       <button type="button" class="btn" id="btnHeaderNew" title="New chapter (Ctrl+Alt+N)"><i class="fa fa-plus"></i> New chapter</button>
@@ -715,7 +715,7 @@ $pmAdminEmail = pm_auth_admin_email();
               </div>
               <div class="lib-list" id="libList"><div class="lib-empty">Loading…</div></div>
               <div class="lib-tools">
-                <button type="button" id="btnNewFolder" title="Naya folder banao"><i class="fa fa-folder-plus"></i> Folder</button>
+                <button type="button" id="btnNewFolder" title="Make a new folder"><i class="fa fa-folder-plus"></i> Folder</button>
                 <button type="button" id="btnLibRefresh" title="Reload list from server"><i class="fa fa-rotate"></i> Refresh</button>
                 <button type="button" id="btnDuplicate" title="Copy current chapter as a new one"><i class="fa fa-copy"></i> Duplicate</button>
                 <button type="button" id="btnTrash" title="Show deleted chapters"><i class="fa fa-trash-can"></i> Trash</button>
@@ -765,7 +765,7 @@ $pmAdminEmail = pm_auth_admin_email();
             <div class="field"><label class="field-label">Title</label><input class="inp" id="titleInput" type="text" value="Atomic Structure" autocomplete="off"></div>
           </div>
           <div class="field">
-            <label class="field-label">Subject logo <span style="color:var(--text-muted);text-transform:none;letter-spacing:0">(pehle page ke header par)</span></label>
+            <label class="field-label">Subject logo <span style="color:var(--text-muted);text-transform:none;letter-spacing:0">(in the header of the first page)</span></label>
             <div class="subj-pick" id="subjPick">
               <button type="button" data-icon="auto" title="Folder ke naam se khud chun lega">Auto</button>
               <button type="button" data-icon="physics" title="Physics">Physics</button>
@@ -898,7 +898,7 @@ $pmAdminEmail = pm_auth_admin_email();
       <div class="pick-bd"><div class="pgrid" id="pickGrid"></div></div>
     </div>
   </div>
-  <div class="modal-scrim" id="modalScrim"><div class="modal"><h3><i class="fa fa-triangle-exclamation"></i> <span id="modalTitle">Unsaved draft mila</span></h3><p id="modalBody"></p><div class="row" id="modalRow"></div></div></div>
+  <div class="modal-scrim" id="modalScrim"><div class="modal"><h3><i class="fa fa-triangle-exclamation"></i> <span id="modalTitle">Unsaved draft found</span></h3><p id="modalBody"></p><div class="row" id="modalRow"></div></div></div>
 
 </div>
 
@@ -1348,11 +1348,11 @@ $pmAdminEmail = pm_auth_admin_email();
             if (b.cap) { var fc = document.createElement("figcaption"); fc.innerHTML = inline(b.cap); fg.appendChild(fc); }
             node.appendChild(fg);
           } else if (b.slot) {
-            node.innerHTML = '<div class="fig slot" data-slot="' + b.line + '" style="width:' + (b.w || "100%") + '" title="Click karo — yahan image lagani hai">' +
+            node.innerHTML = '<div class="fig slot" data-slot="' + b.line + '" style="width:' + (b.w || "100%") + '" title="Click — place an image here">' +
               '<i class="fa fa-image si"></i><b>' + esc(b.name) + "</b>" +
-              '<small>Click karke image lagao</small></div>';
+              '<small>Click to place an image</small></div>';
           }
-          else node.innerHTML = '<div class="fig missing" style="width:' + (b.w || "100%") + '"><i class="fa fa-image"></i> Image <b>' + esc(b.name) + '</b> nahi mili — Images panel se add karo</div>';
+          else node.innerHTML = '<div class="fig missing" style="width:' + (b.w || "100%") + '"><i class="fa fa-image"></i> Image <b>' + esc(b.name) + '</b> not found — add it from the Images panel</div>';
           break;
         case "qt": node = el("blk qt", b.html); break;
         case "break": node = el("brk"); node.dataset.kind = b.kind; break;
@@ -1588,7 +1588,7 @@ $pmAdminEmail = pm_auth_admin_email();
     stage.innerHTML = ""; $("measure").innerHTML = "";
     var done = document.createDocumentFragment();
     function finish(pg) { if (pg && pg.el.parentNode !== done) done.appendChild(pg.el); }
-    if (!nodes.length) { var p0 = newPage(1, false); p0.body.innerHTML = '<div class="empty-paper">Yahan apne notes paste karein.<br><b>Plain text</b> bhi chalega.</div>'; finish(p0); stage.appendChild(done); return 1; }
+    if (!nodes.length) { var p0 = newPage(1, false); p0.body.innerHTML = '<div class="empty-paper">Paste your notes here.<br><b>Plain text</b> works too.</div>'; finish(p0); stage.appendChild(done); return 1; }
     var pageNo = 1, page = newPage(1, false), carry = [], colW = 0;
     function measureColW() { colW = page.cols[0].clientWidth; }
     measureColW();
@@ -1691,7 +1691,7 @@ $pmAdminEmail = pm_auth_admin_email();
       }
       return '<button type="button" class="oitem' + (b.type === "h2" ? " sub" : "") + '" data-line="' + b.line + '"><span class="n">' + (b.type === "h2" ? "❖" : esc(b.num || "")) + '</span><span class="t">' + esc(b.text) + "</span></button>";
     }).join("")
-      : '<div style="color:var(--text-muted);font-size:.82rem;padding:10px 4px;text-align:center">Koi heading nahi.</div>';
+      : '<div style="color:var(--text-muted);font-size:.82rem;padding:10px 4px;text-align:center">No headings.</div>';
   }
   function caretTopIn(pos) {
     var cs = getComputedStyle(ta), m = document.createElement("div");
@@ -1796,7 +1796,7 @@ $pmAdminEmail = pm_auth_admin_email();
   function toggleWrap(w) {
     var v = ta.value, s = ta.selectionStart, e = ta.selectionEnd, L = w.length;
     if (removeWrap(w, s, e)) return;
-    if (s === e) { var wd = wordAt(v, s); if (wd.s === wd.e) { toast("Pehle text select karo"); return; } s = wd.s; e = wd.e; }
+    if (s === e) { var wd = wordAt(v, s); if (wd.s === wd.e) { toast("Select some text first"); return; } s = wd.s; e = wd.e; }
     var sel = v.slice(s, e);
     if (sel.length >= 2 * L && sel.slice(0, L) === w && sel.slice(-L) === w) { setText(v.slice(0, s) + sel.slice(L, -L) + v.slice(e), s, e - 2 * L); return; }
     var lead = sel.match(/^\s*/)[0].length, trail = sel.match(/\s*$/)[0].length; s += lead; e -= trail; sel = v.slice(s, e);
@@ -1805,7 +1805,7 @@ $pmAdminEmail = pm_auth_admin_email();
   }
   function clearFormat() {
     var v = ta.value, s = ta.selectionStart, e = ta.selectionEnd;
-    if (s === e) { var info = activeWrapsAt(s), best = null; WRAPS.forEach(function (w) { if (info.act[w]) best = info.act[w]; }); if (!best) { toast("Cursor kisi styled text par rakho"); return; } s = info.ls + best.s; e = info.ls + best.e; }
+    if (s === e) { var info = activeWrapsAt(s), best = null; WRAPS.forEach(function (w) { if (info.act[w]) best = info.act[w]; }); if (!best) { toast("Put the cursor on styled text"); return; } s = info.ls + best.s; e = info.ls + best.e; }
     var sel = v.slice(s, e), before = v.slice(0, s), after = v.slice(e);
     WRAPS.forEach(function (w) { var L = w.length; if (before.slice(-L) === w && after.slice(0, L) === w) { before = before.slice(0, -L); after = after.slice(L); } });
     var cleaned = sel.replace(/\*\*|==|!!|%%|\^\^|::|@@|__|(?<!\*)\*(?!\*)|\$/g, "");
@@ -1829,7 +1829,7 @@ $pmAdminEmail = pm_auth_admin_email();
     else if (btn.dataset.unwrap) {
       var ws = btn.dataset.unwrap === "hl" ? ["==", "%%", "^^", "!!", "::"] : [btn.dataset.unwrap], did = false;
       ws.forEach(function (w) { if (removeWrap(w, ta.selectionStart, ta.selectionEnd)) did = true; });
-      if (!did) toast("Yahan koi highlight nahi hai");
+      if (!did) toast("There is no highlight here");
     }
     else if (btn.dataset.clear) clearFormat();
     else if (btn.dataset.line != null) toggleLine(btn.dataset.line);
@@ -1960,7 +1960,7 @@ $pmAdminEmail = pm_auth_admin_email();
   fb.addEventListener("click", function (e) {
     var b = e.target.closest("button"); if (!b || !pendingSel) return;
     var loc = locateInSource(pendingSel.blk, pendingSel.text);
-    if (!loc) { toast("Ye text source me nahi mila — editor me select karke lagao"); hideFloat(); return; }
+    if (!loc) { toast("This text was not found in the source — select it in the editor and apply"); hideFloat(); return; }
     ta.setSelectionRange(loc.s, loc.e);
     runAction(b);
     window.getSelection().removeAllRanges();
@@ -2089,7 +2089,7 @@ $pmAdminEmail = pm_auth_admin_email();
     if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
     if (!dirty) return Promise.resolve(true);
     if (saving) { pendingSave = true; return Promise.resolve(false); }
-    if (!online) { syncUI("offline", "Offline — draft local me safe hai, net aate hi save hoga"); armRetry(); return Promise.resolve(false); }
+    if (!online) { syncUI("offline", "Offline — your draft is safe on this device and will be saved when the internet is back"); armRetry(); return Promise.resolve(false); }
 
     saving = true; syncUI("saving", "Saving…");
     var snapVersion = cur.version, payload = collect(true), sentImages = "images" in payload;
@@ -2106,7 +2106,7 @@ $pmAdminEmail = pm_auth_admin_email();
         if (pendingSave) { pendingSave = false; dirty = true; return saveToServer("auto"); }
         return true;
       }
-      if (r.status === 401) { syncUI("error", "Login expire ho gaya — admin_panel.php me dobara login karo. Draft local me safe hai."); return false; }
+      if (r.status === 401) { syncUI("error", "Login expired — log in again in admin_panel.php. Your draft is safe on this device."); return false; }
       if (r.status === 409 && r.json && r.json.code === "version_conflict") { showConflict(r.json.server_version); return false; }
       syncUI("error", "Save failed: " + ((r.json && r.json.msg) || ("HTTP " + r.status)) + " — retrying");
       armRetry(); return false;
@@ -2122,7 +2122,7 @@ $pmAdminEmail = pm_auth_admin_email();
       api("ping").then(function (r) { if (r.ok) { online = true; if (dirty) saveToServer("retry"); } else armRetry(); }, armRetry);
     }, retryDelay);
   }
-  window.addEventListener("online", function () { online = true; toast("Wapas online"); if (dirty) saveToServer("reconnect"); });
+  window.addEventListener("online", function () { online = true; toast("Back online"); if (dirty) saveToServer("reconnect"); });
   window.addEventListener("offline", function () { online = false; syncUI("offline", "Offline — draft local me safe hai"); });
   window.addEventListener("beforeunload", function (e) { if (dirty) { saveLocal(); e.preventDefault(); e.returnValue = ""; } });
   document.addEventListener("visibilitychange", function () { if (document.hidden && dirty) { saveLocal(); saveToServer("blur"); } });
@@ -2136,11 +2136,11 @@ $pmAdminEmail = pm_auth_admin_email();
   function hideModal() { $("modalScrim").classList.remove("show"); }
   function showConflict(serverVersion) {
     syncUI("error", "Conflict — server pe nayi copy hai");
-    showModal("Server pe nayi version hai",
-      "Is chapter ko kisi doosre tab/device se save kiya gaya (v" + serverVersion + "). Aap kya rakhna chahte ho?<br><br><b>Mera rakho</b> — server wali overwrite hogi.<br><b>Server wala lo</b> — aapke abhi ke changes local draft me rahenge.",
+    showModal("A newer version is on the server",
+      "This chapter was saved from another tab/device (v" + serverVersion + "). Which one do you want to keep?<br><br><b>Keep mine</b> — the server copy will be overwritten.<br><b>Take the server copy</b> — your current changes stay in the local draft.",
       [
-        { html: '<i class="fa fa-cloud-arrow-down"></i> Server wala lo', ghost: true, fn: function () { var keep = collect(); try { localStorage.setItem("d2d_conflict_backup_" + cur.id + "_" + Date.now(), JSON.stringify(keep)); } catch (e) {} loadNote(cur.id, { ignoreDraft: true }); } },
-        { html: '<i class="fa fa-cloud-arrow-up"></i> Mera rakho', fn: function () { cur.version = serverVersion; dirty = true; imagesDirty = true; saveToServer("force"); } }
+        { html: '<i class="fa fa-cloud-arrow-down"></i> Take the server copy', ghost: true, fn: function () { var keep = collect(); try { localStorage.setItem("d2d_conflict_backup_" + cur.id + "_" + Date.now(), JSON.stringify(keep)); } catch (e) {} loadNote(cur.id, { ignoreDraft: true }); } },
+        { html: '<i class="fa fa-cloud-arrow-up"></i> Keep mine', fn: function () { cur.version = serverVersion; dirty = true; imagesDirty = true; saveToServer("force"); } }
       ]);
   }
 
@@ -2155,11 +2155,11 @@ $pmAdminEmail = pm_auth_admin_email();
       var draft = opts.ignoreDraft ? null : readDraft(note.id);
       if (draft && draft.dirty && draft.version === note.version && (draft.notes_text !== note.notes_text || draft.source_content !== note.source_content)) {
         applyNote(note, imgs); dirty = false; syncUI("saved", "Loaded · server copy");
-        showModal("Unsaved draft mila",
-          "Is chapter ka ek <b>local draft</b> hai jo server copy se naya hai (" + fmtAgo(new Date(draft.savedAt).toISOString()) + "). Shayad pichli baar net kat gaya tha ya tab band ho gaya tha.",
+        showModal("Unsaved draft found",
+          "This chapter has a <b>local draft</b> that is newer than the server copy (" + fmtAgo(new Date(draft.savedAt).toISOString()) + "). The internet may have dropped last time, or the tab was closed.",
           [
-            { html: '<i class="fa fa-trash"></i> Draft hatao', ghost: true, fn: function () { clearDraft(note.id); } },
-            { html: '<i class="fa fa-rotate-left"></i> Draft restore karo', fn: function () { var d = draft; applyNote(d, d._images || imgs); imagesDirty = !!d._images; dirty = true; syncUI("dirty", "Draft restored — saving…"); saveToServer("restore"); } }
+            { html: '<i class="fa fa-trash"></i> Remove draft', ghost: true, fn: function () { clearDraft(note.id); } },
+            { html: '<i class="fa fa-rotate-left"></i> Restore draft', fn: function () { var d = draft; applyNote(d, d._images || imgs); imagesDirty = !!d._images; dirty = true; syncUI("dirty", "Draft restored — saving…"); saveToServer("restore"); } }
           ]);
       } else {
         applyNote(note, imgs); dirty = false; clearDraft(note.id); saveLocal();
@@ -2177,26 +2177,26 @@ $pmAdminEmail = pm_auth_admin_email();
     applyNote(base, (prefill && prefill.images) || []);
     var d = readDraft(0);
     if (!prefill && d && d.dirty && (d.notes_text || d.source_content)) {
-      showModal("Naya chapter — unsaved draft mila", "Pichli baar ek naya chapter likhte waqt save nahi hua tha. Restore karein?",
-        [{ html: "Nahi, blank", ghost: true, fn: function () { clearDraft(0); } }, { html: '<i class="fa fa-rotate-left"></i> Restore', fn: function () { applyNote(d, d._images || []); imagesDirty = true; dirty = true; syncUI("dirty", "Draft restored"); scheduleSave(); } }]);
+      showModal("New chapter — unsaved draft found", "The last new chapter was not saved while you were writing it. Restore it?",
+        [{ html: "No, blank", ghost: true, fn: function () { clearDraft(0); } }, { html: '<i class="fa fa-rotate-left"></i> Restore', fn: function () { applyNote(d, d._images || []); imagesDirty = true; dirty = true; syncUI("dirty", "Draft restored"); scheduleSave(); } }]);
     }
-    dirty = !!prefill; if (prefill) { syncUI("dirty", "Duplicate ready — saving…"); scheduleSave(); } else syncUI("saved", "New chapter — likhna shuru karo, auto-save ON");
+    dirty = !!prefill; if (prefill) { syncUI("dirty", "Duplicate ready — saving…"); scheduleSave(); } else syncUI("saved", "New chapter — start writing; auto-save is ON");
     highlightLib(); $("titleInput").focus(); setStatus("New chapter.");
   }
 
   function deleteNote(id, title) {
     if (!confirm("\"" + (title || "Chapter") + "\" ko trash me daalein? (Baad me Trash se restore ho sakta hai)")) return;
     api("delete", { id: id }).then(function (r) {
-      if (r.ok) { toast("Trash me gaya"); if (cur.id === id) newNote(); loadList(false); } else toast("Delete failed");
+      if (r.ok) { toast("Moved to trash"); if (cur.id === id) newNote(); loadList(false); } else toast("Delete failed");
     });
   }
-  function restoreNote(id) { api("restore", { id: id }).then(function (r) { if (r.ok) { toast("Restore ho gaya"); loadList(false); } }); }
+  function restoreNote(id) { api("restore", { id: id }).then(function (r) { if (r.ok) { toast("Restored"); loadList(false); } }); }
 
   function loadList(quiet) {
     if (!quiet) $("libList").innerHTML = '<div class="lib-empty">Loading…</div>';
     return api(showingTrash ? "trash" : "list", undefined, "GET").then(function (r) {
-      if (r.status === 401) { syncUI("error", "Login required — admin_panel.php me login karo"); $("libList").innerHTML = '<div class="lib-empty">Login required</div>'; return; }
-      if (!r.ok || !r.json) { $("libList").innerHTML = '<div class="lib-empty">List load nahi hui</div>'; return; }
+      if (r.status === 401) { syncUI("error", "Login required — log in in admin_panel.php"); $("libList").innerHTML = '<div class="lib-empty">Login required</div>'; return; }
+      if (!r.ok || !r.json) { $("libList").innerHTML = '<div class="lib-empty">Could not load the list</div>'; return; }
       libNotes = r.json.notes || []; if (r.json.folders) folders = r.json.folders; renderLib(); fillSubjectList();
       if (!showingTrash && !quiet) { online = true; if (!dirty) syncUI("saved", cur.id ? "Saved · " + fmtAgo(cur.updated_at) : "Ready · DB connected"); }
     }).catch(function () { $("libList").innerHTML = '<div class="lib-empty">Offline — list unavailable</div>'; online = false; });
@@ -2224,7 +2224,7 @@ $pmAdminEmail = pm_auth_admin_email();
     list.forEach(function (n) { bucket(((n.subject || "General").trim() || "General")).push(n); });
     if (!order.length) {
       host.className = "lib-list";
-      host.innerHTML = '<div class="lib-empty">' + (showingTrash ? "Trash khali hai." : "Abhi kuch nahi. <b>Folder</b> banao, phir <b>New</b> dabao.") + "</div>";
+      host.innerHTML = '<div class="lib-empty">' + (showingTrash ? "The trash is empty." : "Nothing yet. Make a <b>Folder</b>, then press <b>New</b>.") + "</div>";
       return;
     }
     host.className = "lib-list lib-tree";
@@ -2280,7 +2280,7 @@ $pmAdminEmail = pm_auth_admin_email();
     loadNote(id);
   });
   $("libSearch").addEventListener("input", function () { libFilter = this.value.trim(); renderLib(); });
-  function startNewChapter() { if (dirty) { saveLocal(); saveToServer("switch"); } newNote(); setDrawer(true); $("titleInput").focus(); toast("Naya chapter — title likho, text paste karo"); }
+  function startNewChapter() { if (dirty) { saveLocal(); saveToServer("switch"); } newNote(); setDrawer(true); $("titleInput").focus(); toast("New chapter — write a title and paste the text"); }
   $("btnNewNote").addEventListener("click", startNewChapter);
   $("btnHeaderNew").addEventListener("click", startNewChapter);
   document.addEventListener("keydown", function (e) {
@@ -2292,14 +2292,14 @@ $pmAdminEmail = pm_auth_admin_email();
   $("btnTrash").addEventListener("click", function () { showingTrash = !showingTrash; this.innerHTML = showingTrash ? '<i class="fa fa-folder"></i> Library' : '<i class="fa fa-trash-can"></i> Trash'; loadList(false); });
   $("btnDuplicate").addEventListener("click", function () {
     var c = collect(); c.note.title = (c.note.title || "Untitled") + " (Copy)"; c.note.chapter_no = ""; c.note.images = images.slice();
-    newNote(c.note); toast("Duplicate bana — chapter number set karo");
+    newNote(c.note); toast("Duplicate created — set the chapter number");
   });
   $("btnSaveNow").addEventListener("click", function () { dirty = true; saveToServer("manual"); });
   document.addEventListener("keydown", function (e) { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") { e.preventDefault(); dirty = true; saveToServer("manual"); } });
 
   function updateSrcMeta() { var w = srcTa.value.trim() ? srcTa.value.trim().split(/\s+/).length : 0; $("srcMeta").textContent = w + " words · " + srcTa.value.length + " chars"; $("srcCount").textContent = w ? Math.round(w / 100) / 10 + "k" : "0"; }
   srcTa.addEventListener("input", function () { updateSrcMeta(); saveState(); });
-  $("btnSrcToNotes").addEventListener("click", function () { if (!srcTa.value.trim()) { toast("Source khali hai"); return; } insertLineAt("cursor", srcTa.value.trim()); toast("Notes me add ho gaya"); });
+  $("btnSrcToNotes").addEventListener("click", function () { if (!srcTa.value.trim()) { toast("The source is empty"); return; } insertLineAt("cursor", srcTa.value.trim()); toast("Added to the notes"); });
   $("btnSrcCopy").addEventListener("click", function () { var t = srcTa.value; if (navigator.clipboard) navigator.clipboard.writeText(t).then(function () { toast("Copied"); }); else { srcTa.select(); document.execCommand("copy"); toast("Copied"); } });
 
   /* =====================================================================
@@ -2328,12 +2328,12 @@ $pmAdminEmail = pm_auth_admin_email();
   }
   function addImageFiles(files, then) {
     var list = [].slice.call(files || []).filter(function (f) { return /^image\//.test(f.type); });
-    if (!list.length) { toast("Image file choose karo"); return; }
+    if (!list.length) { toast("Choose an image file"); return; }
     var added = [];
-    list.reduce(function (p, f) { return p.then(function () { return compressFile(f).then(function (r) { var nm = uniqueName(slug(f.name)); images.push({ name: nm, data: r.data, w: r.w, h: r.h }); added.push(nm); }, function () { toast(f.name + " load nahi hui"); }); }); }, Promise.resolve())
+    list.reduce(function (p, f) { return p.then(function () { return compressFile(f).then(function (r) { var nm = uniqueName(slug(f.name)); images.push({ name: nm, data: r.data, w: r.w, h: r.h }); added.push(nm); }, function () { toast(f.name + " could not be loaded"); }); }); }, Promise.resolve())
       .then(function () {
         saveImages(); renderImages(); render();
-        if (added.length) toast(added.length + " image add ho gayi");
+        if (added.length) toast(added.length + " image(s) added");
         if (pendingSlot != null && added.length) {       /* slot par click karke image chuni thi */
           var ps = pendingSlot; pendingSlot = null;
           fillSlot(ps.line, ps.name, added[0]);
@@ -2533,7 +2533,7 @@ $pmAdminEmail = pm_auth_admin_email();
   /** slot me image lagao — dobara lagi image ko shift karo, duplicate tag na bane */
   function fillSlot(line, name, imgName) {
     var at = resolveSlot(line, name);
-    if (at < 0) { toast("Ye slot text me nahi mila — text badal gaya hai"); render(); return false; }
+    if (at < 0) { toast("This slot was not found in the text — the text has changed"); render(); return false; }
     putImage(imgName, "slot:" + at, "100%", "center", "", { move: !!findImgTag(imgName), restoreSlot: true });
     renderImages();
     return true;
@@ -2569,7 +2569,7 @@ $pmAdminEmail = pm_auth_admin_email();
     var pk = e.target.closest(".pk"); if (!pk || !pickTarget) return;
     var nm = pk.getAttribute("data-img"), t = pickTarget, moved = !!findImgTag(nm);
     closePicker();
-    if (fillSlot(t.line, t.name, nm)) toast(moved ? "Image is slot me shift ho gayi" : "Image slot me lag gayi");
+    if (fillSlot(t.line, t.name, nm)) toast(moved ? "Image moved into this slot" : "Image placed in the slot");
   });
   $("slotList").addEventListener("click", function (e) {
     if (!e.target.closest(".pickbtn")) return;
@@ -2610,7 +2610,7 @@ $pmAdminEmail = pm_auth_admin_email();
     putImage(im.name, sel.value,
       card.querySelector(".imgW").value, card.querySelector(".imgAl").value,
       card.querySelector(".imgCap").value.trim(), { move: moving });
-    toast(moving ? "Image shift ho gayi" : "Image lag gayi");
+    toast(moving ? "Image moved" : "Image placed");
     renderImages();
   });
   $("imgList").addEventListener("click", function (e) {
@@ -2623,7 +2623,7 @@ $pmAdminEmail = pm_auth_admin_email();
       return;
     }
     if (e.target.closest(".del")) {
-      if (!confirm("Image \"" + im.name + "\" delete karein?")) return;
+      if (!confirm("Delete image \"" + im.name + "\"?")) return;
       images.splice(images.indexOf(im), 1); delete openImg[im.name]; saveImages(); renderImages(); render(); return;
     }
     var btn = e.target.closest(".ins");
@@ -2631,12 +2631,12 @@ $pmAdminEmail = pm_auth_admin_email();
       var w = card.querySelector(".imgW").value, al = card.querySelector(".imgAl").value, cap = card.querySelector(".imgCap").value.trim();
       var posSel = card.querySelector(".imgPos"), pos = posSel ? posSel.value : "cursor";
       if (btn.classList.contains("upd")) {
-        if (updateImgTag(im.name, imgLine(im.name, w === "wide" ? "" : w, al, cap), w === "wide")) { toast("Image update ho gayi"); focusImageInPreview(im.name); renderImages(); }
-        else toast("Tag nahi mila — Insert karo");
+        if (updateImgTag(im.name, imgLine(im.name, w === "wide" ? "" : w, al, cap), w === "wide")) { toast("Image updated"); focusImageInPreview(im.name); renderImages(); }
+        else toast("Tag not found — press Insert");
         return;
       }
       putImage(im.name, pos, w, al, cap, { move: btn.classList.contains("mv") });
-      toast(btn.classList.contains("mv") ? "Image shift ho gayi" : "Image insert ho gayi");
+      toast(btn.classList.contains("mv") ? "Image moved" : "Image inserted");
       renderImages();
       return;
     }
@@ -2753,7 +2753,7 @@ $pmAdminEmail = pm_auth_admin_email();
     try { localStorage.setItem("d2d_nav_hidden", hidden ? "1" : "0"); } catch (e) {}
     setTimeout(function () { updateScale(); hideFloat(); }, 50);
   }
-  $("btnNavHide").addEventListener("click", function () { setNav(true); toast("Top bar hidden — upar \"Menu\" se wapas lao"); });
+  $("btnNavHide").addEventListener("click", function () { setNav(true); toast("Top bar hidden — bring it back from the \"Menu\" above"); });
   $("btnNavShow").addEventListener("click", function () { setNav(false); });
   try { if (localStorage.getItem("d2d_nav_hidden") === "1") document.body.classList.add("nav-hidden"); } catch (e) {}
   var zoom = 1;
@@ -2941,7 +2941,7 @@ $pmAdminEmail = pm_auth_admin_email();
       if (!j) return;
       foldOpen[n.toLowerCase()] = true; saveFoldOpen(); renderLib();
       $("subjInput").value = n; saveState();
-      toast("Folder bana: " + n);
+      toast("Folder created: " + n);
     });
   }
   function renameFolder(old) {
@@ -2950,12 +2950,12 @@ $pmAdminEmail = pm_auth_admin_email();
     folderApi("folder_rename", n, { old: old }).then(function (j) {
       if (!j) return;
       if (($("subjInput").value || "").trim() === old) { $("subjInput").value = n; saveState(); }
-      loadList(true); toast("Folder rename ho gaya");
+      loadList(true); toast("Folder renamed");
     });
   }
   function removeFolder(name) {
-    if (!confirm('Folder "' + name + '" delete karein? (khali hona chahiye)')) return;
-    folderApi("folder_delete", name).then(function (j) { if (j) toast("Folder hat gaya"); });
+    if (!confirm('Delete folder "' + name + '"? (it must be empty)')) return;
+    folderApi("folder_delete", name).then(function (j) { if (j) toast("Folder deleted"); });
   }
 
   /* =====================================================================
@@ -2996,7 +2996,7 @@ $pmAdminEmail = pm_auth_admin_email();
     var note = { subject: "Imported", chapter_no: f.chapInput || "", title: f.titleInput || "Imported notes", subtitle: f.subInput || "", tagline: f.tagInput || "", badge: f.badgeInput || "", notes_text: s.text, source_content: "", settings: { o: s.o || {}, font: s.font, pal: s.pal } };
     newNote(note); if (Array.isArray(im)) { images = im.filter(function (x) { return x && x.name && x.data; }); imagesDirty = true; renderImages(); render(); }
     try { localStorage.removeItem("notesd2d_v2"); localStorage.removeItem("notesd2d_imgs"); } catch (e) {}
-    toast("Purana kaam import ho gaya — save ho raha hai");
+    toast("Old work imported — saving");
     return true;
   }
 

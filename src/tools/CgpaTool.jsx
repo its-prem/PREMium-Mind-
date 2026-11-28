@@ -66,8 +66,7 @@ export default function CgpaTool() {
     <div className="tl-panel">
       <h2>CGPA / SGPA Calculator</h2>
       <p className="tl-help">
-        Subject ke credits aur grade daalo, SGPA turant mil jayega. Sab semester ka SGPA daal kar CGPA
-        nikalo.
+        Enter the credits and grade of each subject to get the SGPA at once. Enter the SGPA of every semester to get the CGPA.
       </p>
 
       <div className="tl-tabs" role="tablist">

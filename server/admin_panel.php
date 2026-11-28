@@ -1562,7 +1562,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     <select id="copyFromSelect" style="width:100%; margin-bottom:0; background:#fff; border:1.5px solid #a5b4fc;">
                                         <option value="">— Select a card to copy —</option>
                                     </select>
-                                    <div class="file-hint" style="margin-top:8px; color:#4338ca;">Select karo → saara data form me aa jayega. Phir edit karke <strong>Publish</strong> dabao → naya card banega (purana same rahega).</div>
+                                    <div class="file-hint" style="margin-top:8px; color:#4338ca;">Select one → all its data is filled into the form. Then edit it and press <strong>Publish</strong> → a new card is made (the old one stays the same).</div>
                                 </div>
                                 
                                 <div class="form-group">
@@ -1645,7 +1645,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     </label>
                                     <div class="toggle-info">
                                         <h4 style="color: #065f46;">Show Download Button</h4>
-                                        <p style="color: #047857;">ON = Download chalegi. OFF = neeche message box khulega (click pe student ko dikhega).</p>
+                                        <p style="color: #047857;">ON = Download works. OFF = the message box below opens (the student sees it on click).</p>
                                     </div>
                                 </div>
 
@@ -1654,8 +1654,8 @@ input:checked + .slider:before { transform: translateX(20px); }
                                         <ion-icon name="lock-closed-outline" style="font-size:20px; color:#c2410c;"></ion-icon>
                                         <label style="margin:0; color:#9a3412; font-weight:800;">Download Locked Message</label>
                                     </div>
-                                    <textarea name="download_msg" id="inp_download_msg" rows="3" placeholder="Example: Download exam se 1 din pehle subah 6 baje unlock hoga." style="width:100%; border:1px solid #fdba74; border-radius:10px; padding:12px; font-size:13px; line-height:1.5; resize:vertical; background:#fff;"></textarea>
-                                    <div class="file-hint" style="margin-top:8px; color:#9a3412;">Download OFF hai — student Download pe click kare to ye message dikhega. Khali = default text.</div>
+                                    <textarea name="download_msg" id="inp_download_msg" rows="3" placeholder="Example: Download unlocks at 6 AM, 1 day before the exam." style="width:100%; border:1px solid #fdba74; border-radius:10px; padding:12px; font-size:13px; line-height:1.5; resize:vertical; background:#fff;"></textarea>
+                                    <div class="file-hint" style="margin-top:8px; color:#9a3412;">Download is OFF — the student sees this message when they click Download. Empty = default text.</div>
                                 </div>
 
                                 <div class="toggle-wrapper" style="background:#111; border-color:#334155; margin-bottom: 15px;">
@@ -1676,7 +1676,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                     </label>
                                     <div class="toggle-info">
                                         <h4 style="color: #1e3a8a;">Show Preview Card</h4>
-                                        <p style="color: #1d4ed8;">ON = store card pe Preview dikhega — PDF ka sirf 1st page.</p>
+                                        <p style="color: #1d4ed8;">ON = a Preview shows on the store card — only the 1st page of the PDF.</p>
                                     </div>
                                 </div>
 
@@ -1690,7 +1690,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                                         </label>
                                         <div class="toggle-info">
                                             <h4>Show T&amp;C Checkbox</h4>
-                                            <p>ON = pehle T&amp;C, phir pay — neeche text box khulega</p>
+                                            <p>ON = Terms &amp; Conditions first, then pay — the text box below opens</p>
                                         </div>
                                     </div>
                                     <div class="toggle-wrapper">
@@ -1715,8 +1715,8 @@ input:checked + .slider:before { transform: translateX(20px); }
                                             <ion-icon name="document-text-outline"></ion-icon> Load Default Sample
                                         </button>
                                     </div>
-                                    <textarea name="tnc_text" id="inp_tnc_text" rows="10" placeholder="Har line: 1. Title: rest of text&#10;Title bold dikhega, baaki normal. Khali = default sample sab courses pe." style="width:100%; border:1px solid #94a3b8; border-radius:10px; padding:12px; font-size:13px; line-height:1.55; resize:vertical; background:#fff; font-family:inherit;"></textarea>
-                                    <div class="file-hint" style="margin-top:8px;">Format: <code>1. Non-Refundable: All sales are final...</code> — colon se pehle bold. Blank = website default sample.</div>
+                                    <textarea name="tnc_text" id="inp_tnc_text" rows="10" placeholder="Each line: 1. Title: rest of text&#10;The title shows in bold, the rest normal. Empty = the default sample on all courses." style="width:100%; border:1px solid #94a3b8; border-radius:10px; padding:12px; font-size:13px; line-height:1.55; resize:vertical; background:#fff; font-family:inherit;"></textarea>
+                                    <div class="file-hint" style="margin-top:8px;">Format: <code>1. Non-Refundable: All sales are final...</code> — bold before the colon. Blank = website default sample.</div>
                                 </div>
 
                                 <h4 style="font-size: 1.1rem; font-weight: 800; border-bottom: 1px solid var(--gray-border); padding-bottom: 10px; margin-top: 10px; margin-bottom: 15px;">Buttons & External Links</h4>
@@ -1799,12 +1799,12 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <div class="toolbar">
                         <div>
                             <h2 class="section-title" style="margin-bottom: 5px;"><ion-icon name="swap-vertical-outline"></ion-icon> Store Ranking</h2>
-                            <p style="font-size: 0.9rem; color: var(--dark-muted); font-weight: 500;">Card ko slide / drag karke upar-neeche lao. Rank 1 = homepage pe pehle.</p>
+                            <p style="font-size: 0.9rem; color: var(--dark-muted); font-weight: 500;">Slide / drag a card up or down. Rank 1 = first on the homepage.</p>
                         </div>
                     </div>
 
                     <div class="rank-help">
-                        ☰ left side se pakdo aur slide karo (phone pe bhi). Order set hone ke baad neeche <strong>Save Ranking</strong> dabao.
+                        Hold the ☰ on the left and slide (on a phone too). After the order is set, press <strong>Save Ranking</strong> below.
                     </div>
 
                     <div id="ranking_list" class="rank-list">
@@ -2485,7 +2485,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         if (btnLoadDefaultTnc) {
             btnLoadDefaultTnc.addEventListener('click', function () {
                 document.getElementById('inp_tnc_text').value = PM_DEFAULT_TNC;
-                showToast('Default T&C sample loaded — edit karke Save karo', 'success');
+                showToast('Default T&C sample loaded — edit it and press Save', 'success');
             });
         }
 
@@ -2626,7 +2626,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 document.getElementById('submitBtn').innerHTML = '<ion-icon name="cloud-upload"></ion-icon> Publish New Card';
                 document.getElementById('cancelBtn').style.display = 'inline-flex';
                 setCopyBoxVisible(true);
-                showToast('Copied from #' + id + ' — edit karke Publish karo', 'success');
+                showToast('Copied from #' + id + ' — edit it and press Publish', 'success');
                 document.getElementById('inp_title').focus();
             });
         }
@@ -2687,7 +2687,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
         // REVOKE COURSE FROM ALL ACCOUNTS (access removed, history kept)
         window.revokeAllCard = function(id) {
-            if(!confirm('⚠️ Ye course SABHI student accounts se hata dega — jinhone purchase kiya tha unki access chali jayegi.\n\nRecord history me safe rahega. Pakka?')) return;
+            if(!confirm('⚠️ This will remove the course from ALL student accounts — everyone who bought it will lose access.\n\nThe record stays safe in the history. Are you sure?')) return;
             if(!confirm('🚨 Last confirm: SABHI buyers ki access turant band ho jayegi. Proceed?')) return;
             const fd = new FormData();
             fd.append('ajax_revoke_course_all','1'); fd.append('course_id', id);
@@ -2707,7 +2707,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         // REVOKE MULTIPLE CARDS FROM ALL ACCOUNTS in one go.
         window.revokeSelected = function() {
             const ids = Array.from(document.querySelectorAll('.revoke-pick:checked')).map(cb => cb.value);
-            if(ids.length === 0) { showToast('Pehle kuch cards select karo', 'error'); return; }
+            if(ids.length === 0) { showToast('Select some cards first', 'error'); return; }
             if(!confirm('⚠️ ' + ids.length + ' card(s) SABHI student accounts se hata denge — in sabke buyers ki access chali jayegi.\n\nRecord history me safe rahega. Pakka?')) return;
             if(!confirm('🚨 Last confirm: in ' + ids.length + ' card(s) ke SABHI buyers ki access turant band ho jayegi. Proceed?')) return;
             const fd = new FormData();

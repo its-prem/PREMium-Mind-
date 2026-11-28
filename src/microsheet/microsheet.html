@@ -882,9 +882,9 @@
             </button>
             <div class="acc-body">
               <p>
-                Naya box <strong>sirf</strong> <code>Q.7</code> se banega. Numbered points usi box me rahenge.
-                Markdown code marks (triple backticks) answer se auto hata diye jate hain.
-                Sabse last box me saare questions ki list <strong>"Subject Covered Ques"</strong> heading ke sath auto ban jayegi.
+                A new box is made <strong>only</strong> by a <code>Q.7</code> line. Numbered points stay in the same box.
+                Markdown code marks (triple backticks) are removed from the answer automatically.
+                The last box shows the list of all questions under the heading <strong>"Subject Covered Ques"</strong>, made automatically.
                 DOC export name: <code>SubjectName_imp-ques.docx</code>
               </p>
             </div>
@@ -1159,7 +1159,7 @@
     if (!items.length) {
       stage.appendChild(createSheet(1, 1));
       metaEl.textContent = "0 questions";
-      setStatus("No Q&A found. Sirf Q.7 / Q.8 se naya box banta hai. (1. 2. 3. answer ke andar rehte hain)");
+      setStatus("No Q&A found. Only a line starting with Q.7 / Q.8 starts a new box. (1. 2. 3. stay inside the answer)");
       return;
     }
 
@@ -1193,7 +1193,7 @@
     }
 
     metaEl.textContent = items.length + " questions → " + pages + " page(s) · " + summary.join(" · ");
-    setStatus(items.length + " boxes filled · " + pages + " page(s). Extra text box ke bahar kabhi nahi dikhega.");
+    setStatus(items.length + " boxes filled · " + pages + " page(s). Extra text never shows outside the box.");
     updateMobileScale();
     truncateAllCells();
   }
@@ -1281,7 +1281,7 @@
       if (after.length < before.length) cutCount++;
     });
     if (cutCount) {
-      setStatus(cutCount + " box(es) me extra answer box ke andar hi hide ho gaya (box limit se bahar kuch nahi dikhega).");
+      setStatus(cutCount + " box(es): the extra answer text is hidden inside the box (nothing shows outside the box limit).");
     } else {
       setStatus("All boxes OK. Export DOC / Print ready.");
     }
@@ -1325,7 +1325,7 @@
   function fitAllCells(allowShrink) {
     var cells = stage.querySelectorAll(".cell:not(.empty)");
     cells.forEach(function (c) { fitCell(c, allowShrink); });
-    setStatus(allowShrink ? "Auto-Fit done (extra text box ke andar hi chhup jayega)." : "Ready.");
+    setStatus(allowShrink ? "Auto-Fit done (extra text stays hidden inside the box)." : "Ready.");
   }
 
   /* ---------------- sheet scale = phone fit x user zoom ---------------- */
@@ -1699,7 +1699,7 @@
 
   function buildDocxBlob(pages) {
     if (!window.JSZip) {
-      return Promise.reject(new Error("JSZip load nahi hua — internet on karke refresh karo"));
+      return Promise.reject(new Error("JSZip did not load. Turn on the internet and refresh."));
     }
     var zip = new JSZip();
     zip.file(
@@ -1758,7 +1758,7 @@
       var items = parseQA(rawInput.value);
       if (!items.length) {
         fillBoxes(items);
-        setStatus("Pehle Q&A paste karo, phir Export DOC dabao.");
+        setStatus("Paste the Q&A first, then press Export DOC.");
         return;
       }
       fillBoxes(withCoveredSummary(items));
@@ -1766,11 +1766,11 @@
       truncateAllCells();
       var pages = cellsFromDom();
       if (!pages.length) {
-        setStatus("Boxes empty — Fill Boxes ke baad Export DOC dabao.");
+        setStatus("Boxes are empty. Press Fill Boxes first, then Export DOC.");
         return;
       }
 
-      setStatus("DOCX bana rahe hain...");
+      setStatus("Making the DOCX...");
       var fileName = docFileName();
       var blob = await buildDocxBlob(pages);
       if (window.parent && window.parent !== window) {
@@ -1786,7 +1786,7 @@
         document.body.removeChild(a);
         setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
       }
-      setStatus("Saved: " + fileName + " (Word me 3×3 same page)");
+      setStatus("Saved: " + fileName + " (Word: 3×3 on the same page)");
     } catch (err) {
       console.error(err);
       setStatus("Export failed: " + (err && err.message ? err.message : "unknown error"));
@@ -1803,7 +1803,7 @@
     }
     if (pdfBusy) return;
     if (!window.html2canvas || !window.jspdf) {
-      var noLib = "PDF library load nahi hui — internet check karke dobara try karo";
+      var noLib = "The PDF library did not load. Check your internet and try again.";
       setStatus(noLib);
       sendToHost({ type: "export-state", state: "failed", message: noLib });
       return;
@@ -1821,7 +1821,7 @@
       fillBoxes(withCoveredSummary(items));
       truncateAllCells();
 
-      setStatus("PDF bana rahe hain...");
+      setStatus("Making the PDF...");
       var isPhone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 700;
       try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (eF) { /* fonts: draw anyway */ }
       var sheets = stage.querySelectorAll(".sheet");
@@ -1947,8 +1947,8 @@
     qCountEl.textContent = qs.length;
 
     if (!qs.length) {
-      qListEl.innerHTML = '<div class="qlist-empty">Koi question nahi mila.<br>' +
-        "<b>Q.1</b> / <b>Q.2</b> se line shuru karo.</div>";
+      qListEl.innerHTML = '<div class="qlist-empty">No question found.<br>' +
+        "Start each question line with <b>Q.1</b> / <b>Q.2</b>.</div>";
       return;
     }
 
@@ -2016,7 +2016,7 @@
     stage.innerHTML = "";
     stage.appendChild(createSheet(1, 1));
     metaEl.textContent = "";
-    setStatus("Cleared. Naya Q&A paste/type karo — boxes auto update honge.");
+    setStatus("Cleared. Paste or type a new Q&A; the boxes update by themselves.");
     setDrawer(true);
     rawInput.focus();
   });

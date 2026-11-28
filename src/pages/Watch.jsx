@@ -21,7 +21,7 @@ import './Watch.css';
 const THEME_KEY = 'pm_reader_dark';
 
 const DEFAULT_DL_MSG =
-  'Download abhi available nahi hai. Exam se 1 din pehle unlock hoga.';
+  'Download is not available yet. It unlocks 1 day before the exam.';
 
 const isNativeApp = () =>
   !!window.AndroidPdfSaver ||

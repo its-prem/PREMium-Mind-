@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { PRODUCTS } from '../data/storeData';
 import { SITE_API } from './api';
-import { getPdfSession } from './session';
+import { getPdfSession, isAppOnlyCourse } from './session';
 import { normalizeOpenLink } from './openLink';
 import { isKnownTemplate } from './resumeTemplates';
 import { setOwned } from './purchases';
@@ -75,6 +75,7 @@ function rowToProduct(row) {
     // Used only when the product has no PDF / questions of its own (the PDF always opens first).
     openLink: safeLink(row.website_link),
     demoSrc: '',
+    appOnly: isAppOnlyCourse(row), // the store shows it only inside the Android app (Store.jsx)
     fromServer: true,
   };
 }
@@ -99,7 +100,9 @@ export function loadCatalog(force = false) {
       const rows = await res.json();
       if (!Array.isArray(rows)) throw new Error('bad catalog');
 
-      const live = rows.filter((r) => Number(r.id) > 0 && !Number(r.is_deleted) && !Number(r.app_only));
+      // App-only products are kept in the list too: they are hidden in a normal browser and shown in the Android app at the moment
+      // the store is drawn (Store.jsx), so it works even when the app marks itself a moment after the page started.
+      const live = rows.filter((r) => Number(r.id) > 0 && !Number(r.is_deleted));
       if (live.length) {
         PRODUCTS.splice(0, PRODUCTS.length, ...live.map(rowToProduct));
         state.source = 'server';

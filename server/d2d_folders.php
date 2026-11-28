@@ -121,18 +121,18 @@ if (!defined('D2D_FOLDERS')) {
         }
 
         if ($action === 'folder_add') {
-            if ($name === '') d2d_fold_err('Folder ka naam likho');
+            if ($name === '') d2d_fold_err('Enter the folder name');
             $stmt = $conn->prepare("INSERT IGNORE INTO d2d_folders (name, sort) VALUES (?, 0)");
             if (!$stmt) d2d_fold_err('Query failed: ' . $conn->error, 500);
             $stmt->bind_param('s', $name);
-            if (!$stmt->execute()) d2d_fold_err('Folder ban nahi paya: ' . $stmt->error, 500);
+            if (!$stmt->execute()) d2d_fold_err('Could not create the folder: ' . $stmt->error, 500);
             $stmt->close();
             d2d_fold_out(['status' => 'success', 'name' => $name, 'folders' => d2d_folders_list($conn)]);
         }
 
         if ($action === 'folder_rename') {
             $old = mb_substr(trim((string)($body['old'] ?? '')), 0, 120);
-            if ($name === '' || $old === '') d2d_fold_err('Purana aur naya naam dono chahiye');
+            if ($name === '' || $old === '') d2d_fold_err('Both the old and the new name are needed');
             if ($name === $old) d2d_fold_out(['status' => 'success', 'folders' => d2d_folders_list($conn)]);
 
             // renaming onto a folder that already exists = merge the two
@@ -179,9 +179,9 @@ if (!defined('D2D_FOLDERS')) {
         }
 
         if ($action === 'folder_delete') {
-            if ($name === '') d2d_fold_err('Folder ka naam chahiye');
+            if ($name === '') d2d_fold_err('The folder name is needed');
             $used = d2d_folder_usage($conn, $name);
-            if ($used > 0) d2d_fold_err('Folder khali nahi hai — ' . $used . ' item andar hai', 409, ['code' => 'folder_not_empty', 'used' => $used]);
+            if ($used > 0) d2d_fold_err('The folder is not empty — ' . $used . ' item(s) inside', 409, ['code' => 'folder_not_empty', 'used' => $used]);
             $stmt = $conn->prepare("DELETE FROM d2d_folders WHERE name = ?");
             if ($stmt) { $stmt->bind_param('s', $name); $stmt->execute(); $stmt->close(); }
             d2d_fold_out(['status' => 'success', 'folders' => d2d_folders_list($conn)]);

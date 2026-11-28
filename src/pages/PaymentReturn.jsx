@@ -80,8 +80,8 @@ export default function PaymentReturn() {
         {result.status === 'checking' && (
           <>
             <div className="pr-spin" aria-hidden="true" />
-            <h1>Payment check ho raha hai...</h1>
-            <p>Please ye page band mat karo. Kuch second lagte hain.</p>
+            <h1>Checking your payment...</h1>
+            <p>Please do not close this page. It takes a few seconds.</p>
           </>
         )}
 
@@ -89,7 +89,7 @@ export default function PaymentReturn() {
           <>
             <div className="pr-icon is-ok"><ion-icon name="checkmark-circle"></ion-icon></div>
             <h1>Payment Successful!</h1>
-            <p>{isMicro ? 'Aapka micro format unlock ho gaya hai.' : product ? <><b>{product.title}</b> ab aapke account me hai.</> : 'Aapka course unlock ho gaya hai.'}</p>
+            <p>{isMicro ? 'Your micro format is unlocked.' : product ? <><b>{product.title}</b> is now in your account.</> : 'Your course is unlocked.'}</p>
             <button type="button" className="pr-btn is-dark" onClick={openNow}>
               {isMicro ? 'Open Micro Format' : product && product.category === 'resume' ? 'Open Template Editor' : 'Open Now'}
             </button>
@@ -100,10 +100,10 @@ export default function PaymentReturn() {
         {result.status === 'pending' && (
           <>
             <div className="pr-icon is-wait"><ion-icon name="time-outline"></ion-icon></div>
-            <h1>Payment confirm ho raha hai</h1>
+            <h1>Confirming your payment</h1>
             <p>
-              Bank se confirmation aane me thoda time lag sakta hai. Aapka course 1-2 minute me khud unlock ho jayega
-              (My Courses me dekho). Order id: <code>{orderId}</code>
+              The confirmation from the bank can take a little time. Your course will unlock by itself in 1-2 minutes
+              (check My Courses). Order id: <code>{orderId}</code>
             </p>
             <Link to="/lecture" className="pr-btn is-dark">My Courses</Link>
             <a className="pr-btn" href={`${SUPPORT_WHATSAPP}?text=${encodeURIComponent(`Mera payment pending hai. Order id: ${orderId}`)}`} target="_blank" rel="noreferrer">
@@ -124,8 +124,8 @@ export default function PaymentReturn() {
         {result.status === 'failed' && (
           <>
             <div className="pr-icon is-bad"><ion-icon name="close-circle"></ion-icon></div>
-            <h1>Payment complete nahi hua</h1>
-            <p>{result.message || 'Payment cancel ya fail ho gaya. Paisa kata ho to 24 ghante me wapas aa jata hai.'}</p>
+            <h1>Payment was not completed</h1>
+            <p>{result.message || 'The payment was cancelled or failed. If money was deducted, it is refunded within 24 hours.'}</p>
             <Link to="/#our-store" className="pr-btn is-dark">Back to Store</Link>
             <a className="pr-btn" href={`${SUPPORT_WHATSAPP}?text=${encodeURIComponent(`Payment issue. Order id: ${orderId}`)}`} target="_blank" rel="noreferrer">
               WhatsApp Support

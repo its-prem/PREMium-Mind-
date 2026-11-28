@@ -133,7 +133,7 @@ export default function App() {
     }
     if (product.fromServer && product.hasPdf && !product.pdfFile) {
       // it has a PDF but the server did not send its path: the login token is missing or expired
-      window.alert('Security ke liye dobara login karna hoga. Login page khul raha hai.');
+      window.alert('For your security you need to log in again. Opening the login page.');
       clearStoredSession();
       navigate('/login');
       return;

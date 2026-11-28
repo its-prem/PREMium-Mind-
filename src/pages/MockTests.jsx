@@ -106,7 +106,7 @@ export default function MockTests() {
   }, [left, test, done, answers, finish]);
 
   const back = () => {
-    if (test && !done && !window.confirm('Test beech me chhod doge? Progress save nahi hogi.')) return;
+    if (test && !done && !window.confirm('Leave the test in the middle? Your progress will not be saved.')) return;
     if (test) setTest(null);
     else goBackOrHome(navigate);
   };
@@ -184,7 +184,7 @@ export default function MockTests() {
               <div className="tl-stat"><small>Attempted</small><b>{answered} / {total}</b></div>
             </div>
             <p className="tl-msg" style={{ marginBottom: 14 }}>
-              {pct >= 80 ? 'Shandaar! Tum is topic me strong ho.' : pct >= 50 ? 'Achha hai, thodi aur practice se top score aa jayega.' : 'Is topic ko ek baar aur padho, phir dobara try karo.'}
+              {pct >= 80 ? 'Great! You are strong in this topic.' : pct >= 50 ? 'Good. A little more practice will get you a top score.' : 'Read this topic once more, then try again.'}
             </p>
             <div className="tl-row">
               <button type="button" className="tl-btn" onClick={() => start(test)}>
@@ -303,7 +303,7 @@ export default function MockTests() {
               className="tl-btn"
               style={{ marginLeft: 'auto', background: '#dc2626' }}
               onClick={() => {
-                if (answered < total && !window.confirm(`${total - answered} question abhi baaki hain. Submit karein?`)) return;
+                if (answered < total && !window.confirm(`${total - answered} question(s) are still unanswered. Submit anyway?`)) return;
                 finish(test, answers);
               }}
             >

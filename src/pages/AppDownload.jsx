@@ -119,7 +119,7 @@ export default function AppDownload() {
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(downloadUrl);
-      setHint('Link copied. Chrome me paste karke download start karo.');
+      setHint('Link copied. Paste it in Chrome to start the download.');
     } catch {
       window.prompt('Copy this link and open it in Chrome:', downloadUrl);
     }
@@ -133,7 +133,7 @@ export default function AppDownload() {
           text: 'PREMium Mind app download',
           url: downloadUrl,
         });
-        setHint('Chrome choose karo - download start ho jayega.');
+        setHint('Choose Chrome and the download will start.');
       } catch (err) {
         if (err?.name !== 'AbortError') copyLink();
       }
@@ -147,7 +147,7 @@ export default function AppDownload() {
     const next = cleanNextPath(params.get('next'));
     const isAndroid = /Android/i.test(navigator.userAgent || '');
     if (!isAndroid) {
-      setHint('App open karne ka option sirf Android phone par kaam karta hai.');
+      setHint('Opening the app works only on an Android phone.');
       return;
     }
     const fallback = `${window.location.origin}/app-download?from=gate`;

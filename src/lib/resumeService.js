@@ -13,7 +13,7 @@ export function buildResumeMessage(product, data) {
   L.push('*Resume banwana hai (Admin se)*');
   L.push(`Template: ${product.title} (#${product.id})`);
   L.push(Number(product.price) === 0 ? 'Template: free' : `Template payment: Rs ${product.price} (paid online)`);
-  L.push(`Admin charge: Rs ${ADMIN_MADE_EXTRA} (baaki, admin ko dena hai)`);
+  L.push(`Admin charge: Rs ${ADMIN_MADE_EXTRA} (the rest is to be paid to the admin)`);
   L.push('');
   L.push(`Name: ${one(data.name, 80)}`);
   if (data.title) L.push(`Job title / Degree: ${one(data.title, 120)}`);

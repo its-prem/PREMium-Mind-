@@ -191,7 +191,7 @@ export default function Highlighter({ scrollRef, pagesRef, docKey, ready, dock }
   const clearAll = () => {
     if (!count) return;
     // eslint-disable-next-line no-alert
-    if (!window.confirm('Is PDF ke saare highlights hata dein?')) return;
+    if (!window.confirm('Remove all highlights of this PDF?')) return;
     snapshot();
     marks.current = {};
     redrawAll();

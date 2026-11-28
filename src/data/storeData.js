@@ -12,7 +12,7 @@ export const CATEGORIES = [
     desc: 'Handwritten, unit-wise exam notes',
     kind: 'pdf',
     tint: '#38bdf8',
-    after: 'Buy karte hi access: padho apne My Courses me',
+    after: 'Instant access after buying: read it in My Courses',
   },
   {
     id: 'ebooks',
@@ -21,7 +21,7 @@ export const CATEGORIES = [
     desc: 'Complete syllabus guides & PYQs',
     kind: 'pdf',
     tint: '#a78bfa',
-    after: 'Buy karte hi access: padho apne My Courses me',
+    after: 'Instant access after buying: read it in My Courses',
   },
   {
     id: 'resume',
@@ -30,7 +30,7 @@ export const CATEGORIES = [
     desc: 'ATS-ready, fully editable templates',
     kind: 'resume',
     tint: '#34d399',
-    after: 'Buy karke template khud edit karo aur PDF download karo',
+    after: 'Buy the template, edit it yourself and download the PDF',
   },
   {
     id: 'important',
@@ -39,7 +39,7 @@ export const CATEGORIES = [
     desc: 'Exam-focused expected questions',
     kind: 'pdf',
     tint: '#fbbf24',
-    after: 'Buy karte hi access: padho apne My Courses me',
+    after: 'Instant access after buying: read it in My Courses',
   },
   {
     id: 'syllabus',
@@ -58,8 +58,8 @@ export const CATEGORIES = [
     desc: 'Mini/final year project, report & PPT',
     kind: 'pdf',
     tint: '#fb923c',
-    soonNote: 'Projects & Reports jaldi aa rahe hain. Abhi chahiye to WhatsApp par poochho.',
-    whatsapp: 'Hi PREMium Mind, mujhe project / report help chahiye.',
+    soonNote: 'Projects & Reports are coming soon. Need one now? Ask us on WhatsApp.',
+    whatsapp: 'Hi PREMium Mind, I need help with a project / report.',
   },
   {
     id: 'mock-tests',

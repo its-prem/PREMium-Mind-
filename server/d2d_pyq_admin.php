@@ -10,7 +10,7 @@ header('Cache-Control: no-store');
 if (!pm_auth_admin_ok()) {
     http_response_code(401);
     echo '<!doctype html><meta charset="utf-8"><body style="font-family:sans-serif;text-align:center;padding:60px">'
-       . '<h2>Login required</h2><p>Pehle Admin Panel me Google se login karo.</p>'
+       . '<h2>Login required</h2><p>Log in with Google in the Admin Panel first.</p>'
        . '<a href="admin_panel.php" style="color:#8e1b2a">→ Admin Panel</a></body>';
     exit;
 }
@@ -42,7 +42,7 @@ if (isset($_POST['action'])) {
     if ($action === 'add') {
         $email = strtolower(trim((string)($_POST['email'] ?? '')));
         if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo json_encode(['status' => 'error', 'msg' => 'Sahi email daalo']); exit;
+            echo json_encode(['status' => 'error', 'msg' => 'Enter a valid email']); exit;
         }
         $stmt = $conn->prepare("INSERT INTO d2d_pyq_access (email, granted_by) VALUES (?, ?)
                                 ON DUPLICATE KEY UPDATE granted_by = VALUES(granted_by)");
@@ -104,7 +104,7 @@ if (isset($_POST['action'])) {
       <input type="email" id="emailInput" placeholder="student@gmail.com" autocomplete="off">
       <button class="add" id="addBtn">+ Access do</button>
     </div>
-    <p class="note">Ye wahi email honi chahiye jisse student site par login karta hai (Google wala email). Galti se add ho gayi to niche se hata sakte ho.</p>
+    <p class="note">This must be the same email the student uses to log in on the site (the Google email). If one is added by mistake, you can remove it below.</p>
   </div>
 
   <div class="card">
@@ -128,7 +128,7 @@ if (isset($_POST['action'])) {
     const d = await api({ action:'list' });
     const rows = (d && d.rows) || [];
     $('count').textContent = rows.length;
-    if (!rows.length) { $('list').innerHTML = '<div class="empty">Abhi koi email nahi. Upar se add karo.</div>'; return; }
+    if (!rows.length) { $('list').innerHTML = '<div class="empty">No emails yet. Add one above.</div>'; return; }
     $('list').innerHTML = rows.map(r =>
       '<div class="item"><div class="em" title="'+esc(r.email)+'">'+esc(r.email)+
       '<div class="meta">'+fmt(r.granted_at)+'</div></div>'+
@@ -143,7 +143,7 @@ if (isset($_POST['action'])) {
     const d = await api({ action:'add', email });
     $('addBtn').disabled = false;
     if (d.status === 'success') { $('emailInput').value=''; load(); }
-    else alert(d.msg || 'Add fail ho gaya');
+    else alert(d.msg || 'Could not add');
   }
 
   $('addBtn').addEventListener('click', add);
