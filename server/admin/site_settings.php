@@ -5,6 +5,7 @@
  *   GET   admin/site_settings.php                        -> { site: { heroImage, ant, butterfly } }
  *   POST  admin/site_settings.php  (multipart or JSON)
  *           ant=1|0, butterfly=1|0        switch the little animals on / off
+ *           forceAppUpdate=1|0            old Android app versions see only an "update the app" page
  *           hero_file = an image          replace the home page photo (jpg, png, webp, max 5 MB)
  *           hero_reset = 1                go back to the photo that is built into the website
  * The public website reads it through ../maintenance_status.php ("site").
@@ -14,7 +15,7 @@ require_once __DIR__ . '/../pm_settings.php';
 pm_admin_require();
 
 function pm_site_defaults(): array {
-    return ['heroImage' => '', 'ant' => true, 'butterfly' => true];
+    return ['heroImage' => '', 'ant' => true, 'butterfly' => true, 'forceAppUpdate' => false];
 }
 function pm_site_load(mysqli $conn): array {
     $cur = pm_setting_get($conn, 'site');
@@ -25,6 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $site = pm_site_load($conn);
     if (isset($_REQUEST['ant']) || pm_in('ant', null) !== null)             $site['ant'] = pm_in_flag('ant') === 1;
     if (isset($_REQUEST['butterfly']) || pm_in('butterfly', null) !== null) $site['butterfly'] = pm_in_flag('butterfly') === 1;
+
+    if (isset($_REQUEST['forceAppUpdate']) || pm_in('forceAppUpdate', null) !== null) $site['forceAppUpdate'] = pm_in_flag('forceAppUpdate') === 1;
 
     $dir = __DIR__ . '/../uploads/thumbnails/';
     $removeOld = function () use (&$site, $dir) {

@@ -104,7 +104,7 @@ export async function payForCourse(courseId, { kind = 'course' } = {}) {
 
   const { res, data } = await post(
     '/create_order.php',
-    { course_id: Number(courseId), kind, return_origin: window.location.origin, from_app: false },
+    { course_id: Number(courseId), kind, return_origin: window.location.origin },
     token
   );
   if (!res.ok || data.status !== 'success' || !data.payment_session_id) {

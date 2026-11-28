@@ -45,5 +45,6 @@ $site = [
     'heroImage' => (string)($siteCfg['heroImage'] ?? ''),
     'ant'       => !isset($siteCfg['ant']) || !empty($siteCfg['ant']),
     'butterfly' => !isset($siteCfg['butterfly']) || !empty($siteCfg['butterfly']),
+    'forceAppUpdate' => !empty($siteCfg['forceAppUpdate']),
 ];
 echo json_encode(['status' => 'success', 'config' => $cfg, 'blocked' => $blocked, 'site' => $site]);

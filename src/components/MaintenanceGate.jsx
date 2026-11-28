@@ -1,13 +1,14 @@
 import React, { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SITE_API } from '../lib/api';
-import { getPdfSession } from '../lib/session';
+import { getPdfSession, isNativeApp } from '../lib/session';
 import { isPageClosed } from '../lib/sitePages';
 import './Maintenance.css';
 
 // The maintenance page (cat artwork + styles) is only downloaded when maintenance is really on.
 const MaintenancePage = lazy(() => import('./MaintenancePage'));
 const BlockedPage = lazy(() => import('./BlockedPage'));
+const UpdateRequiredPage = lazy(() => import('./UpdateRequiredPage'));
 
 /**
  * Maintenance mode for the WHOLE site.
@@ -103,6 +104,14 @@ export default function MaintenanceGate({ children }) {
   const [checking, setChecking] = useState(true);
   const [bypass, setBypass] = useState(readBypass);
   const bypassTried = useRef(false);
+  // an OLD app version = the Android app without the new native signer (window.PMAppSigner). Looked at again after a
+  // moment, because the app may attach its native objects a little after the page starts.
+  const [oldApp, setOldApp] = useState(false);
+  useEffect(() => {
+    if (!isNativeApp()) return undefined;
+    const t = setTimeout(() => setOldApp(!window.PMAppSigner), 2500);
+    return () => clearTimeout(t);
+  }, []);
 
   const check = useCallback(async (timeoutMs) => {
     setChecking(true);
@@ -174,6 +183,15 @@ export default function MaintenanceGate({ children }) {
     return (
       <Suspense fallback={<div className="mt-splash" />}>
         <BlockedPage why={config.blocked} whatsapp={config.whatsapp} />
+      </Suspense>
+    );
+  }
+
+  // the admin switched on "Force app update" and this is an old app: only the update page
+  if (config.site?.forceAppUpdate && oldApp && !isAdminPage) {
+    return (
+      <Suspense fallback={<div className="mt-splash" />}>
+        <UpdateRequiredPage />
       </Suspense>
     );
   }

@@ -33,7 +33,7 @@ if ($origin && origin_allowed($origin)) {
     header('Access-Control-Allow-Origin: ' . $origin);
     header('Vary: Origin');
     header('Access-Control-Allow-Methods: GET, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Allow-Headers: Content-Type, X-PM-App-Ts, X-PM-App-Sign');
 } elseif ($origin) {
     http_response_code(403);
     header('Content-Type: application/json; charset=utf-8');

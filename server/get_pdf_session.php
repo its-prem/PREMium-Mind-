@@ -24,7 +24,7 @@ if ($originOk) {
     header("Access-Control-Allow-Origin: $origin");
     header('Vary: Origin');
     header('Access-Control-Allow-Methods: POST, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Allow-Headers: Content-Type, X-PM-App-Ts, X-PM-App-Sign');
 } elseif ($origin !== '') {
     http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'Origin not allowed']);

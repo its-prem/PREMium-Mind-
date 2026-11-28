@@ -129,33 +129,41 @@ function pm_is_native_app_user_agent(): bool {
 }
 
 /**
- * Real proof the request came from the Android app: it must send
- * X-PM-App-Ts (current unix time) and X-PM-App-Sign =
- * hex(HMAC-SHA256(ts, app_shared_secret)). Unlike Origin/Referer, a raw
- * HTTP client cannot produce a valid signature without knowing the secret
- * compiled into the app — see APP_ONLY_COURSES_SETUP.txt for what the app
- * needs to send. Returns false (not an error) until the app is updated to
- * send this and app_shared_secret is configured in pm_secrets.php — the
- * feature quietly does nothing until both sides are wired up.
+ * Real proof the request came from the Android app.
+ *
+ * The app keeps a secret inside its own code (never in the website) and signs EVERY request it sends to this server:
+ *   X-PM-App-Ts   = current unix time (seconds)
+ *   X-PM-App-Sign = hex( HMAC-SHA256( "<ts>|<METHOD>|<path>", app_shared_secret ) )
+ * <path> is the URL path of this very request (e.g. /create_order.php), so a signature made for one request cannot
+ * be reused for another endpoint, and it is only valid for 5 minutes. A browser or curl cannot make it without the
+ * secret. The secret lives in .env (APP_SHARED_SECRET) or pm_secrets.php ('app_shared_secret').
  */
 function pm_app_signature_valid(): bool {
     $secret = pm_app_shared_secret();
     if ($secret === '') return false;
 
     $ts = $_SERVER['HTTP_X_PM_APP_TS'] ?? '';
-    $sign = $_SERVER['HTTP_X_PM_APP_SIGN'] ?? '';
-    if ($ts === '' || $sign === '' || !ctype_digit((string)$ts)) return false;
+    $sign = strtolower(trim((string)($_SERVER['HTTP_X_PM_APP_SIGN'] ?? '')));
+    if ($ts === '' || $sign === '' || !ctype_digit((string)$ts) || !preg_match('/^[0-9a-f]{64}$/', $sign)) return false;
+    if (abs(time() - (int)$ts) > 300) return false;   // stale or replayed
 
-    // Reject stale/replayed signatures — 5 minute window.
-    if (abs(time() - (int)$ts) > 300) return false;
-
-    $expected = hash_hmac('sha256', (string)$ts, $secret);
-    return hash_equals($expected, strtolower($sign));
+    $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
+    $path   = (string)(parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH) ?? '');
+    $expected = hash_hmac('sha256', $ts . '|' . $method . '|' . $path, $secret);
+    return hash_equals($expected, $sign);
 }
 
-/** True if this request can be trusted as coming from the native app. */
+/**
+ * True if this request can be trusted as coming from the native app.
+ *
+ * APP_SIGNATURE_REQUIRED=1 in .env  -> ONLY a valid signature counts (secure; turn it on once everybody has the new app).
+ * otherwise (the transition)        -> the old hints (WebView user-agent / app origin) still count, so the app that is
+ *                                      already installed keeps working. Those hints can be faked by anyone.
+ */
 function pm_is_native_app_request(): bool {
-    return pm_app_signature_valid() || pm_is_native_app_origin() || pm_is_native_app_user_agent();
+    if (pm_app_signature_valid()) return true;
+    if (pm_env('APP_SIGNATURE_REQUIRED') === '1') return false;
+    return pm_is_native_app_origin() || pm_is_native_app_user_agent();
 }
 
 /**

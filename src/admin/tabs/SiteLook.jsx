@@ -8,7 +8,7 @@ const DEFAULT_IMG = '/mh.jpg';
 export default function SiteLook() {
   const { toast, confirm } = useUi();
   const { data, error, loading, reload } = useLoad(() => adminGet('site_settings.php'));
-  const [site, setSite] = useState({ heroImage: '', ant: true, butterfly: true });
+  const [site, setSite] = useState({ heroImage: '', ant: true, butterfly: true, forceAppUpdate: false });
   const [saving, setSaving] = useState(false);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState('');
@@ -126,6 +126,35 @@ export default function SiteLook() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="adm-card" style={{ marginTop: 16 }}>
+        <div className="adm-section-head">
+          <h4>Force app update</h4>
+          <span className="adm-hint">
+            When ON, people using an OLD version of the Android app see only a “Please update the app” page with the download button.
+            Turn it on after the new APK is uploaded to Hostinger (downloads/PREMium-Mind.apk). The new app and the website are not affected.
+          </span>
+        </div>
+        <div className={`adm-flagrow${site.forceAppUpdate ? ' on' : ''}`}>
+          <div>
+            <b>Old app versions must update</b>
+            <span className="adm-hint">{site.forceAppUpdate ? 'Old apps are blocked until they update' : 'Old apps keep working'}</span>
+          </div>
+          <div className="adm-row" style={{ flexWrap: 'nowrap' }}>
+            <span className={`adm-chip ${site.forceAppUpdate ? 'bad' : 'ok'}`}>{site.forceAppUpdate ? 'On' : 'Off'}</span>
+            <Switch
+              checked={!!site.forceAppUpdate}
+              disabled={saving}
+              onChange={async (on) => {
+                if (!on || (await confirm({ title: 'Force the app update?', text: 'Every old app will show only the update page. Make sure the new APK is already uploaded and downloads fine.', confirmText: 'Turn ON', danger: true }))) {
+                  send({ forceAppUpdate: on }, on ? 'Old apps must update now' : 'Old apps work again');
+                }
+              }}
+              label="Force app update"
+            />
+          </div>
         </div>
       </div>
     </>

@@ -1,0 +1,142 @@
+/* the first screen of the Android app (always dark, the colours of the logo) */
+.al-page {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: max(28px, env(safe-area-inset-top)) 24px max(28px, env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, #181920 0%, #1f2029 55%, #14151b 100%);
+  color: #f4f5f8;
+  overflow-y: auto;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+.al-glow {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  width: 420px;
+  height: 420px;
+  max-width: 120vw;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(59, 83, 200, 0.38) 0%, rgba(59, 83, 200, 0) 68%);
+  pointer-events: none;
+}
+.al-inner {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+  padding: 16px 0;
+}
+.al-logo {
+  width: min(52vw, 220px);
+  height: auto;
+  border-radius: 24%;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  animation: al-pop 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.al-title {
+  margin: 22px 0 0;
+  font-family: 'Sora', 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: clamp(1.9rem, 8vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  animation: al-up 0.6s 0.15s both;
+}
+.al-title em {
+  font-style: normal;
+  color: #c9ccd6;
+}
+.al-tag {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #8fa0ff;
+  animation: al-up 0.6s 0.25s both;
+}
+.al-sub {
+  max-width: 320px;
+  margin: 14px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #a9adbb;
+  animation: al-up 0.6s 0.35s both;
+}
+.al-feats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  animation: al-up 0.6s 0.45s both;
+}
+.al-feats li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #dfe2ee;
+}
+.al-feats ion-icon {
+  font-size: 1.05rem;
+  color: #8fa0ff;
+}
+.al-actions {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+  animation: al-up 0.6s 0.55s both;
+}
+.al-btn {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 18px;
+  border-radius: 16px;
+  font: 800 1rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.al-primary {
+  background: linear-gradient(135deg, #3b53c8, #5a74ee);
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(59, 83, 200, 0.45);
+}
+.al-ghost {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #e6e8f2;
+  font-size: 0.9rem;
+}
+.al-btn:active {
+  transform: scale(0.98);
+}
+@keyframes al-pop {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes al-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .al-page * { animation: none !important; }
+}

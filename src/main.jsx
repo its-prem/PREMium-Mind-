@@ -7,6 +7,8 @@ import './index.css'
 import { installClickSound, installHoverNotes } from './lib/uiSounds'
 import MaintenanceGate from './components/MaintenanceGate.jsx'
 import { useSiteConfig } from './lib/siteConfig'
+import { installAppSigning } from './lib/appSign'
+import AppLanding from './components/AppLanding.jsx'
 import App from './App.jsx'
 
 // Every other page is a separate download that starts only when the page is opened,
@@ -56,6 +58,7 @@ function Pets() {
   )
 }
 
+installAppSigning() // the Android app signs its requests to our server (app-only products)
 initSiteTheme() // night mode: set before the first paint
 installClickSound()
 // the web app (Install from Chrome): the service worker only in the real site, never while developing
@@ -70,6 +73,8 @@ createRoot(document.getElementById('root')).render(
       {/* Shows a maintenance page on every route while public/maintenance.json has "enabled": true */}
       <MaintenanceGate>
         <Pets />
+        {/* the first screen of the Android app (shown once) */}
+        <AppLanding />
         <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
           <Routes>
             <Route path="/" element={<App />} />

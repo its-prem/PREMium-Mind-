@@ -66,7 +66,7 @@ if (!function_exists('pm_cors_json')) {
             header('Vary: Origin');
         }
         header('Access-Control-Allow-Methods: ' . implode(', ', array_unique(array_merge($methods, ['OPTIONS']))));
-        header('Access-Control-Allow-Headers: Content-Type, X-PM-Session');
+        header('Access-Control-Allow-Headers: Content-Type, X-PM-Session, X-PM-App-Ts, X-PM-App-Sign');
 
         if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
             http_response_code(204);
