@@ -419,23 +419,3 @@
   border-style: dashed;
   color: #b45309;
 }
-
-/* the clear micro format button under the title */
-.qa-micro-open {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-  padding: 10px 18px;
-  border: 0;
-  border-radius: 999px;
-  background: #dc2626;
-  color: #fff;
-  font: 800 0.9rem 'Plus Jakarta Sans', system-ui, sans-serif;
-  cursor: pointer;
-  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.3);
-}
-.qa-micro-open.owned {
-  background: #16a34a;
-  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.3);
-}
