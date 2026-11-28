@@ -56,6 +56,10 @@ function Pets() {
 
 initSiteTheme() // night mode: set before the first paint
 installClickSound()
+// the web app (Install from Chrome): the service worker only in the real site, never while developing
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}))
+}
 installHoverNotes()
 
 createRoot(document.getElementById('root')).render(

@@ -47,6 +47,12 @@ if (!$isAdmin && !pm_user_owns($conn, $email, $courseId)) {
     pm_qa_fail('Buy this product to read it.', 403, 'not_owned');
 }
 
+// "app only" product: the text is given only to the real app (or an admin)
+if (!$isAdmin && (int)($row['app_only'] ?? 0) === 1) {
+    require_once __DIR__ . '/pm_pdf_access.php';
+    if (!pm_is_native_app_request()) pm_qa_fail('This product can be opened only in the PREMium Mind app.', 403, 'app_only');
+}
+
 $text = trim((string)($row['qa_text'] ?? ''));
 $pdf  = trim((string)($row['pdf_file'] ?? ''));   // the card may also have a PDF (sent to the buyer only)
 if ($text === '') pm_qa_fail('The questions for this product are not added yet.', 404, 'no_text');

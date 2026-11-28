@@ -65,6 +65,25 @@ export default function AppDownload() {
   const [loadFailed, setLoadFailed] = useState(false);
   const [hint, setHint] = useState('');
   const inApp = useMemo(() => isNativeApp(), []);
+  // "Install app" (a web app from Chrome): same design as the website, opens from the home screen
+  const [installEvt, setInstallEvt] = useState(null);
+  const [installed, setInstalled] = useState(
+    () => window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true
+  );
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  useEffect(() => {
+    const onPrompt = (e) => { e.preventDefault(); setInstallEvt(e); };
+    const onDone = () => { setInstalled(true); setInstallEvt(null); };
+    window.addEventListener('beforeinstallprompt', onPrompt);
+    window.addEventListener('appinstalled', onDone);
+    return () => { window.removeEventListener('beforeinstallprompt', onPrompt); window.removeEventListener('appinstalled', onDone); };
+  }, []);
+  const installWebApp = async () => {
+    if (!installEvt) return;
+    installEvt.prompt();
+    await installEvt.userChoice.catch(() => {});
+    setInstallEvt(null);
+  };
 
   const user = useMemo(
     () => (email ? { name: name || 'User', email } : null),
@@ -201,6 +220,18 @@ export default function AppDownload() {
             <span>Download Latest APK</span>
           </a>
           <p className="ad-hint">{hint || fileHint}</p>
+
+          {!inApp && !installed && (installEvt || isIos) && (
+            <div style={{ marginTop: 14, textAlign: 'center' }}>
+              {installEvt ? (
+                <button type="button" className="ad-btn-ghost" onClick={installWebApp}>
+                  Install app (Chrome) - no APK needed
+                </button>
+              ) : (
+                <p className="ad-hint">iPhone: Share button → "Add to Home Screen".</p>
+              )}
+            </div>
+          )}
 
           {inApp && (
             <div className="ad-inapp">

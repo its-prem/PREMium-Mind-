@@ -77,6 +77,18 @@
   [headers.values]
     Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
 
+# the service worker and the manifest must always be fresh
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Cache-Control = "no-cache"
+    Content-Type = "application/manifest+json"
+
 # Security headers for every page (the Content-Security-Policy itself is in the built index.html, see vite.config.js)
 [[headers]]
   for = "/*"

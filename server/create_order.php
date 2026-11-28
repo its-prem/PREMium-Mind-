@@ -68,8 +68,9 @@ if (!$course || (int)($course['is_deleted'] ?? 0) === 1) {
 if (in_array((string)($course['btn_type'] ?? ''), ['coming_soon', 'disabled', 'disabled_look'], true)) {
     pm_fail('This product is not open for sale yet.', 'not_for_sale', 403);
 }
-$fromApp = !empty($data['from_app']) && in_array($data['from_app'], [true, 1, '1', 'true'], true);
-if ((int)($course['app_only'] ?? 0) === 1 && !$fromApp) {
+// app-only is decided by the SERVER (signed app request / WebView), never by a flag the browser sends
+require_once __DIR__ . '/pm_pdf_access.php';
+if ((int)($course['app_only'] ?? 0) === 1 && !pm_is_native_app_request()) {
     pm_fail('This course can be bought only in the PREMium Mind app.', 'app_only', 403);
 }
 
