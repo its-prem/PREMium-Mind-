@@ -1,7 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
+import CatAvatar from '../components/CatAvatar';
+import { clearAvatar, photoFromFile, saveAvatar, useAvatar } from '../lib/avatar';
 import { SITE_API } from '../lib/api';
 import { clearStoredSession, getPdfSession, getStoredEmail, getStoredName, saveLoginSession } from '../lib/session';
 import '../styles/theme.css';
@@ -21,6 +23,8 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState(null); // { error, text }
+  const photo = useAvatar(email); // the saved photo; empty = the cat
+  const photoInput = useRef(null);
 
   const user = useMemo(() => (email ? { name: name || 'User', email } : null), [email, name]);
 
@@ -59,6 +63,19 @@ export default function Profile() {
     })();
     return () => ctrl.abort();
   }, [email, navigate]);
+
+  const pickPhoto = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const url = await photoFromFile(file);
+      if (!saveAvatar(email, url)) throw new Error('Could not keep the photo on this phone (storage is full or blocked).');
+      setMsg({ error: false, text: 'Photo updated.' });
+    } catch (err) {
+      setMsg({ error: true, text: err.message });
+    }
+  };
 
   const handleLogout = () => {
     clearStoredSession();
@@ -117,8 +134,33 @@ export default function Profile() {
 
       <main className="ad-wrap">
         <form className="ad-card pf-card" onSubmit={save} noValidate>
-          <div className="pf-avatar" aria-hidden="true">
-            {(name || email || '?').trim().charAt(0).toUpperCase()}
+          <div className="pf-photo">
+            <div className="pf-photo-box">
+              <div className="pm-sb-wave-avatar-box pf-avatar-box" style={{ cursor: 'default' }}>
+                <span className="pm-wave-ring ring-outer" aria-hidden="true" />
+                <span className="pm-wave-ring ring-inner" aria-hidden="true" />
+                {photo ? <img src={photo} alt="Your profile" className="pm-sb-circle-img" /> : <CatAvatar active />}
+              </div>
+            </div>
+            <input ref={photoInput} type="file" accept="image/*" style={{ display: 'none' }} onChange={pickPhoto} />
+            <div className="pf-photo-actions">
+              <button type="button" className="pf-link" onClick={() => photoInput.current?.click()}>
+                <ion-icon name="camera-outline"></ion-icon> {photo ? 'Change photo' : 'Add photo'}
+              </button>
+              {photo && (
+                <button
+                  type="button"
+                  className="pf-link"
+                  onClick={() => {
+                    clearAvatar(email);
+                    setMsg({ error: false, text: 'Photo removed. The cat is back.' });
+                  }}
+                >
+                  <ion-icon name="paw-outline"></ion-icon> Use the cat
+                </button>
+              )}
+            </div>
+            <small className="pf-photo-note">The photo stays on this device only. Without a photo the cat stays.</small>
           </div>
 
           <label className="pf-field">

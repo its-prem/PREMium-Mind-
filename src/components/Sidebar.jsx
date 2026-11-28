@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { isSoundOn, playClick, playPiano, setSoundOn } from '../lib/uiSounds';
 import CatAvatar from './CatAvatar';
+import { useAvatar } from '../lib/avatar';
 import { useSiteTheme } from '../lib/siteTheme';
 import './Sidebar.css';
 
@@ -20,13 +21,11 @@ export default function Sidebar({
   onLogout,
   onSelectCategory,
   onNavigate,
-  onPhotoChange,
 }) {
   const [storeOpen, setStoreOpen] = useState(false);
-  const [customAvatar, setCustomAvatar] = useState(null);
+  const savedAvatar = useAvatar(user?.email); // the photo chosen on the My Profile page (kept on this device)
   const [soundOn, setSoundOnState] = useState(() => isSoundOn());
   const [night, toggleNight] = useSiteTheme();
-  const photoInputRef = useRef(null);
 
   const toggleSound = () => {
     const next = !soundOn;
@@ -112,19 +111,8 @@ export default function Sidebar({
     }
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setCustomAvatar(ev.target.result);
-      if (onPhotoChange) onPhotoChange(ev.target.result, file);
-    };
-    reader.readAsDataURL(file);
-  };
-
   const displayName = user?.name || 'PREMium Learner';
-  const uploadedPhoto = customAvatar || user?.photoURL || null;
+  const uploadedPhoto = savedAvatar || user?.photoURL || null;
 
   return (
     <>
@@ -160,7 +148,20 @@ export default function Sidebar({
             {/* Circular Avatar with Sonar Rings & Animated Eyes Emoji */}
             <div
               className="pm-sb-wave-avatar-box"
-              onClick={() => photoInputRef.current?.click()}
+              role="button"
+              tabIndex={0}
+              aria-label={user ? 'Edit your profile' : 'Log in'}
+              onClick={() => {
+                if (onClose) onClose();
+                if (onNavigate) onNavigate(user ? '/profile' : '/login');
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  if (onClose) onClose();
+                  if (onNavigate) onNavigate(user ? '/profile' : '/login');
+                }
+              }}
             >
               <span className="pm-wave-ring ring-outer" aria-hidden="true" />
               <span className="pm-wave-ring ring-inner" aria-hidden="true" />
@@ -176,18 +177,12 @@ export default function Sidebar({
                 <CatAvatar active={isOpen} />
               )}
 
-              <span className="pm-sb-cam-badge" title="Upload photo">
-                <ion-icon name="camera"></ion-icon>
-              </span>
+              {user && (
+                <span className="pm-sb-cam-badge" title="Edit profile">
+                  <ion-icon name="pencil"></ion-icon>
+                </span>
+              )}
             </div>
-
-            <input
-              ref={photoInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
 
             {/* Right: User Info / Login CTA */}
             <div className="pm-sb-horiz-info">
@@ -324,26 +319,6 @@ export default function Sidebar({
                 </div>
               </div>
             </li>
-
-            {user && (
-              <li className="pm-sb-row" style={{ '--delay': '0.13s' }}>
-                <a
-                  href="/profile"
-                  className="pm-sb-nav-btn"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (onClose) onClose();
-                    if (onNavigate) onNavigate('/profile');
-                  }}
-                >
-                  <span className="pm-sb-icon-circle">
-                    <ion-icon name="person-circle-outline"></ion-icon>
-                  </span>
-                  <span className="pm-sb-nav-text">My Profile</span>
-                  <ion-icon name="chevron-forward-outline" className="pm-sb-arrow-right"></ion-icon>
-                </a>
-              </li>
-            )}
 
             <li className="pm-sb-row" style={{ '--delay': '0.15s' }}>
               <a

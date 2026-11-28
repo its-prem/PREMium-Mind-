@@ -2,18 +2,6 @@
 .pf-card {
   text-align: left;
 }
-.pf-avatar {
-  width: 68px;
-  height: 68px;
-  margin: 0 auto 18px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: #09090b;
-  color: #ffffff;
-  font: 800 1.7rem 'Sora', 'Plus Jakarta Sans', sans-serif;
-  box-shadow: 0 8px 20px rgba(9, 9, 11, 0.18);
-}
 .pf-field {
   display: block;
   margin-bottom: 16px;
@@ -81,4 +69,45 @@
 .pf-save:disabled {
   opacity: 0.6;
   cursor: default;
+}
+
+/* the photo / cat on top of the form (the cat and its rings are the ones of the menu) */
+.pf-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.pf-photo-box {
+  width: 110px;
+  height: 112px;
+  display: grid;
+  place-items: center;
+}
+.pf-avatar-box {
+  transform: scale(1.5);
+}
+.pf-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 16px;
+  margin-top: 8px;
+}
+.pf-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 4px;
+  border: 0;
+  background: none;
+  color: #dc2626;
+  font: 800 0.85rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  cursor: pointer;
+}
+.pf-photo-note {
+  margin-top: 4px;
+  color: #71717a;
+  font-size: 0.72rem;
+  text-align: center;
 }
