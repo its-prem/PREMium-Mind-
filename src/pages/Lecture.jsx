@@ -203,6 +203,13 @@ export default function Lecture() {
       return;
     }
 
+    // An app-only course (questions, PDF or link) does not open on the website at all: it goes to the app download page.
+    if (isAppOnlyCourse(course) && !isNativeApp()) {
+      const next = `lecture?open=${encodeURIComponent(course.id ?? '')}`;
+      navigate(`/app-download?from=gate&next=${encodeURIComponent(next)}`);
+      return;
+    }
+
     const ownLink = safeWebsiteLink(course.website_link);
     if (ownLink && !pickPdfPath(course) && Number(course.has_qa) !== 1) {
       window.location.href = ownLink; // no PDF: open the link set in the admin (e.g. D2D PYQ)

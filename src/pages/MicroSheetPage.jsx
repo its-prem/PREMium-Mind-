@@ -63,6 +63,10 @@ export default function MicroSheetPage() {
         return;
       }
       if (!res.ok || data.status !== 'success') {
+        if (data.code === 'app_only') {
+          navigate('/app-download?from=gate', { replace: true }); // not for the website: go to the app page
+          return;
+        }
         setState({ status: 'error', message: data.message || 'Could not open this page.' });
         return;
       }

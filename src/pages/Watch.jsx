@@ -230,6 +230,10 @@ export default function Watch() {
       } catch (err) {
         if (cancelled || err?.name === 'AbortError') return;
         console.error(err);
+        if (/only available in the PREMium Mind app/i.test(String(err?.message || ''))) {
+          navigate('/app-download?from=gate', { replace: true }); // an app-only PDF is not for the website
+          return;
+        }
         setStatus('error');
         setErrorText(
           `Access Denied. ${String(err?.message || 'Secure Connection Failed')}`

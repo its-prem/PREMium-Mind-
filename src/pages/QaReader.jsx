@@ -64,6 +64,10 @@ export default function QaReader() {
         navigate('/login', { replace: true });
         return;
       }
+      if (data.code === 'app_only') {
+        navigate('/app-download?from=gate', { replace: true }); // not for the website: go to the app page
+        return;
+      }
       if (!res.ok || data.status !== 'success') {
         setState({ status: 'error', code: data.code || '', message: data.message || 'Could not open this page.' });
         return;
