@@ -1808,6 +1808,8 @@
       truncateAllCells();
 
       setStatus("PDF bana rahe hain...");
+      var isPhone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 700;
+      try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (eF) { /* fonts: draw anyway */ }
       var sheets = stage.querySelectorAll(".sheet");
       var pdf = new window.jspdf.jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
 
@@ -1824,9 +1826,19 @@
         copy.style.borderRadius = "0";
         host.appendChild(copy);
         await new Promise(function (r) { setTimeout(r, 30); });
-        var canvas = await window.html2canvas(copy, { scale: 3, backgroundColor: "#ffffff", useCORS: true, logging: false });
+        // A phone has little memory: a big picture of every page can make it fail. Start sharp (3x on a computer, 2x on a
+        // phone) and, if a page fails, try again smaller instead of giving up.
+        var canvas = null, tryScales = isPhone ? [2, 1.5, 1] : [3, 2, 1.5, 1], lastErr = null;
+        for (var t = 0; t < tryScales.length && !canvas; t++) {
+          try {
+            canvas = await window.html2canvas(copy, { scale: tryScales[t], backgroundColor: "#ffffff", useCORS: true, logging: false });
+            if (!canvas || !canvas.width || !canvas.height) { canvas = null; throw new Error("empty page picture"); }
+          } catch (e1) { lastErr = e1; canvas = null; await new Promise(function (r) { setTimeout(r, 60); }); }
+        }
+        if (!canvas) throw (lastErr || new Error("could not draw page " + (i + 1)));
         if (i > 0) pdf.addPage();
-        pdf.addImage(canvas.toDataURL("image/jpeg", 0.93), "JPEG", 0, 0, 210, 297, undefined, "FAST");
+        pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, 210, 297, undefined, "FAST");
+        canvas.width = canvas.height = 0; // free the memory at once
         host.removeChild(copy);
       }
 

@@ -39,9 +39,9 @@ if ($verified_email !== '') {
 // For owned-state display we may use the token email, or fall back to the raw
 // ?email= (so a logged-in user without a fresh token still sees their courses).
 // This value is used ONLY for is_enrolled/req_status — never to expose paths.
-$display_email = $verified_email !== ''
-    ? $verified_email
-    : strtolower(trim((string)($_GET['email'] ?? '')));
+// Only the VERIFIED (token) email is used. A raw ?email= is ignored: it let anybody ask "does this person own this product /
+// has he sent a report?" for any email address.
+$display_email = $verified_email;
 
 $courses = array();
 

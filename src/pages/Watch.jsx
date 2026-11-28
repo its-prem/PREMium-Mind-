@@ -312,24 +312,38 @@ export default function Watch() {
       showToast('No PDF file found.');
       return;
     }
-    if (!allowDownload) {
-      showToast(dlMsg);
-      return;
-    }
-
+    // No early "not allowed" here: the page may hold an old answer (for example the admin turned download on a moment ago).
+    // The server is asked every time and it alone decides.
     dlBusy.current = true;
     setDlState('busy');
     try {
-      const tokenData = await requestToken({
-        file,
-        email,
-        purpose: 'download',
-        getIdToken,
-      });
+      let tokenData;
+      try {
+        tokenData = await requestToken({
+          file,
+          email,
+          purpose: 'download',
+          getIdToken,
+        });
+      } catch (err) {
+        // the server said "not allowed" for this student / product: show the admin's message
+        if (err?.denied && /download is not allowed/i.test(String(err.message))) {
+          setAllowDownload(false);
+          showToast(dlMsg);
+          setDlState('idle');
+          dlBusy.current = false;
+          return;
+        }
+        throw err;
+      }
       if (typeof tokenData.allow_download === 'boolean' && !tokenData.allow_download) {
         setAllowDownload(false);
-        throw new Error(dlMsg);
+        showToast(dlMsg);
+        setDlState('idle');
+        dlBusy.current = false;
+        return;
       }
+      setAllowDownload(true);
       const buf = await fetchPdfBytes({ file, email, token: tokenData.token });
 
       let baseName = 'Premium_Notes';

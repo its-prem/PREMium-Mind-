@@ -301,7 +301,9 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  width: calc(100% * var(--pdf-scale));
+  /* zoom makes the PAGE itself bigger (not just the empty space around it): at least the screen width, and as wide as the
+     zoomed page (900px max at 100%) plus its side padding */
+  width: max(100%, calc(min(100%, 916px) * var(--pdf-scale)));
   min-width: 100%;
   padding: 12px 8px calc(24px + var(--rd-safe-bottom));
   box-sizing: border-box;
@@ -309,7 +311,7 @@
 
 .rd-page {
   width: 100%;
-  max-width: 900px;
+  max-width: calc(900px * var(--pdf-scale, 1));
   background: #ffffff;
   border: 1px solid #e4e4e7;
   border-radius: 6px;

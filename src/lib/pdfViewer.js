@@ -47,13 +47,13 @@ export function createZoomController({ scrollArea, zoomTarget, onZoomEnd }) {
     const prev = scale;
     scale = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, next));
     if (Math.abs(scale - prev) < 0.001) return;
-    const ratio = scale / prev;
-    const left = scrollArea.scrollLeft;
-    const top = scrollArea.scrollTop;
-    // Resize first so the new scrollable bounds exist before we scroll.
+    // The point under the fingers stays under the fingers: remember where it is as a share of the whole content,
+    // resize, then scroll so the same share sits under the same spot (works for centred pages too).
+    const fx = (scrollArea.scrollLeft + anchorX) / Math.max(1, scrollArea.scrollWidth);
+    const fy = (scrollArea.scrollTop + anchorY) / Math.max(1, scrollArea.scrollHeight);
     zoomTarget.style.setProperty('--pdf-scale', String(scale));
-    scrollArea.scrollLeft = (left + anchorX) * ratio - anchorX;
-    scrollArea.scrollTop = (top + anchorY) * ratio - anchorY;
+    scrollArea.scrollLeft = fx * scrollArea.scrollWidth - anchorX;
+    scrollArea.scrollTop = fy * scrollArea.scrollHeight - anchorY;
   };
 
   const touchCenter = (e) => {
