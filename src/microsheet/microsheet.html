@@ -1831,7 +1831,13 @@
       }
 
       var pdfName = subjectBaseName() + "_imp-ques.pdf";
-      pdf.save(pdfName);
+      if (window.parent && window.parent !== window) {
+        // inside the website: the page that holds this frame saves the file (a download from inside a frame is blocked on some phones)
+        var pdfBuf = pdf.output("arraybuffer");
+        window.parent.postMessage({ source: "pm-microsheet", type: "file", name: pdfName, mime: "application/pdf", buffer: pdfBuf }, "*");
+      } else {
+        pdf.save(pdfName);
+      }
       setStatus("Saved: " + pdfName);
       sendToHost({ type: "export-state", state: "done" });
     } catch (err) {

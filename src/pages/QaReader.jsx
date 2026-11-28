@@ -249,7 +249,7 @@ export default function QaReader() {
                   </g>
                   <path d="M7.4 18.6h9.2" />
                 </svg>
-                  <em className={`qa-micro-price${micro.owned ? ' ok' : ''}`}>{micro.owned ? '✓' : `₹${micro.price}`}</em>
+                  <em className={`qa-micro-price${micro.owned ? ' ok' : ''}`}>{micro.owned ? 'Open' : `₹${micro.price}`}</em>
                 </button>
                 {adminPreview && micro.enabled && (
                   <button type="button" className="rd-theme qa-admin-eye" aria-label="Admin preview of the micro format (free)" title="Admin preview (free)" onClick={() => navigate(`/microsheet/${id}`)}>
@@ -270,6 +270,17 @@ export default function QaReader() {
       <div className="qa-wrap qa-headwrap">
         <h1 className="qa-title">{title}</h1>
         <span className="qa-count">{questions.length} question{questions.length === 1 ? '' : 's'}</span>
+        {/* the micro format: one clear button. Not bought: it asks for the payment. Bought: it opens the micro format page. */}
+        {micro.enabled && (
+          <button
+            type="button"
+            className={`qa-micro-open${micro.owned ? ' owned' : ''}`}
+            onClick={() => (micro.owned ? navigate(`/microsheet/${id}`) : openMicroCheckout())}
+          >
+            <ion-icon name={micro.owned ? 'grid-outline' : 'lock-closed-outline'}></ion-icon>
+            {micro.owned ? 'Open micro format' : `Get micro format · ₹${micro.price}`}
+          </button>
+        )}
       </div>
 
       {/* one line of question numbers: scroll it sideways, tap one to jump; the one on screen is highlighted */}

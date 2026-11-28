@@ -16,6 +16,7 @@
  */
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import toolHtml from './microsheet.html?raw';
+import { saveFile } from '../lib/saveFile';
 
 const MicroSheetFrame = forwardRef(function MicroSheetFrame(
   { subject = '', text = '', canDownload = false, lockedMessage = '', mode = 'editor', dark = false, watermark = '', blurred = false, className = '', onEvent },
@@ -38,6 +39,7 @@ const MicroSheetFrame = forwardRef(function MicroSheetFrame(
       const d = ev.data;
       if (!d || d.source !== 'pm-microsheet') return;
       if (d.type === 'ready') setReady(true);
+      if (d.type === 'file' && d.buffer) saveFile(d.buffer, String(d.name || 'micro.pdf'), d.mime || 'application/pdf').catch(() => onEventRef.current?.({ type: 'export-state', state: 'failed', message: 'Could not save the file. Please try again.' }));
       onEventRef.current?.(d); // for example { type: 'export-state', state: 'busy' | 'done' | 'failed', message }
       if (d.type === 'text' && waiting.current) {
         waiting.current({ text: d.text, subject: d.subject });
