@@ -120,6 +120,7 @@ export default function Login() {
   /** After Google sign-in: confirm the account exists, then save the session. */
   const handleGoogleUser = async (user) => {
     // 1) Signed PDF session token
+    let sessionFailure = '';
     try {
       const idToken = await user.getIdToken(true);
       const res = await fetch(`${SITE_API}/get_pdf_session.php`, {
@@ -129,8 +130,20 @@ export default function Login() {
       });
       const data = await res.json().catch(() => ({}));
       if (data?.pdf_session) setPdfSession(data.pdf_session);
+      else sessionFailure = data?.message || `server answered ${res.status}`;
     } catch (err) {
       console.warn('PDF token generation failed', err);
+      sessionFailure = 'could not reach the server';
+    }
+    // Without the signed session the account details cannot be read, and the page used to think "no account" and send an
+    // existing student to Sign Up ("already registered"). Say what went wrong instead.
+    if (sessionFailure) {
+      try {
+        await signOutFirebase();
+      } catch {
+        /* ignore */
+      }
+      throw new Error(`Login could not be completed (${sessionFailure}). Please try again in a minute.`);
     }
 
     // 2) Does this email already have an account?
@@ -198,10 +211,23 @@ export default function Login() {
           String(checkData.status || '').toLowerCase() === 'found' ||
           String(checkData.message || '').toLowerCase().includes('exists'))
       ) ||
-      (profileOk && isValidPhone(phone));
+      profileOk; // the server found this very email in its users list (even without a phone: e.g. added by the admin)
 
-    // New users must Sign Up first.
-    if (!accountExists || !isValidPhone(phone)) {
+    // The account IS there (check_user says so) but its details could not be read: that is a server problem, not a new user.
+    const checkSaysExists =
+      !!checkData && (checkData.exists === true || checkData.exists === 1 || checkData.exists === '1' || checkData.exists === 'true');
+    if (checkSaysExists && !profileOk) {
+      try {
+        await signOutFirebase();
+      } catch {
+        /* ignore */
+      }
+      throw new Error(`Your account was found, but its details could not be loaded (${profile?.message || 'server error'}). Please try again in a minute.`);
+    }
+
+    // Only a person who is not in the users list at all must Sign Up first. A student the admin added (bulk enrol) has no
+    // phone number yet: he can log in; the phone can be added by the admin (Students -> Manage).
+    if (!accountExists) {
       setTab('register');
       setForm((prev) => ({
         ...prev,

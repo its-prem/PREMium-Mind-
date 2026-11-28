@@ -809,7 +809,11 @@
     -webkit-overflow-scrolling: touch;
     background: var(--viewer-bg);
   }
-  body.viewer .stage { gap: 16px; overflow: visible; } /* the zoomed pages may be wider than the screen: the column slides */
+  /* the zoomed pages may be wider than the screen: the column slides. The stage must GROW to the width of the widest page
+     (max-content): a fixed-width centred column would push the left half of a zoomed page into a place that cannot be scrolled to. */
+  body.viewer .stage { gap: 16px; overflow: visible; width: max-content; min-width: 100%; }
+  /* the column itself centres its children: a wider stage would then hang out on BOTH sides, the left part unreachable */
+  body.viewer .preview-col { align-items: flex-start; }
   body.viewer .sheet { box-shadow: 0 6px 22px rgba(0,0,0,.2); }
   body.viewer.vdark .sheet { box-shadow: 0 6px 22px rgba(0,0,0,.65); }
   body.viewer.secure-blur .preview-col { filter: blur(24px) grayscale(1); }
@@ -1332,7 +1336,9 @@
   /** how much the sheet must shrink to fit the column on a narrow screen */
   function fitScale() {
     if (!viewerMode && window.innerWidth > 900) return 1;
-    var available = Math.max(stage.clientWidth || window.innerWidth, 1) - 16;
+    // the viewer's stage grows with the zoomed pages, so it cannot be the measuring stick: use the scrolling column
+    var holder = viewerMode ? document.querySelector(".preview-col") : stage;
+    var available = Math.max((holder && holder.clientWidth) || window.innerWidth, 1) - 16;
     return Math.max(0.24, Math.min(1, available / (210 * 3.7795275591)));
   }
 
@@ -1382,12 +1388,15 @@
     function dist(t) { return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY); }
     function zoomAt(next, cx, cy) {
       var old = sheetZoom;
+      var oldW = col.scrollWidth, oldH = col.scrollHeight;
       sheetZoom = Math.min(ZOOM_MAX, Math.max(viewerMode ? 1 : ZOOM_MIN, next)); // the viewer never goes smaller than "fit the screen"
       updateMobileScale();
-      var r = sheetZoom / old;
-      if (r === 1) return;
-      col.scrollLeft = (col.scrollLeft + cx) * r - cx;
-      col.scrollTop = (col.scrollTop + cy) * r - cy;
+      if (sheetZoom === old) return;
+      // keep the spot under the fingers: use its share of the whole scrollable area before and after the resize
+      var fx = (col.scrollLeft + cx) / Math.max(1, oldW);
+      var fy = (col.scrollTop + cy) / Math.max(1, oldH);
+      col.scrollLeft = fx * col.scrollWidth - cx;
+      col.scrollTop = fy * col.scrollHeight - cy;
     }
     document.addEventListener("touchstart", function (e) {
       if (!viewerMode) return;

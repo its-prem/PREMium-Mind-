@@ -5,6 +5,7 @@
  *   POST admin/students.php action=grant   {email, course_id}   give one product
  *   POST admin/students.php action=revoke  {email, course_id}   take one product (a copy is kept)
  *   POST admin/students.php action=verify  {email, value}       mark verified / pending
+ *   POST admin/students.php action=profile {email, name, phone}  fix the name / phone (10 digits) of a student, e.g. one added by bulk enrol
  *   POST admin/students.php action=delete  {email}              delete the student and their access
  *   POST admin/students.php action=history {email}              last seen, device and every address the student used
  *   POST admin/students.php action=block_user   {email, reason}  the account can no longer log in or use the website
@@ -63,6 +64,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $v = pm_in_flag('value');
         $stmt = $conn->prepare('UPDATE users SET is_active = ? WHERE email = ?');
         $stmt->bind_param('is', $v, $email);
+        if (!$stmt->execute()) pm_admin_fail('Failed: ' . $stmt->error, 500);
+        pm_admin_ok();
+    }
+
+    if ($action === 'profile') {
+        $name  = mb_substr(trim((string)pm_in('name')), 0, 80);
+        $phone = preg_replace('/[^0-9]/', '', (string)pm_in('phone'));
+        if (strlen($phone) > 10) $phone = substr($phone, -10);   // drop a +91 / 91 in front
+        if ($phone !== '' && !preg_match('/^[6-9][0-9]{9}$/', $phone)) pm_admin_fail('The phone number must be 10 digits (starting with 6, 7, 8 or 9).');
+        if ($name === '') pm_admin_fail('Name is required.');
+        $stmt = $conn->prepare('UPDATE users SET name = ?, phone = ? WHERE email = ?');
+        $stmt->bind_param('sss', $name, $phone, $email);
         if (!$stmt->execute()) pm_admin_fail('Failed: ' . $stmt->error, 500);
         pm_admin_ok();
     }

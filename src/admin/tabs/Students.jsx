@@ -170,6 +170,9 @@ export default function Students() {
             if (await run({ action: 'verify', email: open.email, value: v ? 1 : 0 }, 'Saved')) reload();
           }}
           onDelete={() => del(open)}
+          onProfile={async (name, phone) => {
+            if (await run({ action: 'profile', email: open.email, name, phone }, 'Details saved')) reload();
+          }}
           toast={toast}
           confirm={confirm}
           onChanged={reload}
@@ -179,8 +182,10 @@ export default function Students() {
   );
 }
 
-function AccessModal({ student, courses, onClose, onToggle, onVerify, onDelete, toast, confirm, onChanged }) {
+function AccessModal({ student, courses, onClose, onToggle, onVerify, onDelete, onProfile, toast, confirm, onChanged }) {
   const [filter, setFilter] = useState('');
+  const [pName, setPName] = useState(student.name || '');
+  const [pPhone, setPPhone] = useState(student.phone || '');
   const owned = new Set(student.enrolled);
   const shown = courses.filter((c) => c.title.toLowerCase().includes(filter.toLowerCase()));
   return (
@@ -189,6 +194,21 @@ function AccessModal({ student, courses, onClose, onToggle, onVerify, onDelete, 
       <div className="adm-tog">
         <span>Verified account</span>
         <Switch checked={student.is_active == 1} onChange={onVerify} />
+      </div>
+      <div className="adm-form-grid" style={{ margin: '10px 0' }}>
+        <div className="adm-field">
+          <label htmlFor="st_name">Name</label>
+          <input id="st_name" className="adm-input" value={pName} onChange={(e) => setPName(e.target.value)} maxLength={80} />
+        </div>
+        <div className="adm-field">
+          <label htmlFor="st_phone">Phone (10 digits)</label>
+          <input id="st_phone" className="adm-input" value={pPhone} onChange={(e) => setPPhone(e.target.value)} inputMode="numeric" placeholder="98XXXXXXXX" />
+        </div>
+      </div>
+      <div className="adm-row end" style={{ marginBottom: 6 }}>
+        <button className="adm-btn" onClick={() => onProfile(pName, pPhone)}>
+          Save name &amp; phone
+        </button>
       </div>
       <ActivityPanel student={student} toast={toast} confirm={confirm} onChanged={onChanged} />
       <input className="adm-input" style={{ margin: '12px 0 6px' }} placeholder="Find a product…" value={filter} onChange={(e) => setFilter(e.target.value)} />
